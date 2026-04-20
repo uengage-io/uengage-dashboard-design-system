@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+playground/node_modules/
+
+# Build output
+dist/
+playground/dist/
+storybook-static/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Env
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Cache
+.vite/
+.turbo/
+.next/
+.cache/
+
+# Local Claude
+.claude/
+node_modules

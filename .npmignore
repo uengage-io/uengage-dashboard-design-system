@@ -1,0 +1,10 @@
+src
+node_modules
+.gitignore
+tsconfig.json
+tsup.config.ts
+components.json
+*.log
+.env*
+.vscode
+.idea

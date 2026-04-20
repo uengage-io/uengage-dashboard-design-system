@@ -1,0 +1,86 @@
+import * as React from "react";
+import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import {
+  radioCircleVariants,
+  radioDotVariants,
+  radioLabelVariants,
+} from "@/utils/radio";
+
+type Size = "sm" | "md" | "lg";
+
+export interface CustomRadioItemProps extends Omit<
+  React.ComponentProps<typeof RadioGroupPrimitive.Item>,
+  "children"
+> {
+  label: React.ReactNode;
+  size?: Size;
+  disabled?: boolean;
+  error?: boolean;
+}
+
+function Radio({
+  id,
+  label,
+  size = "md",
+  disabled,
+  error,
+  value,
+  className,
+  ...rest
+}: CustomRadioItemProps) {
+  const reactId = React.useId();
+  const itemId = id ?? reactId;
+
+  const state: "default" | "disabled" | "error" = disabled
+    ? "disabled"
+    : error
+      ? "error"
+      : "default";
+
+  const labelState: "default" | "checked" | "disabled" = disabled
+    ? "disabled"
+    : "default";
+
+  return (
+    <label
+      htmlFor={itemId}
+      className={cn(
+        "group inline-flex cursor-pointer items-center gap-2",
+        disabled && "cursor-not-allowed",
+        className,
+      )}
+    >
+      <RadioGroupPrimitive.Item
+        {...rest}
+        id={itemId}
+        value={value}
+        disabled={disabled}
+        data-slot="radio-group-item"
+        className={cn(radioCircleVariants({ size, state }))}
+      >
+        <RadioGroupPrimitive.Indicator
+          data-slot="radio-group-indicator"
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <span className={cn(radioDotVariants({ size }))} />
+        </RadioGroupPrimitive.Indicator>
+      </RadioGroupPrimitive.Item>
+
+      <Label
+        htmlFor={itemId}
+        className={cn(
+          radioLabelVariants({ size, state: labelState }),
+          "group-has-[[data-state=checked]]:text-[#0A5A2A]",
+        )}
+      >
+        {label}
+      </Label>
+    </label>
+  );
+}
+
+Radio.displayName = "Radio";
+
+export { Radio };
