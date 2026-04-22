@@ -2,11 +2,17 @@ import * as React from "react";
 import { CircleAlert } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { CustomCheckbox } from "./CustomCheckbox";
-import type { CustomCheckboxGroupProps } from "@/types/checkbox";
+import { Checkbox } from "./Checkbox";
+import type {
+  CheckboxOption,
+  CustomCheckboxGroupProps,
+} from "@/types/checkbox";
 
-function CustomCheckboxGroup({
+function CheckboxGroup<T = CheckboxOption>({
   options,
+  getLabel,
+  getValue,
+  getDisabled,
   value,
   onChange,
   size = "md",
@@ -17,7 +23,7 @@ function CustomCheckboxGroup({
   helperText,
   error,
   selectAll,
-}: CustomCheckboxGroupProps) {
+}: CustomCheckboxGroupProps<T>) {
   const reactId = React.useId();
   const groupId = `checkbox-group-${reactId}`;
   const describedById = error
@@ -35,6 +41,13 @@ function CustomCheckboxGroup({
     onChange?.(next);
   };
 
+  const toLabel =
+    getLabel ?? ((item: T) => (item as unknown as CheckboxOption).label);
+  const toValue =
+    getValue ?? ((item: T) => (item as unknown as CheckboxOption).value);
+  const toDisabled =
+    getDisabled ?? ((item: T) => (item as unknown as CheckboxOption).disabled);
+
   const toggle = (optValue: string, nextChecked: boolean) => {
     if (nextChecked) {
       if (currentValue.includes(optValue)) return;
@@ -44,21 +57,21 @@ function CustomCheckboxGroup({
     }
   };
 
-  const enabledOptions = options.filter((o) => !o.disabled);
+  const enabledOptions = options.filter((o) => !toDisabled(o));
   const allChecked =
     enabledOptions.length > 0 &&
-    enabledOptions.every((o) => currentValue.includes(o.value));
+    enabledOptions.every((o) => currentValue.includes(toValue(o)));
   const someChecked = enabledOptions.some((o) =>
-    currentValue.includes(o.value),
+    currentValue.includes(toValue(o)),
   );
   const indeterminate = someChecked && !allChecked;
 
   const toggleAll = (next: boolean) => {
     const keptDisabled = options
-      .filter((o) => o.disabled && currentValue.includes(o.value))
-      .map((o) => o.value);
+      .filter((o) => toDisabled(o) && currentValue.includes(toValue(o)))
+      .map((o) => toValue(o));
     if (next) {
-      setValue([...enabledOptions.map((o) => o.value), ...keptDisabled]);
+      setValue([...enabledOptions.map((o) => toValue(o)), ...keptDisabled]);
     } else {
       setValue(keptDisabled);
     }
@@ -84,7 +97,7 @@ function CustomCheckboxGroup({
 
       {selectAll && (
         <div className="pb-1">
-          <CustomCheckbox
+          <Checkbox
             label="Select all"
             size={size}
             disabled={disabled || enabledOptions.length === 0}
@@ -97,17 +110,20 @@ function CustomCheckboxGroup({
       )}
 
       <div id={groupId} role="group" className={layoutClass}>
-        {options.map((opt) => (
-          <CustomCheckbox
-            key={opt.value}
-            label={opt.label}
-            size={size}
-            disabled={disabled || opt.disabled}
-            error={Boolean(error)}
-            checked={currentValue.includes(opt.value)}
-            onCheckedChange={(c) => toggle(opt.value, c)}
-          />
-        ))}
+        {options.map((opt) => {
+          const optValue = toValue(opt);
+          return (
+            <Checkbox
+              key={optValue}
+              label={toLabel(opt)}
+              size={size}
+              disabled={disabled || Boolean(toDisabled(opt))}
+              error={Boolean(error)}
+              checked={currentValue.includes(optValue)}
+              onCheckedChange={(c) => toggle(optValue, c)}
+            />
+          );
+        })}
       </div>
 
       {error ? (
@@ -122,10 +138,7 @@ function CustomCheckboxGroup({
           <span>{error}</span>
         </p>
       ) : helperText ? (
-        <p
-          id={`${groupId}-helper`}
-          className={cn("text-gray-500", helperSize)}
-        >
+        <p id={`${groupId}-helper`} className={cn("text-gray-500", helperSize)}>
           {helperText}
         </p>
       ) : describedById ? null : null}
@@ -133,6 +146,6 @@ function CustomCheckboxGroup({
   );
 }
 
-CustomCheckboxGroup.displayName = "CustomCheckboxGroup";
+CheckboxGroup.displayName = "CheckboxGroup";
 
-export { CustomCheckboxGroup };
+export { CheckboxGroup };

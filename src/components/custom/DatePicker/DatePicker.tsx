@@ -2,7 +2,6 @@ import * as React from "react";
 import { CalendarIcon, X } from "lucide-react";
 import type { Modifiers } from "react-day-picker";
 import { cn } from "@/lib/utils";
-import { toCssSize } from "@/utils/layoutTokens";
 import {
   Popover,
   PopoverContent,
@@ -54,13 +53,17 @@ function DatePicker({
   value: controlledValue,
   onChange,
   placeholder = mode === "range" ? "Date Range" : "Select date...",
+  size = "md",
   width,
-  height,
+  className,
   disabled = false,
   minDate,
   maxDate,
+  onTouch,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
+  const touchedRef = React.useRef(false);
+  const interactedRef = React.useRef(false);
 
   // ── Committed value (shown in trigger) ───────────────────────────────
   const [committed, setCommitted] = React.useState<Date | DateRange | null>(
@@ -218,7 +221,23 @@ function DatePicker({
   };
 
   const handleOpenChange = (next: boolean) => {
-    if (!disabled) setOpen(next);
+    if (disabled) return;
+    setOpen(next);
+    if (next) {
+      interactedRef.current = true;
+    } else if (interactedRef.current && !touchedRef.current) {
+      touchedRef.current = true;
+      onTouch?.();
+    }
+  };
+
+  const handleTriggerBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    if (open) return;
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+    if (!interactedRef.current) return;
+    if (touchedRef.current) return;
+    touchedRef.current = true;
+    onTouch?.();
   };
 
   // ── Render ────────────────────────────────────────────────────────────
@@ -226,10 +245,6 @@ function DatePicker({
   const canApply = draftRange !== null || pendingFrom !== null;
 
   const triggerState = disabled ? "disabled" : open ? "open" : "default";
-  const triggerStyle: React.CSSProperties = {
-    ...(width != null ? { width: toCssSize(width) } : {}),
-    ...(height != null ? { height: toCssSize(height) } : { height: "40px" }),
-  };
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
@@ -240,6 +255,10 @@ function DatePicker({
           aria-disabled={disabled}
           aria-haspopup="dialog"
           aria-expanded={open}
+          onFocus={() => {
+            interactedRef.current = true;
+          }}
+          onBlur={handleTriggerBlur}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
@@ -249,17 +268,25 @@ function DatePicker({
             }
           }}
           className={cn(
-            triggerVariants({ state: triggerState }),
+            triggerVariants({ state: triggerState, size }),
             "gap-2 px-3 cursor-pointer select-none",
+            width,
+            className,
           )}
-          style={triggerStyle}
         >
           <span
             className={cn(
               "flex-1 truncate",
               triggerLabel
-                ? "text-sm text-[#111827]"
-                : "text-[12px] text-[#C4C9D2]",
+                ? "text-[#111827]"
+                : cn(
+                    "text-[#C4C9D2]",
+                    size === "lg"
+                      ? "text-[14px]"
+                      : size === "md"
+                        ? "text-[12px]"
+                        : "text-[11px]",
+                  ),
             )}
           >
             {triggerLabel ?? placeholder}
@@ -271,18 +298,25 @@ function DatePicker({
                 type="button"
                 tabIndex={-1}
                 onClick={handleClearTrigger}
-                className="flex items-center text-[#9CA3AF] transition-colors hover:text-[#374151]"
+                className="flex items-center text-gray-400 transition-colors hover:text-gray-600"
                 aria-label="Clear"
               >
                 <X size={13} strokeWidth={2} className="hover:text-red-500" />
               </button>
             )}
-            <CalendarIcon size={15} className="text-[#9CA3AF]" />
+            <CalendarIcon
+              size={15}
+              strokeWidth={2}
+              className="text-gray-600"
+            />
           </div>
         </div>
       </PopoverTrigger>
 
-      <PopoverContent align="start" className="w-auto p-0">
+      <PopoverContent
+        align="start"
+        className="w-auto max-w-[calc(100vw-1rem)] p-0"
+      >
         <div className="overflow-hidden rounded-lg bg-white shadow-md">
           {/* ── From / To boxes (range mode only) ── */}
           {mode === "range" && (
@@ -322,8 +356,8 @@ function DatePicker({
                 className={cn(
                   "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
                   canApply
-                    ? "border-[#006F42] text-[#006F42] hover:bg-[#E6F4EA]"
-                    : "border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed",
+                    ? "border-[#006F42] text-[#006F42]"
+                    : "border-gray-300 text-gray-400 cursor-not-allowed",
                 )}
               >
                 Apply

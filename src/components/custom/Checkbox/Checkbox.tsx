@@ -7,6 +7,10 @@ import {
   checkboxBoxVariants,
   checkboxLabelVariants,
 } from "@/utils/checkbox";
+import {
+  truncateLabelToWordLimit,
+  validateLabelWordLimit,
+} from "@/utils/labelValidation";
 import type { CustomCheckboxProps } from "@/types/checkbox";
 
 const ICON_SIZE: Record<"sm" | "md" | "lg", string> = {
@@ -21,7 +25,7 @@ const GAP: Record<"sm" | "md" | "lg", string> = {
   lg: "gap-3",
 };
 
-function CustomCheckbox({
+function Checkbox({
   checked,
   defaultChecked,
   onCheckedChange,
@@ -43,6 +47,10 @@ function CustomCheckbox({
   >) {
   const reactId = React.useId();
   const itemId = rest.id ?? reactId;
+
+  React.useEffect(() => {
+    validateLabelWordLimit(label, "CustomCheckbox");
+  }, [label]);
 
   const isControlled = checked !== undefined;
   const [internalChecked, setInternalChecked] = React.useState<boolean>(
@@ -103,8 +111,9 @@ function CustomCheckbox({
         className={cn(checkboxBoxVariants({ size, state: boxState }))}
       >
         <CheckboxPrimitive.Indicator
+          forceMount
           data-slot="checkbox-indicator"
-          className="flex items-center justify-center text-current"
+          className="grid h-full w-full place-content-center text-current transition-none data-[state=unchecked]:opacity-0"
         >
           {indeterminate ? (
             <Minus className={cn(ICON_SIZE[size], "stroke-[3]")} />
@@ -117,15 +126,18 @@ function CustomCheckbox({
       {label && (
         <Label
           htmlFor={itemId}
-          className={cn(checkboxLabelVariants({ size, state: labelState }))}
+          className={cn(
+            checkboxLabelVariants({ size, state: labelState }),
+            "whitespace-normal break-words",
+          )}
         >
-          {label}
+          {truncateLabelToWordLimit(label)}
         </Label>
       )}
     </label>
   );
 }
 
-CustomCheckbox.displayName = "CustomCheckbox";
+Checkbox.displayName = "CustomCheckbox";
 
-export { CustomCheckbox };
+export { Checkbox };

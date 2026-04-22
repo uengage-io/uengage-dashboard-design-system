@@ -124,9 +124,9 @@ export default function LayoutPreview() {
           <SearchBar placeholder="size='sm' (default h-8)" size="sm" />
           <SearchBar placeholder="size='md' (default h-10)" size="md" />
           <SearchBar placeholder="size='lg' (default h-12)" size="lg" />
-          <SearchBar placeholder="height={36}" height={36} />
-          <SearchBar placeholder="height={48}" height={48} />
-          <SearchBar placeholder='height="3.5rem"' height="3.5rem" />
+          <SearchBar placeholder="height={36}" />
+          <SearchBar placeholder="height={48}" />
+          <SearchBar placeholder='height="3.5rem"'/>
         </Grid>
 
         <div style={{ height: 40 }} />

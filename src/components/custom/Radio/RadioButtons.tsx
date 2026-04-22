@@ -3,10 +3,10 @@ import { CircleAlert } from "lucide-react";
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Radio } from "./CustomRadioItem";
+import { Radio } from "./Radio";
 import type { CustomRadioGroupProps, RadioOption } from "@/types/radio";
 
-function CustomRadioGroup<T = RadioOption>({
+function RadioGroup<T = RadioOption>({
   options,
   getLabel,
   getValue,
@@ -17,6 +17,7 @@ function CustomRadioGroup<T = RadioOption>({
   size = "md",
   layout = "vertical",
   columns = 2,
+  
   disabled,
   label,
   helperText,
@@ -31,11 +32,20 @@ function CustomRadioGroup<T = RadioOption>({
       ? `${groupId}-helper`
       : undefined;
 
+  // Static class map so Tailwind's JIT detects every variant at build time.
+  // Mobile = 1 col, sm = 2 cols, md+ = `columns` (clamped to 1–4).
+  const gridColsMap: Record<1 | 2 | 3 | 4, string> = {
+    1: "grid-cols-1",
+    2: "grid-cols-1 sm:grid-cols-2",
+    3: "grid-cols-1 sm:grid-cols-2 md:grid-cols-3",
+    4: "grid-cols-1 sm:grid-cols-2 md:grid-cols-4",
+  };
+
   const layoutClass =
     layout === "horizontal"
       ? "flex flex-row flex-wrap gap-x-6 gap-y-3"
       : layout === "grid"
-        ? `grid grid-cols-[repeat(${columns},auto)] gap-x-6 gap-y-3`
+        ? cn("grid w-full gap-x-6 gap-y-3", gridColsMap[columns])
         : "flex flex-col gap-3";
 
   const helperSize =
@@ -93,10 +103,7 @@ function CustomRadioGroup<T = RadioOption>({
           <span>{error}</span>
         </p>
       ) : helperText ? (
-        <p
-          id={`${groupId}-helper`}
-          className={cn("text-gray-500", helperSize)}
-        >
+        <p id={`${groupId}-helper`} className={cn("text-gray-500", helperSize)}>
           {helperText}
         </p>
       ) : null}
@@ -104,6 +111,6 @@ function CustomRadioGroup<T = RadioOption>({
   );
 }
 
-CustomRadioGroup.displayName = "CustomRadioGroup";
+RadioGroup.displayName = "CustomRadioGroup";
 
-export { CustomRadioGroup };
+export { RadioGroup };

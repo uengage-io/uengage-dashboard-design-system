@@ -30,12 +30,16 @@ export interface CustomInputProps
   error?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  /** Explicit width for the input block. Number → px; string passes through. Overrides the default `w-full`. */
-  width?: string | number;
-  /** Explicit height for the input wrapper row. Number → px; string passes through. Overrides the size-driven height. */
-  height?: string | number;
+  /**
+   * Tailwind width class(es) applied to the outer wrapper. Use any responsive
+   * utility (e.g. `"w-full md:w-96 lg:w-[400px]"`). Defaults to `w-full` when
+   * omitted. For one-off layout overrides, prefer `className`.
+   */
+  width?: string;
   /** Custom regex the value must match on blur. String is compiled via `new RegExp(...)`. */
   validationRegex?: RegExp | string;
   /** Error message shown when `validationRegex` or native (min/max/minLength/maxLength/required) validity fails. */
   validationMessage?: string;
+  /** Fires once the first time the field is blurred (Angular-style `touched` state). */
+  onTouch?: () => void;
 }

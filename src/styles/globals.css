@@ -106,3 +106,34 @@
     font-weight: 500;
   }
 }
+
+/* Popover / dropdown open/close transitions.
+   Driven by Radix's data-state attribute on the portaled content. */
+@keyframes uengage-popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes uengage-popover-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+}
+[data-slot="popover-content"][data-state="open"] {
+  animation: uengage-popover-in 140ms ease-out;
+  transform-origin: var(--radix-popover-content-transform-origin, top);
+}
+[data-slot="popover-content"][data-state="closed"] {
+  animation: uengage-popover-out 100ms ease-in;
+  transform-origin: var(--radix-popover-content-transform-origin, top);
+}

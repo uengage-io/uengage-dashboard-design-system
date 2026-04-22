@@ -1,16 +1,39 @@
-import { SearchBar } from "@uengage/ui";
+import {SearchBar} from "@uengage/ui";
+import { useState } from "react";
+const dummy = [
+  { value: "tickets", label: "Tickets made by me" },
+  { value: "teams", label: "Teams" },
+  { value: "projects", label: "Projects" },
+  { value: "sprints", label: "Sprints" },
+  { value: "created-by-me", label: "Created By Me" },
+];
 export default function SearchPreview() {
+  const [value, setValue] = useState("");
+
   return (
-    <div className="mt-8 flex flex-col gap-4 px-20">
-      <SearchBar placeholder="Search ticket..." width={280}  />
-      <SearchBar
-        placeholder="Numbers only"
-        valueType="number"
-        width={280}
-        
-      />
-      <SearchBar placeholder="Small"  size="sm" width={220}  />
-      <SearchBar placeholder="Large"  size="lg" width={340}  />
-    </div>
+    <>
+    <div className="relative w-[200px]">
+     <SearchBar 
+     placeholder="Search..." 
+    value={value}
+    valueType="string"
+    size="sm"
+    // disabled={true}
+    onChange={(val)=>setValue(val)}
+    onSearch={()=>console.log("Search:", value)}
+    onClear={()=>setValue("")}
+    dropdownItems={dummy}
+    getLabel={(i)=>i.label}
+    getValue={(i)=>i.value}
+    onSelect={(val)=>console.log("Selected:",val)}
+    fallbackText="No result found"
+    
+     />
+
+     </div>
+    </>
   );
 }
+      
+     
+  

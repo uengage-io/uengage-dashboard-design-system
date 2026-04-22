@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Popover-based date picker with `single` and `range` modes. Uses `react-day-picker` under the hood and exposes min/max bounds, width/height, and a controlled/uncontrolled `value` API.",
+          "Popover-based date picker with `single` and `range` modes. Uses `react-day-picker` under the hood. Width is parent-driven — wrap the component to constrain it. Height is set via the `size` preset.",
       },
     },
   },
@@ -22,10 +22,14 @@ const meta = {
       options: ["single", "range"],
       description: "Pick one date or a start/end range.",
     },
+    size: {
+      control: "radio",
+      options: ["sm", "md", "lg"],
+      description: "Trigger height preset.",
+    },
     placeholder: { control: "text" },
     disabled: { control: "boolean" },
-    width: { control: "text" },
-    height: { control: "text" },
+    className: { control: "text" },
     minDate: { control: "date" },
     maxDate: { control: "date" },
     value: { control: false },
@@ -34,8 +38,14 @@ const meta = {
   args: {
     mode: "single",
     disabled: false,
-    width: 260,
   },
+  decorators: [
+    (Story) => (
+      <div style={{ width: 300 }}>
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof DatePicker>;
 
 export default meta;
@@ -46,11 +56,30 @@ export const Single: Story = {
 };
 
 export const Range: Story = {
-  args: { mode: "range", placeholder: "Date range", width: 300 },
+  args: { mode: "range", placeholder: "Date range" },
 };
 
 export const Disabled: Story = {
   args: { mode: "single", disabled: true, placeholder: "Disabled" },
+};
+
+export const Small: Story = {
+  args: { mode: "single", size: "sm", placeholder: "Small" },
+};
+
+export const Large: Story = {
+  args: { mode: "single", size: "lg", placeholder: "Large" },
+};
+
+export const FullBleed: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ width: "100%", maxWidth: 560 }}>
+        <Story />
+      </div>
+    ),
+  ],
+  args: { mode: "range", placeholder: "Spans full parent width" },
 };
 
 const today = new Date();
@@ -66,10 +95,6 @@ export const WithMinMax: Story = {
     maxDate: in30,
     placeholder: "Within ±30 days",
   },
-};
-
-export const CustomWidth: Story = {
-  args: { mode: "range", width: 420, height: 48 },
 };
 
 export const Controlled: Story = {
@@ -88,5 +113,5 @@ export const Controlled: Story = {
       </div>
     );
   },
-  args: { mode: "single", width: 280 },
+  args: { mode: "single" },
 };

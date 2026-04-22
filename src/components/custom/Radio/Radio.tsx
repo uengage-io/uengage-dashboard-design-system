@@ -7,6 +7,10 @@ import {
   radioDotVariants,
   radioLabelVariants,
 } from "@/utils/radio";
+import {
+  truncateLabelToWordLimit,
+  validateLabelWordLimit,
+} from "@/utils/labelValidation";
 
 type Size = "sm" | "md" | "lg";
 
@@ -21,7 +25,7 @@ export interface CustomRadioItemProps extends Omit<
 }
 
 function Radio({
-  id,
+  id, 
   label,
   size = "md",
   disabled,
@@ -32,6 +36,10 @@ function Radio({
 }: CustomRadioItemProps) {
   const reactId = React.useId();
   const itemId = id ?? reactId;
+
+  React.useEffect(() => {
+    validateLabelWordLimit(label, "Radio");
+  }, [label]);
 
   const state: "default" | "disabled" | "error" = disabled
     ? "disabled"
@@ -47,7 +55,7 @@ function Radio({
     <label
       htmlFor={itemId}
       className={cn(
-        "group inline-flex cursor-pointer items-center gap-2",
+        "group flex w-full cursor-pointer items-center gap-2",
         disabled && "cursor-not-allowed",
         className,
       )}
@@ -72,10 +80,11 @@ function Radio({
         htmlFor={itemId}
         className={cn(
           radioLabelVariants({ size, state: labelState }),
+          "whitespace-normal break-words",
           "group-has-[[data-state=checked]]:text-[#0A5A2A]",
         )}
       >
-        {label}
+        {truncateLabelToWordLimit(label)}
       </Label>
     </label>
   );

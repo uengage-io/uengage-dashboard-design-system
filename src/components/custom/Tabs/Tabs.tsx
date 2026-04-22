@@ -5,6 +5,11 @@ import { cn } from "@/lib/utils";
 import type { CustomTabsProps } from "@/components/custom/Tabs/Tabs.types";
 
 function Tabs(props: CustomTabsProps) {
+  if (!props.tabs || props.tabs.length < 2) {
+    throw new Error(
+      `Tabs: at least two tabs are required to render (received ${props.tabs?.length ?? 0}).`,
+    );
+  }
   const variant = props.variant ?? "primary";
   return variant === "secondary" ? (
     <SecondaryTabs {...props} />
@@ -88,7 +93,7 @@ function PrimaryTabs({
           variant="line"
           className={cn(
             "flex w-max min-w-full flex-row items-center justify-start",
-            "h-auto rounded-none bg-transparent p-0 gap-4",
+            "h-auto rounded-none bg-transparent p-0 gap-2",
           )}
         >
           {tabs.map((tab) => (

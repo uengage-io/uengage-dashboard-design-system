@@ -60,11 +60,11 @@ function StyledDayButton({
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006F42] focus-visible:ring-offset-1",
         // green filled circle — single selected or range edge
         isGreenFilled &&
-          "bg-[#006F42] text-white hover:bg-[#005a35] font-medium",
+          "bg-[#006F42] text-white font-medium",
         // range middle — transparent, cell bg (#006F42) shows through
         modifiers.range_middle &&
           !isEdge &&
-          "w-full rounded-none text-white hover:bg-[#005a35]",
+          "w-full rounded-none text-white",
         // today underline — always render; color depends on context
         modifiers.today &&
           (isGreenFilled || (modifiers.range_middle && !isEdge)) &&
@@ -170,7 +170,7 @@ export function DatePickerCalendar({
       new Date(maxDate.getFullYear(), maxDate.getMonth());
 
   return (
-    <div className={cn("w-[360px] bg-white", className)}>
+    <div className={cn("w-[360px] max-w-full bg-white", className)}>
       {/* ── Navigation header ── */}
       <div className="flex items-center gap-1 px-3 py-2">
         <button
@@ -188,15 +188,15 @@ export function DatePickerCalendar({
             options={MONTH_OPTIONS}
             value={String(viewMonth.getMonth())}
             onChange={handleMonthSelect}
-            width={144}
-            height={32}
+            size="sm"
+            className="w-36"
           />
           <Select
             options={yearOptions}
             value={String(viewMonth.getFullYear())}
             onChange={handleYearSelect}
-            width={96}
-            height={32}
+            size="sm"
+            className="w-24"
           />
         </div>
 

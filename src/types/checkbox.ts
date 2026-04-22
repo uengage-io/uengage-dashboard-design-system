@@ -16,8 +16,14 @@ export interface CustomCheckboxProps {
   className?: string;
 }
 
-export interface CustomCheckboxGroupProps {
-  options: CheckboxOption[];
+export interface CustomCheckboxGroupProps<T = CheckboxOption> {
+  options: T[];
+  /** Extract the display label from an option. Defaults to `option.label`. */
+  getLabel?: (item: T) => string;
+  /** Extract the form value from an option. Defaults to `option.value`. */
+  getValue?: (item: T) => string;
+  /** Extract per-option disabled state. Defaults to `option.disabled`. */
+  getDisabled?: (item: T) => boolean | undefined;
   value?: string[];
   onChange?: (value: string[]) => void;
   size?: "sm" | "md" | "lg";

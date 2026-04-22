@@ -86,12 +86,11 @@ export default function DatePickerDemo() {
             mode="single"
             value={controlledDate}
             onChange={(v) => setControlledDate(v as Date | null)}
-            width={220}
           />
         </Field>
 
         <Field label="Disabled">
-          <DatePicker mode="single" disabled placeholder="Not available" width={200} />
+          <DatePicker mode="single" disabled placeholder="Not available" />
         </Field>
       </Section>
 
@@ -112,12 +111,11 @@ export default function DatePickerDemo() {
             mode="range"
             value={prefilledRange}
             onChange={(v) => setPrefilledRange(v as DateRange | null)}
-            width={260}
           />
         </Field>
 
         <Field label="Disabled">
-          <DatePicker mode="range" disabled width={220} />
+          <DatePicker mode="range" disabled />
         </Field>
       </Section>
 
@@ -141,7 +139,6 @@ export default function DatePickerDemo() {
             minDate={MIN_DATE}
             maxDate={MAX_DATE}
             placeholder="Bounded single..."
-            width={220}
           />
         </Field>
       </Section>
@@ -190,7 +187,8 @@ export default function DatePickerDemo() {
               ["value", "Date | DateRange | null", "—", "Controlled value"],
               ["onChange", "(v: Date | DateRange | null) => void", "—", "Fires when committed (single: on click, range: on Apply)"],
               ["placeholder", "string", '"Select date..."', "Trigger placeholder when no value"],
-              ["width", "string | number", "auto", "Trigger width (number = px)"],
+              ["size", '"sm" | "md" | "lg"', '"md"', "Trigger height preset"],
+              ["className", "string", "—", "Forwarded to trigger wrapper (width, margins, etc.)"],
               ["disabled", "boolean", "false", "Disables the entire picker"],
               ["minDate", "Date", "—", "Dates before this are disabled"],
               ["maxDate", "Date", "—", "Dates after this are disabled"],

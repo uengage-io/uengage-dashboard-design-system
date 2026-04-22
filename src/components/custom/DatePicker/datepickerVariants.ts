@@ -3,16 +3,21 @@ import { cva } from "class-variance-authority";
 export type DatePickerTriggerState = "default" | "open" | "disabled";
 
 export const triggerVariants = cva(
-  "inline-flex items-center w-full rounded-[4px] border bg-white text-sm transition-colors",
+  "inline-flex items-center w-full rounded-[4px] border border-gray-400 bg-white transition-colors",
   {
     variants: {
       state: {
-        default: "border-[#D1D5DB] text-[#374151] hover:border-[#9CA3AF]",
-        open:    "border-[#006F42] ring-1 ring-[#006F42] text-[#374151]",
-        disabled:"border-[#E5E7EB] bg-[#F9FAFB] text-[#9CA3AF] cursor-not-allowed opacity-60 pointer-events-none",
+        default: "text-[#374151] hover:border-gray-500 hover:shadow-sm",
+        open:    "border-gray-500 ring-1 ring-gray-200 text-[#374151]",
+        disabled:"border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60 pointer-events-none",
+      },
+      size: {
+        sm: "h-8 text-xs",
+        md: "h-10 text-sm",
+        lg: "h-12 text-base",
       },
     },
-    defaultVariants: { state: "default" },
+    defaultVariants: { state: "default", size: "md" },
   },
 );
 
@@ -32,10 +37,10 @@ export const dayCellVariants = cva(
       variant: {
         default:      "text-[#374151] hover:bg-[#F3F4F6]",
         today:        "text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
-        selected:     "bg-[#006F42] text-white hover:bg-[#005a35]",
+        selected:     "bg-[#006F42] text-white",
         inRange:      "bg-[#E6F4EA] text-[#374151] rounded-none",
-        rangeStart:   "bg-[#006F42] text-white rounded-r-none hover:bg-[#005a35]",
-        rangeEnd:     "bg-[#006F42] text-white rounded-l-none hover:bg-[#005a35]",
+        rangeStart:   "bg-[#006F42] text-white rounded-r-none",
+        rangeEnd:     "bg-[#006F42] text-white rounded-l-none",
         outsideMonth: "text-[#D1D5DB] cursor-default hover:bg-transparent",
       },
     },

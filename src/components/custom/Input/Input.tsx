@@ -2,7 +2,6 @@ import * as React from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Input as I } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { toCssSize } from "@/utils/layoutTokens";
 import {
   inputWrapperVariants,
   inputFieldVariants,
@@ -28,12 +27,13 @@ function Input({
   rightIcon,
   required,
   width,
-  height,
   className,
   disabled,
   readOnly,
   validationRegex,
   validationMessage,
+  onTouch,
+  spellCheck = true,
   id,
   onChange,
   onFocus,
@@ -48,6 +48,7 @@ function Input({
   const [internalError, setInternalError] = React.useState<string | undefined>(
     undefined,
   );
+  const touchedRef = React.useRef(false);
 
   const runValidation = (el: HTMLInputElement): string | undefined => {
     if (!el.validity.valid) {
@@ -79,9 +80,13 @@ function Input({
         tabIndex={-1}
         aria-label={showPassword ? "Hide password" : "Show password"}
         onClick={() => setShowPassword((s) => !s)}
-        className="pointer-events-auto inline-flex items-center justify-center text-slate-400 hover:text-slate-600"
+        className="pointer-events-auto inline-flex items-center justify-center text-gray-400 hover:text-gray-600"
       >
-        {showPassword ? <EyeOff /> : <Eye />}
+        {showPassword ? (
+          <EyeOff strokeWidth={2} />
+        ) : (
+          <Eye strokeWidth={2} />
+        )}
       </button>
     );
   }, [rightIcon, isPassword, showPassword]);
@@ -126,26 +131,15 @@ function Input({
       ? `${inputId}-helper`
       : undefined;
 
-  const outerStyle: React.CSSProperties | undefined =
-    width != null ? { width: toCssSize(width) } : undefined;
-  const wrapperStyle: React.CSSProperties | undefined =
-    height != null ? { height: toCssSize(height) } : undefined;
-
   return (
-    <div
-      className={cn("flex w-full flex-col gap-1.5", className)}
-      style={outerStyle}
-    >
+    <div className={cn("flex w-full flex-col gap-1.5", width, className)}>
       {label && (
         <InputLabel htmlFor={inputId} size={size} required={required}>
           {label}
         </InputLabel>
       )}
 
-      <div
-        className={cn(inputWrapperVariants({ size, state }))}
-        style={wrapperStyle}
-      >
+      <div className={cn(inputWrapperVariants({ size, state }))}>
         {hasLeftIcon && (
           <span
             className={cn(
@@ -163,6 +157,7 @@ function Input({
           type={effectiveType}
           disabled={disabled}
           readOnly={readOnly}
+          spellCheck={spellCheck}
           aria-invalid={Boolean(effectiveError) || undefined}
           aria-describedby={describedById}
           onChange={handleChange}
@@ -178,6 +173,10 @@ function Input({
           onBlur={(e) => {
             setFocused(false);
             setInternalError(runValidation(e.target));
+            if (!touchedRef.current) {
+              touchedRef.current = true;
+              onTouch?.();
+            }
             onBlur?.(e);
           }}
           className={cn(

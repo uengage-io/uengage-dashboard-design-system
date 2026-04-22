@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { AllowPattern } from "@/types/input";
 
 export const inputWrapperVariants = cva(
-  "relative flex w-full items-center rounded-[4px] border transition-colors",
+  "relative flex w-full items-center rounded-[4px] border bg-white transition-colors",
   {
     variants: {
       size: {
@@ -11,13 +11,14 @@ export const inputWrapperVariants = cva(
         lg: "h-12 text-base",
       },
       state: {
-        default: "bg-slate-50 border-slate-200",
-        focused: "bg-white border-slate-300",
-        error: "bg-white border-red-500",
+        default:
+          "border-gray-400 hover:border-gray-500 hover:shadow-sm",
+        focused: "border-gray-500 ring-1 ring-gray-200",
+        error: "border-red-500",
         disabled:
-          "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-60",
+          "bg-gray-50 border-gray-300 text-gray-400 cursor-not-allowed opacity-60",
         readonly:
-          "bg-slate-100 border-slate-200 text-slate-700 cursor-default",
+          "bg-gray-50 border-gray-300 text-gray-700 cursor-default",
       },
     },
     defaultVariants: {
@@ -28,13 +29,13 @@ export const inputWrapperVariants = cva(
 );
 
 export const inputFieldVariants = cva(
-  "h-full w-full bg-transparent border-0 shadow-none outline-none text-inherit placeholder:text-[12px] placeholder:text-[#C4C9D2] disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-0 focus-visible:border-transparent focus-visible:outline-none",
+  "h-full w-full bg-transparent border-0 shadow-none outline-none text-inherit placeholder:text-[#C4C9D2] disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-0 focus-visible:border-transparent focus-visible:outline-none",
   {
     variants: {
       size: {
-        sm: "px-2.5 py-0",
-        md: "px-3 py-0",
-        lg: "px-3.5 py-0",
+        sm: "px-2.5 py-0 placeholder:text-[11px]",
+        md: "px-3 py-0 placeholder:text-[12px]",
+        lg: "px-3.5 py-0 placeholder:text-[14px]",
       },
       hasLeftIcon: {
         true: "",
@@ -62,7 +63,7 @@ export const inputFieldVariants = cva(
 );
 
 export const inputIconSlotVariants = cva(
-  "absolute inset-y-0 flex items-center text-slate-400",
+  "absolute inset-y-0 flex items-center text-gray-400",
   {
     variants: {
       size: {

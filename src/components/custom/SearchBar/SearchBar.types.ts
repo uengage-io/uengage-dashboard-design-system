@@ -8,9 +8,15 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   valueType?: SearchValueType;
   size?: SearchBarSize;
   placeholder?: string;
-  width?: string | number;
+  /**
+   * Tailwind width class(es) applied to the outer wrapper. Use any responsive
+   * utility (e.g. `"w-full md:w-96 lg:w-[400px]"`). Defaults to `w-full` when
+   * omitted. For one-off layout overrides, prefer `className`.
+   */
+  width?: string;
   /** Override the default height from `size`. Accepts any CSS size (number = px). */
-  height?: string | number;
+  
+  /** Extra classes merged onto the outer wrapper — use this for layout/width. */
   className?: string;
   inputClassName?: string;
   dropdownClassName?: string;
@@ -20,6 +26,10 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   /** Fires on Enter OR icon click when input is non-empty. */
   onSearch?: (value: T) => void;
   onClear?: () => void;
+  /** Fires once the first time the field is blurred (Angular-style `touched` state). */
+  onTouch?: () => void;
+  /** Toggle the browser's native spell-check. Defaults to `true`. */
+  spellCheck?: boolean;
 
   // ── Static string list (simple case) ──────────────────────────
   /** Pre-mapped string list. Component auto-filters with fuzzy matching. */

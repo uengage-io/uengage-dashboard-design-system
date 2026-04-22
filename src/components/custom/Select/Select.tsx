@@ -47,9 +47,14 @@ function Select<TItem = unknown>({
   size = "md",
   placeholder = "Select...",
   disabled = false,
+  width,
   className,
   onChange,
+  onTouch,
+  spellCheck = true,
 }: SelectProps<TItem>) {
+  const touchedRef = React.useRef(false);
+  const interactedRef = React.useRef(false);
   const resolvedOptions = React.useMemo<SelectOption[]>(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
@@ -170,8 +175,50 @@ function Select<TItem = unknown>({
 
   const triggerState = disabled ? "disabled" : open ? "open" : "default";
 
+  const placeholderSizeClass =
+    size === "lg"
+      ? "text-[14px]"
+      : size === "md"
+        ? "text-[12px]"
+        : "text-[11px]";
+
+  const commandInputSizeClass =
+    size === "lg"
+      ? "h-10 text-base"
+      : size === "md"
+        ? "h-9 text-sm"
+        : "h-8 text-xs";
+
+  const commandItemSizeClass =
+    size === "lg"
+      ? "px-3 py-2.5 text-base"
+      : size === "md"
+        ? "px-3 py-2 text-sm"
+        : "px-2.5 py-1.5 text-xs";
+
+  const handleOpenChange = (next: boolean) => {
+    if (disabled) return;
+    setOpen(next);
+    if (next) {
+      interactedRef.current = true;
+    } else if (interactedRef.current && !touchedRef.current) {
+      touchedRef.current = true;
+      onTouch?.();
+    }
+  };
+
+  const handleTriggerBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    // If focus moves outside the trigger AND the popover is not open, mark touched.
+    if (open) return;
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+    if (!interactedRef.current) return;
+    if (touchedRef.current) return;
+    touchedRef.current = true;
+    onTouch?.();
+  };
+
   return (
-    <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <div
           role="button"
@@ -179,6 +226,10 @@ function Select<TItem = unknown>({
           aria-disabled={disabled}
           aria-haspopup="listbox"
           aria-expanded={open}
+          onFocus={() => {
+            interactedRef.current = true;
+          }}
+          onBlur={handleTriggerBlur}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
@@ -189,6 +240,7 @@ function Select<TItem = unknown>({
           }}
           className={cn(
             triggerVariants({ state: triggerState, size }),
+            width,
             className,
           )}
         >
@@ -233,7 +285,12 @@ function Select<TItem = unknown>({
                   )}
                 </>
               ) : (
-                <span className="truncate text-[#C4C9D2]">
+                <span
+                  className={cn(
+                    "truncate text-[#C4C9D2]",
+                    placeholderSizeClass,
+                  )}
+                >
                   {placeholder}
                 </span>
               )
@@ -241,7 +298,9 @@ function Select<TItem = unknown>({
               <span
                 className={cn(
                   "truncate",
-                  singleLabel ? "text-[#111827]" : "text-[#C4C9D2]",
+                  singleLabel
+                    ? "text-[#111827]"
+                    : cn("text-[#C4C9D2]", placeholderSizeClass),
                 )}
               >
                 {singleLabel ?? placeholder}
@@ -255,7 +314,7 @@ function Select<TItem = unknown>({
                 type="button"
                 tabIndex={-1}
                 onClick={clearAll}
-                className="flex items-center text-[#9CA3AF] hover:text-[#374151]"
+                className="flex items-center text-gray-400 hover:text-gray-600"
                 aria-label="Clear selection"
               >
                 <X size={14} className="hover:text-red-500" strokeWidth={2} />
@@ -263,8 +322,9 @@ function Select<TItem = unknown>({
             )}
             <ChevronDown
               size={16}
+              strokeWidth={2}
               className={cn(
-                "text-[#6B7280] transition-transform duration-200",
+                "text-gray-600 transition-transform duration-200",
                 open && "rotate-180",
               )}
             />
@@ -273,9 +333,9 @@ function Select<TItem = unknown>({
       </PopoverTrigger>
 
       <PopoverContent
+        className="max-w-[calc(100vw-1rem)]"
         style={{
           width: "var(--radix-popover-trigger-width)",
-          minWidth: "220px",
         }}
       >
         <Command
@@ -283,7 +343,11 @@ function Select<TItem = unknown>({
             value === SELECT_ALL ? 1 : defaultFilter(value, search)
           }
         >
-          <CommandInput placeholder="Search..." />
+          <CommandInput
+            placeholder="Search..."
+            spellCheck={spellCheck}
+            className={commandInputSizeClass}
+          />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
 
@@ -291,7 +355,10 @@ function Select<TItem = unknown>({
               <CommandItem
                 value={SELECT_ALL}
                 onSelect={() => handleSelect(SELECT_ALL)}
-                className="gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]"
+                className={cn(
+                  "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                  commandItemSizeClass,
+                )}
               >
                 <CheckboxIcon checked={allSelected} />
                 <span className="flex-1">Select all</span>
@@ -305,7 +372,10 @@ function Select<TItem = unknown>({
                 disabled={option.disabled}
                 aria-selected={isSelected(option.value)}
                 onSelect={() => handleSelect(option.value)}
-                className="hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]"
+                className={cn(
+                  "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                  commandItemSizeClass,
+                )}
               >
                 {mode === "multi" && (
                   <CheckboxIcon checked={isSelected(option.value)} />

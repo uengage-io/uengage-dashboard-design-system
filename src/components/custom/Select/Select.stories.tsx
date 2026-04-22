@@ -20,6 +20,7 @@ const meta = {
     mode: { control: "radio", options: ["single", "multi"] },
     size: { control: "radio", options: ["xs", "sm", "md", "lg"] },
     disabled: { control: "boolean" },
+     width: { control: "text" },
     placeholder: { control: "text" },
     onChange: { action: "changed" },
   },
@@ -27,6 +28,7 @@ const meta = {
     mode: "single",
     size: "md",
     placeholder: "Select…",
+    width: "w-full sm:w-80",
     disabled: false,
   },
 } satisfies Meta<typeof Select>;

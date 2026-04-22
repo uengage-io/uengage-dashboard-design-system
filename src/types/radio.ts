@@ -17,7 +17,8 @@ export interface CustomRadioGroupProps<T = RadioOption> {
   onChange?: (value: string) => void;
   size?: "sm" | "md" | "lg";
   layout?: "horizontal" | "vertical" | "grid";
-  columns?: number;
+  /** Max columns at the largest breakpoint when `layout="grid"`. Smaller breakpoints scale down (mobile=1, sm=2). */
+  columns?: 1 | 2 | 3 | 4;
   disabled?: boolean;
   label?: string;
   helperText?: string;

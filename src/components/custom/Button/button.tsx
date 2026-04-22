@@ -128,7 +128,9 @@ function getButtonStyle(
   const insetShadow = "0px 2px 4px 0px #0000000A inset";
   const liftShadow = "2px 2px 4px 0px #0000001F";
   const boxShadow =
-    state === "disabled"
+    variant === "tertiary"
+      ? "none"
+      : state === "disabled"
       ? "none"
       : state === "hover" || state === "pressed"
         ? `${insetShadow}, ${liftShadow}`

@@ -1,2 +1,2 @@
-export { CustomCheckbox } from "./CustomCheckbox";
-export { CustomCheckboxGroup } from "./CustomCheckboxGroup";
+export { Checkbox } from "./Checkbox";
+export { CheckboxGroup } from "./CheckboxGroup";

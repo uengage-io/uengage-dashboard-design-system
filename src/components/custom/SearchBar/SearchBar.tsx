@@ -11,9 +11,15 @@ const SIZE_HEIGHT_CLASSES: Record<SearchBarSize, string> = {
 };
 
 const SIZE_TEXT_CLASSES: Record<SearchBarSize, string> = {
-  sm: "text-sm",
-  md: "text-base",
-  lg: "text-lg",
+  sm: "text-xs",
+  md: "text-sm",
+  lg: "text-base",
+};
+
+const SIZE_PLACEHOLDER_CLASSES: Record<SearchBarSize, string> = {
+  sm: "placeholder:text-[11px]",
+  md: "placeholder:text-[12px]",
+  lg: "placeholder:text-[14px]",
 };
 
 const ICON_SIZES: Record<SearchBarSize, number> = {
@@ -69,13 +75,14 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   size = "md",
   placeholder,
   width,
-  height,
   className,
   inputClassName,
   disabled = false,
+  spellCheck = true,
   onChange,
   onSearch,
   onClear,
+  onTouch,
   dropdownClassName,
   dropdownItems,
   getLabel,
@@ -88,6 +95,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   );
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const touchedRef = React.useRef(false);
 
   // Sync external `value` changes (e.g. from onSelect/onClear handlers) into
   // internal state, so each callback stays independent of onChange.
@@ -181,6 +189,10 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   const handleBlur = (e: React.FocusEvent) => {
     if (!wrapperRef.current?.contains(e.relatedTarget as Node)) {
       setDropdownOpen(false);
+      if (!touchedRef.current) {
+        touchedRef.current = true;
+        onTouch?.();
+      }
     }
   };
 
@@ -193,29 +205,28 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   return (
     <div
       ref={wrapperRef}
-      className="relative inline-block"
-      style={width != null ? { width } : undefined}
+      className={cn("relative block w-full", width, className)}
       onBlur={handleBlur}
     >
       <div
-        className={cn(
-          "inline-flex w-full items-center rounded-lg border border-gray-400 bg-white",
-          SIZE_TEXT_CLASSES[size],
-          height == null && SIZE_HEIGHT_CLASSES[size],
-          disabled && "pointer-events-none opacity-50",
-          className,
-        )}
-        style={height != null ? { height } : undefined}
-      >
+          className={cn(
+            "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
+            !disabled && "hover:border-gray-500 hover:shadow-sm",
+            SIZE_TEXT_CLASSES[size],
+            SIZE_HEIGHT_CLASSES[size],
+            disabled && "pointer-events-none opacity-50",
+          )}
+        >
         <Input
           value={displayValue}
           placeholder={placeholder}
           disabled={disabled}
-          spellCheck
+          spellCheck={spellCheck}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           className={cn(
-            "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[12px] placeholder:text-[#C4C9D2]",
+            "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[#C4C9D2]",
+            SIZE_PLACEHOLDER_CLASSES[size],
             inputClassName,
           )}
         />
@@ -226,7 +237,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
               type="button"
               onClick={handleClear}
               disabled={disabled}
-              className="flex items-center justify-center text-[#6B7280] hover:text-[#4B5563] transition-colors"
+              className="flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Clear search"
             >
               <X
@@ -237,20 +248,16 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
             </button>
           )}
 
-          <div className={cn("w-px bg-gray-300", DIVIDER_CLASSES[size])} />
+          <div className={cn("w-px bg-gray-400", DIVIDER_CLASSES[size])} />
 
           <button
             type="button"
             onClick={handleSearchClick}
             disabled={disabled}
-            className="flex items-center justify-center text-[#6B7280] hover:text-[#4B5563] transition-colors"
+            className="flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
             aria-label="Search"
           >
-            <Search
-              className="text-gray-500 w-5"
-              strokeWidth={3}
-              size={iconSize}
-            />
+            <Search strokeWidth={2} size={iconSize} />
           </button>
         </div>
       </div>

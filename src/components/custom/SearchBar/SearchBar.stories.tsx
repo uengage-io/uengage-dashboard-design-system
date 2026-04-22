@@ -34,7 +34,7 @@ const meta = {
     size: "md",
     valueType: "string",
     placeholder: "Search…",
-    width: 320,
+    width: "w-full sm:w-80",
     disabled: false,
   },
 } satisfies Meta<typeof SearchBar>;
@@ -101,7 +101,7 @@ export const WithObjectDropdown: Story = {
       getValue={(d: Driver) => d.id}
     />
   ),
-  args: { width: 380 },
+  args: { width: "w-full md:w-96" },
 };
 
 export const Controlled: Story = {

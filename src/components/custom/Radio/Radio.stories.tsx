@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { CustomRadioGroup } from "./CustomRadioGroup";
+import { RadioGroup } from "./RadioButtons";
 import type { RadioOption } from "@/types/radio";
 
 const THREE_OPTIONS: RadioOption[] = [
@@ -35,7 +35,7 @@ const SEGMENT_OPTIONS: RadioOption[] = [
 
 const meta = {
   title: "Components/Radio",
-  component: CustomRadioGroup,
+  component: RadioGroup,
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
@@ -67,7 +67,7 @@ const meta = {
     columns: 2,
     disabled: false,
   },
-} satisfies Meta<typeof CustomRadioGroup>;
+} satisfies Meta<typeof RadioGroup>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -77,7 +77,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -88,7 +88,7 @@ export const Small: Story = {
   args: { size: "sm", defaultValue: "one" },
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -97,7 +97,7 @@ export const Medium: Story = {
   args: { size: "md", defaultValue: "one" },
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -106,7 +106,7 @@ export const Large: Story = {
   args: { size: "lg", defaultValue: "one" },
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -121,7 +121,7 @@ export const Horizontal: Story = {
   },
   render: (args) => (
     <div className="w-[560px]">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -134,7 +134,7 @@ export const Vertical: Story = {
   },
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -148,7 +148,7 @@ export const Grid: Story = {
   },
   render: (args) => (
     <div className="w-[560px]">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -158,7 +158,7 @@ export const Grid: Story = {
 export const Unselected: Story = {
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -167,7 +167,7 @@ export const Preselected: Story = {
   args: { defaultValue: "two" },
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -176,7 +176,7 @@ export const GroupDisabled: Story = {
   args: { defaultValue: "one", disabled: true },
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -192,7 +192,7 @@ export const SingleItemDisabled: Story = {
   },
   render: (args) => (
     <div className="w-96">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -206,7 +206,7 @@ export const WithLabelAndHelper: Story = {
   },
   render: (args) => (
     <div className="w-[560px]">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -219,7 +219,7 @@ export const WithError: Story = {
   },
   render: (args) => (
     <div className="w-[560px]">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -236,7 +236,7 @@ export const CustomerSegments: Story = {
   },
   render: (args) => (
     <div className="w-[640px]">
-      <CustomRadioGroup {...args} />
+      <RadioGroup {...args} />
     </div>
   ),
 };
@@ -253,10 +253,8 @@ export const Controlled: Story = {
     const [value, setValue] = React.useState<string>("alpha");
     return (
       <div className="flex w-[560px] flex-col gap-3">
-        <CustomRadioGroup {...args} value={value} onChange={setValue} />
-        <code className="text-xs text-[#6B7280]">
-          value: {`"${value}"`}
-        </code>
+        <RadioGroup {...args} value={value} onChange={setValue} />
+        <code className="text-xs text-[#6B7280]">value: {`"${value}"`}</code>
       </div>
     );
   },
@@ -291,7 +289,7 @@ export const CustomOptionShape: Story = {
     const selected = SEGMENTS.find((s) => s.id === value);
     return (
       <div className="flex w-[560px] flex-col gap-3">
-        <CustomRadioGroup<Segment>
+        <RadioGroup<Segment>
           label="Customer segment"
           helperText="Options use { id, name, locked } — mapped via getter props."
           options={SEGMENTS}
@@ -303,8 +301,7 @@ export const CustomOptionShape: Story = {
           layout="horizontal"
         />
         <code className="text-xs text-[#6B7280]">
-          selected id: {`"${value}"`} · name:{" "}
-          {`"${selected?.name ?? ""}"`}
+          selected id: {`"${value}"`} · name: {`"${selected?.name ?? ""}"`}
         </code>
       </div>
     );

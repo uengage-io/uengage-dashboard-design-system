@@ -31,6 +31,16 @@ export interface SelectProps<TItem = unknown> {
   size?: "xs" | "sm" | "md" | "lg";
   placeholder?: string;
   disabled?: boolean;
+  /**
+   * Tailwind width class(es) applied to the trigger wrapper. Use any responsive
+   * utility (e.g. `"w-full md:w-96 lg:w-[400px]"`). Defaults to `w-full` when
+   * omitted. For one-off layout overrides, prefer `className`.
+   */
+  width?: string;
   className?: string;
   onChange?: (value: string | string[]) => void;
+  /** Fires once the first time the trigger is blurred after interacting (Angular-style `touched`). */
+  onTouch?: () => void;
+  /** Toggle the browser's native spell-check on the dropdown search input. Defaults to `true`. */
+  spellCheck?: boolean;
 }
