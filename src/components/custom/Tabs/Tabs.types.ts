@@ -10,5 +10,7 @@ export interface CustomTabsProps {
   value?: string;
   onChange?: (value: string) => void;
   variant?: "primary" | "secondary";
+  visibleTabLimit?: number;
+  overflowLabel?: string;
   className?: string;
 }

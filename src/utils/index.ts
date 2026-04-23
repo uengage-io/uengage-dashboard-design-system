@@ -12,7 +12,7 @@ export {
   type RadioCircleVariants,
   type RadioDotVariants,
   type RadioLabelVariants,
-} from "../components/custom/Radio/radio";
+} from "./radio";
 export {
   checkboxBoxVariants,
   checkboxLabelVariants,

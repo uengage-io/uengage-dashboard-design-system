@@ -6,26 +6,19 @@
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    // "ignoreDeprecations": "6.0",
+    "noEmit": true,
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
-      "@/*": ["./src/*"],
-      "@uengage/ui": ["./src/index.ts"]
+      "@/*": ["../src/*"],
+      "@uengage/ui": ["../src/index.ts"]
     }
   },
-  "include": ["src", "src/components/custom/Grid"],
-  "exclude": ["node_modules", "dist", "src/**/*.stories.ts", "src/**/*.stories.tsx"]
+  "include": ["src", "../src", "../src/components/custom/Grid"]
 }

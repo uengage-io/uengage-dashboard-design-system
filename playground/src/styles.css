@@ -1,31 +1,32 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
-/* Local Figtree font — files live in src/public/Figtree and should be
-   served at the web root (e.g. via vite's publicDir). */
+/* Scan both playground files and the library source for class names */
+@source "./";
+@source "../../src/**/*.{ts,tsx}";
+
+/* Local Figtree font (served from src/public via vite publicDir) */
 @font-face {
   font-family: "Figtree";
-  src: url("/Figtree/Figtree-VariableFont_wght.ttf") format("truetype-variations");
+  src: url("/Figtree/Figtree-VariableFont_wght.ttf")
+    format("truetype-variations");
   font-weight: 300 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Figtree";
-  src: url("/Figtree/Figtree-Italic-VariableFont_wght.ttf") format("truetype-variations");
+  src: url("/Figtree/Figtree-Italic-VariableFont_wght.ttf")
+    format("truetype-variations");
   font-weight: 300 900;
   font-style: italic;
   font-display: swap;
 }
 
-/* Tell Tailwind to scan our component source for class names */
-@source "../components/**/*.{ts,tsx}";
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -105,42 +106,4 @@
     font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
     font-weight: 500;
   }
-  button,
-  input,
-  select,
-  textarea {
-    font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 500;
-  }
-}
-
-/* Popover / dropdown open/close transitions.
-   Driven by Radix's data-state attribute on the portaled content. */
-@keyframes uengage-popover-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-@keyframes uengage-popover-out {
-  from {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.96) translateY(-4px);
-  }
-}
-[data-slot="popover-content"][data-state="open"] {
-  animation: uengage-popover-in 140ms ease-out;
-  transform-origin: var(--radix-popover-content-transform-origin, top);
-}
-[data-slot="popover-content"][data-state="closed"] {
-  animation: uengage-popover-out 100ms ease-in;
-  transform-origin: var(--radix-popover-content-transform-origin, top);
 }
