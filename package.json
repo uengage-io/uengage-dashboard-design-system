@@ -3,8 +3,10 @@
   "version": "0.0.1",
   "description": "Shared UI component library built with React, TypeScript, Tailwind CSS, and CVA.",
   "type": "module",
+  "style": "./dist/styles.css",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./styled.js"
   ],
   "files": [
     "dist",

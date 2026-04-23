@@ -205,7 +205,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   return (
     <div
       ref={wrapperRef}
-      className={cn("relative block w-full", width, className)}
+      className={cn("uengage-ui relative block w-full", width, className)}
       onBlur={handleBlur}
     >
       <div

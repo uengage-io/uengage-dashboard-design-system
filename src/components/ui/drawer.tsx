@@ -36,6 +36,7 @@ function DrawerOverlay({
       <DialogPrimitive.Overlay
         data-slot="drawer-overlay"
         className={cn(
+          "uengage-ui",
           "fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:duration-300 data-[state=closed]:duration-200",
           className
         )}
@@ -57,6 +58,7 @@ function DrawerContent({
       <DialogPrimitive.Content
         data-slot="drawer-content"
         className={cn(
+          "uengage-ui",
           "fixed z-50 bg-background border shadow-lg duration-300 outline-none",
           className
         )}

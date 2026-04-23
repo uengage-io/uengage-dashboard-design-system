@@ -223,7 +223,7 @@ function Button({
       data-state={state}
       data-loading={loading || undefined}
       aria-busy={loading || undefined}
-      className={`${BASE_CLASSES} ${sizeClass}${tertiaryClass ? ` ${tertiaryClass}` : ""}${className ? ` ${className}` : ""}`}
+      className={`uengage-ui ${BASE_CLASSES} ${sizeClass}${tertiaryClass ? ` ${tertiaryClass}` : ""}${className ? ` ${className}` : ""}`}
       style={{ ...gradientStyle, ...style }}
       disabled={interactionBlocked}
       onPointerEnter={(e: React.PointerEvent<HTMLButtonElement>) => {

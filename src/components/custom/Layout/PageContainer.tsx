@@ -52,7 +52,7 @@ function PageContainer({
     <main
       data-slot="page-container"
       className={cn(
-        "font-['Figtree'] font-medium",
+        "uengage-ui font-['Figtree'] font-medium",
         "flex w-full min-w-0 flex-col rounded-xl border border-[#E2E2E2] bg-background text-foreground",
         "ml-[16px] mr-[12px] mt-[12px] pl-[22px] pr-[20px]",
         className,

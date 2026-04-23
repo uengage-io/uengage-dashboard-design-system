@@ -55,7 +55,7 @@ function SubHeader({
   return (
     <section
       data-slot="sub-header"
-      className={cn("flex w-full flex-col", className)}
+      className={cn("uengage-ui flex w-full flex-col", className)}
       style={style}
       {...props}
     >
