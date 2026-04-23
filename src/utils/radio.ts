@@ -1,5 +1,4 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { brand } from "./colors";
 export const radioCircleVariants = cva(
   "relative inline-flex shrink-0 items-center justify-center rounded-full border bg-transparent transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006F42]",
   {
@@ -23,10 +22,10 @@ export const radioCircleVariants = cva(
   },
 );
 
-export const radioDotVariants = cva(`rounded-full bg-[${brand.green.deepGreen}]`, {
+export const radioDotVariants = cva("rounded-full bg-[#003C1B]", {
   variants: {
     size: {
-      sm: "h-[8px] w-[8px]",
+      sm: "h-[8px] w-[8px] ",
       md: "h-[10px] w-[10px]",
       lg: "h-[12px] w-[12px]",
     },

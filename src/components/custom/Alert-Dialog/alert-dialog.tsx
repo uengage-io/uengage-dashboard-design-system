@@ -65,6 +65,9 @@ export interface StatusAlertDialogProps {
   description?: React.ReactNode;
 
   footer?: React.ReactNode;
+  closeOnOverlayClick?: boolean;
+  closeOnEsc?: boolean;
+  autoCloseMs?: number;
 
   className?: string;
 }
@@ -78,6 +81,9 @@ export function StatusAlertDialog({
   title,
   description,
   footer,
+  closeOnOverlayClick,
+  closeOnEsc,
+  autoCloseMs,
   className,
 }: StatusAlertDialogProps) {
   return (
@@ -90,6 +96,9 @@ export function StatusAlertDialog({
       title={title}
       description={description}
       footer={footer}
+      closeOnOverlayClick={closeOnOverlayClick}
+      closeOnEsc={closeOnEsc}
+      autoCloseMs={autoCloseMs}
       className={className}
       showActions={!!footer}
     />
@@ -139,6 +148,7 @@ export interface SweetAlertOptions<TValue = string> {
 
   closeOnOverlayClick?: boolean;
   closeOnEsc?: boolean;
+  autoCloseMs?: number;
 
   input?: SweetAlertInput;
   inputPlaceholder?: string;
@@ -262,6 +272,18 @@ function SweetAlertInstance({
     close();
   }, [close, resolve]);
 
+  React.useEffect(() => {
+    if (!state.open || !options?.autoCloseMs || options.autoCloseMs <= 0 || loading) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      dismiss();
+    }, options.autoCloseMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [dismiss, loading, options?.autoCloseMs, state.open]);
+
   const confirm = React.useCallback(async () => {
     if (!options) return;
     const value = inputValue;
@@ -320,6 +342,12 @@ function SweetAlertInstance({
     onInteractOutside: (e: any) => {
       if (options.closeOnOverlayClick === false) e.preventDefault();
     },
+    overlayProps:
+      options.closeOnOverlayClick === false
+        ? undefined
+        : {
+            onClick: () => dismiss(),
+          },
   };
 
   return (
@@ -460,6 +488,7 @@ export function AlertDialog<TValue = string>({
   cancelButtonVariant = "secondary",
   closeOnOverlayClick = true,
   closeOnEsc = true,
+  autoCloseMs,
   input,
   inputPlaceholder,
   defaultValue,
@@ -496,6 +525,18 @@ export function AlertDialog<TValue = string>({
     setLoading(false);
   }, [resolvedOpen, defaultValue]);
 
+  React.useEffect(() => {
+    if (!resolvedOpen || !autoCloseMs || autoCloseMs <= 0 || loading) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      handleOpenChange(false);
+    }, autoCloseMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [autoCloseMs, handleOpenChange, loading, resolvedOpen]);
+
   const Icon =
     typeof icon === "function"
       ? icon
@@ -525,6 +566,13 @@ export function AlertDialog<TValue = string>({
   const dismiss = React.useCallback(() => {
     handleOpenChange(false);
   }, [handleOpenChange]);
+
+  contentInteractionProps.overlayProps =
+    closeOnOverlayClick === false
+      ? undefined
+      : {
+          onClick: () => dismiss(),
+        };
 
   const confirm = React.useCallback(async () => {
     if (!preConfirm && !inputValidator) {

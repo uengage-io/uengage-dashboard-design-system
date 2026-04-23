@@ -85,6 +85,7 @@ const meta = {
     },
     closeOnOverlayClick: { control: "boolean" },
     closeOnEsc: { control: "boolean" },
+    autoCloseMs: { control: "number" },
     input: { control: "radio", options: ["text", "textarea"] },
     inputPlaceholder: { control: "text" },
     defaultValue: { control: "text" },
@@ -110,6 +111,7 @@ const meta = {
     cancelButtonVariant: "secondary",
     closeOnOverlayClick: true,
     closeOnEsc: true,
+    autoCloseMs: undefined,
     input: undefined,
     inputPlaceholder: "",
     defaultValue: "",
@@ -226,5 +228,16 @@ export const AsyncPreConfirm: Story = {
     preConfirm: async () => {
       await new Promise((resolve) => setTimeout(resolve, 1200));
     },
+  },
+};
+
+export const AutoClose: Story = {
+  args: {
+    variant: "success",
+    title: "Saved successfully",
+    description: "This dialog closes automatically after 2 seconds.",
+    showActions: false,
+    autoCloseMs: 2000,
+    closeOnOverlayClick: true,
   },
 };

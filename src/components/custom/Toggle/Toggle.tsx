@@ -12,7 +12,7 @@ export interface ToggleProps extends Omit<
   /** Label text to display */
   label?: string;
   /** Position of the label: 'inside' (within track), 'left' or 'right' */
-  labelPosition?: "left" | "right";
+  labelPosition?: "inside" | "left" | "right";
   /** Controlled checked state */
   checked?: boolean;
   /** Initial unchecked state (uncontrolled mode) */
@@ -42,7 +42,7 @@ export const Toggle = React.forwardRef<
     ref,
   ) => {
     const isControlled = checked !== undefined;
-    const hasInsideLabel = Boolean(label);
+    const hasInsideLabel = Boolean(label) && labelPosition === "inside";
 
     const handleChange = (e: boolean) => {
       onChange?.(e);
@@ -55,25 +55,24 @@ export const Toggle = React.forwardRef<
         defaultChecked={isControlled ? undefined : defaultChecked}
         onCheckedChange={handleChange}
         disabled={disabled}
-        className={trackVariants({ size })}
+        className={trackVariants({ size, hasInsideLabel })}
         {...props}
       >
-        {/* Inside label - rendered before thumb so it appears to the right */}
-        
-
-        {/* Thumb */}
+        {hasInsideLabel && (
+          <span className="pointer-events-none absolute left-3 right-3 truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1F6B32]">
+            {label}
+          </span>
+        )}
         <SwitchPrimitive.Thumb
-          className={thumbVariants({ size })}
+          className={thumbVariants({ size, hasInsideLabel })}
         />
       </SwitchPrimitive.Root>
     );
 
-    // If no external label or position is inside, return just the switch
-    if (!label) {
+    if (!label || hasInsideLabel) {
       return switchContent;
     }
 
-    // Render with external label
     return (
       <label
         className={`inline-flex items-center gap-2 cursor-pointer ${
@@ -81,12 +80,10 @@ export const Toggle = React.forwardRef<
         } ${wrapperClassName || ""}`}
       >
         {switchContent}
-        <span className="text-sm font-medium">{label}</span>
+        <span className="text-sm font-medium text-[#1F2937]">{label}</span>
       </label>
     );
   },
 );
 
 Toggle.displayName = "Toggle";
-
-// export { Toggle };
