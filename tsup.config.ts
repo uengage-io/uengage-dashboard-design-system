@@ -4,7 +4,6 @@ export default defineConfig({
   entry: [
     "src/index.ts",
     "src/components/ui/*.tsx",
-    "src/components/components/Layout/*.tsx",
     "src/lib/utils.ts",
     "src/utils/layoutTokens.ts",
     "src/utils/colors.ts",
