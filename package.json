@@ -45,10 +45,10 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
-    "prepare": "npm run clean && npm run build",
     "prepublishOnly": "npm run clean && npm run build",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prepare": "npm run clean && npm run build"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
