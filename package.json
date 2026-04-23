@@ -8,17 +8,18 @@
   ],
   "files": [
     "dist",
-    "styles.d.ts"
+    "styles.d.ts",
+    "styled.js",
+    "styled.d.ts"
   ],
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./styled.js",
+  "module": "./styled.js",
+  "types": "./styled.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.js"
+      "types": "./styled.d.ts",
+      "import": "./styled.js",
+      "default": "./styled.js"
     },
     "./styles.css": {
       "types": "./styles.d.ts",
