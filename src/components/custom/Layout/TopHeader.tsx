@@ -32,7 +32,7 @@ function TopHeader({
   return (
     <header
       data-slot="top-header"
-      className={cn("flex w-full shrink-0 flex-col", className)}
+      className={cn("uengage-ui flex w-full shrink-0 flex-col", className)}
       style={style}
       {...props}
     >

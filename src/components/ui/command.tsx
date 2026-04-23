@@ -14,7 +14,7 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
   return (
     <CommandPrimitive
       data-slot="command"
-      className={cn("flex h-full w-full flex-col overflow-hidden bg-white text-[#111827]", className)}
+      className={cn("uengage-ui flex h-full w-full flex-col overflow-hidden bg-white text-[#111827]", className)}
       {...props}
     />
   );
@@ -22,7 +22,7 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
 
 function CommandInput({ className, ...props }: React.ComponentProps<typeof CommandInputPrimitive>) {
   return (
-    <div className="flex items-center border-b border-[#E5E7EB] px-3">
+    <div className="uengage-ui flex items-center border-b border-[#E5E7EB] px-3">
       <CommandInputPrimitive
         data-slot="command-input"
         className={cn(
