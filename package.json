@@ -42,8 +42,9 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsup && npm run build:css",
+    "build": "tsup && npm run build:css && npm run build:inject-directive",
     "build:css": "tailwindcss -i ./src/styles/globals.css -o ./dist/styles.css --minify",
+    "build:inject-directive": "node scripts/inject-use-client.mjs",
     "dev": "tsup --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
