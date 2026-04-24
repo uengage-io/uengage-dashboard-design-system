@@ -32,6 +32,7 @@ export function Sidebar({
   onOpenChange,
   side = "left",
   size = "md",
+  sizePercent,
   overlay = true,
   closeOnOutsideClick = true,
   persistentOnDesktop = false,
@@ -55,6 +56,17 @@ export function Sidebar({
     [isControlled, onOpenChange]
   )
 
+  // Inline styles for percentage-based sizing. vw/vh are inherently responsive
+  // and override any CVA width/maxWidth class via specificity.
+  const customSizeStyle = React.useMemo<React.CSSProperties>(() => {
+    if (sizePercent == null) return {}
+    const pct = Math.min(100, Math.max(1, sizePercent))
+    if (side === "top" || side === "bottom") {
+      return { height: `${pct}vh`, maxHeight: "100vh" }
+    }
+    return { width: `${pct}vw`, maxWidth: "100vw" }
+  }, [sizePercent, side])
+
   const shouldRenderPersistent = persistentOnDesktop && isDesktop
 
   if (shouldRenderPersistent) {
@@ -69,6 +81,7 @@ export function Sidebar({
           className,
           contentClassName
         )}
+        style={customSizeStyle}
       >
         {children}
       </aside>
@@ -97,6 +110,7 @@ export function Sidebar({
           className,
           contentClassName
         )}
+        style={customSizeStyle}
       >
         {children}
       </DrawerContent>
