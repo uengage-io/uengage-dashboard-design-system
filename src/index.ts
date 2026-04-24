@@ -243,3 +243,6 @@ export {
 export { brand, type BrandGreen } from "./utils/colors";
 
 export { cn } from "./lib/utils";
+
+// Provider
+export { UengageProvider } from "./components/custom/Provider";
