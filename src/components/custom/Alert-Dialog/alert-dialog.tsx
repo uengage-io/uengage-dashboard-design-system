@@ -23,8 +23,8 @@ import {
 
 const statusBadgeVariants = cva(
   [
-    "relative inline-flex size-20 items-center justify-center rounded-full",
-    "before:absolute before:inset-[-10px] before:rounded-full before:border",
+    "relative inline-flex size-14 sm:size-20 items-center justify-center rounded-full",
+    "before:absolute before:inset-[-6px] sm:before:inset-[-10px] before:rounded-full before:border",
   ].join(" "),
   {
     variants: {
@@ -363,22 +363,22 @@ function SweetAlertInstance({
         size={size}
         aria-label="Alert dialog"
         className={cn(
-          "gap-0 rounded-2xl px-8 py-10 text-center sm:gap-0",
+          "gap-0 rounded-2xl px-4 py-6 sm:px-8 sm:py-10 text-center sm:gap-0",
           size === "sm" ? "max-w-xs" : "max-w-md",
         )}
         {...contentInteractionProps}
       >
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-4 sm:gap-6">
           <div className={cn(statusBadgeVariants({ variant: badgeVariant }))}>
-            <Icon className="size-10" strokeWidth={2.5} aria-hidden />
+            <Icon className="size-7 sm:size-10" strokeWidth={2.5} aria-hidden />
           </div>
 
           <AlertDialogHeader className="gap-2 sm:text-center sm:place-items-center">
-            <AlertDialogTitle className="text-2xl font-semibold tracking-tight">
+            <AlertDialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight">
               {options.title}
             </AlertDialogTitle>
             {options.text ?? options.description ? (
-              <AlertDialogDescription className="text-base text-muted-foreground">
+              <AlertDialogDescription className="text-sm sm:text-base text-muted-foreground">
                 {options.text ?? options.description}
               </AlertDialogDescription>
             ) : null}
@@ -388,7 +388,7 @@ function SweetAlertInstance({
             <div className="w-full text-left">
               {options.input === "textarea" ? (
                 <textarea
-                  className="min-h-24 w-full resize-none rounded-xl border bg-background px-4 py-3 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  className="min-h-20 sm:min-h-24 w-full resize-none rounded-xl border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   placeholder={options.inputPlaceholder}
                   value={inputValue ?? ""}
                   onChange={(e) => {
@@ -608,23 +608,23 @@ export function AlertDialog<TValue = string>({
         size={size}
         aria-label="Alert dialog"
         className={cn(
-          "gap-0 rounded-2xl px-8 py-10 text-center sm:gap-0",
+          "gap-0 rounded-2xl px-4 py-6 sm:px-8 sm:py-10 text-center sm:gap-0",
           size === "sm" ? "max-w-xs" : "max-w-md",
           className,
         )}
         {...contentInteractionProps}
       >
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-4 sm:gap-6">
           <div className={cn(statusBadgeVariants({ variant: badgeVariant }))}>
-            <Icon className="size-10" strokeWidth={2.5} aria-hidden />
+            <Icon className="size-7 sm:size-10" strokeWidth={2.5} aria-hidden />
           </div>
 
           <AlertDialogHeader className="gap-2 sm:text-center sm:place-items-center">
-            <AlertDialogTitle className="text-2xl font-semibold tracking-tight">
+            <AlertDialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight">
               {title}
             </AlertDialogTitle>
             {text ?? description ? (
-              <AlertDialogDescription className="text-base text-muted-foreground">
+              <AlertDialogDescription className="text-sm sm:text-base text-muted-foreground">
                 {text ?? description}
               </AlertDialogDescription>
             ) : null}
@@ -634,7 +634,7 @@ export function AlertDialog<TValue = string>({
             <div className="w-full text-left">
               {input === "textarea" ? (
                 <textarea
-                  className="min-h-24 w-full resize-none rounded-xl border bg-background px-4 py-3 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  className="min-h-20 sm:min-h-24 w-full resize-none rounded-xl border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   placeholder={inputPlaceholder}
                   value={inputValue ?? ""}
                   onChange={(e) => {

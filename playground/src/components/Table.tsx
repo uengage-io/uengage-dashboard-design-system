@@ -24,19 +24,17 @@ const columns = [
 ];
 export default function TablePreview() {
   return (
-    <div className="w-[800px]">
-      <Table
-        columns={columns}
-        data={users}
-        keyField="id"
-        loading={false}
-        emptyMessage="No data found"
-        onRowClick={(row) => console.log(row)}
-        stickyHeader={true}
-        maxHeight="300px"
-        bordered={true}
-        size="md"
-      />
-    </div>
+    <Table
+      columns={columns}
+      data={users}
+      keyField="id"
+      loading={false}
+      emptyMessage="No data found"
+      onRowClick={(row) => console.log(row)}
+      stickyHeader={true}
+      bordered={true}
+      size="md"
+      mobileLayout="scroll"
+    />
   );
 }

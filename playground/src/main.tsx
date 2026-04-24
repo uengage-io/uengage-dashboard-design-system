@@ -12,6 +12,9 @@ import DatePickerPreview from "./components/DatePicker";
 import TogglePreview from "./Toggle";
 import AlertDialogPreview from "./components/AlertDialog";
 import PageContainerDemo from "./components/PageContainer";
+import SidebarDemo from "./components/Sidebar";
+import TablePreview from "./components/Table";
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ButtonPreview />
@@ -27,5 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <TogglePreview />
     <AlertDialogPreview />
     <PageContainerDemo />
+    <SidebarDemo />
+    <TablePreview/>
   </React.StrictMode>,
 );

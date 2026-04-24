@@ -24,4 +24,10 @@ export interface CustomTableProps<T> {
   bordered?: boolean;
   size?: "sm" | "md" | "lg";
   className?: string;
+  /**
+   * How the table renders on small screens (< md / 768px).
+   * - "scroll"  — horizontal scroll (default, existing behaviour)
+   * - "cards"   — each row becomes a labelled card; columns with hideOnMobile are omitted
+   */
+  mobileLayout?: "scroll" | "cards";
 }
