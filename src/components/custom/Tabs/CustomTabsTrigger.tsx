@@ -35,7 +35,7 @@ function CustomTabsTrigger({
         data-tab-value={props.value}
         className={cn(
           "relative z-10 flex-none w-auto cursor-pointer select-none whitespace-nowrap",
-          "rounded-full px-3 py-1 text-[14px] font-semibold",
+          "rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold",
           "transition-colors duration-300 ease-out outline-none",
           "text-[#595959] hover:text-black data-[state=active]:!text-black!",
           "bg-transparent data-[state=active]:bg-transparent",

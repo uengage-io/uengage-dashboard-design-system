@@ -101,7 +101,7 @@
     border-color: var(--border);
   }
   body {
-    background-color: var(--background);
+    background-color: #F3F4F6;
     color: var(--foreground);
     font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
     font-weight: 500;

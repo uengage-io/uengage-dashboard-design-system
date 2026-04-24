@@ -6,12 +6,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { CustomTableProps } from "@/types/table";
-import {
-  tableBodyRowVariants,
-  tableWrapperVariants,
-} from "@/utils/table";
+import { tableBodyRowVariants, tableWrapperVariants } from "@/utils/table";
 import { TableCell } from "./TableCell";
 import { TableHeaderCell, type SortDirection } from "./TableHeaderCell";
 import { TableSkeleton } from "./TableSkeleton";
@@ -27,7 +25,8 @@ export function Table<T>({
   stickyHeader = false,
   maxHeight,
   bordered = false,
-  size = "md",  
+  size = "md",
+  mobileLayout = "scroll",
   className,
 }: CustomTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -63,15 +62,98 @@ export function Table<T>({
     }
   };
 
-  const scrollStyle =
-    stickyHeader && maxHeight ? { maxHeight } : undefined;
+  const scrollStyle = stickyHeader && maxHeight ? { maxHeight } : undefined;
+
+  const visibleColumns = columns.filter((col) => !col.hideOnMobile);
 
   return (
-    <div className={cn(tableWrapperVariants({ bordered }), className)}>
+    <div
+      className={cn(
+        tableWrapperVariants({ bordered }),
+        // Strip wrapper border on mobile when card view owns its own borders
+        mobileLayout === "cards" &&
+          bordered &&
+          "max-md:border-0 max-md:rounded-none",
+        className,
+      )}
+    >
+      {/* ── Mobile card view ─────────────────────────────────────────── */}
+      {mobileLayout === "cards" && (
+        <div className="flex flex-col gap-2 sm:gap-3 md:hidden">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-lg border bg-white p-3 sm:p-4 space-y-2 sm:space-y-3">
+                {visibleColumns.map((_, j) => (
+                  <Skeleton key={j} className="h-4 w-full" />
+                ))}
+              </div>
+            ))
+          ) : sortedData.length === 0 ? (
+            <p className="py-8 text-center text-sm text-gray-500">
+              {emptyMessage}
+            </p>
+          ) : (
+            sortedData.map((row, rowIndex) => {
+              const rowKey = String(
+                (row as Record<string, unknown>)[keyField as string] ??
+                  rowIndex,
+              );
+              return (
+                <div
+                  key={rowKey}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  className={cn(
+                    "rounded-lg border border-gray-200 bg-white p-3 sm:p-4",
+                    onRowClick &&
+                      "cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors",
+                    rowClassName?.(row),
+                  )}
+                >
+                  {visibleColumns.map((col) => {
+                    const colKey = String(col.key);
+                    const rawValue = (row as Record<string, unknown>)[colKey];
+                    const content = col.render
+                      ? col.render(rawValue, row, rowIndex)
+                      : (rawValue as React.ReactNode);
+                    return (
+                      <div
+                        key={colKey}
+                        className="flex items-start justify-between gap-3 sm:gap-4 border-b border-gray-100 py-1.5 sm:py-2 first:pt-0 last:border-0 last:pb-0"
+                      >
+                        <span className="shrink-0 text-xs font-medium text-gray-500">
+                          {col.header}
+                        </span>
+                        <span
+                          className={cn(
+                            "text-sm",
+                            col.align === "center"
+                              ? "text-center"
+                              : col.align === "left"
+                                ? "text-left"
+                                : "text-right",
+                          )}
+                        >
+                          {content}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* ── Table view (always on "scroll"; md+ only on "cards") ──────── */}
       <div
         className={cn(
           "overflow-x-auto",
+          // Clip table cells to the rounded corners — overflow:auto on this
+          // element also clips to border-radius, so no parent overflow-hidden needed.
+          bordered && "rounded-lg",
           stickyHeader && "overflow-y-auto",
+          mobileLayout === "cards" && "hidden md:block",
         )}
         style={scrollStyle}
       >
@@ -91,9 +173,7 @@ export function Table<T>({
                     sorted={sortKey === colKey ? sortDir : null}
                     onSort={() => toggleSort(colKey)}
                     style={{ width: col.width, minWidth: col.minWidth }}
-                    className={cn(
-                      col.hideOnMobile && "hidden md:table-cell",
-                    )}
+                    className={cn(col.hideOnMobile && "hidden md:table-cell")}
                   >
                     {col.header}
                   </TableHeaderCell>
@@ -119,9 +199,8 @@ export function Table<T>({
             <TableBody>
               {sortedData.map((row, rowIndex) => {
                 const rowKey = String(
-                  (row as Record<string, unknown>)[
-                    keyField as string
-                  ] ?? rowIndex,
+                  (row as Record<string, unknown>)[keyField as string] ??
+                    rowIndex,
                 );
                 return (
                   <TableRow
@@ -137,9 +216,7 @@ export function Table<T>({
                   >
                     {columns.map((col) => {
                       const colKey = String(col.key);
-                      const rawValue = (row as Record<string, unknown>)[
-                        colKey
-                      ];
+                      const rawValue = (row as Record<string, unknown>)[colKey];
                       const content = col.render
                         ? col.render(rawValue, row, rowIndex)
                         : (rawValue as React.ReactNode);

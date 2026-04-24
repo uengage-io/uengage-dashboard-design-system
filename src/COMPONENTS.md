@@ -533,8 +533,8 @@ All standard `<p>` HTML attributes are also accepted.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `paddingLeft` | `CssSize` | `0` | Extra left padding (responsive, paired with CSS `min()`) |
-| `paddingRight` | `CssSize` | `0` | Extra right padding |
+| `paddingLeft` | `CssSize` | `0` | Extra left padding on top of the responsive base (e.g. desktop sidebar clearance). Scales via `min()`. |
+| `paddingRight` | `CssSize` | `0` | Extra right padding on top of the responsive base. |
 | `gap` | `CssSize` | — | Gap between child elements |
 | `className` | `string` | — | Additional CSS classes |
 
@@ -936,6 +936,7 @@ const statuses = [
 | `maxHeight` | `string` | — | CSS max-height for the scroll container (e.g. `"400px"`) |
 | `bordered` | `boolean` | `false` | Apply border styling to the table |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` | Row and cell size |
+| `mobileLayout` | `"scroll" \| "cards"` | `"scroll"` | How the table renders below `md` (768px). `"scroll"` keeps horizontal scroll; `"cards"` renders each row as a labelled card. Columns with `hideOnMobile: true` are omitted from the card view. |
 | `className` | `string` | — | Additional wrapper CSS classes |
 
 ### `ColumnDef<T>` Shape
@@ -1012,6 +1013,7 @@ const columns: ColumnDef<Order>[] = [
   maxHeight="500px"
   bordered
   size="md"
+  mobileLayout="cards"
 />
 ```
 

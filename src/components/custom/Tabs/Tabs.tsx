@@ -130,11 +130,11 @@ function OverflowTabsSelect({
           className={cn(
             "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
             variant === "primary" && [
-              "relative flex-none self-stretch gap-1 rounded-t-lg px-3 py-5 text-[14px] font-medium text-[#595959]",
+              "relative flex-none self-stretch gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
               "hover:text-[#0A5A2A] focus-visible:ring-2 focus-visible:ring-[#0A5A2A]/30",
             ],
             variant === "secondary" && [
-              "relative z-10 gap-1 rounded-full px-3 py-1 text-[14px] font-semibold text-[#595959]",
+              "relative z-10 gap-1 rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold text-[#595959]",
               "hover:text-black focus-visible:ring-2 focus-visible:ring-[#0A5A2A]/30",
             ],
             className,
@@ -166,7 +166,7 @@ function OverflowTabsSelect({
                 type="button"
                 disabled={tab.disabled}
                 className={cn(
-                  "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2.5 text-left text-[14px]",
+                  "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
                   "transition-colors duration-150",
                   isActive
                     ? "bg-[#F0F9F4] font-semibold text-[#0A5A2A]"
