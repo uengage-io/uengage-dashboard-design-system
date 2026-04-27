@@ -3,12 +3,12 @@ import { useState } from "react";
 
 const tabs = [
   { value: "tab-1", label: "Tab 1" },
-  { value: "tab-2", label: "Tabs" },
-  { value: "tab-3", label: "Tabs" },
-  { value: "tab-4", label: "Tabs" },
-  { value: "tab-5", label: "Tabs" },
-  { value: "tab-6", label: "Tabs" },
-  { value: "tab-7", label: "Tabs" },
+  { value: "tab-2", label: "Tabs 2" },
+  { value: "tab-3", label: "Tabs 3" },
+  { value: "tab-4", label: "Tabs 4" },
+  { value: "tab-5", label: "Tabs 5" },
+  { value: "tab-6", label: "Tabs 6" },
+  { value: "tab-7", label: "Tabs 7" },
 ];
 
 export default function TabsPreview() {
@@ -18,7 +18,7 @@ export default function TabsPreview() {
 
   return (
     <div className="min-h-screen bg-[#F6F8FB] p-8">
-      <div className="mx-auto flex max-w-5xl flex-col gap-8 rounded-[24px] bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+      <div className="mx-auto flex max-w-5xl flex-col gap-8 rounded-3xl bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
         <div className="flex items-center justify-between gap-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6B7280]">

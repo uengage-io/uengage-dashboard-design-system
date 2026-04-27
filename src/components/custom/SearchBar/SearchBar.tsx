@@ -156,7 +156,10 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      if (!hasQuery) return;
+      if (!hasQuery) {
+        onClear?.();
+        return;
+      }
       if (filteredItems.length > 0) {
         handleSelect(filteredItems[0]!);
       } else {
@@ -169,7 +172,10 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
   const handleSearchClick = () => {
     if (disabled) return;
-    if (!hasQuery) return;
+    if (!hasQuery) {
+      onClear?.();
+      return;
+    }
     if (filteredItems.length > 0) {
       handleSelect(filteredItems[0]!);
       return;
