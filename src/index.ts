@@ -217,21 +217,17 @@ export {
 // Alert Dialog (custom)
 export {
   AlertDialog,
-  StatusAlertDialog,
-  SuccessAlertDialog,
-  SweetAlertDialog,
   SweetAlertProvider,
   useSweetAlert,
-  type StatusAlertDialogProps,
-  type StatusAlertDialogVariantProps,
-  type SweetAlertOptions,
-  type SweetAlertResult,
-  type SweetAlertDialogProps,
-  type SweetAlertSize,
   type AlertDialogProps,
+  type AlertDialogOptions,
+  type AlertDialogVariant,
+  type AlertDialogSize,
+  type AlertDialogInput,
+  type AlertDialogIconProp,
+  type SweetAlertResult,
+  alertDialogIconBadgeVariants,
 } from "./components/custom/Alert-Dialog";
-
-export { alertDialogStatusBadgeVariants } from "./components/custom/Alert-Dialog";
 
 // Tokens
 export {

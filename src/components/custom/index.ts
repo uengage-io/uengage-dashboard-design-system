@@ -7,12 +7,11 @@ export { Toggle, type ToggleProps } from "./Toggle";
 export { Table } from "./Table";
 export { StatusBadge, type StatusBadgeProps } from "./StatusBadge";
 export {
-  StatusAlertDialog,
-  SweetAlertDialog,
+  AlertDialog,
   SweetAlertProvider,
   useSweetAlert,
-  type StatusAlertDialogProps,
-  type SweetAlertOptions,
+  type AlertDialogProps,
+  type AlertDialogOptions,
   type SweetAlertResult,
 } from "./Alert-Dialog";
 export { Sidebar, type SidebarProps } from "./sidebar";

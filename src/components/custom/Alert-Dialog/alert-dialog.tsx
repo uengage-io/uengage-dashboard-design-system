@@ -1,14 +1,6 @@
 import * as React from "react";
-import {
-  Check,
-  X,
-  AlertTriangle,
-  Info,
-  HelpCircle,
-  type LucideIcon,
-} from "lucide-react";
+import { Check, X, AlertTriangle, Info, HelpCircle, type LucideIcon } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
 import { Button, type ButtonProps } from "@/components/custom/Button/button";
 import {
@@ -21,7 +13,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-const statusBadgeVariants = cva(
+// ─────────────────────────────────────────────────────────────────────────────
+// Icon badge
+// ─────────────────────────────────────────────────────────────────────────────
+
+const iconBadgeVariants = cva(
   [
     "relative inline-flex size-14 sm:size-20 items-center justify-center rounded-full",
     "before:absolute before:inset-[-6px] sm:before:inset-[-10px] before:rounded-full before:border",
@@ -29,731 +25,554 @@ const statusBadgeVariants = cva(
   {
     variants: {
       variant: {
-        success:
-          "bg-emerald-50 text-emerald-600 before:border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:before:border-emerald-900/60",
-        error:
-          "bg-red-50 text-red-600 before:border-red-100 dark:bg-red-950/40 dark:text-red-400 dark:before:border-red-900/60",
-        warning:
-          "bg-amber-50 text-amber-600 before:border-amber-100 dark:bg-amber-950/40 dark:text-amber-400 dark:before:border-amber-900/60",
-        info: "bg-sky-50 text-sky-600 before:border-sky-100 dark:bg-sky-950/40 dark:text-sky-400 dark:before:border-sky-900/60",
+        success: "bg-emerald-50 text-emerald-600 before:border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:before:border-emerald-800",
+        error:   "bg-red-50 text-red-500 before:border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:before:border-red-800",
+        warning: "bg-amber-50 text-amber-500 before:border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:before:border-amber-800",
+        info:    "bg-sky-50 text-sky-500 before:border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:before:border-sky-800",
       },
     },
-    defaultVariants: { variant: "success" },
+    defaultVariants: { variant: "info" },
   },
 );
 
-type StatusVariant = NonNullable<
-  VariantProps<typeof statusBadgeVariants>["variant"]
->;
+export { iconBadgeVariants as alertDialogIconBadgeVariants };
 
-const defaultIconMap: Record<StatusVariant, LucideIcon> = {
-  success: Check,
-  error: X,
-  warning: AlertTriangle,
-  info: Info,
+// ─────────────────────────────────────────────────────────────────────────────
+// Public types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AlertDialogVariant = NonNullable<VariantProps<typeof iconBadgeVariants>["variant"]>;
+export type AlertDialogSize    = "sm" | "default";
+export type AlertDialogInput   = "text" | "textarea";
+
+/** All icon options: a variant string, "question", or any Lucide icon component. */
+export type AlertDialogIconProp = AlertDialogVariant | "question" | LucideIcon;
+
+const VARIANT_ICONS: Record<AlertDialogVariant | "question", LucideIcon> = {
+  success:  Check,
+  error:    X,
+  warning:  AlertTriangle,
+  info:     Info,
+  question: HelpCircle,
 };
 
-export interface StatusAlertDialogProps {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  trigger?: React.ReactNode;
+const ICON_ANIM: Record<AlertDialogVariant, string> = {
+  success: "uengage-icon-success",
+  error:   "uengage-icon-error",
+  warning: "uengage-icon-warning",
+  info:    "uengage-icon-info",
+};
 
-  variant?: StatusVariant;
-  icon?: LucideIcon;
+// ─────────────────────────────────────────────────────────────────────────────
+// AlertDialogOptions — shared by both declarative and imperative APIs
+// ─────────────────────────────────────────────────────────────────────────────
 
-  title: React.ReactNode;
-  description?: React.ReactNode;
-
-  footer?: React.ReactNode;
-  closeOnOverlayClick?: boolean;
-  closeOnEsc?: boolean;
-  autoCloseMs?: number;
-
-  className?: string;
-}
-
-export function StatusAlertDialog({
-  open,
-  onOpenChange,
-  trigger,
-  variant = "success",
-  icon,
-  title,
-  description,
-  footer,
-  closeOnOverlayClick,
-  closeOnEsc,
-  autoCloseMs,
-  className,
-}: StatusAlertDialogProps) {
-  return (
-    <AlertDialog
-      open={open}
-      onOpenChange={onOpenChange}
-      trigger={trigger}
-      variant={variant}
-      icon={icon}
-      title={title}
-      description={description}
-      footer={footer}
-      closeOnOverlayClick={closeOnOverlayClick}
-      closeOnEsc={closeOnEsc}
-      autoCloseMs={autoCloseMs}
-      className={className}
-      showActions={!!footer}
-    />
-  );
-}
-
-export type StatusAlertDialogVariantProps = Omit<
-  StatusAlertDialogProps,
-  "variant"
->;
-
-export const SuccessAlertDialog = (props: StatusAlertDialogVariantProps) => (
-  <StatusAlertDialog variant="success" {...props} />
-);
-
-export { statusBadgeVariants };
-
-type SweetAlertIcon = StatusVariant | "question";
-
-type SweetAlertInput = "text" | "textarea";
-
-export type SweetAlertResult<TValue = string> =
-  | { isConfirmed: true; isDismissed: false; value?: TValue }
-  | { isConfirmed: false; isDismissed: true; value?: undefined };
-
-export type SweetAlertSize = "sm" | "default";
-
-export interface SweetAlertOptions<TValue = string> {
+export interface AlertDialogOptions<TValue = string> {
+  // ── Visual ──────────────────────────────────────────────────────────────────
   /**
-   * If you pass a string status/icon-key we will use the built-in icons.
-   * If you pass a Lucide icon component we will render it as-is.
+   * The icon shown in the coloured badge at the top.
+   * - Pass `"success" | "error" | "warning" | "info"` for a built-in icon that
+   *   also sets the badge colour automatically.
+   * - Pass `"question"` for a question-mark icon (badge colour defaults to info).
+   * - Pass any Lucide icon **component** (e.g. `Rocket`) for a fully custom icon.
+   * @example icon="success"   icon="question"   icon={Rocket}
    */
-  icon?: SweetAlertIcon | LucideIcon;
+  icon?: AlertDialogIconProp;
+
+  /**
+   * Badge ring / icon colour.  Auto-inferred from `icon` when `icon` is a
+   * variant string — only set this when you want to override.
+   * @example variant="error"
+   */
+  variant?: AlertDialogVariant;
+
+  /** The dialog title — required. */
   title: React.ReactNode;
+
+  /**
+   * Body text shown below the title.
+   * `text` and `description` are identical aliases; use whichever reads better.
+   */
   text?: React.ReactNode;
+  /** Alias for `text`. */
   description?: React.ReactNode;
-  variant?: StatusVariant;
 
-  size?: SweetAlertSize;
+  /**
+   * Controls the max-width of the dialog.
+   * - `"default"` → `max-w-md` (~448 px)
+   * - `"sm"`      → `max-w-xs` (~320 px)
+   * @default "default"
+   */
+  size?: AlertDialogSize;
 
+  // ── Buttons ─────────────────────────────────────────────────────────────────
+  /**
+   * Label for the confirm / primary button.
+   * @default "OK"
+   */
   confirmButtonText?: React.ReactNode;
+
+  /**
+   * Label for the cancel button (only visible when `showCancelButton` is true).
+   * @default "Cancel"
+   */
   cancelButtonText?: React.ReactNode;
+
+  /**
+   * Show a cancel / dismiss button alongside the confirm button.
+   * @default false
+   */
   showCancelButton?: boolean;
 
+  /**
+   * Visual variant of the confirm button (uses the custom Button component).
+   * @default "primary"
+   */
   confirmButtonVariant?: ButtonProps["variant"];
+
+  /**
+   * Visual variant of the cancel button.
+   * @default "secondary"
+   */
   cancelButtonVariant?: ButtonProps["variant"];
 
-  closeOnOverlayClick?: boolean;
-  closeOnEsc?: boolean;
-  autoCloseMs?: number;
-
-  input?: SweetAlertInput;
-  inputPlaceholder?: string;
-  defaultValue?: TValue;
-
-  footer?: React.ReactNode;
   /**
-   * If `false`, we hide the default confirm/cancel buttons.
-   * Useful for status-only dialogs where actions are provided via `footer`.
+   * Hide the default confirm / cancel buttons entirely.
+   * Useful when you supply a custom `footer`.
+   * @default true
    */
   showActions?: boolean;
 
   /**
-   * Return a string to show an inline validation message and block confirm.
-   * Return null/undefined to allow confirm.
+   * Render custom content in the footer **instead of** the default buttons.
+   * When provided, `confirmButtonText`, `cancelButtonText`, `showCancelButton`,
+   * `confirmButtonVariant`, and `cancelButtonVariant` are ignored.
+   */
+  footer?: React.ReactNode;
+
+  // ── Behaviour ───────────────────────────────────────────────────────────────
+  /**
+   * Close the dialog when the user clicks the semi-transparent backdrop.
+   * @default true
+   */
+  closeOnOverlayClick?: boolean;
+
+  /**
+   * Close the dialog when the user presses the Escape key.
+   * @default true
+   */
+  closeOnEsc?: boolean;
+
+  /**
+   * Automatically dismiss the dialog after this many milliseconds.
+   * The timer pauses while an async `preConfirm` is in progress.
+   * @example autoCloseMs={2000}  // closes after 2 seconds
+   */
+  autoCloseMs?: number;
+
+  // ── Input ───────────────────────────────────────────────────────────────────
+  /**
+   * Render an input field inside the dialog body.
+   * - `"text"`     → single-line `<input>`
+   * - `"textarea"` → multi-line `<textarea>`
+   */
+  input?: AlertDialogInput;
+
+  /** Placeholder text for the input field. */
+  inputPlaceholder?: string;
+
+  /** Pre-filled value for the input field. */
+  defaultValue?: TValue;
+
+  /**
+   * Client-side validation run on confirm.
+   * Return a non-empty string to show an inline error and block confirm.
+   * Return `null` or `undefined` to allow the confirm to proceed.
+   * @example inputValidator={(v) => v.trim().length < 3 ? "Too short" : null}
    */
   inputValidator?: (value: TValue) => string | null | undefined;
 
   /**
-   * Called when user clicks confirm. If it throws/rejects, dialog stays open
-   * and the error message is shown.
+   * Async function called after validation passes.
+   * The dialog shows a loading spinner while this resolves.
+   * Throw an `Error` to keep the dialog open and display the error message.
+   * @example preConfirm={async (v) => { await api.save(v); }}
    */
   preConfirm?: (value: TValue) => void | Promise<void>;
 }
 
-type SweetAlertInternalState<TValue> = {
-  open: boolean;
-  options: SweetAlertOptions<TValue> | null;
-  resolve: ((result: SweetAlertResult<TValue>) => void) | null;
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// Internal body — shared between AlertDialog and SweetAlertProvider
+// ─────────────────────────────────────────────────────────────────────────────
 
-type SweetAlertContextValue = {
-  fire: <TValue = string>(
-    options: SweetAlertOptions<TValue>,
-  ) => Promise<SweetAlertResult<TValue>>;
-};
-
-const SweetAlertContext = React.createContext<SweetAlertContextValue | null>(
-  null,
-);
-
-export function useSweetAlert() {
-  const ctx = React.useContext(SweetAlertContext);
-  if (!ctx) {
-    throw new Error("useSweetAlert must be used within SweetAlertProvider");
-  }
-  return ctx;
+interface BodyProps<TValue> extends AlertDialogOptions<TValue> {
+  inputValue: TValue;
+  onInputChange: (v: TValue) => void;
+  inputError: string | null;
+  submitError: string | null;
+  loading: boolean;
+  onConfirm: () => void;
+  onDismiss: () => void;
+  className?: string;
+  /** Forwarded to AlertDialogContent — prevents ESC close when needed */
+  onEscapeKeyDown?: (e: any) => void;
+  /** onClick on the backdrop overlay — used to trigger dismiss on outside click */
+  overlayOnClick?: () => void;
 }
 
-export function SweetAlertProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [state, setState] = React.useState<SweetAlertInternalState<any>>({
-    open: false,
-    options: null,
-    resolve: null,
-  });
-
-  const fire = React.useCallback(
-    <TValue,>(options: SweetAlertOptions<TValue>) => {
-      return new Promise<SweetAlertResult<TValue>>((resolve) => {
-        setState({ open: true, options, resolve });
-      });
-    },
-    [],
-  );
-
-  const contextValue = React.useMemo<SweetAlertContextValue>(
-    () => ({ fire }),
-    [fire],
-  );
-
-  return (
-    <SweetAlertContext.Provider value={contextValue}>
-      {children}
-      <SweetAlertInstance
-        state={state}
-        setState={setState as React.Dispatch<
-          React.SetStateAction<SweetAlertInternalState<unknown>>
-        >}
-      />
-    </SweetAlertContext.Provider>
-  );
-}
-
-function SweetAlertInstance({
-  state,
-  setState,
-}: {
-  state: SweetAlertInternalState<unknown>;
-  setState: React.Dispatch<React.SetStateAction<SweetAlertInternalState<unknown>>>;
-}) {
-  const options = state.options as SweetAlertOptions<any> | null;
-  const resolve = state.resolve as
-    | ((result: SweetAlertResult<any>) => void)
-    | null;
-
-  const [inputValue, setInputValue] = React.useState<any>(
-    options?.defaultValue ?? "",
-  );
-  const [inputError, setInputError] = React.useState<string | null>(null);
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!state.open) return;
-    setInputValue(options?.defaultValue ?? "");
-    setInputError(null);
-    setSubmitError(null);
-    setLoading(false);
-  }, [state.open, options?.defaultValue]);
-
-  const close = React.useCallback(() => {
-    setState((prev) => ({ ...prev, open: false }));
-  }, [setState]);
-
-  const dismiss = React.useCallback(() => {
-    if (resolve) resolve({ isConfirmed: false, isDismissed: true });
-    close();
-  }, [close, resolve]);
-
-  React.useEffect(() => {
-    if (!state.open || !options?.autoCloseMs || options.autoCloseMs <= 0 || loading) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      dismiss();
-    }, options.autoCloseMs);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [dismiss, loading, options?.autoCloseMs, state.open]);
-
-  const confirm = React.useCallback(async () => {
-    if (!options) return;
-    const value = inputValue;
-
-    const validation = options.inputValidator?.(value);
-    if (validation) {
-      setInputError(validation);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setSubmitError(null);
-      await options.preConfirm?.(value);
-      resolve?.({ isConfirmed: true, isDismissed: false, value });
-      close();
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong";
-      setSubmitError(message);
-      setLoading(false);
-    }
-  }, [close, inputValue, options, resolve]);
-
-  if (!options) return null;
-
-  const iconProp = options.icon;
-  const iconKey =
-    typeof iconProp === "string" ? (iconProp as SweetAlertIcon) : undefined;
-  const Icon =
-    typeof iconProp === "function"
-      ? iconProp
-      : iconKey === "question"
-        ? HelpCircle
-        : defaultIconMap[(iconKey as StatusVariant) ?? "info"];
-
-  const badgeVariant: StatusVariant =
-    options.variant ??
-    (iconKey === "success" || iconKey === "error" || iconKey === "warning" || iconKey === "info"
-      ? (iconKey as StatusVariant)
+function DialogBody<TValue = string>({
+  icon, variant, title, text, description, size = "default",
+  confirmButtonText = "OK", cancelButtonText = "Cancel",
+  showCancelButton = false,
+  confirmButtonVariant = "primary", cancelButtonVariant = "secondary",
+  showActions = true, footer,
+  input, inputPlaceholder,
+  inputValue, onInputChange, inputError, submitError, loading,
+  onConfirm, onDismiss, className,
+  onEscapeKeyDown, overlayOnClick,
+}: BodyProps<TValue>) {
+  // Resolve badge colour
+  const resolvedVariant: AlertDialogVariant =
+    variant ??
+    (typeof icon === "string" && icon !== "question" && icon in VARIANT_ICONS
+      ? (icon as AlertDialogVariant)
       : "info");
 
-  const confirmText = options.confirmButtonText ?? "OK";
-  const cancelText = options.cancelButtonText ?? "Cancel";
-  const showCancel = options.showCancelButton ?? false;
+  // Resolve icon component
+  const Icon: LucideIcon =
+    typeof icon === "function"
+      ? (icon as LucideIcon)
+      : (VARIANT_ICONS[icon as keyof typeof VARIANT_ICONS] ?? VARIANT_ICONS[resolvedVariant] ?? Info);
 
-  const confirmVariant = options.confirmButtonVariant ?? "primary";
-  const cancelVariant = options.cancelButtonVariant ?? "secondary";
-
-  const size = options.size ?? "default";
-
-  const contentInteractionProps: any = {
-    onEscapeKeyDown: (e: any) => {
-      if (options.closeOnEsc === false) e.preventDefault();
-    },
-    onInteractOutside: (e: any) => {
-      if (options.closeOnOverlayClick === false) e.preventDefault();
-    },
-    overlayProps:
-      options.closeOnOverlayClick === false
-        ? undefined
-        : {
-            onClick: () => dismiss(),
-          },
-  };
+  const bodyText = text ?? description;
 
   return (
-    <AlertDialogPrimitive
-      open={state.open}
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) {
-          dismiss();
-        }
-      }}
+    <AlertDialogContent
+      size={size}
+      aria-label="Alert dialog"
+      className={cn(
+        "gap-0 rounded-2xl border-0 shadow-2xl px-4 py-6 sm:px-8 sm:py-10 text-center",
+        size === "sm" ? "max-w-xs" : "max-w-md",
+        className,
+      )}
+      onEscapeKeyDown={onEscapeKeyDown}
+      overlayProps={overlayOnClick ? { onClick: overlayOnClick } : undefined}
     >
-      <AlertDialogContent
-        size={size}
-        aria-label="Alert dialog"
-        className={cn(
-          "gap-0 rounded-2xl px-4 py-6 sm:px-8 sm:py-10 text-center sm:gap-0",
-          size === "sm" ? "max-w-xs" : "max-w-md",
-        )}
-        {...contentInteractionProps}
-      >
-        <div className="flex flex-col items-center gap-4 sm:gap-6">
-          <div className={cn(statusBadgeVariants({ variant: badgeVariant }))}>
-            <Icon className="size-7 sm:size-10" strokeWidth={2.5} aria-hidden />
-          </div>
+      <div className="flex flex-col items-center gap-4 sm:gap-6">
 
-          <AlertDialogHeader className="gap-2 sm:text-center sm:place-items-center">
-            <AlertDialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight">
-              {options.title}
-            </AlertDialogTitle>
-            {options.text ?? options.description ? (
-              <AlertDialogDescription className="text-sm sm:text-base text-muted-foreground">
-                {options.text ?? options.description}
-              </AlertDialogDescription>
-            ) : null}
-          </AlertDialogHeader>
-
-          {options.input ? (
-            <div className="w-full text-left">
-              {options.input === "textarea" ? (
-                <textarea
-                  className="min-h-20 sm:min-h-24 w-full resize-none rounded-xl border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                  placeholder={options.inputPlaceholder}
-                  value={inputValue ?? ""}
-                  onChange={(e) => {
-                    setInputValue(e.target.value);
-                    setInputError(null);
-                    setSubmitError(null);
-                  }}
-                  disabled={loading}
-                />
-              ) : (
-                <input
-                  className="h-11 w-full rounded-xl border bg-background px-4 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                  placeholder={options.inputPlaceholder}
-                  value={inputValue ?? ""}
-                  onChange={(e) => {
-                    setInputValue(e.target.value);
-                    setInputError(null);
-                    setSubmitError(null);
-                  }}
-                  disabled={loading}
-                />
-              )}
-              {inputError ? (
-                <p className="mt-2 text-sm text-destructive">{inputError}</p>
-              ) : null}
-            </div>
-          ) : null}
-
-          {submitError ? (
-            <div className="w-full rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-left text-sm text-destructive">
-              {submitError}
-            </div>
-          ) : null}
-
-          {options.footer ? (
-            <AlertDialogFooter className="w-full sm:justify-center">
-              {options.footer}
-            </AlertDialogFooter>
-          ) : options.showActions === false ? null : (
-            <AlertDialogFooter className="w-full sm:justify-center">
-              {showCancel ? (
-                <Button
-                  variant={cancelVariant}
-                  disabled={loading}
-                  onClick={dismiss}
-                >
-                  {cancelText}
-                </Button>
-              ) : null}
-              <Button
-                variant={confirmVariant}
-                loading={loading}
-                onClick={confirm}
-              >
-                {confirmText}
-              </Button>
-            </AlertDialogFooter>
-          )}
+        {/* ── Icon badge ── */}
+        <div className={cn(iconBadgeVariants({ variant: resolvedVariant }), ICON_ANIM[resolvedVariant])}>
+          <Icon className="size-7 sm:size-10" strokeWidth={2.5} aria-hidden />
         </div>
-      </AlertDialogContent>
-    </AlertDialogPrimitive>
+
+        {/* ── Title + body text ── */}
+        <AlertDialogHeader className="gap-2 sm:text-center sm:place-items-center">
+          <AlertDialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight">
+            {title}
+          </AlertDialogTitle>
+          {bodyText && (
+            <AlertDialogDescription className="text-sm sm:text-base text-muted-foreground">
+              {bodyText}
+            </AlertDialogDescription>
+          )}
+        </AlertDialogHeader>
+
+        {/* ── Optional input field ── */}
+        {input && (
+          <div className="w-full text-left">
+            {input === "textarea" ? (
+              <textarea
+                className="min-h-20 sm:min-h-24 w-full resize-none rounded-xl border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                placeholder={inputPlaceholder}
+                value={String(inputValue ?? "")}
+                onChange={(e) => onInputChange(e.target.value as TValue)}
+                disabled={loading}
+              />
+            ) : (
+              <input
+                className="h-11 w-full rounded-xl border bg-background px-4 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                placeholder={inputPlaceholder}
+                value={String(inputValue ?? "")}
+                onChange={(e) => onInputChange(e.target.value as TValue)}
+                disabled={loading}
+              />
+            )}
+            {inputError && (
+              <p className="mt-2 text-sm text-destructive">{inputError}</p>
+            )}
+          </div>
+        )}
+
+        {/* ── Async error from preConfirm ── */}
+        {submitError && (
+          <div className="w-full rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-left text-sm text-destructive">
+            {submitError}
+          </div>
+        )}
+
+        {/* ── Footer ── */}
+        {footer ? (
+          <AlertDialogFooter className="w-full sm:justify-center">
+            {footer}
+          </AlertDialogFooter>
+        ) : showActions !== false ? (
+          <AlertDialogFooter className="w-full sm:justify-center">
+            {showCancelButton && (
+              <Button variant={cancelButtonVariant} disabled={loading} onClick={onDismiss}>
+                {cancelButtonText}
+              </Button>
+            )}
+            <Button variant={confirmButtonVariant} loading={loading} onClick={onConfirm}>
+              {confirmButtonText}
+            </Button>
+          </AlertDialogFooter>
+        ) : null}
+      </div>
+    </AlertDialogContent>
   );
 }
 
-export interface AlertDialogProps<TValue = string>
-  extends SweetAlertOptions<TValue> {
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  trigger?: React.ReactNode;
-  className?: string;
+// ─────────────────────────────────────────────────────────────────────────────
+// AlertDialog — declarative component
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AlertDialogProps<TValue = string> extends AlertDialogOptions<TValue> {
   /**
-   * Controls whether the default action buttons are rendered when `footer`
-   * is not provided. Defaults to `true`.
+   * Controlled open state.  When provided, you must also handle `onOpenChange`.
+   * Omit both to use uncontrolled mode with `defaultOpen`.
    */
-  showActions?: boolean;
-  description?: React.ReactNode;
+  open?: boolean;
+
+  /**
+   * Initial open state for uncontrolled mode.
+   * @default false
+   */
+  defaultOpen?: boolean;
+
+  /** Called whenever the dialog opens or closes. */
+  onOpenChange?: (open: boolean) => void;
+
+  /**
+   * An element that opens the dialog when clicked.
+   * Wrap it in `asChild` automatically — pass the raw element, not a wrapper.
+   * @example trigger={<Button>Open</Button>}
+   */
+  trigger?: React.ReactNode;
+
+  /** Extra Tailwind classes merged onto the dialog panel. */
+  className?: string;
 }
 
 export function AlertDialog<TValue = string>({
-  open,
+  open: openProp,
   defaultOpen = false,
   onOpenChange,
   trigger,
-  variant,
-  icon,
-  title,
-  description,
-  text,
-  footer,
-  className,
-  size = "default",
-  confirmButtonText,
-  cancelButtonText,
-  showCancelButton,
-  confirmButtonVariant = "primary",
-  cancelButtonVariant = "secondary",
-  closeOnOverlayClick = true,
-  closeOnEsc = true,
-  autoCloseMs,
-  input,
-  inputPlaceholder,
   defaultValue,
   inputValidator,
   preConfirm,
-  showActions = true,
+  closeOnOverlayClick = true,
+  closeOnEsc = true,
+  autoCloseMs,
+  className,
+  ...options
 }: AlertDialogProps<TValue>) {
-  const isControlled = open !== undefined;
-  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(
-    defaultOpen,
-  );
-  const resolvedOpen = isControlled ? open : uncontrolledOpen;
+  const isControlled = openProp !== undefined;
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
+  const open = isControlled ? openProp! : uncontrolledOpen;
 
-  const handleOpenChange = React.useCallback(
-    (nextOpen: boolean) => {
-      if (!isControlled) setUncontrolledOpen(nextOpen);
-      onOpenChange?.(nextOpen);
+  const [inputValue, setInputValue]   = React.useState<TValue>((defaultValue ?? "") as TValue);
+  const [inputError, setInputError]   = React.useState<string | null>(null);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const [loading, setLoading]         = React.useState(false);
+
+  const setOpen = React.useCallback(
+    (next: boolean) => {
+      if (!isControlled) setUncontrolledOpen(next);
+      onOpenChange?.(next);
     },
     [isControlled, onOpenChange],
   );
 
-  const [inputValue, setInputValue] = React.useState<any>(
-    defaultValue ?? "",
-  );
-  const [inputError, setInputError] = React.useState<string | null>(null);
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState(false);
-
+  // Reset internal state whenever the dialog (re)opens
   React.useEffect(() => {
-    if (!resolvedOpen) return;
-    setInputValue(defaultValue ?? "");
+    if (!open) return;
+    setInputValue((defaultValue ?? "") as TValue);
     setInputError(null);
     setSubmitError(null);
     setLoading(false);
-  }, [resolvedOpen, defaultValue]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-close timer
   React.useEffect(() => {
-    if (!resolvedOpen || !autoCloseMs || autoCloseMs <= 0 || loading) {
-      return;
-    }
+    if (!open || !autoCloseMs || loading) return;
+    const id = window.setTimeout(() => setOpen(false), autoCloseMs);
+    return () => window.clearTimeout(id);
+  }, [open, autoCloseMs, loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const timeoutId = window.setTimeout(() => {
-      handleOpenChange(false);
-    }, autoCloseMs);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [autoCloseMs, handleOpenChange, loading, resolvedOpen]);
-
-  const Icon =
-    typeof icon === "function"
-      ? icon
-      : (icon === "question"
-          ? HelpCircle
-          : defaultIconMap[(icon as StatusVariant) ?? "info"]) as LucideIcon;
-
-  const badgeVariant: StatusVariant =
-    variant ??
-    (icon === "success" || icon === "error" || icon === "warning" || icon === "info"
-      ? (icon as StatusVariant)
-      : "info");
-
-  const showCancel = showCancelButton ?? false;
-  const confirmText = confirmButtonText ?? "OK";
-  const cancelText = cancelButtonText ?? "Cancel";
-
-  const contentInteractionProps: any = {
-    onEscapeKeyDown: (e: any) => {
-      if (closeOnEsc === false) e.preventDefault();
-    },
-    onInteractOutside: (e: any) => {
-      if (closeOnOverlayClick === false) e.preventDefault();
-    },
-  };
-
-  const dismiss = React.useCallback(() => {
-    handleOpenChange(false);
-  }, [handleOpenChange]);
-
-  contentInteractionProps.overlayProps =
-    closeOnOverlayClick === false
-      ? undefined
-      : {
-          onClick: () => dismiss(),
-        };
+  const dismiss = React.useCallback(() => setOpen(false), [setOpen]);
 
   const confirm = React.useCallback(async () => {
-    if (!preConfirm && !inputValidator) {
-      handleOpenChange(false);
-      return;
-    }
+    const validationError = inputValidator?.(inputValue);
+    if (validationError) { setInputError(validationError); return; }
 
-    const value = inputValue as TValue;
-
-    const validation = inputValidator?.(value);
-    if (validation) {
-      setInputError(validation);
-      return;
-    }
+    if (!preConfirm) { setOpen(false); return; }
 
     try {
       setLoading(true);
       setSubmitError(null);
-      await preConfirm?.(value);
-      handleOpenChange(false);
+      await preConfirm(inputValue);
+      setOpen(false);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong";
-      setSubmitError(message);
+      setSubmitError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
     }
-  }, [handleOpenChange, inputError, inputValue, inputValidator, preConfirm]);
+  }, [inputValue, inputValidator, preConfirm, setOpen]);
 
   return (
-    <AlertDialogPrimitive open={resolvedOpen} onOpenChange={handleOpenChange}>
-      {trigger ? <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger> : null}
-      <AlertDialogContent
-        size={size}
-        aria-label="Alert dialog"
-        className={cn(
-          "gap-0 rounded-2xl px-4 py-6 sm:px-8 sm:py-10 text-center sm:gap-0",
-          size === "sm" ? "max-w-xs" : "max-w-md",
-          className,
-        )}
-        {...contentInteractionProps}
-      >
-        <div className="flex flex-col items-center gap-4 sm:gap-6">
-          <div className={cn(statusBadgeVariants({ variant: badgeVariant }))}>
-            <Icon className="size-7 sm:size-10" strokeWidth={2.5} aria-hidden />
-          </div>
-
-          <AlertDialogHeader className="gap-2 sm:text-center sm:place-items-center">
-            <AlertDialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight">
-              {title}
-            </AlertDialogTitle>
-            {text ?? description ? (
-              <AlertDialogDescription className="text-sm sm:text-base text-muted-foreground">
-                {text ?? description}
-              </AlertDialogDescription>
-            ) : null}
-          </AlertDialogHeader>
-
-          {input ? (
-            <div className="w-full text-left">
-              {input === "textarea" ? (
-                <textarea
-                  className="min-h-20 sm:min-h-24 w-full resize-none rounded-xl border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                  placeholder={inputPlaceholder}
-                  value={inputValue ?? ""}
-                  onChange={(e) => {
-                    setInputValue(e.target.value);
-                    setInputError(null);
-                    setSubmitError(null);
-                  }}
-                  disabled={loading}
-                />
-              ) : (
-                <input
-                  className="h-11 w-full rounded-xl border bg-background px-4 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                  placeholder={inputPlaceholder}
-                  value={inputValue ?? ""}
-                  onChange={(e) => {
-                    setInputValue(e.target.value);
-                    setInputError(null);
-                    setSubmitError(null);
-                  }}
-                  disabled={loading}
-                />
-              )}
-              {inputError ? (
-                <p className="mt-2 text-sm text-destructive">{inputError}</p>
-              ) : null}
-            </div>
-          ) : null}
-
-          {submitError ? (
-            <div className="w-full rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-left text-sm text-destructive">
-              {submitError}
-            </div>
-          ) : null}
-
-          {footer ? (
-            <AlertDialogFooter className="w-full sm:justify-center">
-              {footer}
-            </AlertDialogFooter>
-          ) : showActions === false ? null : (
-            <AlertDialogFooter className="w-full sm:justify-center">
-              {showCancel ? (
-                <Button
-                  variant={cancelButtonVariant}
-                  disabled={loading}
-                  onClick={dismiss}
-                >
-                  {cancelText}
-                </Button>
-              ) : null}
-              <Button
-                variant={confirmButtonVariant}
-                loading={loading}
-                onClick={confirm}
-              >
-                {confirmText}
-              </Button>
-            </AlertDialogFooter>
-          )}
-        </div>
-      </AlertDialogContent>
+    <AlertDialogPrimitive open={open} onOpenChange={setOpen}>
+      {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
+      <DialogBody
+        {...options}
+        defaultValue={defaultValue}
+        inputValue={inputValue}
+        onInputChange={(v) => { setInputValue(v); setInputError(null); setSubmitError(null); }}
+        inputError={inputError}
+        submitError={submitError}
+        loading={loading}
+        onConfirm={confirm}
+        onDismiss={dismiss}
+        className={className}
+        onEscapeKeyDown={(e) => { if (!closeOnEsc) e.preventDefault(); }}
+        overlayOnClick={closeOnOverlayClick ? dismiss : undefined}
+      />
     </AlertDialogPrimitive>
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SweetAlertProvider + useSweetAlert — imperative / Promise-based API
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
- * Controlled, declarative wrapper using the same UI as `SweetAlertProvider`.
- * Use this when you don't want the imperative Promise API.
+ * The value returned by `fire()`.
+ * Check `isConfirmed` to know whether the user clicked the confirm button.
+ *
+ * @example
+ * const result = await fire({ title: "Sure?" });
+ * if (result.isConfirmed) { ... }
  */
-export interface SweetAlertDialogProps<TValue = string>
-  extends SweetAlertOptions<TValue> {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+export type SweetAlertResult<TValue = string> =
+  | { isConfirmed: true;  isDismissed: false; value: TValue }
+  | { isConfirmed: false; isDismissed: true;  value?: undefined };
+
+type SweetAlertContextValue = {
+  /**
+   * Open an AlertDialog imperatively and await the user's response.
+   *
+   * @returns A Promise that resolves with `{ isConfirmed, isDismissed, value }`.
+   *
+   * @example
+   * const { fire } = useSweetAlert();
+   * const result = await fire({
+   *   icon: "warning",
+   *   title: "Delete item?",
+   *   showCancelButton: true,
+   * });
+   * if (result.isConfirmed) deleteItem();
+   */
+  fire: <TValue = string>(options: AlertDialogOptions<TValue>) => Promise<SweetAlertResult<TValue>>;
+};
+
+const SweetAlertContext = React.createContext<SweetAlertContextValue | null>(null);
+
+/** Access the imperative `fire()` method anywhere inside `<SweetAlertProvider>`. */
+export function useSweetAlert() {
+  const ctx = React.useContext(SweetAlertContext);
+  if (!ctx) throw new Error("useSweetAlert must be used inside <SweetAlertProvider>");
+  return ctx;
 }
 
-export function SweetAlertDialog<TValue = string>({
-  open,
-  onOpenChange,
-  ...options
-}: SweetAlertDialogProps<TValue>) {
+type PendingDialog<TValue = any> = {
+  id: number;
+  options: AlertDialogOptions<TValue>;
+  resolve: (result: SweetAlertResult<TValue>) => void;
+};
+
+/**
+ * Wrap your app (or a subtree) with this provider to enable `useSweetAlert()`.
+ *
+ * @example
+ * <SweetAlertProvider>
+ *   <App />
+ * </SweetAlertProvider>
+ */
+export function SweetAlertProvider({ children }: { children: React.ReactNode }) {
+  const [queue, setQueue] = React.useState<PendingDialog[]>([]);
+  const counter = React.useRef(0);
+
+  const fire = React.useCallback(
+    <TValue,>(options: AlertDialogOptions<TValue>) =>
+      new Promise<SweetAlertResult<TValue>>((resolve) => {
+        counter.current += 1;
+        setQueue((q) => [...q, { id: counter.current, options, resolve: resolve as any }]);
+      }),
+    [],
+  );
+
+  const ctx = React.useMemo<SweetAlertContextValue>(() => ({ fire }), [fire]);
+
   return (
-    <AlertDialog
-      open={open}
-      onOpenChange={onOpenChange}
-      {...options}
-      // Consumers of SweetAlertDialog already control `open`.
-      showActions={options.showActions ?? true}
-    />
+    <SweetAlertContext.Provider value={ctx}>
+      {children}
+      {queue[0] && (
+        <SweetAlertInstance
+          key={queue[0].id}
+          pending={queue[0]}
+          onDone={() => setQueue((q) => q.slice(1))}
+        />
+      )}
+    </SweetAlertContext.Provider>
   );
 }
 
-function SweetAlertProviderBridge({
-  open,
-  onOpenChange,
-  options,
+/** Renders one queued dialog and resolves its promise on confirm / dismiss. */
+function SweetAlertInstance({
+  pending,
+  onDone,
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  options: SweetAlertOptions<any>;
+  pending: PendingDialog;
+  onDone: () => void;
 }) {
-  const [state, setState] = React.useState<SweetAlertInternalState<unknown>>({
-    open,
-    options,
-    resolve: null,
-  });
+  const resolvedRef = React.useRef(false);
 
-  React.useEffect(() => {
-    setState((prev) => ({ ...prev, open, options }));
-  }, [open, options]);
+  const handlePreConfirm = React.useCallback(
+    async (value: any) => {
+      await pending.options.preConfirm?.(value as any);
+      // Mark as resolved BEFORE setOpen(false) fires onOpenChange
+      resolvedRef.current = true;
+      pending.resolve({ isConfirmed: true, isDismissed: false, value: value as any });
+      onDone();
+    },
+    [pending, onDone],
+  );
+
+  const handleOpenChange = React.useCallback(
+    (next: boolean) => {
+      if (!next && !resolvedRef.current) {
+        pending.resolve({ isConfirmed: false, isDismissed: true });
+        onDone();
+      }
+    },
+    [pending, onDone],
+  );
 
   return (
-    <SweetAlertInstance
-      state={state}
-      setState={(updater) => {
-        setState((prev) => {
-          const next = typeof updater === "function" ? updater(prev) : updater;
-          if (prev.open !== next.open) onOpenChange(next.open);
-          return next;
-        });
-      }}
+    <AlertDialog
+      {...pending.options}
+      open
+      preConfirm={pending.options.preConfirm ? handlePreConfirm : undefined}
+      onOpenChange={handleOpenChange}
     />
   );
 }

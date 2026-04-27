@@ -1,21 +1,17 @@
 export {
   AlertDialog,
-  StatusAlertDialog,
-  SuccessAlertDialog,
-  type StatusAlertDialogProps,
-  type StatusAlertDialogVariantProps,
+  type AlertDialogProps,
+  type AlertDialogOptions,
+  type AlertDialogVariant,
+  type AlertDialogSize,
+  type AlertDialogInput,
+  type AlertDialogIconProp,
 } from "./alert-dialog";
-
-export { statusBadgeVariants as alertDialogStatusBadgeVariants } from "./alert-dialog";
 
 export {
-  SweetAlertDialog,
   SweetAlertProvider,
   useSweetAlert,
-  type AlertDialogProps,
-  type SweetAlertOptions,
   type SweetAlertResult,
-  type SweetAlertDialogProps,
-  type SweetAlertSize,
 } from "./alert-dialog";
 
+export { alertDialogIconBadgeVariants } from "./alert-dialog";
