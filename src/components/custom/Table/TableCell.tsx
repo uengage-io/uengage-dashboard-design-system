@@ -28,6 +28,7 @@ export function TableCell({
       className={cn(
         tableBodyRowVariants({ size }),
         alignClass[align],
+        "whitespace-normal",
         className,
       )}
       {...props}

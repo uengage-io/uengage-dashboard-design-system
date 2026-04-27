@@ -244,5 +244,8 @@ export { brand, type BrandGreen } from "./utils/colors";
 
 export { cn } from "./lib/utils";
 
+// Modal
+export { Modal, type ModalProps } from "./components/custom/Modal";
+
 // Provider
 export { UengageProvider } from "./components/custom/Provider";

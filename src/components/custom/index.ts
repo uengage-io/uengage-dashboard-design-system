@@ -16,3 +16,4 @@ export {
   type SweetAlertResult,
 } from "./Alert-Dialog";
 export { Sidebar, type SidebarProps } from "./sidebar";
+export { Modal, type ModalProps } from "./Modal";
