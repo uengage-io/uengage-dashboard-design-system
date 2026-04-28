@@ -550,33 +550,44 @@ function SweetAlertInstance({
   pending: PendingDialog;
   onDone: () => void;
 }) {
+  const [open, setOpen] = React.useState(true);
   const resolvedRef = React.useRef(false);
+
+  const close = React.useCallback(() => setOpen(false), []);
 
   const handlePreConfirm = React.useCallback(
     async (value: any) => {
       await pending.options.preConfirm?.(value as any);
-      // Mark as resolved BEFORE setOpen(false) fires onOpenChange
       resolvedRef.current = true;
       pending.resolve({ isConfirmed: true, isDismissed: false, value: value as any });
-      onDone();
+      close();
     },
-    [pending, onDone],
+    [pending, close],
   );
 
   const handleOpenChange = React.useCallback(
     (next: boolean) => {
       if (!next && !resolvedRef.current) {
+        resolvedRef.current = true;
         pending.resolve({ isConfirmed: false, isDismissed: true });
-        onDone();
+        close();
       }
     },
-    [pending, onDone],
+    [pending, close],
   );
+
+  // Delay queue removal so the exit animation (uengage-dialog-out: 0.18 s) can finish
+  React.useEffect(() => {
+    if (!open) {
+      const id = window.setTimeout(onDone, 200);
+      return () => window.clearTimeout(id);
+    }
+  }, [open, onDone]);
 
   return (
     <AlertDialog
       {...pending.options}
-      open
+      open={open}
       preConfirm={handlePreConfirm}
       onOpenChange={handleOpenChange}
     />
