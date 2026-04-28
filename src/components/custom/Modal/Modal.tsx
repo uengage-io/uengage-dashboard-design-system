@@ -81,7 +81,7 @@ export function Modal({
             )}
           </div>
         )}
-        <div className={cn("flex-1 overflow-y-auto p-4", bodyClassName)}>
+        <div className={cn("flex-1 overflow-y-auto p-4 outline-none", bodyClassName)}>
           {children}
         </div>
       </div>
