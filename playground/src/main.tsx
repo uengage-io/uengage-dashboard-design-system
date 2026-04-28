@@ -16,11 +16,14 @@ import SidebarDemo from "./components/Sidebar";
 import TablePreview from "./components/Table";
 import ModalPreview from "./components/Modal";
 import Dialog from "./components/Dialog";
+import Modalprev from "./components/ModalPreview";
+import Demo from "./components/Alert";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Dialog/>
+    <Demo/>
     <ButtonPreview />
-
+    <Modalprev/>
     <SearchPreview />
     <SelectPreview />
     <CheckboxPreview />
