@@ -52,7 +52,7 @@ export default function PaginationPreview() {
       >
         <Pagination
           currentPage={livePage}
-          totalPages={99}
+          totalPages={999999}
           siblingCount={1}
           onPageChange={setLivePage}
         />

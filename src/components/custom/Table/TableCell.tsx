@@ -21,6 +21,7 @@ export function TableCell({
   size = "md",
   align = "left",
   className,
+  children,
   ...props
 }: TableCellProps) {
   return (
@@ -28,10 +29,16 @@ export function TableCell({
       className={cn(
         tableBodyRowVariants({ size }),
         alignClass[align],
-        "whitespace-normal",
+        // Allow content to wrap and break long words/URLs that would otherwise
+        // force the column wider than its flex-allocated share.
+        "whitespace-normal break-words align-top",
         className,
       )}
       {...props}
-    />
+    >
+      {/* Inner div constrains content to the cell width so overflow-wrap works
+          correctly inside table cells across all browsers. */}
+      <div className="min-w-0 w-full">{children}</div>
+    </ShadcnTableCell>
   );
 }

@@ -74,7 +74,7 @@ const renderAmount = (_: unknown, row: OrderRow) => {
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2">
         <StatusBadge
-          variant={variant}
+          variant={"success"}
           label={row.status}
           icon={<CreditCard className="h-3 w-3" />}
         />
@@ -108,25 +108,25 @@ const BASE_COLUMNS: ColumnDef<OrderRow>[] = [
   {
     key: "customerName",
     header: "Customer Detail",
-    minWidth: "180px",
+    flex: 1,
     render: renderCustomer,
   },
   {
     key: "amount",
     header: "Amount Detail",
-    minWidth: "220px",
+    flex: 1.2,
     render: renderAmount,
   },
   {
     key: "address",
     header: "Location",
-    minWidth: "220px",
+    flex: 1.5,
     render: renderLocation,
   },
   {
     key: "orderId",
     header: "Order Id / Remarks",
-    minWidth: "220px",
+    flex: 1.3,
     render: renderOrderRemarks,
   },
 ];

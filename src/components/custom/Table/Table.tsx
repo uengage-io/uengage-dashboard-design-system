@@ -66,6 +66,12 @@ export function Table<T>({
 
   const visibleColumns = columns.filter((col) => !col.hideOnMobile);
 
+  // Compute proportional percentage widths from flex weights
+  const totalFlex = columns.reduce((sum, col) => sum + (col.flex ?? 1), 0);
+  const colWidths = columns.map((col) =>
+    `${(((col.flex ?? 1) / totalFlex) * 100).toFixed(2)}%`,
+  );
+
   return (
     <div
       className={cn(
@@ -157,7 +163,19 @@ export function Table<T>({
         )}
         style={scrollStyle}
       >
-        <T>
+        <T className="w-full">
+          {/*
+           * colgroup sets proportional width hints (flex-derived %).
+           * table-auto (the default) is intentional: with table-fixed, CSS
+           * display:none on a <td> does NOT reclaim its <col> width, so
+           * hideOnMobile columns leave dead space. table-auto correctly
+           * collapses hidden columns and treats <col> widths as hints.
+           */}
+          <colgroup>
+            {columns.map((col, i) => (
+              <col key={String(col.key)} style={{ width: colWidths[i] }} />
+            ))}
+          </colgroup>
           <TableHeader
             className={cn(stickyHeader && "sticky top-0 z-10 bg-slate-50")}
           >
@@ -172,8 +190,10 @@ export function Table<T>({
                     sortable={col.sortable}
                     sorted={sortKey === colKey ? sortDir : null}
                     onSort={() => toggleSort(colKey)}
-                    style={{ width: col.width, minWidth: col.minWidth }}
-                    className={cn(col.hideOnMobile && "hidden md:table-cell")}
+                    className={cn(
+                      col.hideOnMobile && "hidden md:table-cell",
+                      col.className,
+                    )}
                   >
                     {col.header}
                   </TableHeaderCell>
@@ -225,12 +245,9 @@ export function Table<T>({
                           key={colKey}
                           size={size}
                           align={col.align ?? "left"}
-                          style={{
-                            width: col.width,
-                            minWidth: col.minWidth,
-                          }}
                           className={cn(
                             col.hideOnMobile && "hidden md:table-cell",
+                            col.className,
                           )}
                         >
                           {content}
