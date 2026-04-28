@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import { X } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
@@ -58,10 +59,10 @@ export function Modal({
     if (e.target === e.currentTarget) onClose();
   };
 
-  return (
+  const modal = (
     <div
       className="fixed inset-0 bg-[#00000066] flex items-center justify-center px-4"
-      style={{ zIndex: 48 }}
+      style={{ zIndex: 9999 }}
       onClick={handleBackdropClick}
     >
       <div className={cn(modalSizeVariants({ size }), modalClassName)}>
@@ -86,4 +87,6 @@ export function Modal({
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modal, document.body);
 }
