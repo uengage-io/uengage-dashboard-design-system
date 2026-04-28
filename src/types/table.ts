@@ -3,12 +3,18 @@ import type { ReactNode } from "react";
 export interface ColumnDef<T> {
   key: keyof T | string;
   header: ReactNode;
-  width?: string;
-  minWidth?: string;
+  /**
+   * Proportional flex weight used to compute percentage-based column widths.
+   * Columns divide the table width in ratio to their flex values.
+   * e.g. [1, 2, 1] → 25% / 50% / 25%. Defaults to 1 (equal columns).
+   */
+  flex?: number;
   align?: "left" | "center" | "right";
   render?: (value: any, row: T, index: number) => ReactNode;
   sortable?: boolean;
   hideOnMobile?: boolean;
+  /** Extra Tailwind classes applied to both the <th> and <td> for this column. */
+  className?: string;
 }
 
 export interface CustomTableProps<T> {

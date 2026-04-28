@@ -5,9 +5,9 @@ export const pageButtonVariants = cva(
   {
     variants: {
       size: {
-        sm: "w-7 h-7 text-sm",
-        md: "w-10 h-10 text-base",
-        lg: "w-12 h-12 text-lg",
+        sm: "min-w-7 h-7 px-1.5 text-sm",
+        md: "min-w-10 h-10 px-2 text-base",
+        lg: "min-w-12 h-12 px-3 text-lg",
       },
       state: {
         default: "bg-transparent text-[#202020] font-semibold hover:bg-[#EFF8EA]",

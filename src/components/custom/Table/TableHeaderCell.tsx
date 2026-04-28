@@ -64,15 +64,16 @@ export function TableHeaderCell({
       className={cn(
         tableHeaderRowVariants({ size }),
         alignClass[align],
+        "whitespace-normal break-words align-middle",
         sortable && "cursor-pointer select-none hover:text-gray-700",
         className,
       )}
       {...props}
     >
-      <span className={cn("inline-flex items-center gap-1", justifyClass[align])}>
-        {children}
-        {sortable ? <Icon className="h-3.5 w-3.5" aria-hidden="true" /> : null}
-      </span>
+      <div className={cn("flex items-center gap-1 min-w-0", justifyClass[align])}>
+        <span className="min-w-0 break-words">{children}</span>
+        {sortable ? <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> : null}
+      </div>
     </TableHead>
   );
 }

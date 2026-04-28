@@ -8,6 +8,9 @@ export interface TableSkeletonProps {
   className?: string;
 }
 
+// Staggered widths give a natural shimmer pattern — purely cosmetic.
+const SKELETON_WIDTHS = ["w-3/4", "w-2/3", "w-4/5", "w-1/2", "w-5/6"];
+
 export function TableSkeleton({
   rows = 5,
   columns,
@@ -18,8 +21,13 @@ export function TableSkeleton({
       {Array.from({ length: rows }).map((_, rowIndex) => (
         <TableRow key={rowIndex}>
           {Array.from({ length: columns }).map((__, colIndex) => (
-            <TableCell key={colIndex} className={cn("py-3")}>
-              <Skeleton className="h-4 w-full max-w-[160px]" />
+            <TableCell key={colIndex} className={cn("py-3 align-middle")}>
+              <Skeleton
+                className={cn(
+                  "h-4",
+                  SKELETON_WIDTHS[(rowIndex * columns + colIndex) % SKELETON_WIDTHS.length],
+                )}
+              />
             </TableCell>
           ))}
         </TableRow>
