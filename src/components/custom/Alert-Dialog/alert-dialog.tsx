@@ -25,11 +25,11 @@ const iconBadgeVariants = cva(
   {
     variants: {
       variant: {
-        success:  "bg-emerald-50 text-emerald-600 before:border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:before:border-emerald-800",
-        error:    "bg-red-50 text-red-500 before:border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:before:border-red-800",
-        warning:  "bg-amber-50 text-amber-500 before:border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:before:border-amber-800",
-        info:     "bg-sky-50 text-sky-500 before:border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:before:border-sky-800",
-        question: "bg-violet-50 text-violet-600 before:border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:before:border-violet-800",
+        success:  "bg-emerald-50 text-emerald-600 before:border-emerald-200",
+        error:    "bg-red-50 text-red-500 before:border-red-200",
+        warning:  "bg-amber-50 text-amber-500 before:border-amber-200",
+        info:     "bg-sky-50 text-sky-500 before:border-sky-200",
+        question: "bg-violet-50 text-violet-600 before:border-violet-200",
       },
     },
     defaultVariants: { variant: "info" },
