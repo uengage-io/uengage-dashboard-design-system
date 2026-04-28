@@ -1,4 +1,5 @@
 import React from "react";
+import PaginationPrev from "./components/PaginationDemo";
 import ReactDOM from "react-dom/client";
 import "./styles.css";
 import ButtonPreview from "./components/Button";
@@ -18,8 +19,11 @@ import ModalPreview from "./components/Modal";
 import Dialog from "./components/Dialog";
 import Modalprev from "./components/ModalPreview";
 import Demo from "./components/Alert";
+import PaginationPreview from "./components/Pagination";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <PaginationPreview />
+    
     <Dialog/>
     <Demo/>
     <ButtonPreview />
@@ -38,5 +42,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <SidebarDemo />
     <TablePreview/>
     <ModalPreview />
+    <PaginationPrev />
   </React.StrictMode>,
 );

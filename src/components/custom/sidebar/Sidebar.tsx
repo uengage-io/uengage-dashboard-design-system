@@ -58,14 +58,16 @@ export function Sidebar({
 
   // Inline styles for percentage-based sizing. vw/vh are inherently responsive
   // and override any CVA width/maxWidth class via specificity.
+  // On mobile (< 768px) left/right sidebars always take the full viewport width.
   const customSizeStyle = React.useMemo<React.CSSProperties>(() => {
     if (sizePercent == null) return {}
     const pct = Math.min(100, Math.max(1, sizePercent))
     if (side === "top" || side === "bottom") {
       return { height: `${pct}vh`, maxHeight: "100vh" }
     }
+    if (!isDesktop) return { width: "100vw", maxWidth: "100vw" }
     return { width: `${pct}vw`, maxWidth: "100vw" }
-  }, [sizePercent, side])
+  }, [sizePercent, side, isDesktop])
 
   const shouldRenderPersistent = persistentOnDesktop && isDesktop
 

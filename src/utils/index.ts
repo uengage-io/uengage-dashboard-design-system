@@ -35,3 +35,10 @@ export {
   type TableBodyRowVariants,
   type StatusBadgeVariants,
 } from "./table";
+export {
+  pageButtonVariants,
+  chevronButtonVariants,
+  usePagination,
+  type PageButtonVariants,
+  type ChevronButtonVariants,
+} from "./pagination";
