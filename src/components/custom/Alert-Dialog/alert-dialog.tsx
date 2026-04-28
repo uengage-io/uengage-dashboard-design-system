@@ -25,10 +25,11 @@ const iconBadgeVariants = cva(
   {
     variants: {
       variant: {
-        success: "bg-emerald-50 text-emerald-600 before:border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:before:border-emerald-800",
-        error:   "bg-red-50 text-red-500 before:border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:before:border-red-800",
-        warning: "bg-amber-50 text-amber-500 before:border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:before:border-amber-800",
-        info:    "bg-sky-50 text-sky-500 before:border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:before:border-sky-800",
+        success:  "bg-emerald-50 text-emerald-600 before:border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:before:border-emerald-800",
+        error:    "bg-red-50 text-red-500 before:border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:before:border-red-800",
+        warning:  "bg-amber-50 text-amber-500 before:border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:before:border-amber-800",
+        info:     "bg-sky-50 text-sky-500 before:border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:before:border-sky-800",
+        question: "bg-violet-50 text-violet-600 before:border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:before:border-violet-800",
       },
     },
     defaultVariants: { variant: "info" },
@@ -41,14 +42,18 @@ export { iconBadgeVariants as alertDialogIconBadgeVariants };
 // Public types
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type AlertDialogVariant = NonNullable<VariantProps<typeof iconBadgeVariants>["variant"]>;
+/** Badge colour variants exposed to consumers (question is icon-only, not a colour override). */
+export type AlertDialogVariant = "success" | "error" | "warning" | "info";
 export type AlertDialogSize    = "sm" | "default";
 export type AlertDialogInput   = "text" | "textarea";
 
 /** All icon options: a variant string, "question", or any Lucide icon component. */
 export type AlertDialogIconProp = AlertDialogVariant | "question" | LucideIcon;
 
-const VARIANT_ICONS: Record<AlertDialogVariant | "question", LucideIcon> = {
+/** Internal — includes question so the badge can render its own colour + animation. */
+type BadgeVariant = AlertDialogVariant | "question";
+
+const VARIANT_ICONS: Record<BadgeVariant, LucideIcon> = {
   success:  Check,
   error:    X,
   warning:  AlertTriangle,
@@ -56,11 +61,12 @@ const VARIANT_ICONS: Record<AlertDialogVariant | "question", LucideIcon> = {
   question: HelpCircle,
 };
 
-const ICON_ANIM: Record<AlertDialogVariant, string> = {
-  success: "uengage-icon-success",
-  error:   "uengage-icon-error",
-  warning: "uengage-icon-warning",
-  info:    "uengage-icon-info",
+const ICON_ANIM: Record<BadgeVariant, string> = {
+  success:  "uengage-icon-success",
+  error:    "uengage-icon-error",
+  warning:  "uengage-icon-warning",
+  info:     "uengage-icon-info",
+  question: "uengage-icon-question",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -231,18 +237,18 @@ function DialogBody<TValue = string>({
   onConfirm, onDismiss, className,
   onEscapeKeyDown, overlayOnClick,
 }: BodyProps<TValue>) {
-  // Resolve badge colour
-  const resolvedVariant: AlertDialogVariant =
-    variant ??
-    (typeof icon === "string" && icon !== "question" && icon in VARIANT_ICONS
-      ? (icon as AlertDialogVariant)
+  // Resolve badge colour — question gets its own violet badge, not info
+  const resolvedVariant: BadgeVariant =
+    (variant as BadgeVariant | undefined) ??
+    (typeof icon === "string" && icon in VARIANT_ICONS
+      ? (icon as BadgeVariant)
       : "info");
 
   // Resolve icon component
   const Icon: LucideIcon =
     typeof icon === "function"
       ? (icon as LucideIcon)
-      : (VARIANT_ICONS[icon as keyof typeof VARIANT_ICONS] ?? VARIANT_ICONS[resolvedVariant] ?? Info);
+      : (VARIANT_ICONS[resolvedVariant] ?? Info);
 
   const bodyText = text ?? description;
 
@@ -252,7 +258,7 @@ function DialogBody<TValue = string>({
       aria-label="Alert dialog"
       className={cn(
         "gap-0 rounded-2xl border-0 shadow-2xl px-4 py-6 sm:px-8 sm:py-10 text-center",
-        size === "sm" ? "max-w-xs" : "max-w-md",
+        size === "sm" ? "sm:max-w-xs" : "sm:max-w-md",
         className,
       )}
       onEscapeKeyDown={onEscapeKeyDown}
@@ -318,11 +324,11 @@ function DialogBody<TValue = string>({
         ) : showActions !== false ? (
           <AlertDialogFooter className="w-full sm:justify-center">
             {showCancelButton && (
-              <Button variant={cancelButtonVariant} disabled={loading} onClick={onDismiss}>
+              <Button variant={cancelButtonVariant} disabled={loading} onClick={onDismiss} className="w-full sm:w-auto">
                 {cancelButtonText}
               </Button>
             )}
-            <Button variant={confirmButtonVariant} loading={loading} onClick={onConfirm}>
+            <Button variant={confirmButtonVariant} loading={loading} onClick={onConfirm} className="w-full sm:w-auto">
               {confirmButtonText}
             </Button>
           </AlertDialogFooter>
@@ -571,7 +577,7 @@ function SweetAlertInstance({
     <AlertDialog
       {...pending.options}
       open
-      preConfirm={pending.options.preConfirm ? handlePreConfirm : undefined}
+      preConfirm={handlePreConfirm}
       onOpenChange={handleOpenChange}
     />
   );

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export interface ColumnDef<T> {
   key: keyof T | string;
-  header: string;
+  header: ReactNode;
   width?: string;
   minWidth?: string;
   align?: "left" | "center" | "right";
