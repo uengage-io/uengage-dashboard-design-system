@@ -37,11 +37,7 @@ function TopHeader({
     >
       <div
         data-slot="top-header-row"
-        className={cn(
-          "flex w-full flex-col gap-2 py-[6px] sm:py-[8px]",
-          // On sm+ screens restore the side-by-side layout
-          "sm:flex-row sm:items-center sm:justify-between sm:gap-3",
-        )}
+        className="flex w-full flex-row items-center justify-between gap-3 py-[6px] sm:py-[8px]"
       >
         {/* Title + helper */}
         <div

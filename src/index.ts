@@ -243,5 +243,16 @@ export { cn } from "./lib/utils";
 // Modal
 export { Modal, type ModalProps } from "./components/custom/Modal";
 
+// Pagination
+export { Pagination } from "./components/custom/Pagination";
+export type { CustomPaginationProps } from "./types/pagination";
+export {
+  pageButtonVariants,
+  chevronButtonVariants,
+  usePagination,
+  type PageButtonVariants,
+  type ChevronButtonVariants,
+} from "./utils/pagination";
+
 // Provider
 export { UengageProvider } from "./components/custom/Provider";
