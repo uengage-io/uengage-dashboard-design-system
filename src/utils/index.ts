@@ -42,3 +42,4 @@ export {
   type PageButtonVariants,
   type ChevronButtonVariants,
 } from "./pagination";
+export { useFuzzySearch } from "./useFuzzySearch";

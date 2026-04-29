@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronDown, Check, X } from "lucide-react";
-import { defaultFilter } from "cmdk";
+import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -67,6 +67,8 @@ function Select<TItem = unknown>({
   }, [items, getLabel, getValue, getDisabled, options]);
 
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+  const filteredOptions = useFuzzySearch(resolvedOptions, search);
   const [selected, setSelected] = React.useState<string | string[]>(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : ""),
   );
@@ -199,6 +201,7 @@ function Select<TItem = unknown>({
   const handleOpenChange = (next: boolean) => {
     if (disabled) return;
     setOpen(next);
+    if (!next) setSearch(""); // reset search so next open starts fresh
     if (next) {
       interactedRef.current = true;
     } else if (interactedRef.current && !touchedRef.current) {
@@ -338,18 +341,19 @@ function Select<TItem = unknown>({
           width: "var(--radix-popover-trigger-width)",
         }}
       >
-        <Command
-          filter={(value, search) =>
-            value === SELECT_ALL ? 1 : defaultFilter(value, search)
-          }
-        >
+        {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
+        <Command shouldFilter={false}>
           <CommandInput
             placeholder="Search..."
+            value={search}
+            onValueChange={setSearch}
             spellCheck={spellCheck}
             className={commandInputSizeClass}
           />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            {filteredOptions.length === 0 && search.trim() ? (
+              <CommandEmpty>No results found.</CommandEmpty>
+            ) : null}
 
             {mode === "multi" && (
               <CommandItem
@@ -365,7 +369,7 @@ function Select<TItem = unknown>({
               </CommandItem>
             )}
 
-            {resolvedOptions.map((option) => (
+            {filteredOptions.map((option) => (
               <CommandItem
                 key={option.value}
                 value={option.value}

@@ -42,4 +42,11 @@ export interface CustomInputProps
   validationMessage?: string;
   /** Fires once the first time the field is blurred (Angular-style `touched` state). */
   onTouch?: () => void;
+  /**
+   * Optional autocomplete list. Each entry must have `label` (displayed text)
+   * and `value` (emitted on select). Fuse.js fuzzy-filters these as the user types.
+   */
+  suggestions?: Array<{ label: string; value: string }>;
+  /** Fires when the user picks a suggestion. Receives the item's `value` field. */
+  onSuggestionSelect?: (value: string) => void;
 }
