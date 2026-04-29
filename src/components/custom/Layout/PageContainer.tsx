@@ -59,8 +59,6 @@ function PageContainer({
       className={cn(
         "uengage-ui font-['Figtree'] font-medium",
         "flex flex-1 min-w-0 flex-col rounded-xl border border-[#E2E2E2] bg-background text-foreground",
-        // Outer margins: left 20px, right 22px, always fixed
-        "ml-5 mr-[22px] mt-2 sm:mt-[12px]",
         className,
       )}
       style={

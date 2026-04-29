@@ -35,7 +35,7 @@ function AlertDialogOverlay({
       data-slot="alert-dialog-overlay"
       className={cn(
         "uengage-ui",
-        "fixed inset-0 z-50 bg-black/50",
+        "fixed inset-0 z-[10000] bg-black/50",
         "data-[state=open]:animate-[uengage-overlay-in_0.25s_ease_both]",
         "data-[state=closed]:animate-[uengage-overlay-out_0.2s_ease_both]",
         className
@@ -62,7 +62,7 @@ function AlertDialogContent({
         data-size={size}
         className={cn(
           "uengage-ui",
-          "group/alert-dialog-content fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-lg",
+          "group/alert-dialog-content fixed top-[50%] left-[50%] z-[10001] grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-lg",
           "data-[state=open]:animate-[uengage-dialog-in_0.4s_ease-out_both]",
           "data-[state=closed]:animate-[uengage-dialog-out_0.18s_ease-in_both]",
           className

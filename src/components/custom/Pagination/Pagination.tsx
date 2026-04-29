@@ -21,8 +21,8 @@ import type { CustomPaginationProps } from "@/types/pagination";
 
 const ellipsisSizeClass: Record<"sm" | "md" | "lg", string> = {
   sm: "w-7 h-7 text-sm",
-  md: "w-10 h-10 text-base",
-  lg: "w-12 h-12 text-lg",
+  md: "w-7 h-7 text-sm sm:w-10 sm:h-10 sm:text-base",
+  lg: "w-10 h-10 text-base sm:w-12 sm:h-12 sm:text-lg",
 };
 
 type PillState = { x: number; y: number; w: number; h: number; animated: boolean };
@@ -47,29 +47,37 @@ export function Pagination({
   const firstRender = useRef(true);
 
   useLayoutEffect(() => {
-    const btn = buttonRefs.current.get(currentPage);
     const container = containerRef.current;
-    if (!btn || !container) return;
+    if (!container) return;
 
-    const cRect = container.getBoundingClientRect();
-    const bRect = btn.getBoundingClientRect();
-    const animated = !firstRender.current;
+    const measurePill = (animated: boolean) => {
+      const btn = buttonRefs.current.get(currentPage);
+      if (!btn) return;
+      const cRect = container.getBoundingClientRect();
+      const bRect = btn.getBoundingClientRect();
+      setPill({
+        x: bRect.left - cRect.left,
+        y: bRect.top - cRect.top,
+        w: bRect.width,
+        h: bRect.height,
+        animated,
+      });
+    };
+
+    const shouldAnimate = !firstRender.current;
     firstRender.current = false;
+    measurePill(shouldAnimate);
 
-    setPill({
-      x: bRect.left - cRect.left,
-      y: bRect.top - cRect.top,
-      w: bRect.width,
-      h: bRect.height,
-      animated,
-    });
+    const observer = new ResizeObserver(() => measurePill(false));
+    observer.observe(container);
+    return () => observer.disconnect();
   }, [currentPage, totalPages, siblingCount]);
 
   return (
     <P className={cn("mx-auto flex w-full justify-center", className)}>
       <PaginationContent
         ref={containerRef as React.Ref<HTMLUListElement>}
-        className="relative flex flex-row items-center gap-1"
+        className="relative flex flex-row flex-wrap items-center justify-center gap-1"
       >
         {/* Sliding pill — GPU-accelerated via transform */}
         {pill && (
