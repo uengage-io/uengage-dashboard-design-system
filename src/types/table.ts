@@ -9,6 +9,8 @@ export interface ColumnDef<T> {
    * e.g. [1, 2, 1] → 25% / 50% / 25%. Defaults to 1 (equal columns).
    */
   flex?: number;
+  /** Minimum column width in pixels — prevents the column from shrinking below this on mobile scroll. */
+  minWidth?: number;
   align?: "left" | "center" | "right";
   render?: (value: any, row: T, index: number) => ReactNode;
   sortable?: boolean;

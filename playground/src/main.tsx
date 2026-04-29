@@ -20,8 +20,10 @@ import Dialog from "./components/Dialog";
 import Modalprev from "./components/ModalPreview";
 import Demo from "./components/Alert";
 import PaginationPreview from "./components/Pagination";
+import FuzzySearchPreview from "./components/FuzzySearch";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <FuzzySearchPreview />
     <PaginationPreview />
     
     <Dialog/>

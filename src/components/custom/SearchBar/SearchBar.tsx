@@ -2,6 +2,7 @@ import * as React from "react";
 import { Search, X } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { Input } from "../../ui/input";
+import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import type { SearchBarProps, SearchBarSize } from "./SearchBar.types";
 
 const SIZE_HEIGHT_CLASSES: Record<SearchBarSize, string> = {
@@ -40,34 +41,6 @@ function filterValue(raw: string, valueType: string): string {
   return raw;
 }
 
-function levenshtein(a: string, b: string): number {
-  const m = a.length;
-  const n = b.length;
-  const dp: number[][] = Array.from({ length: m + 1 }, () =>
-    Array(n + 1).fill(0),
-  );
-  for (let i = 0; i <= m; i++) dp[i]![0] = i;
-  for (let j = 0; j <= n; j++) dp[0]![j] = j;
-  for (let i = 1; i <= m; i++)
-    for (let j = 1; j <= n; j++)
-      dp[i]![j] =
-        a[i - 1] === b[j - 1]
-          ? dp[i - 1]![j - 1]!
-          : 1 + Math.min(dp[i - 1]![j]!, dp[i]![j - 1]!, dp[i - 1]![j - 1]!);
-  return dp[m]![n]!;
-}
-
-function fuzzyMatch(query: string, item: string): boolean {
-  const q = query.toLowerCase();
-  const lower = item.toLowerCase();
-  if (lower.includes(q)) return true;
-  const queryWords = q.split(/\s+/).filter(Boolean);
-  const itemWords = lower.split(/\s+/);
-  return queryWords.some((qw) =>
-    itemWords.some((iw) => levenshtein(qw, iw.slice(0, qw.length)) <= 2),
-  );
-}
-
 function SearchBar<T extends string | number = string, TItem = unknown>({
   value: controlledValue,
   defaultValue,
@@ -97,23 +70,13 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const touchedRef = React.useRef(false);
 
-  // Sync external `value` changes (e.g. from onSelect/onClear handlers) into
-  // internal state, so each callback stays independent of onChange.
   React.useEffect(() => {
-    if (controlledValue !== undefined) {
-      setInternal(String(controlledValue));
-    }
+    if (controlledValue !== undefined) setInternal(String(controlledValue));
   }, [controlledValue]);
 
   const displayValue = internal;
 
-  // Normalize both data sources into a single shape so the rest of the
-  // component doesn't care whether strings or objects were passed in.
-  type ResolvedItem = {
-    label: string;
-    value: string;
-    raw: TItem | null | undefined;
-  };
+  type ResolvedItem = { label: string; value: string; raw: TItem | null | undefined };
 
   const resolvedItems = React.useMemo<ResolvedItem[]>(() => {
     if (dropdownItems && getLabel) {
@@ -124,22 +87,15 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
       }));
     }
     return [];
-    // return (dropdownContent ?? []).map((s) => ({
-    //   label: s,
-    //   value: s,
-    //   raw: null,
-    // }));
   }, [dropdownItems, getLabel, getValue]);
 
-  const filteredItems = React.useMemo<ResolvedItem[]>(() => {
-    if (!displayValue.trim() || resolvedItems.length === 0) return [];
-    return resolvedItems.filter((item) => fuzzyMatch(displayValue, item.label));
-  }, [resolvedItems, displayValue]);
+  // Fuse.js fuzzy search — replaces the hand-rolled levenshtein filter
+  const fuseResults = useFuzzySearch(resolvedItems, displayValue);
+  // Only surface results when the user has actually typed something
+  const filteredItems = displayValue.trim() ? fuseResults : [];
 
-  const hasDropdown =  dropdownItems != null;
-
-  const castValue = (v: string) =>
-    (valueType === "number" ? Number(v) : v) as T;
+  const hasDropdown = dropdownItems != null;
+  const castValue = (v: string) => (valueType === "number" ? Number(v) : v) as T;
 
   const handleSelect = (item: ResolvedItem) => {
     setInternal(item.label);
@@ -154,34 +110,26 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
     if (hasDropdown) setDropdownOpen(true);
   };
 
+  const hasQuery = displayValue.trim().length > 0;
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      if (!hasQuery) {
-        onClear?.();
-        return;
-      }
+      if (!hasQuery) { onClear?.(); return; }
       if (filteredItems.length > 0) {
         handleSelect(filteredItems[0]!);
       } else {
-        const v = castValue(displayValue);
-        onSearch?.(v);
+        onSearch?.(castValue(displayValue));
         setDropdownOpen(false);
       }
     }
+    if (e.key === "Escape") setDropdownOpen(false);
   };
 
   const handleSearchClick = () => {
     if (disabled) return;
-    if (!hasQuery) {
-      onClear?.();
-      return;
-    }
-    if (filteredItems.length > 0) {
-      handleSelect(filteredItems[0]!);
-      return;
-    }
-    const v = castValue(displayValue);
-    onSearch?.(v);
+    if (!hasQuery) { onClear?.(); return; }
+    if (filteredItems.length > 0) { handleSelect(filteredItems[0]!); return; }
+    onSearch?.(castValue(displayValue));
     setDropdownOpen(false);
   };
 
@@ -195,17 +143,12 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   const handleBlur = (e: React.FocusEvent) => {
     if (!wrapperRef.current?.contains(e.relatedTarget as Node)) {
       setDropdownOpen(false);
-      if (!touchedRef.current) {
-        touchedRef.current = true;
-        onTouch?.();
-      }
+      if (!touchedRef.current) { touchedRef.current = true; onTouch?.(); }
     }
   };
 
   const showClear = displayValue.length > 0;
   const iconSize = ICON_SIZES[size];
-
-  const hasQuery = displayValue.trim().length > 0;
   const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
 
   return (
@@ -215,14 +158,14 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
       onBlur={handleBlur}
     >
       <div
-          className={cn(
-            "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
-            !disabled && "hover:border-gray-500 hover:shadow-sm",
-            SIZE_TEXT_CLASSES[size],
-            SIZE_HEIGHT_CLASSES[size],
-            disabled && "pointer-events-none opacity-50",
-          )}
-        >
+        className={cn(
+          "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
+          !disabled && "hover:border-gray-500 hover:shadow-sm",
+          SIZE_TEXT_CLASSES[size],
+          SIZE_HEIGHT_CLASSES[size],
+          disabled && "pointer-events-none opacity-50",
+        )}
+      >
         <Input
           value={displayValue}
           placeholder={placeholder}
@@ -246,16 +189,10 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
               className="flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Clear search"
             >
-              <X
-                className="hover:text-red-500"
-                strokeWidth={2}
-                size={iconSize}
-              />
+              <X className="hover:text-red-500" strokeWidth={2} size={iconSize} />
             </button>
           )}
-
           <div className={cn("w-px bg-gray-400", DIVIDER_CLASSES[size])} />
-
           <button
             type="button"
             onClick={handleSearchClick}
@@ -287,9 +224,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
               </button>
             ))
           ) : (
-            <div className="px-3 py-2 text-sm text-[#9CA3AF]">
-              {fallbackText}
-            </div>
+            <div className="px-3 py-2 text-sm text-[#9CA3AF]">{fallbackText}</div>
           )}
         </div>
       )}
@@ -298,5 +233,4 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 }
 
 SearchBar.displayName = "SearchBar";
-
 export { SearchBar };

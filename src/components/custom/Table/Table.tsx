@@ -72,6 +72,11 @@ export function Table<T>({
     `${(((col.flex ?? 1) / totalFlex) * 100).toFixed(2)}%`,
   );
 
+  // Sum minWidth values across all columns — used as the table's minimum width
+  // so that on narrow viewports the overflow-x-auto wrapper scrolls rather than
+  // letting columns crush each other.
+  const tableMinWidth = columns.reduce((sum, col) => sum + (col.minWidth ?? 0), 0);
+
   return (
     <div
       className={cn(
@@ -129,18 +134,18 @@ export function Table<T>({
                         <span className="shrink-0 text-xs font-medium text-gray-500">
                           {col.header}
                         </span>
-                        <span
+                        <div
                           className={cn(
-                            "text-sm",
+                            "text-sm flex-1 min-w-0",
                             col.align === "center"
                               ? "text-center"
-                              : col.align === "left"
-                                ? "text-left"
-                                : "text-right",
+                              : col.align === "right"
+                                ? "text-right"
+                                : "text-left",
                           )}
                         >
                           {content}
-                        </span>
+                        </div>
                       </div>
                     );
                   })}
@@ -163,7 +168,10 @@ export function Table<T>({
         )}
         style={scrollStyle}
       >
-        <T className="w-full">
+        <T
+          className="w-full min-w-max"
+          style={tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : undefined}
+        >
           {/*
            * colgroup sets proportional width hints (flex-derived %).
            * table-auto (the default) is intentional: with table-fixed, CSS
@@ -173,7 +181,13 @@ export function Table<T>({
            */}
           <colgroup>
             {columns.map((col, i) => (
-              <col key={String(col.key)} style={{ width: colWidths[i] }} />
+              <col
+                key={String(col.key)}
+                style={{
+                  width: colWidths[i],
+                  minWidth: col.minWidth ? `${col.minWidth}px` : undefined,
+                }}
+              />
             ))}
           </colgroup>
           <TableHeader
