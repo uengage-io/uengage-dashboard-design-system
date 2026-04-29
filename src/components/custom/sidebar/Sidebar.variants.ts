@@ -1,18 +1,19 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
+// Animation is driven by @keyframes in globals.css targeting
+// [data-slot="drawer-content"][data-side="*"][data-state="open|closed"].
+// No transition classes needed here — keyframes ensure Radix waits for
+// animationend before unmounting (prevents the close flicker).
 export const sidebarContentVariants = cva(
-  "fixed z-50 bg-background border shadow-lg outline-none will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
+  "fixed z-50 bg-background border shadow-lg outline-none will-change-transform",
   {
     variants: {
       side: {
-        left: "inset-y-0 left-0 border-r -translate-x-full data-[state=open]:translate-x-0 data-[state=closed]:-translate-x-full",
-        right:
-          "inset-y-0 right-0 border-l translate-x-full data-[state=open]:translate-x-0 data-[state=closed]:translate-x-full",
-        top: "inset-x-0 top-0 border-b -translate-y-full data-[state=open]:translate-y-0 data-[state=closed]:-translate-y-full",
-        bottom:
-          "inset-x-0 bottom-0 border-t translate-y-full data-[state=open]:translate-y-0 data-[state=closed]:translate-y-full",
-        "right-bottom":
-          "bottom-0 right-0 rounded-tl-xl border-t border-l sidebar-rb translate-y-full data-[state=open]:translate-y-0 data-[state=closed]:translate-y-full",
+        left: "inset-y-0 left-0 border-r",
+        right: "inset-y-0 right-0 border-l",
+        top: "inset-x-0 top-0 border-b",
+        bottom: "inset-x-0 bottom-0 border-t",
+        "right-bottom": "bottom-0 right-0 rounded-tl-xl border-t border-l sidebar-rb",
       },
       size: {
         sm: "",
@@ -22,15 +23,15 @@ export const sidebarContentVariants = cva(
       },
     },
     compoundVariants: [
-      { side: "left", size: "sm", className: "w-64 max-w-[85vw]" },
-      { side: "left", size: "md", className: "w-80 max-w-[90vw]" },
-      { side: "left", size: "lg", className: "w-96 max-w-[95vw]" },
+      { side: "left",  size: "sm", className: "w-64 max-w-[85vw]" },
+      { side: "left",  size: "md", className: "w-80 max-w-[90vw]" },
+      { side: "left",  size: "lg", className: "w-96 max-w-[95vw]" },
       { side: "right", size: "sm", className: "w-64 max-w-[85vw]" },
       { side: "right", size: "md", className: "w-80 max-w-[90vw]" },
       { side: "right", size: "lg", className: "w-96 max-w-[95vw]" },
-      { side: "top", size: "sm", className: "h-48 max-h-[80vh]" },
-      { side: "top", size: "md", className: "h-64 max-h-[85vh]" },
-      { side: "top", size: "lg", className: "h-80 max-h-[90vh]" },
+      { side: "top",    size: "sm", className: "h-48 max-h-[80vh]" },
+      { side: "top",    size: "md", className: "h-64 max-h-[85vh]" },
+      { side: "top",    size: "lg", className: "h-80 max-h-[90vh]" },
       { side: "bottom", size: "sm", className: "h-48 max-h-[80vh]" },
       { side: "bottom", size: "md", className: "h-64 max-h-[85vh]" },
       { side: "bottom", size: "lg", className: "h-80 max-h-[90vh]" },
@@ -62,15 +63,15 @@ export const sidebarPersistentVariants = cva("bg-background border", {
     },
   },
   compoundVariants: [
-    { side: "left", size: "sm", className: "w-64" },
-    { side: "left", size: "md", className: "w-80" },
-    { side: "left", size: "lg", className: "w-96" },
+    { side: "left",  size: "sm", className: "w-64" },
+    { side: "left",  size: "md", className: "w-80" },
+    { side: "left",  size: "lg", className: "w-96" },
     { side: "right", size: "sm", className: "w-64" },
     { side: "right", size: "md", className: "w-80" },
     { side: "right", size: "lg", className: "w-96" },
-    { side: "top", size: "sm", className: "h-48" },
-    { side: "top", size: "md", className: "h-64" },
-    { side: "top", size: "lg", className: "h-80" },
+    { side: "top",    size: "sm", className: "h-48" },
+    { side: "top",    size: "md", className: "h-64" },
+    { side: "top",    size: "lg", className: "h-80" },
     { side: "bottom", size: "sm", className: "h-48" },
     { side: "bottom", size: "md", className: "h-64" },
     { side: "bottom", size: "lg", className: "h-80" },
@@ -84,6 +85,4 @@ export const sidebarPersistentVariants = cva("bg-background border", {
   },
 });
 
-export type SidebarContentVariants = VariantProps<
-  typeof sidebarContentVariants
->;
+export type SidebarContentVariants = VariantProps<typeof sidebarContentVariants>;
