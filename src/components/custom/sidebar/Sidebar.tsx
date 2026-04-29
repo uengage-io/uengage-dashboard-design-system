@@ -72,6 +72,30 @@ export function Sidebar({
     return { width: `${pct}vw`, maxWidth: "100vw" }
   }, [sizePercent, side, isDesktop])
 
+  // Animation duration scaled to panel width so wider panels don't feel like
+  // they're teleporting. --sb-open-dur / --sb-close-dur are read by globals.css.
+  // sizePercent overrides the preset — treat 1 vw ≈ 3 ms open, 2 ms close.
+  const animDurationStyle = React.useMemo<React.CSSProperties>(() => {
+    if (sizePercent != null) {
+      const pct = Math.min(100, Math.max(1, sizePercent))
+      return {
+        "--sb-open-dur":  `${Math.round(pct * 3)}ms`,
+        "--sb-close-dur": `${Math.round(pct * 2)}ms`,
+      } as React.CSSProperties
+    }
+    const presets: Record<string, { open: string; close: string }> = {
+      sm:   { open: "260ms", close: "180ms" },
+      md:   { open: "300ms", close: "200ms" },
+      lg:   { open: "340ms", close: "220ms" },
+      full: { open: "400ms", close: "260ms" },
+    }
+    const { open: openDur, close: closeDur } = presets[size ?? "md"] ?? presets["md"]!
+    return {
+      "--sb-open-dur":  openDur,
+      "--sb-close-dur": closeDur,
+    } as React.CSSProperties
+  }, [size, sizePercent])
+
   const shouldRenderPersistent = persistentOnDesktop && isDesktop
 
   if (shouldRenderPersistent) {
@@ -116,7 +140,7 @@ export function Sidebar({
           className,
           contentClassName
         )}
-        style={customSizeStyle}
+        style={{ ...animDurationStyle, ...customSizeStyle }}
       >
         {children}
       </DrawerContent>
