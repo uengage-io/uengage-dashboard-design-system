@@ -9,6 +9,8 @@ export interface ColumnDef<T> {
    * e.g. [1, 2, 1] → 25% / 50% / 25%. Defaults to 1 (equal columns).
    */
   flex?: number;
+  /** Explicit CSS width string (e.g. "20%", "160px") — overrides the flex-derived percentage when set. */
+  width?: string;
   /** Minimum column width in pixels — prevents the column from shrinking below this on mobile scroll. */
   minWidth?: number;
   align?: "left" | "center" | "right";

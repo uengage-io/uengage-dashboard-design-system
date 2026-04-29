@@ -6,8 +6,8 @@ export const pageButtonVariants = cva(
     variants: {
       size: {
         sm: "min-w-7 h-7 px-1.5 text-sm",
-        md: "min-w-10 h-10 px-2 text-base",
-        lg: "min-w-12 h-12 px-3 text-lg",
+        md: "min-w-7 h-7 px-1.5 text-sm sm:min-w-10 sm:h-10 sm:px-2 sm:text-base",
+        lg: "min-w-10 h-10 px-2 text-base sm:min-w-12 sm:h-12 sm:px-3 sm:text-lg",
       },
       state: {
         default: "bg-transparent text-[#202020] font-semibold hover:bg-[#EFF8EA]",
@@ -28,8 +28,8 @@ export const chevronButtonVariants = cva(
     variants: {
       size: {
         sm: "w-7 h-7 text-sm",
-        md: "w-10 h-10 text-base",
-        lg: "w-12 h-12 text-lg",
+        md: "w-7 h-7 text-sm sm:w-10 sm:h-10 sm:text-base",
+        lg: "w-10 h-10 text-base sm:w-12 sm:h-12 sm:text-lg",
       },
       state: {
         default: "text-gray-400 hover:bg-[#EFF8EA]",

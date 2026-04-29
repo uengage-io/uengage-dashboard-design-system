@@ -66,10 +66,10 @@ export function Table<T>({
 
   const visibleColumns = columns.filter((col) => !col.hideOnMobile);
 
-  // Compute proportional percentage widths from flex weights
+  // Compute proportional percentage widths from flex weights; col.width overrides when set
   const totalFlex = columns.reduce((sum, col) => sum + (col.flex ?? 1), 0);
   const colWidths = columns.map((col) =>
-    `${(((col.flex ?? 1) / totalFlex) * 100).toFixed(2)}%`,
+    col.width ?? `${(((col.flex ?? 1) / totalFlex) * 100).toFixed(2)}%`,
   );
 
   // Sum minWidth values across all columns — used as the table's minimum width
@@ -169,8 +169,12 @@ export function Table<T>({
         style={scrollStyle}
       >
         <T
-          className="w-full min-w-max"
-          style={tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : undefined}
+          className="w-full"
+          style={
+            tableMinWidth > 0
+              ? { minWidth: `${tableMinWidth}px` }
+              : { minWidth: "max-content" }
+          }
         >
           {/*
            * colgroup sets proportional width hints (flex-derived %).
