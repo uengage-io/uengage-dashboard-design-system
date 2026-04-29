@@ -109,6 +109,38 @@
   }
 }
 
+/* ── Sidebar right-bottom — grows from bottom-right corner ──────────────────── */
+@keyframes uengage-sidebar-rb-in {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes uengage-sidebar-rb-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+.sidebar-rb {
+  will-change: transform, opacity;
+  transform-origin: bottom right;
+}
+.sidebar-rb[data-state="open"] {
+  animation: uengage-sidebar-rb-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.sidebar-rb[data-state="closed"] {
+  animation: uengage-sidebar-rb-out 280ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
 /* Popover / dropdown open/close transitions.
    Driven by Radix's data-state attribute on the portaled content. */
 @keyframes uengage-popover-in {

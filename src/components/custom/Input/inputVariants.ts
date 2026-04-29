@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { COMPONENT_HEIGHT, TEXT_SIZE, PLACEHOLDER_SIZE } from "@/utils/tokens";
 import type { AllowPattern } from "@/types/input";
 
 export const inputWrapperVariants = cva(
@@ -6,19 +7,17 @@ export const inputWrapperVariants = cva(
   {
     variants: {
       size: {
-        sm: "h-8 text-xs",
-        md: "h-10 text-sm",
-        lg: "h-12 text-base",
+        sm: `${COMPONENT_HEIGHT.sm} ${TEXT_SIZE.sm}`,
+        md: `${COMPONENT_HEIGHT.md} ${TEXT_SIZE.md}`,
+        lg: `${COMPONENT_HEIGHT.lg} ${TEXT_SIZE.lg}`,
       },
       state: {
-        default:
-          "border-gray-400 hover:border-gray-500 hover:shadow-sm",
+        default: "border-gray-400 hover:border-gray-500 hover:shadow-sm",
         focused: "border-gray-500 ring-1 ring-gray-200",
         error: "border-red-500",
         disabled:
           "bg-gray-50 border-gray-300 text-gray-400 cursor-not-allowed opacity-60",
-        readonly:
-          "bg-gray-50 border-gray-300 text-gray-700 cursor-default",
+        readonly: "bg-gray-50 border-gray-300 text-gray-700 cursor-default",
       },
     },
     defaultVariants: {
@@ -29,13 +28,13 @@ export const inputWrapperVariants = cva(
 );
 
 export const inputFieldVariants = cva(
-  "h-full w-full bg-transparent border-0 shadow-none outline-none text-inherit placeholder:text-[#C4C9D2] disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-0 focus-visible:border-transparent focus-visible:outline-none",
+  `h-full w-full bg-transparent border-0 shadow-none outline-none text-inherit placeholder:text-[#C4C9D2] disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-0 focus-visible:border-transparent focus-visible:outline-none`,
   {
     variants: {
       size: {
-        sm: "px-2.5 py-0 placeholder:text-[11px]",
-        md: "px-3 py-0 placeholder:text-[12px]",
-        lg: "px-3.5 py-0 placeholder:text-[14px]",
+        sm: `px-2.5 py-0 ${PLACEHOLDER_SIZE.sm}`,
+        md: `px-3 py-0 ${PLACEHOLDER_SIZE.md}`,
+        lg: `px-3.5 py-0 ${PLACEHOLDER_SIZE.lg}`,
       },
       hasLeftIcon: {
         true: "",

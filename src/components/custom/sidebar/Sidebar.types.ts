@@ -1,6 +1,6 @@
 import type * as React from "react"
 
-export type SidebarSide = "left" | "right" | "top" | "bottom"
+export type SidebarSide = "left" | "right" | "top" | "bottom" | "right-bottom"
 export type SidebarSize = "sm" | "md" | "lg" | "full"
 
 export interface SidebarProps {

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { FOCUS_RING } from "@/utils/tokens";
 import {
   tabTriggerVariants,
   tabPillClass,
@@ -42,7 +43,7 @@ function CustomTabsTrigger({
           "border-0 shadow-none",
           "data-[state=active]:border-0 data-[state=active]:shadow-none",
           "after:hidden after:content-none",
-          "focus-visible:ring-2 focus-visible:ring-[#0A5A2A]/30",
+          FOCUS_RING,
           "disabled:pointer-events-none disabled:text-[#D1D5DB]",
           className,
         )}

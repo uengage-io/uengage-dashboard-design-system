@@ -81,7 +81,7 @@ function Radio({
         className={cn(
           radioLabelVariants({ size, state: labelState }),
           "whitespace-normal break-words",
-          "group-has-[[data-state=checked]]:text-[#0A5A2A]",
+          "group-has-[[data-state=checked]]:text-[#006F42]",
         )}
       >
         {truncateLabelToWordLimit(label)}
