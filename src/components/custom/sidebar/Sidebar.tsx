@@ -107,6 +107,7 @@ export function Sidebar({
       ) : null}
       <DrawerContent
         aria-label={`${side} sidebar`}
+        data-side={side}
         onInteractOutside={
           closeOnOutsideClick ? undefined : (event) => event.preventDefault()
         }
