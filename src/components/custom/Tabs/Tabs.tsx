@@ -9,10 +9,15 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FOCUS_RING } from "@/utils/tokens";
 import type {
   CustomTabsProps,
   TabItem,
 } from "@/components/custom/Tabs/Tabs.types";
+
+// Active/accent color for tab states — intentionally a shade darker than the
+// global #006F42 focus color for visual distinction within the tabs palette.
+const TAB_COLOR = "#0A5A2A";
 
 function getInitialValue(
   tabs: TabItem[],
@@ -144,11 +149,11 @@ function OverflowTabsSelect({
             "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
             variant === "primary" && [
               "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
-              "hover:text-[#0c6e20] focus-visible:ring-2 focus-visible:ring-[#0A5A2A]/30",
+              `hover:text-[#0c6e20] ${FOCUS_RING}`,
             ],
             variant === "secondary" && [
               "relative z-10 gap-1 rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold text-[#595959]",
-              "hover:text-black focus-visible:ring-2 focus-visible:ring-[#0A5A2A]/30",
+              `hover:text-black ${FOCUS_RING}`,
             ],
             className,
           )}
@@ -232,7 +237,8 @@ function PrimaryOverflowTrigger({
       className={cn(
         "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
         "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
-        "hover:text-[#0A5A2A] focus-visible:ring-2 focus-visible:ring-[#0A5A2A]/30",
+
+        `hover:text-[#0A5A2A] ${FOCUS_RING}`,
       )}
     >
       <span>{label}</span>
@@ -452,11 +458,10 @@ function PrimaryTabs({
       onValueChange={handleChangeAndClose}
       className={cn("w-full", className)}
     >
-      {/* relative here so PrimaryOverflowPanel can use absolute right-0 top-full */}
       <div className="relative w-full border-b border-[#E5E7EB]">
         <div
           ref={wrapperRef}
-          className="relative flex min-w-0 items-end overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="relative flex min-w-0 items-end gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           <TabsList
             variant="line"
@@ -477,7 +482,7 @@ function PrimaryTabs({
             ))}
           </TabsList>
 
-          {/* Trigger only — panel is rendered below, outside the scroll container */}
+          {/* Trigger scrolls with tabs, separator keeps it visually distinct */}
           {overflowTabs.length > 0 && (
             <PrimaryOverflowTrigger
               label={overflowLabel}
@@ -502,7 +507,7 @@ function PrimaryTabs({
           />
         </div>
 
-        {/* Panel sits outside overflow-x-auto so it is never clipped on mobile */}
+        {/* Panel is portaled to document.body so it is never clipped */}
         {overflowOpen && overflowTabs.length > 0 && (
           <PrimaryOverflowPanel
             overflowTabs={overflowTabs}
@@ -630,6 +635,10 @@ function SecondaryTabs({
               </CustomTabsTrigger>
             ))}
           </TabsList>
+          {/* Separator + overflow button scrolls with tabs at the end of the list */}
+          {overflowTabs.length > 0 && (
+            <span className="mx-1 h-4 w-px shrink-0 bg-[#b8c4d9]" aria-hidden="true" />
+          )}
           <OverflowTabsSelect
             overflowTabs={overflowTabs}
             overflowLabel={overflowLabel}

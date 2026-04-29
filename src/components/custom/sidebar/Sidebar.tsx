@@ -65,6 +65,9 @@ export function Sidebar({
     if (side === "top" || side === "bottom") {
       return { height: `${pct}vh`, maxHeight: "100vh" }
     }
+    if (side === "right-bottom") {
+      return { width: `${pct}vw`, maxWidth: "100vw" }
+    }
     if (!isDesktop) return { width: "100vw", maxWidth: "100vw" }
     return { width: `${pct}vw`, maxWidth: "100vw" }
   }, [sizePercent, side, isDesktop])

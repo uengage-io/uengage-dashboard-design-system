@@ -1,12 +1,14 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { FOCUS_RING } from "@/utils/tokens";
 
 export type ToggleVariantSize = "sm" | "md" | "lg";
 
+// Checked colors: border #1F6B32, bg #C8D8B6, thumb #1F6B32
 export const trackVariants = cva(
   [
     "group/uengage-toggle relative inline-flex items-center rounded-full border-2",
     "transition-all duration-200 cursor-pointer select-none shadow-[0_2px_6px_rgba(15,23,42,0.12)]",
-    "outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006F42]",
+    `outline-none ${FOCUS_RING}`,
     "disabled:cursor-not-allowed disabled:opacity-50",
     "data-[state=unchecked]:bg-[#F7FAF7] data-[state=unchecked]:border-[#9FB49F]",
     "data-[state=checked]:bg-[#C8D8B6] data-[state=checked]:border-[#1F6B32]",
@@ -109,4 +111,4 @@ export const thumbVariants = cva(
 );
 
 export type TrackVariants = VariantProps<typeof trackVariants>;
-export type ThumbVariants = VariantProps<typeof thumbVariants>
+export type ThumbVariants = VariantProps<typeof thumbVariants>;

@@ -1,12 +1,7 @@
 import { useMemo } from "react";
 import Fuse from "fuse.js";
 
-/**
- * Shared Fuse.js hook used by SearchBar, Select, and Input.
- * Searches across the `label` field of any item array.
- * Returns the full original items sorted by match quality.
- * When query is empty, returns the original array unchanged.
- */
+
 export function useFuzzySearch<T extends { label: string }>(
   items: T[],
   query: string,
@@ -15,10 +10,10 @@ export function useFuzzySearch<T extends { label: string }>(
     () =>
       new Fuse(items, {
         keys: ["label"],
-        threshold: 0.35,      // 0 = exact only, 1 = match anything — 0.35 catches typos without noise
+        threshold: 0.35,     
         minMatchCharLength: 1,
-        ignoreLocation: true, // don't penalise matches that start mid-string
-        shouldSort: true,     // best-score result first
+        ignoreLocation: true, 
+        shouldSort: true,     
       }),
     [items],
   );

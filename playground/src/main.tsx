@@ -23,27 +23,27 @@ import PaginationPreview from "./components/Pagination";
 import FuzzySearchPreview from "./components/FuzzySearch";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <FuzzySearchPreview />
-    <PaginationPreview />
+    {/* <FuzzySearchPreview /> */}
+    {/* <PaginationPreview /> */}
     
-    <Dialog/>
-    <Demo/>
-    <ButtonPreview />
-    <Modalprev/>
-    <SearchPreview />
-    <SelectPreview />
-    <CheckboxPreview />
-    <RadioPreview />
-    <TabsPreview />
-    <BadgePreview />
-    <DatePickerPreview />
-    <br />
-    <TogglePreview />
-    <AlertDialogPreview />
-    <PageContainerDemo />
+    {/* <Dialog/> */}
+    {/* <Demo/> */}
+    {/* <ButtonPreview /> */}
+    {/* <Modalprev/> */}
+    {/* <SearchPreview /> */}
+    {/* <SelectPreview /> */}
+    {/* <CheckboxPreview /> */}
+    {/* <RadioPreview /> */}
+    {/* <TabsPreview /> */}
+    {/* <BadgePreview /> */}
+    {/* <DatePickerPreview /> */}
+    {/* <br /> */}
+    {/* <TogglePreview /> */}
+    {/* <AlertDialogPreview /> */}
+    {/* <PageContainerDemo /> */}
     <SidebarDemo />
-    <TablePreview/>
-    <ModalPreview />
-    <PaginationPrev />
+    {/* <TablePreview/> */}
+    {/* <ModalPreview /> */}
+    {/* <PaginationPrev /> */}
   </React.StrictMode>,
 );

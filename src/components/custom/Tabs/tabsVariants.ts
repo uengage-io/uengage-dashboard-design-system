@@ -1,18 +1,18 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { FOCUS_RING } from "@/utils/tokens";
 
 export const tabTriggerVariants = cva(
   [
     "relative flex items-center gap-2 cursor-pointer select-none whitespace-nowrap",
     "rounded-t-lg transition-all duration-200 outline-none",
     "px-3 py-3 sm:px-5 sm:py-5 text-[13px] sm:text-[14px] font-medium",
-    "focus-visible:ring-2 focus-visible:ring-[#0A5A2A]/40",
+    FOCUS_RING,
   ].join(" "),
-  
   {
     variants: {
       state: {
-        active: "text-[#0A5A2A] font-semibold",
-        inactive: "text-gray-500 hover:text-[#0A5A2A] hover:bg-gray-50",
+        active: "text-[#006F42] font-semibold",
+        inactive: "text-gray-500 hover:text-[#006F42] hover:bg-gray-50",
         disabled: "text-[#D1D5DB] pointer-events-none",
       },
     },

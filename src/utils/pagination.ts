@@ -1,7 +1,8 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { FOCUS_RING } from "./tokens";
 
 export const pageButtonVariants = cva(
-  "relative z-10 inline-flex items-center justify-center rounded-full transition-colors duration-150 ease-in-out outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006F42]",
+  `relative z-10 inline-flex items-center justify-center rounded-full transition-colors duration-150 ease-in-out outline-none ${FOCUS_RING}`,
   {
     variants: {
       size: {
@@ -10,7 +11,8 @@ export const pageButtonVariants = cva(
         lg: "min-w-10 h-10 px-2 text-base sm:min-w-12 sm:h-12 sm:px-3 sm:text-lg",
       },
       state: {
-        default: "bg-transparent text-[#202020] font-semibold hover:bg-[#EFF8EA]",
+        default:
+          "bg-transparent text-[#202020] font-semibold hover:bg-[#EFF8EA]",
         active: "bg-transparent text-white font-bold",
         disabled: "text-gray-300 pointer-events-none",
       },
@@ -23,7 +25,7 @@ export const pageButtonVariants = cva(
 );
 
 export const chevronButtonVariants = cva(
-  "inline-flex items-center justify-center rounded-full transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006F42]",
+  `inline-flex items-center justify-center rounded-full transition-colors outline-none ${FOCUS_RING}`,
   {
     variants: {
       size: {
