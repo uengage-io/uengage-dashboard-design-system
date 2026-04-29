@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const sidebarContentVariants = cva(
-  "fixed z-50 bg-background border shadow-lg outline-none will-change-transform data-[state=open]:duration-300 data-[state=closed]:duration-200 data-[state=open]:ease-out data-[state=closed]:ease-in data-[state=open]:animate-in data-[state=closed]:animate-out",
+  "fixed z-50 bg-background border shadow-lg outline-none data-[state=open]:duration-300 data-[state=closed]:duration-300 data-[state=open]:ease-[cubic-bezier(0.4,0,0.2,1)] data-[state=closed]:ease-[cubic-bezier(0.4,0,0.2,1)] data-[state=open]:animate-in data-[state=closed]:animate-out",
   {
     variants: {
       side: {
