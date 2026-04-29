@@ -1,18 +1,18 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const sidebarContentVariants = cva(
-  "fixed z-50 bg-background border shadow-lg outline-none will-change-transform data-[state=open]:duration-300 data-[state=closed]:duration-200 data-[state=open]:ease-out data-[state=closed]:ease-in data-[state=open]:animate-in data-[state=closed]:animate-out",
+  "fixed z-50 bg-background border shadow-lg outline-none will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
   {
     variants: {
       side: {
-        left: "inset-y-0 left-0 border-r data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left",
+        left: "inset-y-0 left-0 border-r -translate-x-full data-[state=open]:translate-x-0 data-[state=closed]:-translate-x-full",
         right:
-          "inset-y-0 right-0 border-l data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right",
-        top: "inset-x-0 top-0 border-b data-[state=open]:slide-in-from-top data-[state=closed]:slide-out-to-top",
+          "inset-y-0 right-0 border-l translate-x-full data-[state=open]:translate-x-0 data-[state=closed]:translate-x-full",
+        top: "inset-x-0 top-0 border-b -translate-y-full data-[state=open]:translate-y-0 data-[state=closed]:-translate-y-full",
         bottom:
-          "inset-x-0 bottom-0 border-t data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom",
+          "inset-x-0 bottom-0 border-t translate-y-full data-[state=open]:translate-y-0 data-[state=closed]:translate-y-full",
         "right-bottom":
-          "bottom-0 right-0 rounded-tl-xl border-t border-l sidebar-rb",
+          "bottom-0 right-0 rounded-tl-xl border-t border-l sidebar-rb translate-y-full data-[state=open]:translate-y-0 data-[state=closed]:translate-y-full",
       },
       size: {
         sm: "",
