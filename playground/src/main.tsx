@@ -21,6 +21,9 @@ import Modalprev from "./components/ModalPreview";
 import Demo from "./components/Alert";
 import PaginationPreview from "./components/Pagination";
 import FuzzySearchPreview from "./components/FuzzySearch";
+import Loader from "./components/Loader";
+import DemoPreview from "./components/Demo";
+import SidebarPreview from "./components/SidebarPreview";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <FuzzySearchPreview /> */}
@@ -41,7 +44,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <TogglePreview /> */}
     {/* <AlertDialogPreview /> */}
     {/* <PageContainerDemo /> */}
-    <SidebarDemo />
+    <SidebarPreview />
+
+    {/* <Loader /> */}
+    {/* <DemoPreview /> */}
+    {/* <SidebarDemo /> */}
     {/* <TablePreview/> */}
     {/* <ModalPreview /> */}
     {/* <PaginationPrev /> */}

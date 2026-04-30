@@ -16,3 +16,4 @@ export {
 } from "./Alert-Dialog";
 export { Sidebar, type SidebarProps } from "./sidebar";
 export { Modal, type ModalProps } from "./Modal";
+export { Loader } from "./Loader";

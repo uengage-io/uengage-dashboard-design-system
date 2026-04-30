@@ -30,6 +30,7 @@ export {
 } from "./components/custom/Layout";
 
 // Card
+export { Demo } from "./components/custom/Demo/Demo";
 export {
   Card,
   CardHeader,
@@ -196,9 +197,12 @@ export {
   type StatusBadgeVariants,
 } from "./utils/table";
 
-export {Toggle} from "./components/custom/Toggle/Toggle"
+export { Toggle } from "./components/custom/Toggle/Toggle";
 export type { ToggleProps } from "./components/custom/Toggle/Toggle";
-export { trackVariants, thumbVariants } from "./components/custom/Toggle/toggleVariants";
+export {
+  trackVariants,
+  thumbVariants,
+} from "./components/custom/Toggle/toggleVariants";
 export type {
   ToggleVariantSize,
   TrackVariants,
@@ -213,6 +217,7 @@ export {
   sidebarPersistentVariants,
   type SidebarContentVariants,
 } from "./components/custom/sidebar";
+
 
 // Alert Dialog (custom)
 export {
@@ -256,3 +261,6 @@ export {
 
 // Provider
 export { UengageProvider } from "./components/custom/Provider";
+
+// Loader
+export { Loader } from "./components/custom/Loader";

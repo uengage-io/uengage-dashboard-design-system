@@ -65,9 +65,6 @@ export function Sidebar({
     if (side === "top" || side === "bottom") {
       return { height: `${pct}vh`, maxHeight: "100vh" }
     }
-    if (side === "right-bottom") {
-      return { width: `${pct}vw`, maxWidth: "100vw" }
-    }
     if (!isDesktop) return { width: "100vw", maxWidth: "100vw" }
     return { width: `${pct}vw`, maxWidth: "100vw" }
   }, [sizePercent, side, isDesktop])
@@ -132,9 +129,17 @@ export function Sidebar({
       <DrawerContent
         aria-label={`${side} sidebar`}
         data-side={side}
-        onInteractOutside={
-          closeOnOutsideClick ? undefined : (event) => event.preventDefault()
-        }
+        onInteractOutside={(event) => {
+          // When the overlay is rendered it owns outside-click closing via its
+          // onClick. Prevent Radix's built-in dismiss so clicking the overlay
+          // never triggers two close cycles back-to-back (which restarts the
+          // close animation and causes a visible jerk/flicker).
+          if (overlay) {
+            event.preventDefault()
+            return
+          }
+          if (!closeOnOutsideClick) event.preventDefault()
+        }}
         className={cn(
           sidebarContentVariants({ side, size }),
           className,
