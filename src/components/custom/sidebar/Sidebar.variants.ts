@@ -13,7 +13,6 @@ export const sidebarContentVariants = cva(
         right: "inset-y-0 right-0 border-l",
         top: "inset-x-0 top-0 border-b",
         bottom: "inset-x-0 bottom-0 border-t",
-        "right-bottom": "bottom-0 right-0 rounded-tl-xl border-t border-l sidebar-rb",
       },
       size: {
         sm: "",
@@ -35,9 +34,6 @@ export const sidebarContentVariants = cva(
       { side: "bottom", size: "sm", className: "h-48 max-h-[80vh]" },
       { side: "bottom", size: "md", className: "h-64 max-h-[85vh]" },
       { side: "bottom", size: "lg", className: "h-80 max-h-[90vh]" },
-      { side: "right-bottom", size: "sm", className: "w-64 max-w-[85vw] h-screen" },
-      { side: "right-bottom", size: "md", className: "w-80 max-w-[90vw] h-screen" },
-      { side: "right-bottom", size: "lg", className: "w-96 max-w-[95vw] h-screen" },
     ],
     defaultVariants: {
       side: "left",
@@ -53,7 +49,6 @@ export const sidebarPersistentVariants = cva("bg-background border", {
       right: "h-full border-l",
       top: "w-full border-b",
       bottom: "w-full border-t",
-      "right-bottom": "border-t border-l rounded-tl-xl",
     },
     size: {
       sm: "",
@@ -75,9 +70,6 @@ export const sidebarPersistentVariants = cva("bg-background border", {
     { side: "bottom", size: "sm", className: "h-48" },
     { side: "bottom", size: "md", className: "h-64" },
     { side: "bottom", size: "lg", className: "h-80" },
-    { side: "right-bottom", size: "sm", className: "w-64 h-screen" },
-    { side: "right-bottom", size: "md", className: "w-80 h-screen" },
-    { side: "right-bottom", size: "lg", className: "w-96 h-screen" },
   ],
   defaultVariants: {
     side: "left",
