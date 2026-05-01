@@ -1024,6 +1024,10 @@ function Grid({
   );
 }
 Grid.displayName = "Grid";
+function Demo() {
+  return /* @__PURE__ */ jsxRuntime.jsx("h1", { children: "Demo Component" });
+}
+Demo.displayName = "Demo";
 function Card({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntime.jsx(
     "div",
@@ -4534,8 +4538,7 @@ var sidebarContentVariants = classVarianceAuthority.cva(
         left: "inset-y-0 left-0 border-r",
         right: "inset-y-0 right-0 border-l",
         top: "inset-x-0 top-0 border-b",
-        bottom: "inset-x-0 bottom-0 border-t",
-        "right-bottom": "bottom-0 right-0 rounded-tl-xl border-t border-l sidebar-rb"
+        bottom: "inset-x-0 bottom-0 border-t"
       },
       size: {
         sm: "",
@@ -4556,10 +4559,7 @@ var sidebarContentVariants = classVarianceAuthority.cva(
       { side: "top", size: "lg", className: "h-80 max-h-[90vh]" },
       { side: "bottom", size: "sm", className: "h-48 max-h-[80vh]" },
       { side: "bottom", size: "md", className: "h-64 max-h-[85vh]" },
-      { side: "bottom", size: "lg", className: "h-80 max-h-[90vh]" },
-      { side: "right-bottom", size: "sm", className: "w-64 max-w-[85vw] h-screen" },
-      { side: "right-bottom", size: "md", className: "w-80 max-w-[90vw] h-screen" },
-      { side: "right-bottom", size: "lg", className: "w-96 max-w-[95vw] h-screen" }
+      { side: "bottom", size: "lg", className: "h-80 max-h-[90vh]" }
     ],
     defaultVariants: {
       side: "left",
@@ -4573,8 +4573,7 @@ var sidebarPersistentVariants = classVarianceAuthority.cva("bg-background border
       left: "h-full border-r",
       right: "h-full border-l",
       top: "w-full border-b",
-      bottom: "w-full border-t",
-      "right-bottom": "border-t border-l rounded-tl-xl"
+      bottom: "w-full border-t"
     },
     size: {
       sm: "",
@@ -4595,10 +4594,7 @@ var sidebarPersistentVariants = classVarianceAuthority.cva("bg-background border
     { side: "top", size: "lg", className: "h-80" },
     { side: "bottom", size: "sm", className: "h-48" },
     { side: "bottom", size: "md", className: "h-64" },
-    { side: "bottom", size: "lg", className: "h-80" },
-    { side: "right-bottom", size: "sm", className: "w-64 h-screen" },
-    { side: "right-bottom", size: "md", className: "w-80 h-screen" },
-    { side: "right-bottom", size: "lg", className: "w-96 h-screen" }
+    { side: "bottom", size: "lg", className: "h-80" }
   ],
   defaultVariants: {
     side: "left",
@@ -4650,9 +4646,6 @@ function Sidebar({
     const pct = Math.min(100, Math.max(1, sizePercent));
     if (side === "top" || side === "bottom") {
       return { height: `${pct}vh`, maxHeight: "100vh" };
-    }
-    if (side === "right-bottom") {
-      return { width: `${pct}vw`, maxWidth: "100vw" };
     }
     if (!isDesktop) return { width: "100vw", maxWidth: "100vw" };
     return { width: `${pct}vw`, maxWidth: "100vw" };
@@ -4712,7 +4705,13 @@ function Sidebar({
       {
         "aria-label": `${side} sidebar`,
         "data-side": side,
-        onInteractOutside: closeOnOutsideClick ? void 0 : (event) => event.preventDefault(),
+        onInteractOutside: (event) => {
+          if (overlay) {
+            event.preventDefault();
+            return;
+          }
+          if (!closeOnOutsideClick) event.preventDefault();
+        },
         className: cn(
           sidebarContentVariants({ side, size }),
           className,
@@ -5314,6 +5313,30 @@ function UengageProvider({ children, className }) {
   return /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("uengage-ui", className), children });
 }
 
+// src/assets/uEngage_icon.png
+var uEngage_icon_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPwAAAD7CAYAAABOrvnfAAAEHklEQVR4nO3d0U1jSRCG0WKFSIocCJYcSIoX9mE00uwsxjb4uqv6PyeCEre/rmujGaoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuMTD6gG+8vTy/LF6hku8v761/jnuott5mPjc2w7c7eGeM/HhT9L5PEx69v+sHgDO6Rz7NIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKnvffXt4fVM+xC8IzQNfquc53yuHoAuNS0uDqy4SGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CHI4+oB4BJPL88fq2f4zPvr28PqGa5hw8MPdL2IThE87U2LqjPBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDB34h/0cUEgocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggr8h/+vNMd5f3x5Wz3BK59k+87h6ALjEtLC6suEhiOBvzGs9nQkegggeggj+AF7r6UrwEKRt8H4NA7fXNvjpvNbTkeAhiOAPZMvTjeAPJno6aR28L+7gtloHvwtbni4EfyeipwPBQxDB35Etz2rtg9/tizvRs1L74HckelYR/CKiZ4URwe/2Wv+b6Lm3EcHvTPTck+AbED33IvgmRM89jPpsnBLFrt9ZsJ4N31DKxcb9jdskaTHY9tySDd9c2gXHsUZuj9QIbHt+yoYf5Onl+SP1suM2xm4MB/8XW59r2PDD2fpcY/R2cNC/Zvvzt9EHQvDHc2nsZfzDFD2rTLwMfYaHb5q4bMYHP/GWhVXGB18lerjUFsEDl9kmeFseztsm+CrRwzlbBQ98bbvgbXk4bbvgq0QPp2wZfJXo4TPbBg/839bB2/LwX1sHXyV6+NP2wVeJHn6LCL5K9FAVFHyV6CEq+CrRky0u+CrRkysy+CrRkyk2+CrRkyc6+CrRkyU++Kpf0QufBIL/g+jZneD/Inp2JvhPiJ5dCf4En+vZkeDPED47EfyFRM8OBH8F257pBP8Nwmcqwf+A6JlG8D9k2zOJg3qAiX83nO+Zdtnb8Aew9elK8AcSPt04jHfmdX8v0y70UcPuyAUwm+D5MZfAHILnEC6BfqbFXiV4rpBy6UwMGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDb+hd78es6KyZOZAAAAABJRU5ErkJggg==";
+function Loader(_props) {
+  const [mounted, setMounted] = React14__namespace.useState(false);
+  React14__namespace.useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
+  return /* @__PURE__ */ jsxRuntime.jsx("div", { className: "ue-loader-overlay", role: "status", "aria-label": "Loading", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "ue-loader", children: [
+    /* @__PURE__ */ jsxRuntime.jsx("span", { className: "ue-inner-loader" }),
+    /* @__PURE__ */ jsxRuntime.jsx(
+      "img",
+      {
+        src: uEngage_icon_default,
+        alt: "uEngage",
+        width: 60,
+        height: 60,
+        draggable: false
+      }
+    )
+  ] }) });
+}
+Loader.displayName = "Loader";
+
 exports.AlertDialog = AlertDialog2;
 exports.AlertDialogAction = AlertDialogAction;
 exports.AlertDialogCancel = AlertDialogCancel;
@@ -5349,6 +5372,7 @@ exports.CustomTableSkeleton = TableSkeleton;
 exports.CustomTabsTrigger = CustomTabsTrigger;
 exports.DatePicker = DatePicker;
 exports.DatePickerCalendar = DatePickerCalendar;
+exports.Demo = Demo;
 exports.Drawer = Drawer;
 exports.DrawerClose = DrawerClose;
 exports.DrawerContent = DrawerContent;
@@ -5363,6 +5387,7 @@ exports.InputHelper = InputHelper;
 exports.InputLabel = InputLabel;
 exports.LAYOUT = LAYOUT;
 exports.Label = Label;
+exports.Loader = Loader;
 exports.Modal = Modal;
 exports.PATTERN_REGEX = PATTERN_REGEX;
 exports.PageContainer = PageContainer;
