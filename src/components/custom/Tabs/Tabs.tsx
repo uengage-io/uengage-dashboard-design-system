@@ -15,8 +15,6 @@ import type {
   TabItem,
 } from "@/components/custom/Tabs/Tabs.types";
 
-// Active/accent color for tab states — intentionally a shade darker than the
-// global #006F42 focus color for visual distinction within the tabs palette.
 const TAB_COLOR = "#0A5A2A";
 
 function getInitialValue(
@@ -121,19 +119,18 @@ function getVisibleTabs(
   return { visibleTabs: nextVisibleTabs, overflowTabs };
 }
 
+// Used by TertiaryTabs (pill/chip variant) overflow
 function OverflowTabsSelect({
   overflowTabs,
   overflowLabel,
   activeValue,
   onChange,
-  variant,
   className,
 }: {
   overflowTabs: TabItem[];
   overflowLabel: string;
   activeValue: string;
   onChange: (value: string) => void;
-  variant: "primary" | "secondary";
   className?: string;
 }) {
   const [open, setOpen] = React.useState(false);
@@ -147,14 +144,8 @@ function OverflowTabsSelect({
           type="button"
           className={cn(
             "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-            variant === "primary" && [
-              "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
-              `hover:text-[#0c6e20] ${FOCUS_RING}`,
-            ],
-            variant === "secondary" && [
-              "relative z-10 gap-1 rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold text-[#595959]",
-              `hover:text-black ${FOCUS_RING}`,
-            ],
+            "relative z-10 gap-1 rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold text-[#595959]",
+            `hover:text-black ${FOCUS_RING}`,
             className,
           )}
         >
@@ -214,21 +205,24 @@ function OverflowTabsSelect({
   );
 }
 
-// ── Primary overflow: trigger lives inside the scroll row (scrolls with tabs),
-//    panel renders OUTSIDE the overflow-x-auto container so it is never clipped
-//    and positions correctly on every screen size.
+// ── Line-tab variants (primary + secondary) share the same overflow trigger/panel
+//    pattern; variant controls text colours and active-item style.
 
-function PrimaryOverflowTrigger({
+function LineTabsOverflowTrigger({
   label,
   open,
   onClick,
   btnRef,
+  variant,
 }: {
   label: string;
   open: boolean;
   onClick: () => void;
   btnRef: React.RefObject<HTMLButtonElement | null>;
+  variant: "primary" | "secondary";
 }) {
+  const isPrimary = variant === "primary";
+
   return (
     <button
       ref={btnRef}
@@ -236,9 +230,10 @@ function PrimaryOverflowTrigger({
       onClick={onClick}
       className={cn(
         "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-        "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
-
-        `hover:text-[#0A5A2A] ${FOCUS_RING}`,
+        isPrimary
+          ? "relative flex-none gap-1 p-[10px] text-[15px] font-semibold text-gray-500 hover:text-gray-900"
+          : "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
+        FOCUS_RING,
       )}
     >
       <span>{label}</span>
@@ -246,7 +241,8 @@ function PrimaryOverflowTrigger({
         size={16}
         strokeWidth={2.25}
         className={cn(
-          "text-[#0A5A2A] transition-transform duration-200",
+          isPrimary ? "text-gray-500" : "text-[#0A5A2A]",
+          "transition-transform duration-200",
           open && "rotate-180",
         )}
       />
@@ -254,24 +250,24 @@ function PrimaryOverflowTrigger({
   );
 }
 
-function PrimaryOverflowPanel({
+function LineTabsOverflowPanel({
   overflowTabs,
   activeValue,
   onChange,
   onClose,
   triggerRef,
+  variant,
 }: {
   overflowTabs: TabItem[];
   activeValue: string;
   onChange: (value: string) => void;
   onClose: () => void;
   triggerRef: React.RefObject<HTMLButtonElement | null>;
+  variant: "primary" | "secondary";
 }) {
   const panelRef = React.useRef<HTMLDivElement>(null);
   const [panelStyle, setPanelStyle] = React.useState<React.CSSProperties>({});
 
-  // Compute fixed coordinates from the trigger's bounding rect so the panel
-  // always aligns with the button regardless of any scroll/overflow ancestor.
   React.useLayoutEffect(() => {
     const btn = triggerRef.current;
     if (!btn) return;
@@ -309,8 +305,13 @@ function PrimaryOverflowPanel({
     };
   }, [onClose, triggerRef]);
 
-  // Portal to document.body so the panel escapes every stacking context
-  // (including overflow-x:auto ancestors on iOS Safari).
+  const activeItemClass =
+    variant === "primary"
+      ? "bg-[#F3F4F6] font-semibold text-[#111827]"
+      : "bg-[#F0F9F4] font-semibold text-[#0A5A2A]";
+  const checkClass =
+    variant === "primary" ? "text-[#111827]" : "text-[#0A5A2A]";
+
   return createPortal(
     <div
       ref={panelRef}
@@ -334,7 +335,7 @@ function PrimaryOverflowPanel({
                 "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
                 "transition-colors duration-150",
                 isActive
-                  ? "bg-[#F0F9F4] font-semibold text-[#0A5A2A]"
+                  ? activeItemClass
                   : "text-[#374151] hover:bg-[#F8FAFC]",
                 tab.disabled && "cursor-not-allowed opacity-50",
               )}
@@ -349,7 +350,7 @@ function PrimaryOverflowPanel({
                 <Check
                   size={16}
                   strokeWidth={2.5}
-                  className="shrink-0 text-[#0A5A2A]"
+                  className={cn("shrink-0", checkClass)}
                 />
               )}
             </button>
@@ -368,13 +369,12 @@ function Tabs(props: CustomTabsProps) {
     );
   }
   const variant = props.variant ?? "primary";
-  return variant === "secondary" ? (
-    <SecondaryTabs {...props} />
-  ) : (
-    <PrimaryTabs {...props} />
-  );
+  if (variant === "tertiary") return <TertiaryTabs {...props} />;
+  if (variant === "secondary") return <SecondaryTabs {...props} />;
+  return <PrimaryTabs {...props} />;
 }
 
+// Primary: sliding gradient indicator with glow, bold dark text when active
 function PrimaryTabs({
   tabs,
   defaultValue,
@@ -404,7 +404,153 @@ function PrimaryTabs({
     [activeValue, tabs, visibleTabLimit],
   );
 
-  // Close overflow panel whenever the active tab changes
+  const handleChangeAndClose = React.useCallback(
+    (v: string) => {
+      handleChange(v);
+      setOverflowOpen(false);
+    },
+    [handleChange],
+  );
+
+  React.useLayoutEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper || !activeValue) return;
+    const btn = wrapper.querySelector(
+      `[data-tab-value="${escapeTabValue(activeValue)}"]`,
+    ) as HTMLElement | null;
+    if (!btn) {
+      setIndicator((i) => ({ ...i, ready: false }));
+      return;
+    }
+    setIndicator({ left: btn.offsetLeft, width: btn.offsetWidth, ready: true });
+  }, [
+    activeValue,
+    visibleTabs.length,
+    visibleTabs.map((t) => t.value).join("|"),
+  ]);
+
+  React.useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const handle = () => {
+      const btn = wrapper.querySelector(
+        `[data-tab-value="${escapeTabValue(activeValue)}"]`,
+      ) as HTMLElement | null;
+      if (!btn) return;
+      setIndicator((prev) => ({
+        left: btn.offsetLeft,
+        width: btn.offsetWidth,
+        ready: prev.ready,
+      }));
+    };
+    window.addEventListener("resize", handle);
+    return () => window.removeEventListener("resize", handle);
+  }, [activeValue]);
+
+  return (
+    <T
+      value={activeValue}
+      onValueChange={handleChangeAndClose}
+      className={cn("w-full", className)}
+    >
+      <div className="relative w-full border-b border-[#E5E7EB]">
+        <div
+          ref={wrapperRef}
+          className="relative flex min-w-0 items-end overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <TabsList
+            variant="line"
+            className={cn(
+              "flex w-max min-w-0 flex-row items-center justify-start",
+              "h-auto! rounded-none bg-transparent p-0 gap-6",
+            )}
+          >
+            {visibleTabs.map((tab) => (
+              <CustomTabsTrigger
+                key={tab.value}
+                value={tab.value}
+                disabled={tab.disabled}
+                variant="primary"
+              >
+                {tab.label}
+              </CustomTabsTrigger>
+            ))}
+          </TabsList>
+
+          {overflowTabs.length > 0 && (
+            <LineTabsOverflowTrigger
+              label={overflowLabel}
+              open={overflowOpen}
+              onClick={() => setOverflowOpen((o) => !o)}
+              btnRef={overflowBtnRef}
+              variant="primary"
+            />
+          )}
+
+          {/* Single sliding indicator shared across all tabs */}
+          <div
+            aria-hidden="true"
+            className={cn(
+              "pointer-events-none absolute bottom-0 left-0 h-[8px] rounded-t-full",
+              "shadow-[0_-3px_10px_rgba(0,168,107,0.45)]",
+              indicator.ready
+                ? "transition-all duration-300 ease-out opacity-100"
+                : "opacity-0",
+            )}
+            style={{
+              background:
+                "linear-gradient(189.6deg, #003C1B -188.01%, #00A86B 92.12%)",
+              transform: `translateX(${indicator.left}px)`,
+              width: indicator.width,
+            }}
+          />
+        </div>
+
+        {overflowOpen && overflowTabs.length > 0 && (
+          <LineTabsOverflowPanel
+            overflowTabs={overflowTabs}
+            activeValue={activeValue}
+            onChange={handleChangeAndClose}
+            onClose={() => setOverflowOpen(false)}
+            triggerRef={overflowBtnRef}
+            variant="primary"
+          />
+        )}
+      </div>
+    </T>
+  );
+}
+
+// Secondary (formerly primary): green active text, thin indicator, subtle overlay
+function SecondaryTabs({
+  tabs,
+  defaultValue,
+  value,
+  onChange,
+  visibleTabLimit,
+  overflowLabel = "More Options",
+  className,
+}: CustomTabsProps) {
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const overflowBtnRef = React.useRef<HTMLButtonElement>(null);
+  const [overflowOpen, setOverflowOpen] = React.useState(false);
+  const { activeValue, handleChange } = useTabValue(
+    tabs,
+    value,
+    defaultValue,
+    onChange,
+  );
+  const [indicator, setIndicator] = React.useState<{
+    left: number;
+    width: number;
+    ready: boolean;
+  }>({ left: 0, width: 0, ready: false });
+
+  const { visibleTabs, overflowTabs } = React.useMemo(
+    () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
+    [activeValue, tabs, visibleTabLimit],
+  );
+
   const handleChangeAndClose = React.useCallback(
     (v: string) => {
       handleChange(v);
@@ -475,27 +621,27 @@ function PrimaryTabs({
                 key={tab.value}
                 value={tab.value}
                 disabled={tab.disabled}
-                variant="primary"
+                variant="secondary"
               >
                 {tab.label}
               </CustomTabsTrigger>
             ))}
           </TabsList>
 
-          {/* Trigger scrolls with tabs, separator keeps it visually distinct */}
           {overflowTabs.length > 0 && (
-            <PrimaryOverflowTrigger
+            <LineTabsOverflowTrigger
               label={overflowLabel}
               open={overflowOpen}
               onClick={() => setOverflowOpen((o) => !o)}
               btnRef={overflowBtnRef}
+              variant="secondary"
             />
           )}
 
           <span
             aria-hidden="true"
             className={cn(
-              "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0A5A2A]",
+              "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
               indicator.ready
                 ? "transition-all duration-300 ease-out opacity-100"
                 : "opacity-0",
@@ -507,14 +653,14 @@ function PrimaryTabs({
           />
         </div>
 
-        {/* Panel is portaled to document.body so it is never clipped */}
         {overflowOpen && overflowTabs.length > 0 && (
-          <PrimaryOverflowPanel
+          <LineTabsOverflowPanel
             overflowTabs={overflowTabs}
             activeValue={activeValue}
             onChange={handleChangeAndClose}
             onClose={() => setOverflowOpen(false)}
             triggerRef={overflowBtnRef}
+            variant="secondary"
           />
         )}
       </div>
@@ -522,7 +668,8 @@ function PrimaryTabs({
   );
 }
 
-function SecondaryTabs({
+// Tertiary (formerly secondary): pill/chip style with animated background slab
+function TertiaryTabs({
   tabs,
   defaultValue,
   value,
@@ -629,22 +776,23 @@ function SecondaryTabs({
                 key={tab.value}
                 value={tab.value}
                 disabled={tab.disabled}
-                variant="secondary"
+                variant="tertiary"
               >
                 {tab.label}
               </CustomTabsTrigger>
             ))}
           </TabsList>
-          {/* Separator + overflow button scrolls with tabs at the end of the list */}
           {overflowTabs.length > 0 && (
-            <span className="mx-1 h-4 w-px shrink-0 bg-[#b8c4d9]" aria-hidden="true" />
+            <span
+              className="mx-1 h-4 w-px shrink-0 bg-[#b8c4d9]"
+              aria-hidden="true"
+            />
           )}
           <OverflowTabsSelect
             overflowTabs={overflowTabs}
             overflowLabel={overflowLabel}
             activeValue={activeValue}
             onChange={handleChange}
-            variant="secondary"
           />
         </div>
       </div>

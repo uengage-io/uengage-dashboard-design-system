@@ -30,7 +30,6 @@ export {
 } from "./components/custom/Layout";
 
 // Card
-export { Demo } from "./components/custom/Demo/Demo";
 export {
   Card,
   CardHeader,
@@ -264,3 +263,20 @@ export { UengageProvider } from "./components/custom/Provider";
 
 // Loader
 export { Loader } from "./components/custom/Loader";
+
+// Accordion
+export {
+  Accordion,
+  type AccordionItem,
+  type CustomAccordionProps,
+  type AccordionVariant,
+  type AccordionSize,
+  accordionRootVariants,
+  accordionItemVariants,
+  accordionTriggerVariants,
+  accordionContentVariants,
+  type AccordionRootVariants,
+  type AccordionItemVariants,
+  type AccordionTriggerVariants,
+  type AccordionContentVariants,
+} from "./components/custom/Accordion";

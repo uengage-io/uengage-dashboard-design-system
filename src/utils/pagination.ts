@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { FOCUS_RING } from "./tokens";
 
 export const pageButtonVariants = cva(
-  `relative z-10 inline-flex items-center justify-center rounded-full transition-colors duration-150 ease-in-out outline-none ${FOCUS_RING}`,
+  `relative z-10 inline-flex items-center justify-center leading-none rounded-full transition-colors duration-150 ease-in-out outline-none ${FOCUS_RING}`,
   {
     variants: {
       size: {

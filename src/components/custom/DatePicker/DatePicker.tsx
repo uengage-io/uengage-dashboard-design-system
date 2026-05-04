@@ -15,7 +15,13 @@ import type { DatePickerProps, DateRange } from "./DatePicker.types";
 /* ── Helpers ──────────────────────────────────────────────────────────── */
 
 function isDateRange(v: unknown): v is DateRange {
-  return !!v && typeof v === "object" && "from" in v && "to" in v;
+  return (
+    !!v &&
+    typeof v === "object" &&
+    "from" in v &&
+    "to" in v &&
+    ((v as DateRange).from instanceof Date || (v as DateRange).to instanceof Date)
+  );
 }
 
 function orderedRange(a: Date, b: Date): DateRange {
@@ -115,7 +121,7 @@ function DatePicker({
     if (mode === "single" && committed instanceof Date)
       return formatDate(committed);
     if (mode === "range" && isDateRange(committed))
-      return formatRange(committed.from, committed.to);
+      return formatRange(committed.from, committed.to) ?? null;
     return null;
   }, [committed, mode]);
 
@@ -151,6 +157,7 @@ function DatePicker({
     if (isDateRange(committed)) return formatDate(committed.to);
     return null;
   }, [pendingFrom, hoverDate, draftRange, committed]);
+
 
   // ── Event handlers ────────────────────────────────────────────────────
 

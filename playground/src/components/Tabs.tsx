@@ -14,6 +14,7 @@ const tabs = [
 export default function TabsPreview() {
   const [primaryTab, setPrimaryTab] = useState("tab-1");
   const [secondaryTab, setSecondaryTab] = useState("tab-1");
+  const [tertiaryTab, setTertiaryTab] = useState("tab-1");
   const [enabled, setEnabled] = useState(true);
 
   return (
@@ -71,6 +72,26 @@ export default function TabsPreview() {
           />
           <div className="rounded-[16px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-3 text-sm text-[#374151]">
             Active secondary tab: <strong>{secondaryTab}</strong>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-[#111827]">Tertiary</h2>
+            <p className="text-sm text-[#6B7280]">
+              Animated pill/chip style with sliding background slab.
+            </p>
+          </div>
+          <Tabs
+            variant="tertiary"
+            value={tertiaryTab}
+            tabs={tabs}
+            visibleTabLimit={4}
+            overflowLabel="More Options"
+            onChange={setTertiaryTab}
+          />
+          <div className="rounded-[16px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-3 text-sm text-[#374151]">
+            Active tertiary tab: <strong>{tertiaryTab}</strong>
           </div>
         </section>
       </div>

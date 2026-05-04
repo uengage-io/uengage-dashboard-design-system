@@ -44,9 +44,13 @@ function TopHeader({
           data-slot="top-header-title"
           className="flex min-w-0 flex-1 items-center gap-[10px] overflow-hidden"
         >
-          <h1 className="truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]">
-            {title}
-          </h1>
+          {React.isValidElement(title) ? (
+            title
+          ) : (
+            <h1 className="truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]">
+              {title}
+            </h1>
+          )}
           {helper != null && (
             <span className="shrink-0 text-xs sm:text-sm leading-none">{helper}</span>
           )}

@@ -67,7 +67,7 @@ export default function LayoutPreview() {
     <div style={{ display: "flex", margin: "0 auto", background: "#F3F4F6" }}>
       <PageContainer>
         <TopHeader
-          title="Grid Variants Showcase"
+          title="Hello"
           helper={
             <a
               href="#"

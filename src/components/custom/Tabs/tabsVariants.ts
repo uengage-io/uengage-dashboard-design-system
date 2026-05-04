@@ -5,7 +5,7 @@ export const tabTriggerVariants = cva(
   [
     "relative flex items-center gap-2 cursor-pointer select-none whitespace-nowrap",
     "rounded-t-lg transition-all duration-200 outline-none",
-    "px-3 py-3 sm:px-5 sm:py-5 text-[13px] sm:text-[14px] font-medium",
+    "px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium",
     FOCUS_RING,
   ].join(" "),
   {
