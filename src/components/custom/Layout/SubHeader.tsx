@@ -80,14 +80,18 @@ function SubHeader({
           {hasHeading && (
             <div data-slot="sub-header-heading">
               {title != null && (
-                <h2 className="text-sm sm:text-base font-semibold leading-tight text-foreground">
-                  {title}
-                </h2>
+                React.isValidElement(title) ? title : (
+                  <h2 className="text-sm sm:text-base font-semibold leading-tight text-foreground">
+                    {title}
+                  </h2>
+                )
               )}
               {subtitle != null && (
-                <div className="mt-0.5 text-[12px] sm:text-[13px] leading-tight text-muted-foreground">
-                  {subtitle}
-                </div>
+                React.isValidElement(subtitle) ? subtitle : (
+                  <div className="mt-0.5 text-[12px] sm:text-[13px] leading-tight text-muted-foreground">
+                    {subtitle}
+                  </div>
+                )
               )}
             </div>
           )}

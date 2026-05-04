@@ -139,11 +139,6 @@ declare namespace Grid {
     var displayName: string;
 }
 
-declare function Demo(): react_jsx_runtime.JSX.Element;
-declare namespace Demo {
-    var displayName: string;
-}
-
 interface CardProps extends React.ComponentProps<"div"> {
 }
 declare function Card({ className, ...props }: CardProps): react_jsx_runtime.JSX.Element;
@@ -271,7 +266,7 @@ interface CustomTabsProps {
     defaultValue?: string;
     value?: string;
     onChange?: (value: string) => void;
-    variant?: "primary" | "secondary";
+    variant?: "primary" | "secondary" | "tertiary";
     visibleTabLimit?: number;
     overflowLabel?: string;
     className?: string;
@@ -283,7 +278,7 @@ declare namespace Tabs {
 }
 
 interface CustomTabsTriggerProps extends React.ComponentProps<typeof TabsTrigger> {
-    variant?: "primary" | "secondary";
+    variant?: "primary" | "secondary" | "tertiary";
 }
 declare function CustomTabsTrigger({ className, children, disabled, variant, ...props }: CustomTabsTriggerProps): react_jsx_runtime.JSX.Element;
 declare namespace CustomTabsTrigger {
@@ -536,10 +531,10 @@ declare const dayCellVariants: (props?: ({
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 
 /** Returns e.g. "Apr 17, 2026" */
-declare function formatDate(date: Date): string;
+declare function formatDate(date: Date | null | undefined): string | null;
 /** Returns e.g. "Apr 1, 2026 – Apr 17, 2026" */
-declare function formatRange(from: Date, to: Date): string;
-declare function isSameDay(a: Date, b: Date): boolean;
+declare function formatRange(from: Date | null | undefined, to: Date | null | undefined): string | null;
+declare function isSameDay(a: Date | null | undefined, b: Date | null | undefined): boolean;
 
 interface ColumnDef<T> {
     key: keyof T | string;
@@ -961,4 +956,60 @@ declare namespace Loader {
     var displayName: string;
 }
 
-export { AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, Button, type ButtonState, Card, type CardProps, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, Demo, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, iconBadgeVariants as alertDialogIconBadgeVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, formatDate, formatRange, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
+interface AccordionItem {
+    value: string;
+    title: string;
+    content: React.ReactNode;
+    disabled?: boolean;
+    icon?: React.ReactNode;
+}
+type AccordionVariant = "default" | "ghost" | "bordered";
+type AccordionSize = "sm" | "md" | "lg";
+interface AccordionBaseProps {
+    items: AccordionItem[];
+    variant?: AccordionVariant;
+    size?: AccordionSize;
+    className?: string;
+}
+interface AccordionSingleProps extends AccordionBaseProps {
+    type?: "single";
+    collapsible?: boolean;
+    defaultValue?: string;
+    value?: string;
+    onChange?: (value: string) => void;
+}
+interface AccordionMultipleProps extends AccordionBaseProps {
+    type: "multiple";
+    collapsible?: never;
+    defaultValue?: string[];
+    value?: string[];
+    onChange?: (value: string[]) => void;
+}
+type CustomAccordionProps = AccordionSingleProps | AccordionMultipleProps;
+
+declare function Accordion(props: CustomAccordionProps): react_jsx_runtime.JSX.Element;
+declare namespace Accordion {
+    var displayName: string;
+}
+
+declare const accordionRootVariants: (props?: ({
+    variant?: "default" | "ghost" | "bordered" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+declare const accordionItemVariants: (props?: ({
+    variant?: "default" | "ghost" | "bordered" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+declare const accordionTriggerVariants: (props?: ({
+    variant?: "default" | "ghost" | "bordered" | null | undefined;
+    size?: "sm" | "lg" | "md" | null | undefined;
+    state?: "closed" | "open" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+declare const accordionContentVariants: (props?: ({
+    variant?: "default" | "ghost" | "bordered" | null | undefined;
+    size?: "sm" | "lg" | "md" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+type AccordionRootVariants = VariantProps<typeof accordionRootVariants>;
+type AccordionItemVariants = VariantProps<typeof accordionItemVariants>;
+type AccordionTriggerVariants = VariantProps<typeof accordionTriggerVariants>;
+type AccordionContentVariants = VariantProps<typeof accordionContentVariants>;
+
+export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, Button, type ButtonState, Card, type CardProps, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, formatDate, formatRange, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };

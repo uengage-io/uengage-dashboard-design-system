@@ -6,7 +6,7 @@ var radixUi = require('radix-ui');
 var clsx = require('clsx');
 var tailwindMerge = require('tailwind-merge');
 var jsxRuntime = require('react/jsx-runtime');
-var React14 = require('react');
+var React6 = require('react');
 var lucideReact = require('lucide-react');
 var Fuse = require('fuse.js');
 var cmdk = require('cmdk');
@@ -33,7 +33,7 @@ function _interopNamespace(e) {
   return Object.freeze(n);
 }
 
-var React14__namespace = /*#__PURE__*/_interopNamespace(React14);
+var React6__namespace = /*#__PURE__*/_interopNamespace(React6);
 var Fuse__default = /*#__PURE__*/_interopDefault(Fuse);
 var ReactDOM__namespace = /*#__PURE__*/_interopNamespace(ReactDOM);
 
@@ -677,9 +677,9 @@ function Button2({
   onBlur,
   ...props
 }) {
-  const [hovered, setHovered] = React14__namespace.useState(false);
-  const [pressed, setPressed] = React14__namespace.useState(false);
-  const [focused, setFocused] = React14__namespace.useState(false);
+  const [hovered, setHovered] = React6__namespace.useState(false);
+  const [pressed, setPressed] = React6__namespace.useState(false);
+  const [focused, setFocused] = React6__namespace.useState(false);
   const interactionBlocked = disabled || loading;
   const state = disabled ? "disabled" : pressed ? "pressed" : hovered ? "hover" : focused ? "focused" : "default";
   const gradientStyle = getButtonStyle(variant, state);
@@ -807,7 +807,7 @@ function TopHeader({
                   "data-slot": "top-header-title",
                   className: "flex min-w-0 flex-1 items-center gap-[10px] overflow-hidden",
                   children: [
-                    /* @__PURE__ */ jsxRuntime.jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
+                    React6__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
                     helper != null && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "shrink-0 text-xs sm:text-sm leading-none", children: helper })
                   ]
                 }
@@ -918,8 +918,8 @@ function SubHeader({
                   style: gap !== LAYOUT.gap.xs ? { gap: toCssSize(gap) } : void 0,
                   children: [
                     hasHeading && /* @__PURE__ */ jsxRuntime.jsxs("div", { "data-slot": "sub-header-heading", children: [
-                      title != null && /* @__PURE__ */ jsxRuntime.jsx("h2", { className: "text-sm sm:text-base font-semibold leading-tight text-foreground", children: title }),
-                      subtitle != null && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-0.5 text-[12px] sm:text-[13px] leading-tight text-muted-foreground", children: subtitle })
+                      title != null && (React6__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h2", { className: "text-sm sm:text-base font-semibold leading-tight text-foreground", children: title })),
+                      subtitle != null && (React6__namespace.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-0.5 text-[12px] sm:text-[13px] leading-tight text-muted-foreground", children: subtitle }))
                     ] }),
                     children != null && /* @__PURE__ */ jsxRuntime.jsx("div", { "data-slot": "sub-header-content", children })
                   ]
@@ -1024,10 +1024,6 @@ function Grid({
   );
 }
 Grid.displayName = "Grid";
-function Demo() {
-  return /* @__PURE__ */ jsxRuntime.jsx("h1", { children: "Demo Component" });
-}
-Demo.displayName = "Demo";
 function Card({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntime.jsx(
     "div",
@@ -1137,7 +1133,7 @@ function Input({ className, type, ...props }) {
   );
 }
 function useFuzzySearch(items, query) {
-  const fuse = React14.useMemo(
+  const fuse = React6.useMemo(
     () => new Fuse__default.default(items, {
       keys: ["label"],
       threshold: 0.35,
@@ -1147,7 +1143,7 @@ function useFuzzySearch(items, query) {
     }),
     [items]
   );
-  return React14.useMemo(() => {
+  return React6.useMemo(() => {
     const q = query.trim();
     if (!q) return items;
     return fuse.search(q).map((r) => r.item);
@@ -1205,17 +1201,17 @@ function SearchBar({
   onSelect,
   fallbackText = "No results found"
 }) {
-  const [internal, setInternal] = React14__namespace.useState(
+  const [internal, setInternal] = React6__namespace.useState(
     String(controlledValue ?? defaultValue ?? "")
   );
-  const [dropdownOpen, setDropdownOpen] = React14__namespace.useState(false);
-  const wrapperRef = React14__namespace.useRef(null);
-  const touchedRef = React14__namespace.useRef(false);
-  React14__namespace.useEffect(() => {
+  const [dropdownOpen, setDropdownOpen] = React6__namespace.useState(false);
+  const wrapperRef = React6__namespace.useRef(null);
+  const touchedRef = React6__namespace.useRef(false);
+  React6__namespace.useEffect(() => {
     if (controlledValue !== void 0) setInternal(String(controlledValue));
   }, [controlledValue]);
   const displayValue = internal;
-  const resolvedItems = React14__namespace.useMemo(() => {
+  const resolvedItems = React6__namespace.useMemo(() => {
     if (dropdownItems && getLabel) {
       return dropdownItems.map((item) => ({
         label: getLabel(item),
@@ -1567,9 +1563,9 @@ function Select({
   onTouch,
   spellCheck = true
 }) {
-  const touchedRef = React14__namespace.useRef(false);
-  const interactedRef = React14__namespace.useRef(false);
-  const resolvedOptions = React14__namespace.useMemo(() => {
+  const touchedRef = React6__namespace.useRef(false);
+  const interactedRef = React6__namespace.useRef(false);
+  const resolvedOptions = React6__namespace.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -1579,13 +1575,13 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React14__namespace.useState(false);
-  const [search, setSearch] = React14__namespace.useState("");
+  const [open, setOpen] = React6__namespace.useState(false);
+  const [search, setSearch] = React6__namespace.useState("");
   const filteredOptions = useFuzzySearch(resolvedOptions, search);
-  const [selected, setSelected] = React14__namespace.useState(
+  const [selected, setSelected] = React6__namespace.useState(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
   );
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -1619,12 +1615,12 @@ function Select({
     e.stopPropagation();
     commit(mode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React14__namespace.useRef(null);
-  const [visibleCount, setVisibleCount] = React14__namespace.useState(null);
-  React14__namespace.useLayoutEffect(() => {
+  const pillsContainerRef = React6__namespace.useRef(null);
+  const [visibleCount, setVisibleCount] = React6__namespace.useState(null);
+  React6__namespace.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), mode]);
-  React14__namespace.useLayoutEffect(() => {
+  React6__namespace.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     const container = pillsContainerRef.current;
     if (!container || mode !== "multi" || selectedArr.length === 0) {
@@ -1927,7 +1923,7 @@ var tabTriggerVariants = classVarianceAuthority.cva(
   [
     "relative flex items-center gap-2 cursor-pointer select-none whitespace-nowrap",
     "rounded-t-lg transition-all duration-200 outline-none",
-    "px-3 py-3 sm:px-5 sm:py-5 text-[13px] sm:text-[14px] font-medium",
+    "px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium",
     FOCUS_RING
   ].join(" "),
   {
@@ -1959,7 +1955,7 @@ function CustomTabsTrigger({
   ...props
 }) {
   const state = disabled ? "disabled" : "inactive";
-  if (variant === "secondary") {
+  if (variant === "tertiary") {
     return /* @__PURE__ */ jsxRuntime.jsx(
       TabsTrigger,
       {
@@ -1983,44 +1979,67 @@ function CustomTabsTrigger({
       }
     );
   }
-  return /* @__PURE__ */ jsxRuntime.jsxs(
+  if (variant === "secondary") {
+    return /* @__PURE__ */ jsxRuntime.jsxs(
+      TabsTrigger,
+      {
+        disabled,
+        "data-tab-value": props.value,
+        className: cn(
+          "group/tab flex-none w-auto",
+          tabTriggerVariants({ state }),
+          STRIP_SHADCN_DEFAULTS,
+          "data-[state=active]:!text-[#0A5A2A]! data-[state=active]:!font-semibold!",
+          className
+        ),
+        ...props,
+        children: [
+          /* @__PURE__ */ jsxRuntime.jsx(
+            "span",
+            {
+              className: cn(
+                tabPillClass,
+                "transition-colors duration-300 ease-out",
+                "text-gray-500 group-hover/tab:text-[#0A5A2A]",
+                "group-data-[state=active]/tab:text-[#0A5A2A] group-data-[state=active]/tab:font-semibold"
+              ),
+              children
+            }
+          ),
+          /* @__PURE__ */ jsxRuntime.jsx(
+            "span",
+            {
+              "aria-hidden": "true",
+              className: cn(
+                tabOverlayClass,
+                "transition-colors duration-300 ease-out",
+                "group-data-[state=active]/tab:bg-[#0A5A2A]/5"
+              )
+            }
+          )
+        ]
+      }
+    );
+  }
+  return /* @__PURE__ */ jsxRuntime.jsx(
     TabsTrigger,
     {
       disabled,
       "data-tab-value": props.value,
       className: cn(
-        "group/tab flex-none w-auto",
-        tabTriggerVariants({ state }),
+        "group/tab relative flex-none w-auto cursor-pointer select-none whitespace-nowrap",
+        "p-[10px] text-[15px] font-semibold",
+        "transition-colors duration-200 outline-none",
+        "bg-transparent data-[state=active]:bg-transparent",
+        "border-0 shadow-none after:hidden after:content-none",
+        "data-[state=active]:border-0 data-[state=active]:shadow-none",
+        FOCUS_RING,
+        "disabled:pointer-events-none",
         STRIP_SHADCN_DEFAULTS,
-        "data-[state=active]:!text-[#0A5A2A]! data-[state=active]:!font-semibold!",
         className
       ),
       ...props,
-      children: [
-        /* @__PURE__ */ jsxRuntime.jsx(
-          "span",
-          {
-            className: cn(
-              tabPillClass,
-              "transition-colors duration-300 ease-out",
-              "text-gray-500 group-hover/tab:text-[#0A5A2A]",
-              "group-data-[state=active]/tab:text-[#0A5A2A] group-data-[state=active]/tab:font-semibold"
-            ),
-            children
-          }
-        ),
-        /* @__PURE__ */ jsxRuntime.jsx(
-          "span",
-          {
-            "aria-hidden": "true",
-            className: cn(
-              tabOverlayClass,
-              "transition-colors duration-300 ease-out",
-              "group-data-[state=active]/tab:bg-[#0A5A2A]/5"
-            )
-          }
-        )
-      ]
+      children: /* @__PURE__ */ jsxRuntime.jsx("span", { className: "relative z-10 transition-colors duration-200 text-gray-500 group-hover/tab:text-[#0A5A2A] group-data-[state=active]/tab:text-[#0A5A2A] group-disabled/tab:text-[#D1D5DB]", children })
     }
   );
 }
@@ -2035,16 +2054,16 @@ function escapeTabValue(value) {
   return value.replace(/["\\]/g, "\\$&");
 }
 function useTabValue(tabs, value, defaultValue, onChange) {
-  const [uncontrolledValue, setUncontrolledValue] = React14__namespace.useState(
+  const [uncontrolledValue, setUncontrolledValue] = React6__namespace.useState(
     () => getInitialValue(tabs, value, defaultValue)
   );
   const activeValue = value ?? uncontrolledValue;
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     if (value !== void 0) return;
     if (tabs.some((tab) => tab.value === uncontrolledValue)) return;
     setUncontrolledValue(getInitialValue(tabs, value, defaultValue));
   }, [defaultValue, tabs, uncontrolledValue, value]);
-  const handleChange = React14__namespace.useCallback(
+  const handleChange = React6__namespace.useCallback(
     (nextValue) => {
       if (!tabs.some((tab) => tab.value === nextValue && !tab.disabled)) return;
       if (value === void 0) setUncontrolledValue(nextValue);
@@ -2104,10 +2123,9 @@ function OverflowTabsSelect({
   overflowLabel,
   activeValue,
   onChange,
-  variant,
   className
 }) {
-  const [open, setOpen] = React14__namespace.useState(false);
+  const [open, setOpen] = React6__namespace.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
@@ -2116,14 +2134,8 @@ function OverflowTabsSelect({
         type: "button",
         className: cn(
           "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-          variant === "primary" && [
-            "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
-            `hover:text-[#0c6e20] ${FOCUS_RING}`
-          ],
-          variant === "secondary" && [
-            "relative z-10 gap-1 rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold text-[#595959]",
-            `hover:text-black ${FOCUS_RING}`
-          ],
+          "relative z-10 gap-1 rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold text-[#595959]",
+          `hover:text-black ${FOCUS_RING}`,
           className
         ),
         children: [
@@ -2185,12 +2197,14 @@ function OverflowTabsSelect({
     )
   ] });
 }
-function PrimaryOverflowTrigger({
+function LineTabsOverflowTrigger({
   label,
   open,
   onClick,
-  btnRef
+  btnRef,
+  variant
 }) {
+  const isPrimary = variant === "primary";
   return /* @__PURE__ */ jsxRuntime.jsxs(
     "button",
     {
@@ -2199,8 +2213,8 @@ function PrimaryOverflowTrigger({
       onClick,
       className: cn(
         "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-        "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
-        `hover:text-[#0A5A2A] ${FOCUS_RING}`
+        isPrimary ? "relative flex-none gap-1 p-[10px] text-[15px] font-semibold text-gray-500 hover:text-gray-900" : "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
+        FOCUS_RING
       ),
       children: [
         /* @__PURE__ */ jsxRuntime.jsx("span", { children: label }),
@@ -2210,7 +2224,8 @@ function PrimaryOverflowTrigger({
             size: 16,
             strokeWidth: 2.25,
             className: cn(
-              "text-[#0A5A2A] transition-transform duration-200",
+              isPrimary ? "text-gray-500" : "text-[#0A5A2A]",
+              "transition-transform duration-200",
               open && "rotate-180"
             )
           }
@@ -2219,16 +2234,17 @@ function PrimaryOverflowTrigger({
     }
   );
 }
-function PrimaryOverflowPanel({
+function LineTabsOverflowPanel({
   overflowTabs,
   activeValue,
   onChange,
   onClose,
-  triggerRef
+  triggerRef,
+  variant
 }) {
-  const panelRef = React14__namespace.useRef(null);
-  const [panelStyle, setPanelStyle] = React14__namespace.useState({});
-  React14__namespace.useLayoutEffect(() => {
+  const panelRef = React6__namespace.useRef(null);
+  const [panelStyle, setPanelStyle] = React6__namespace.useState({});
+  React6__namespace.useLayoutEffect(() => {
     const btn = triggerRef.current;
     if (!btn) return;
     const rect = btn.getBoundingClientRect();
@@ -2239,7 +2255,7 @@ function PrimaryOverflowPanel({
       zIndex: 9999
     });
   }, [triggerRef]);
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     const handleOutside = (e) => {
       const target = e.target;
       if (panelRef.current?.contains(target) || triggerRef.current?.contains(target))
@@ -2259,6 +2275,8 @@ function PrimaryOverflowPanel({
       window.removeEventListener("scroll", handleScroll, { capture: true });
     };
   }, [onClose, triggerRef]);
+  const activeItemClass = variant === "primary" ? "bg-[#F3F4F6] font-semibold text-[#111827]" : "bg-[#F0F9F4] font-semibold text-[#0A5A2A]";
+  const checkClass = variant === "primary" ? "text-[#111827]" : "text-[#0A5A2A]";
   return ReactDOM.createPortal(
     /* @__PURE__ */ jsxRuntime.jsx(
       "div",
@@ -2281,7 +2299,7 @@ function PrimaryOverflowPanel({
               className: cn(
                 "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
                 "transition-colors duration-150",
-                isActive ? "bg-[#F0F9F4] font-semibold text-[#0A5A2A]" : "text-[#374151] hover:bg-[#F8FAFC]",
+                isActive ? activeItemClass : "text-[#374151] hover:bg-[#F8FAFC]",
                 tab.disabled && "cursor-not-allowed opacity-50"
               ),
               onClick: () => {
@@ -2296,7 +2314,7 @@ function PrimaryOverflowPanel({
                   {
                     size: 16,
                     strokeWidth: 2.5,
-                    className: "shrink-0 text-[#0A5A2A]"
+                    className: cn("shrink-0", checkClass)
                   }
                 )
               ]
@@ -2316,7 +2334,9 @@ function Tabs2(props) {
     );
   }
   const variant = props.variant ?? "primary";
-  return variant === "secondary" ? /* @__PURE__ */ jsxRuntime.jsx(SecondaryTabs, { ...props }) : /* @__PURE__ */ jsxRuntime.jsx(PrimaryTabs, { ...props });
+  if (variant === "tertiary") return /* @__PURE__ */ jsxRuntime.jsx(TertiaryTabs, { ...props });
+  if (variant === "secondary") return /* @__PURE__ */ jsxRuntime.jsx(SecondaryTabs, { ...props });
+  return /* @__PURE__ */ jsxRuntime.jsx(PrimaryTabs, { ...props });
 }
 function PrimaryTabs({
   tabs,
@@ -2327,28 +2347,168 @@ function PrimaryTabs({
   overflowLabel = "More Options",
   className
 }) {
-  const wrapperRef = React14__namespace.useRef(null);
-  const overflowBtnRef = React14__namespace.useRef(null);
-  const [overflowOpen, setOverflowOpen] = React14__namespace.useState(false);
+  const wrapperRef = React6__namespace.useRef(null);
+  const overflowBtnRef = React6__namespace.useRef(null);
+  const [overflowOpen, setOverflowOpen] = React6__namespace.useState(false);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [indicator, setIndicator] = React14__namespace.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React14__namespace.useMemo(
+  const [indicator, setIndicator] = React6__namespace.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React6__namespace.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  const handleChangeAndClose = React14__namespace.useCallback(
+  const handleChangeAndClose = React6__namespace.useCallback(
     (v) => {
       handleChange(v);
       setOverflowOpen(false);
     },
     [handleChange]
   );
-  React14__namespace.useLayoutEffect(() => {
+  React6__namespace.useLayoutEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper || !activeValue) return;
+    const btn = wrapper.querySelector(
+      `[data-tab-value="${escapeTabValue(activeValue)}"]`
+    );
+    if (!btn) {
+      setIndicator((i) => ({ ...i, ready: false }));
+      return;
+    }
+    setIndicator({ left: btn.offsetLeft, width: btn.offsetWidth, ready: true });
+  }, [
+    activeValue,
+    visibleTabs.length,
+    visibleTabs.map((t) => t.value).join("|")
+  ]);
+  React6__namespace.useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const handle = () => {
+      const btn = wrapper.querySelector(
+        `[data-tab-value="${escapeTabValue(activeValue)}"]`
+      );
+      if (!btn) return;
+      setIndicator((prev) => ({
+        left: btn.offsetLeft,
+        width: btn.offsetWidth,
+        ready: prev.ready
+      }));
+    };
+    window.addEventListener("resize", handle);
+    return () => window.removeEventListener("resize", handle);
+  }, [activeValue]);
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    Tabs,
+    {
+      value: activeValue,
+      onValueChange: handleChangeAndClose,
+      className: cn("w-full", className),
+      children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative w-full border-b border-[#E5E7EB]", children: [
+        /* @__PURE__ */ jsxRuntime.jsxs(
+          "div",
+          {
+            ref: wrapperRef,
+            className: "relative flex min-w-0 items-end overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                TabsList,
+                {
+                  variant: "line",
+                  className: cn(
+                    "flex w-max min-w-0 flex-row items-center justify-start",
+                    "h-auto! rounded-none bg-transparent p-0 gap-6"
+                  ),
+                  children: visibleTabs.map((tab) => /* @__PURE__ */ jsxRuntime.jsx(
+                    CustomTabsTrigger,
+                    {
+                      value: tab.value,
+                      disabled: tab.disabled,
+                      variant: "primary",
+                      children: tab.label
+                    },
+                    tab.value
+                  ))
+                }
+              ),
+              overflowTabs.length > 0 && /* @__PURE__ */ jsxRuntime.jsx(
+                LineTabsOverflowTrigger,
+                {
+                  label: overflowLabel,
+                  open: overflowOpen,
+                  onClick: () => setOverflowOpen((o) => !o),
+                  btnRef: overflowBtnRef,
+                  variant: "primary"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "div",
+                {
+                  "aria-hidden": "true",
+                  className: cn(
+                    "pointer-events-none absolute bottom-0 left-0 h-[8px] rounded-t-full",
+                    "shadow-[0_-3px_10px_rgba(0,168,107,0.45)]",
+                    indicator.ready ? "transition-all duration-300 ease-out opacity-100" : "opacity-0"
+                  ),
+                  style: {
+                    background: "linear-gradient(189.6deg, #003C1B -188.01%, #00A86B 92.12%)",
+                    transform: `translateX(${indicator.left}px)`,
+                    width: indicator.width
+                  }
+                }
+              )
+            ]
+          }
+        ),
+        overflowOpen && overflowTabs.length > 0 && /* @__PURE__ */ jsxRuntime.jsx(
+          LineTabsOverflowPanel,
+          {
+            overflowTabs,
+            activeValue,
+            onChange: handleChangeAndClose,
+            onClose: () => setOverflowOpen(false),
+            triggerRef: overflowBtnRef,
+            variant: "primary"
+          }
+        )
+      ] })
+    }
+  );
+}
+function SecondaryTabs({
+  tabs,
+  defaultValue,
+  value,
+  onChange,
+  visibleTabLimit,
+  overflowLabel = "More Options",
+  className
+}) {
+  const wrapperRef = React6__namespace.useRef(null);
+  const overflowBtnRef = React6__namespace.useRef(null);
+  const [overflowOpen, setOverflowOpen] = React6__namespace.useState(false);
+  const { activeValue, handleChange } = useTabValue(
+    tabs,
+    value,
+    defaultValue,
+    onChange
+  );
+  const [indicator, setIndicator] = React6__namespace.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React6__namespace.useMemo(
+    () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
+    [activeValue, tabs, visibleTabLimit]
+  );
+  const handleChangeAndClose = React6__namespace.useCallback(
+    (v) => {
+      handleChange(v);
+      setOverflowOpen(false);
+    },
+    [handleChange]
+  );
+  React6__namespace.useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper || !activeValue) return;
     const btn = wrapper.querySelector(
@@ -2368,7 +2528,7 @@ function PrimaryTabs({
     visibleTabs.length,
     visibleTabs.map((t) => t.value).join("|")
   ]);
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
     const handle = () => {
@@ -2411,7 +2571,7 @@ function PrimaryTabs({
                     {
                       value: tab.value,
                       disabled: tab.disabled,
-                      variant: "primary",
+                      variant: "secondary",
                       children: tab.label
                     },
                     tab.value
@@ -2419,12 +2579,13 @@ function PrimaryTabs({
                 }
               ),
               overflowTabs.length > 0 && /* @__PURE__ */ jsxRuntime.jsx(
-                PrimaryOverflowTrigger,
+                LineTabsOverflowTrigger,
                 {
                   label: overflowLabel,
                   open: overflowOpen,
                   onClick: () => setOverflowOpen((o) => !o),
-                  btnRef: overflowBtnRef
+                  btnRef: overflowBtnRef,
+                  variant: "secondary"
                 }
               ),
               /* @__PURE__ */ jsxRuntime.jsx(
@@ -2432,7 +2593,7 @@ function PrimaryTabs({
                 {
                   "aria-hidden": "true",
                   className: cn(
-                    "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0A5A2A]",
+                    "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
                     indicator.ready ? "transition-all duration-300 ease-out opacity-100" : "opacity-0"
                   ),
                   style: {
@@ -2445,20 +2606,21 @@ function PrimaryTabs({
           }
         ),
         overflowOpen && overflowTabs.length > 0 && /* @__PURE__ */ jsxRuntime.jsx(
-          PrimaryOverflowPanel,
+          LineTabsOverflowPanel,
           {
             overflowTabs,
             activeValue,
             onChange: handleChangeAndClose,
             onClose: () => setOverflowOpen(false),
-            triggerRef: overflowBtnRef
+            triggerRef: overflowBtnRef,
+            variant: "secondary"
           }
         )
       ] })
     }
   );
 }
-function SecondaryTabs({
+function TertiaryTabs({
   tabs,
   defaultValue,
   value,
@@ -2467,19 +2629,19 @@ function SecondaryTabs({
   overflowLabel = "More Options",
   className
 }) {
-  const listRef = React14__namespace.useRef(null);
+  const listRef = React6__namespace.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [chip, setChip] = React14__namespace.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React14__namespace.useMemo(
+  const [chip, setChip] = React6__namespace.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React6__namespace.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  React14__namespace.useLayoutEffect(() => {
+  React6__namespace.useLayoutEffect(() => {
     const list = listRef.current;
     if (!list || !activeValue) return;
     const btn = list.querySelector(
@@ -2499,7 +2661,7 @@ function SecondaryTabs({
     visibleTabs.length,
     visibleTabs.map((t) => t.value).join("|")
   ]);
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     const list = listRef.current;
     if (!list) return;
     const handle = () => {
@@ -2560,22 +2722,27 @@ function SecondaryTabs({
                   {
                     value: tab.value,
                     disabled: tab.disabled,
-                    variant: "secondary",
+                    variant: "tertiary",
                     children: tab.label
                   },
                   tab.value
                 ))
               }
             ),
-            overflowTabs.length > 0 && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "mx-1 h-4 w-px shrink-0 bg-[#b8c4d9]", "aria-hidden": "true" }),
+            overflowTabs.length > 0 && /* @__PURE__ */ jsxRuntime.jsx(
+              "span",
+              {
+                className: "mx-1 h-4 w-px shrink-0 bg-[#b8c4d9]",
+                "aria-hidden": "true"
+              }
+            ),
             /* @__PURE__ */ jsxRuntime.jsx(
               OverflowTabsSelect,
               {
                 overflowTabs,
                 overflowLabel,
                 activeValue,
-                onChange: handleChange,
-                variant: "secondary"
+                onChange: handleChange
               }
             )
           ]
@@ -2774,20 +2941,20 @@ function Input2({
   onSuggestionSelect,
   ...rest
 }) {
-  const reactId = React14__namespace.useId();
+  const reactId = React6__namespace.useId();
   const inputId = id ?? reactId;
-  const [focused, setFocused] = React14__namespace.useState(false);
-  const [showPassword, setShowPassword] = React14__namespace.useState(false);
-  const [internalError, setInternalError] = React14__namespace.useState(void 0);
-  const touchedRef = React14__namespace.useRef(false);
+  const [focused, setFocused] = React6__namespace.useState(false);
+  const [showPassword, setShowPassword] = React6__namespace.useState(false);
+  const [internalError, setInternalError] = React6__namespace.useState(void 0);
+  const touchedRef = React6__namespace.useRef(false);
   const isControlled = rest.value !== void 0;
-  const [uncontrolledQuery, setUncontrolledQuery] = React14__namespace.useState(
+  const [uncontrolledQuery, setUncontrolledQuery] = React6__namespace.useState(
     String(rest.defaultValue ?? "")
   );
   const suggestionQuery = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
   const fuseResults = useFuzzySearch(suggestions ?? [], suggestionQuery);
   const showSuggestions = !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
-  const wrapperRef = React14__namespace.useRef(null);
+  const wrapperRef = React6__namespace.useRef(null);
   const runValidation = (el) => {
     if (!el.validity.valid) {
       return validationMessage ?? el.validationMessage ?? "Invalid value";
@@ -2803,7 +2970,7 @@ function Input2({
   const effectiveError = error ?? internalError;
   const isPassword = inputType === "password";
   const effectiveType = isPassword && showPassword ? "text" : inputType;
-  const resolvedRightIcon = React14__namespace.useMemo(() => {
+  const resolvedRightIcon = React6__namespace.useMemo(() => {
     if (rightIcon !== void 0) return rightIcon;
     if (!isPassword) return null;
     return /* @__PURE__ */ jsxRuntime.jsx(
@@ -3002,9 +3169,9 @@ function Radio({
   className,
   ...rest
 }) {
-  const reactId = React14__namespace.useId();
+  const reactId = React6__namespace.useId();
   const itemId = id ?? reactId;
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     validateLabelWordLimit(label, "Radio");
   }, [label]);
   const state = disabled ? "disabled" : error ? "error" : "default";
@@ -3072,7 +3239,7 @@ function RadioGroup({
   error,
   className
 }) {
-  const reactId = React14__namespace.useId();
+  const reactId = React6__namespace.useId();
   const groupId = `radio-group-${reactId}`;
   const describedById = error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0;
   const gridColsMap = {
@@ -3195,13 +3362,13 @@ function Checkbox({
   className,
   ...rest
 }) {
-  const reactId = React14__namespace.useId();
+  const reactId = React6__namespace.useId();
   const itemId = rest.id ?? reactId;
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     validateLabelWordLimit(label, "CustomCheckbox");
   }, [label]);
   const isControlled = checked !== void 0;
-  const [internalChecked, setInternalChecked] = React14__namespace.useState(
+  const [internalChecked, setInternalChecked] = React6__namespace.useState(
     defaultChecked ?? false
   );
   const visualChecked = isControlled ? Boolean(checked) : internalChecked;
@@ -3277,11 +3444,11 @@ function CheckboxGroup({
   error,
   selectAll
 }) {
-  const reactId = React14__namespace.useId();
+  const reactId = React6__namespace.useId();
   const groupId = `checkbox-group-${reactId}`;
   const describedById = error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0;
   const isControlled = value !== void 0;
-  const [internalValue, setInternalValue] = React14__namespace.useState([]);
+  const [internalValue, setInternalValue] = React6__namespace.useState([]);
   const currentValue = isControlled ? value : internalValue;
   const setValue = (next) => {
     if (!isControlled) setInternalValue(next);
@@ -3387,8 +3554,8 @@ function StyledDayButton({
   className,
   ...props
 }) {
-  const ref = React14__namespace.useRef(null);
-  React14__namespace.useEffect(() => {
+  const ref = React6__namespace.useRef(null);
+  React6__namespace.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
   const isEdge = modifiers.range_start || modifiers.range_end;
@@ -3436,10 +3603,10 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React14__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React6__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? today;
-  const [viewMonth, setViewMonth] = React14__namespace.useState(initialMonth);
-  const yearOptions = React14__namespace.useMemo(
+  const [viewMonth, setViewMonth] = React6__namespace.useState(initialMonth);
+  const yearOptions = React6__namespace.useMemo(
     () => buildYearOptions(today.getFullYear()),
     [today]
   );
@@ -3595,16 +3762,21 @@ var MONTHS = [
   "Dec"
 ];
 function formatDate(date) {
+  if (!date) return null;
   return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 function formatRange(from, to) {
-  return `${formatDate(from)} \u2013 ${formatDate(to)}`;
+  const f = formatDate(from);
+  const t = formatDate(to);
+  if (!f && !t) return null;
+  return `${f ?? "\u2014"} \u2013 ${t ?? "\u2014"}`;
 }
 function isSameDay(a, b) {
+  if (!a || !b) return false;
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 function isDateRange(v) {
-  return !!v && typeof v === "object" && "from" in v && "to" in v;
+  return !!v && typeof v === "object" && "from" in v && "to" in v && (v.from instanceof Date || v.to instanceof Date);
 }
 function orderedRange(a, b) {
   return a <= b ? { from: a, to: b } : { from: b, to: a };
@@ -3638,20 +3810,20 @@ function DatePicker({
   maxDate,
   onTouch
 }) {
-  const [open, setOpen] = React14__namespace.useState(false);
-  const touchedRef = React14__namespace.useRef(false);
-  const interactedRef = React14__namespace.useRef(false);
-  const [committed, setCommitted] = React14__namespace.useState(
+  const [open, setOpen] = React6__namespace.useState(false);
+  const touchedRef = React6__namespace.useRef(false);
+  const interactedRef = React6__namespace.useRef(false);
+  const [committed, setCommitted] = React6__namespace.useState(
     controlledValue !== void 0 ? controlledValue ?? null : null
   );
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     if (controlledValue !== void 0) setCommitted(controlledValue ?? null);
   }, [controlledValue]);
-  const [pendingFrom, setPendingFrom] = React14__namespace.useState(null);
-  const [draftRange, setDraftRange] = React14__namespace.useState(null);
-  const [hoverDate, setHoverDate] = React14__namespace.useState(null);
-  const prevOpen = React14__namespace.useRef(false);
-  React14__namespace.useEffect(() => {
+  const [pendingFrom, setPendingFrom] = React6__namespace.useState(null);
+  const [draftRange, setDraftRange] = React6__namespace.useState(null);
+  const [hoverDate, setHoverDate] = React6__namespace.useState(null);
+  const prevOpen = React6__namespace.useRef(false);
+  React6__namespace.useEffect(() => {
     if (open && !prevOpen.current) {
       setPendingFrom(null);
       setHoverDate(null);
@@ -3665,21 +3837,21 @@ function DatePicker({
     }
     prevOpen.current = open;
   }, [open, committed, mode]);
-  const calendarDisabled = React14__namespace.useMemo(() => {
+  const calendarDisabled = React6__namespace.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length > 0 ? m : void 0;
   }, [minDate, maxDate]);
-  const triggerLabel = React14__namespace.useMemo(() => {
+  const triggerLabel = React6__namespace.useMemo(() => {
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return formatDate(committed);
     if (mode === "range" && isDateRange(committed))
-      return formatRange(committed.from, committed.to);
+      return formatRange(committed.from, committed.to) ?? null;
     return null;
   }, [committed, mode]);
-  const calendarSelected = React14__namespace.useMemo(() => {
+  const calendarSelected = React6__namespace.useMemo(() => {
     if (mode === "single") {
       return committed instanceof Date ? committed : void 0;
     }
@@ -3691,13 +3863,13 @@ function DatePicker({
     if (isDateRange(committed)) return committed;
     return void 0;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const fromLabel = React14__namespace.useMemo(() => {
+  const fromLabel = React6__namespace.useMemo(() => {
     if (pendingFrom) return formatDate(pendingFrom);
     if (draftRange) return formatDate(draftRange.from);
     if (isDateRange(committed)) return formatDate(committed.from);
     return null;
   }, [pendingFrom, draftRange, committed]);
-  const toLabel = React14__namespace.useMemo(() => {
+  const toLabel = React6__namespace.useMemo(() => {
     if (pendingFrom)
       return hoverDate ? formatDate(orderedRange(pendingFrom, hoverDate).to) : null;
     if (draftRange) return formatDate(draftRange.to);
@@ -4143,9 +4315,9 @@ function Table2({
   mobileLayout = "scroll",
   className
 }) {
-  const [sortKey, setSortKey] = React14.useState(null);
-  const [sortDir, setSortDir] = React14.useState(null);
-  const sortedData = React14.useMemo(() => {
+  const [sortKey, setSortKey] = React6.useState(null);
+  const [sortDir, setSortDir] = React6.useState(null);
+  const sortedData = React6.useMemo(() => {
     if (!sortKey || !sortDir) return data;
     return [...data].sort((a, b) => {
       const av = a[sortKey];
@@ -4476,7 +4648,7 @@ var thumbVariants = classVarianceAuthority.cva(
     }
   }
 );
-var Toggle = React14__namespace.forwardRef(
+var Toggle = React6__namespace.forwardRef(
   ({
     size = "md",
     label,
@@ -4602,8 +4774,8 @@ var sidebarPersistentVariants = classVarianceAuthority.cva("bg-background border
   }
 });
 function useIsDesktop(breakpoint = 768) {
-  const [isDesktop, setIsDesktop] = React14__namespace.useState(false);
-  React14__namespace.useEffect(() => {
+  const [isDesktop, setIsDesktop] = React6__namespace.useState(false);
+  React6__namespace.useEffect(() => {
     const query = `(min-width: ${breakpoint}px)`;
     const media = window.matchMedia(query);
     const setFromMedia = () => setIsDesktop(media.matches);
@@ -4630,9 +4802,9 @@ function Sidebar({
 }) {
   const isDesktop = useIsDesktop();
   const isControlled = open !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React14__namespace.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React6__namespace.useState(defaultOpen);
   const resolvedOpen = isControlled ? open : uncontrolledOpen;
-  const handleOpenChange = React14__namespace.useCallback(
+  const handleOpenChange = React6__namespace.useCallback(
     (nextOpen) => {
       if (!isControlled) {
         setUncontrolledOpen(nextOpen);
@@ -4641,7 +4813,7 @@ function Sidebar({
     },
     [isControlled, onOpenChange]
   );
-  const customSizeStyle = React14__namespace.useMemo(() => {
+  const customSizeStyle = React6__namespace.useMemo(() => {
     if (sizePercent == null) return {};
     const pct = Math.min(100, Math.max(1, sizePercent));
     if (side === "top" || side === "bottom") {
@@ -4650,7 +4822,7 @@ function Sidebar({
     if (!isDesktop) return { width: "100vw", maxWidth: "100vw" };
     return { width: `${pct}vw`, maxWidth: "100vw" };
   }, [sizePercent, side, isDesktop]);
-  const animDurationStyle = React14__namespace.useMemo(() => {
+  const animDurationStyle = React6__namespace.useMemo(() => {
     if (sizePercent != null) {
       const pct = Math.min(100, Math.max(1, sizePercent));
       return {
@@ -4849,33 +5021,33 @@ function AlertDialog2({
   ...options
 }) {
   const isControlled = openProp !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React14__namespace.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React6__namespace.useState(defaultOpen);
   const open = isControlled ? openProp : uncontrolledOpen;
-  const [inputValue, setInputValue] = React14__namespace.useState(defaultValue ?? "");
-  const [inputError, setInputError] = React14__namespace.useState(null);
-  const [submitError, setSubmitError] = React14__namespace.useState(null);
-  const [loading, setLoading] = React14__namespace.useState(false);
-  const setOpen = React14__namespace.useCallback(
+  const [inputValue, setInputValue] = React6__namespace.useState(defaultValue ?? "");
+  const [inputError, setInputError] = React6__namespace.useState(null);
+  const [submitError, setSubmitError] = React6__namespace.useState(null);
+  const [loading, setLoading] = React6__namespace.useState(false);
+  const setOpen = React6__namespace.useCallback(
     (next) => {
       if (!isControlled) setUncontrolledOpen(next);
       onOpenChange?.(next);
     },
     [isControlled, onOpenChange]
   );
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     if (!open) return;
     setInputValue(defaultValue ?? "");
     setInputError(null);
     setSubmitError(null);
     setLoading(false);
   }, [open]);
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     if (!open || !autoCloseMs || loading) return;
     const id = window.setTimeout(() => setOpen(false), autoCloseMs);
     return () => window.clearTimeout(id);
   }, [open, autoCloseMs, loading]);
-  const dismiss = React14__namespace.useCallback(() => setOpen(false), [setOpen]);
-  const confirm = React14__namespace.useCallback(async () => {
+  const dismiss = React6__namespace.useCallback(() => setOpen(false), [setOpen]);
+  const confirm = React6__namespace.useCallback(async () => {
     const validationError = inputValidator?.(inputValue);
     if (validationError) {
       setInputError(validationError);
@@ -4922,23 +5094,23 @@ function AlertDialog2({
     )
   ] });
 }
-var SweetAlertContext = React14__namespace.createContext(null);
+var SweetAlertContext = React6__namespace.createContext(null);
 function useSweetAlert() {
-  const ctx = React14__namespace.useContext(SweetAlertContext);
+  const ctx = React6__namespace.useContext(SweetAlertContext);
   if (!ctx) throw new Error("useSweetAlert must be used inside <SweetAlertProvider>");
   return ctx;
 }
 function SweetAlertProvider({ children }) {
-  const [queue, setQueue] = React14__namespace.useState([]);
-  const counter = React14__namespace.useRef(0);
-  const fire = React14__namespace.useCallback(
+  const [queue, setQueue] = React6__namespace.useState([]);
+  const counter = React6__namespace.useRef(0);
+  const fire = React6__namespace.useCallback(
     (options) => new Promise((resolve) => {
       counter.current += 1;
       setQueue((q) => [...q, { id: counter.current, options, resolve }]);
     }),
     []
   );
-  const ctx = React14__namespace.useMemo(() => ({ fire }), [fire]);
+  const ctx = React6__namespace.useMemo(() => ({ fire }), [fire]);
   return /* @__PURE__ */ jsxRuntime.jsxs(SweetAlertContext.Provider, { value: ctx, children: [
     children,
     queue[0] && /* @__PURE__ */ jsxRuntime.jsx(
@@ -4955,10 +5127,10 @@ function SweetAlertInstance({
   pending,
   onDone
 }) {
-  const [open, setOpen] = React14__namespace.useState(true);
-  const resolvedRef = React14__namespace.useRef(false);
-  const close = React14__namespace.useCallback(() => setOpen(false), []);
-  const handlePreConfirm = React14__namespace.useCallback(
+  const [open, setOpen] = React6__namespace.useState(true);
+  const resolvedRef = React6__namespace.useRef(false);
+  const close = React6__namespace.useCallback(() => setOpen(false), []);
+  const handlePreConfirm = React6__namespace.useCallback(
     async (value) => {
       await pending.options.preConfirm?.(value);
       resolvedRef.current = true;
@@ -4967,7 +5139,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  const handleOpenChange = React14__namespace.useCallback(
+  const handleOpenChange = React6__namespace.useCallback(
     (next) => {
       if (!next && !resolvedRef.current) {
         resolvedRef.current = true;
@@ -4977,7 +5149,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     if (!open) {
       const id = window.setTimeout(onDone, 200);
       return () => window.clearTimeout(id);
@@ -5018,7 +5190,7 @@ function Modal({
   bodyClassName,
   modalClassName
 }) {
-  React14__namespace.useEffect(() => {
+  React6__namespace.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -5087,7 +5259,7 @@ function PaginationItem({ ...props }) {
   return /* @__PURE__ */ jsxRuntime.jsx("li", { "data-slot": "pagination-item", ...props });
 }
 var pageButtonVariants = classVarianceAuthority.cva(
-  `relative z-10 inline-flex items-center justify-center rounded-full transition-colors duration-150 ease-in-out outline-none ${FOCUS_RING}`,
+  `relative z-10 inline-flex items-center justify-center leading-none rounded-full transition-colors duration-150 ease-in-out outline-none ${FOCUS_RING}`,
   {
     variants: {
       size: {
@@ -5166,11 +5338,11 @@ function Pagination2({
   const pages = usePagination({ currentPage, totalPages, siblingCount });
   const isPrevDisabled = disabled || currentPage === 1;
   const isNextDisabled = disabled || currentPage === totalPages;
-  const containerRef = React14.useRef(null);
-  const buttonRefs = React14.useRef(/* @__PURE__ */ new Map());
-  const [pill, setPill] = React14.useState(null);
-  const firstRender = React14.useRef(true);
-  React14.useLayoutEffect(() => {
+  const containerRef = React6.useRef(null);
+  const buttonRefs = React6.useRef(/* @__PURE__ */ new Map());
+  const [pill, setPill] = React6.useState(null);
+  const firstRender = React6.useRef(true);
+  React6.useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     const measurePill = (animated) => {
@@ -5316,8 +5488,8 @@ function UengageProvider({ children, className }) {
 // src/assets/uEngage_icon.png
 var uEngage_icon_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPwAAAD7CAYAAABOrvnfAAAEHklEQVR4nO3d0U1jSRCG0WKFSIocCJYcSIoX9mE00uwsxjb4uqv6PyeCEre/rmujGaoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuMTD6gG+8vTy/LF6hku8v761/jnuott5mPjc2w7c7eGeM/HhT9L5PEx69v+sHgDO6Rz7NIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKnvffXt4fVM+xC8IzQNfquc53yuHoAuNS0uDqy4SGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CHI4+oB4BJPL88fq2f4zPvr28PqGa5hw8MPdL2IThE87U2LqjPBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDB34h/0cUEgocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggr8h/+vNMd5f3x5Wz3BK59k+87h6ALjEtLC6suEhiOBvzGs9nQkegggeggj+AF7r6UrwEKRt8H4NA7fXNvjpvNbTkeAhiOAPZMvTjeAPJno6aR28L+7gtloHvwtbni4EfyeipwPBQxDB35Etz2rtg9/tizvRs1L74HckelYR/CKiZ4URwe/2Wv+b6Lm3EcHvTPTck+AbED33IvgmRM89jPpsnBLFrt9ZsJ4N31DKxcb9jdskaTHY9tySDd9c2gXHsUZuj9QIbHt+yoYf5Onl+SP1suM2xm4MB/8XW59r2PDD2fpcY/R2cNC/Zvvzt9EHQvDHc2nsZfzDFD2rTLwMfYaHb5q4bMYHP/GWhVXGB18lerjUFsEDl9kmeFseztsm+CrRwzlbBQ98bbvgbXk4bbvgq0QPp2wZfJXo4TPbBg/839bB2/LwX1sHXyV6+NP2wVeJHn6LCL5K9FAVFHyV6CEq+CrRky0u+CrRkysy+CrRkyk2+CrRkyc6+CrRkyU++Kpf0QufBIL/g+jZneD/Inp2JvhPiJ5dCf4En+vZkeDPED47EfyFRM8OBH8F257pBP8Nwmcqwf+A6JlG8D9k2zOJg3qAiX83nO+Zdtnb8Aew9elK8AcSPt04jHfmdX8v0y70UcPuyAUwm+D5MZfAHILnEC6BfqbFXiV4rpBy6UwMGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDb+hd78es6KyZOZAAAAABJRU5ErkJggg==";
 function Loader(_props) {
-  const [mounted, setMounted] = React14__namespace.useState(false);
-  React14__namespace.useEffect(() => {
+  const [mounted, setMounted] = React6__namespace.useState(false);
+  React6__namespace.useEffect(() => {
     setMounted(true);
   }, []);
   if (!mounted) return null;
@@ -5336,7 +5508,143 @@ function Loader(_props) {
   ] }) });
 }
 Loader.displayName = "Loader";
+var accordionRootVariants = classVarianceAuthority.cva("w-full", {
+  variants: {
+    variant: {
+      default: "divide-y divide-[#E5E7EB]",
+      ghost: "",
+      bordered: "flex flex-col gap-2"
+    }
+  },
+  defaultVariants: { variant: "default" }
+});
+var accordionItemVariants = classVarianceAuthority.cva("group", {
+  variants: {
+    variant: {
+      default: "",
+      ghost: "border-b border-[#E5E7EB] last:border-b-0",
+      bordered: "border border-[#E5E7EB] rounded-xl overflow-hidden bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+    }
+  },
+  defaultVariants: { variant: "default" }
+});
+var accordionTriggerVariants = classVarianceAuthority.cva(
+  [
+    "flex w-full items-center gap-3 font-medium outline-none",
+    "transition-colors duration-200 cursor-pointer",
+    "disabled:pointer-events-none disabled:opacity-40",
+    FOCUS_RING
+  ].join(" "),
+  {
+    variants: {
+      variant: {
+        default: "hover:bg-[#F9FAFB] rounded-lg",
+        ghost: "hover:text-[#006F42]",
+        bordered: "hover:bg-[#F9FAFB]"
+      },
+      size: {
+        sm: "px-3 py-2.5 text-[12px] sm:text-[13px]",
+        md: "px-4 py-3 text-[13px] sm:text-[14px]",
+        lg: "px-5 py-4 text-[14px] sm:text-[15px]"
+      },
+      state: {
+        open: "text-[#006F42]",
+        closed: "text-[#374151]"
+      }
+    },
+    defaultVariants: { variant: "default", size: "md", state: "closed" }
+  }
+);
+var accordionContentVariants = classVarianceAuthority.cva(
+  "text-[#6B7280] leading-relaxed",
+  {
+    variants: {
+      variant: {
+        default: "",
+        ghost: "",
+        bordered: ""
+      },
+      size: {
+        sm: "px-3 pb-3 text-[11px] sm:text-[12px]",
+        md: "px-4 pb-4 text-[12px] sm:text-[13px]",
+        lg: "px-5 pb-5 text-[13px] sm:text-[14px]"
+      }
+    },
+    defaultVariants: { variant: "default", size: "md" }
+  }
+);
+function AccordionItems({
+  items,
+  variant,
+  size
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsx(jsxRuntime.Fragment, { children: items.map((item) => /* @__PURE__ */ jsxRuntime.jsxs(
+    radixUi.Accordion.Item,
+    {
+      value: item.value,
+      disabled: item.disabled,
+      className: accordionItemVariants({ variant }),
+      children: [
+        /* @__PURE__ */ jsxRuntime.jsx(radixUi.Accordion.Header, { className: "flex", children: /* @__PURE__ */ jsxRuntime.jsxs(
+          radixUi.Accordion.Trigger,
+          {
+            className: cn(
+              accordionTriggerVariants({ variant, size }),
+              "data-[state=open]:text-[#006F42] w-full justify-between"
+            ),
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "flex items-center gap-2.5 min-w-0", children: [
+                item.icon && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "shrink-0 [&_svg]:size-4", children: item.icon }),
+                /* @__PURE__ */ jsxRuntime.jsx("span", { className: "truncate text-left", children: item.title })
+              ] }),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                lucideReact.ChevronDown,
+                {
+                  className: "ml-3 size-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 group-data-[state=open]:rotate-180",
+                  "aria-hidden": true
+                }
+              )
+            ]
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntime.jsx(radixUi.Accordion.Content, { className: "overflow-hidden will-change-[height] data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down", children: /* @__PURE__ */ jsxRuntime.jsx("div", { className: accordionContentVariants({ variant, size }), children: item.content }) })
+      ]
+    },
+    item.value
+  )) });
+}
+function Accordion(props) {
+  const { items, variant = "default", size = "md", className } = props;
+  const rootClass = cn(accordionRootVariants({ variant }), className);
+  if (props.type === "multiple") {
+    return /* @__PURE__ */ jsxRuntime.jsx(
+      radixUi.Accordion.Root,
+      {
+        type: "multiple",
+        value: props.value,
+        defaultValue: props.defaultValue,
+        onValueChange: props.onChange,
+        className: rootClass,
+        children: /* @__PURE__ */ jsxRuntime.jsx(AccordionItems, { items, variant, size })
+      }
+    );
+  }
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    radixUi.Accordion.Root,
+    {
+      type: "single",
+      collapsible: props.collapsible ?? true,
+      value: props.value,
+      defaultValue: props.defaultValue,
+      onValueChange: props.onChange,
+      className: rootClass,
+      children: /* @__PURE__ */ jsxRuntime.jsx(AccordionItems, { items, variant, size })
+    }
+  );
+}
+Accordion.displayName = "Accordion";
 
+exports.Accordion = Accordion;
 exports.AlertDialog = AlertDialog2;
 exports.AlertDialogAction = AlertDialogAction;
 exports.AlertDialogCancel = AlertDialogCancel;
@@ -5372,7 +5680,6 @@ exports.CustomTableSkeleton = TableSkeleton;
 exports.CustomTabsTrigger = CustomTabsTrigger;
 exports.DatePicker = DatePicker;
 exports.DatePickerCalendar = DatePickerCalendar;
-exports.Demo = Demo;
 exports.Drawer = Drawer;
 exports.DrawerClose = DrawerClose;
 exports.DrawerContent = DrawerContent;
@@ -5409,6 +5716,10 @@ exports.Tabs = Tabs2;
 exports.Toggle = Toggle;
 exports.TopHeader = TopHeader;
 exports.UengageProvider = UengageProvider;
+exports.accordionContentVariants = accordionContentVariants;
+exports.accordionItemVariants = accordionItemVariants;
+exports.accordionRootVariants = accordionRootVariants;
+exports.accordionTriggerVariants = accordionTriggerVariants;
 exports.alertDialogIconBadgeVariants = iconBadgeVariants;
 exports.brand = brand;
 exports.buttonVariants = buttonVariants;

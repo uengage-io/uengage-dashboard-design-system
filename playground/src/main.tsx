@@ -24,16 +24,19 @@ import FuzzySearchPreview from "./components/FuzzySearch";
 import Loader from "./components/Loader";
 import DemoPreview from "./components/Demo";
 import SidebarPreview from "./components/SidebarPreview";
+import LayoutPreview from "./components/Layout";
+import AccordionPreview from "./components/Accordion";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <FuzzySearchPreview /> */}
     {/* <PaginationPreview /> */}
-    
+
     {/* <Dialog/> */}
     {/* <Demo/> */}
     {/* <ButtonPreview /> */}
     {/* <Modalprev/> */}
-    {/* <SearchPreview /> */}
+    <SearchPreview />
+    <LayoutPreview/>
     {/* <SelectPreview /> */}
     {/* <CheckboxPreview /> */}
     {/* <RadioPreview /> */}
@@ -44,13 +47,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <TogglePreview /> */}
     {/* <AlertDialogPreview /> */}
     {/* <PageContainerDemo /> */}
-    <SidebarPreview />
+    {/* <TabsPreview /> */}
+    <AccordionPreview />
 
     {/* <Loader /> */}
     {/* <DemoPreview /> */}
     {/* <SidebarDemo /> */}
     {/* <TablePreview/> */}
     {/* <ModalPreview /> */}
-    {/* <PaginationPrev /> */}
+    <PaginationPrev />
   </React.StrictMode>,
 );
