@@ -1085,12 +1085,24 @@ function Card2({ className, ...props }) {
     Card,
     {
       className: cn(
-        "border-gray-300 bg-white p-3 sm:p-4 md:p-5 text-sm text-[#6B7280] shadow-none",
+        "border-gray-300 bg-white p-3 sm:p-4 md:p-5 text-sm text-[#202020] shadow-none",
         className
       ),
       ...props
     }
   );
+}
+function CardHeader2({ className, ...props }) {
+  return /* @__PURE__ */ jsx(CardHeader, { className: cn("text-[#202020]", className), ...props });
+}
+function CardTitle2({ className, ...props }) {
+  return /* @__PURE__ */ jsx(CardTitle, { className: cn("text-[#202020]", className), ...props });
+}
+function CardContent2({ className, ...props }) {
+  return /* @__PURE__ */ jsx(CardContent, { className: cn("text-[#202020]", className), ...props });
+}
+function CardFooter2({ className, ...props }) {
+  return /* @__PURE__ */ jsx(CardFooter, { className: cn("text-[#202020]", className), ...props });
 }
 Card2.displayName = "Card";
 function Input({ className, type, ...props }) {
@@ -2806,10 +2818,10 @@ var inputIconSlotVariants = cva(
 );
 var PATTERN_REGEX = {
   alphanumeric: "[^a-zA-Z0-9]",
-  alpha: "[^a-zA-Z]",
+  alpha: "[^a-zA-Z ]",
   numeric: "[^0-9]",
   decimal: "[^0-9.]",
-  phone: "[^\\d\\s+\\-()]",
+  phone: "[^0-9]",
   none: "(?!)"
 };
 function Label({
@@ -2968,7 +2980,8 @@ function Input2({
     if (allowPattern && allowPattern !== "none") {
       const raw = e.target.value;
       const regex = new RegExp(PATTERN_REGEX[allowPattern], "g");
-      const stripped = raw.replace(regex, "");
+      let stripped = raw.replace(regex, "");
+      if (allowPattern === "phone" && stripped.length > 10) stripped = stripped.slice(0, 10);
       if (stripped !== raw) e.target.value = stripped;
     }
     if (internalError) setInternalError(runValidation(e.target));
@@ -5620,6 +5633,6 @@ function Accordion(props) {
 }
 Accordion.displayName = "Accordion";
 
-export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, Button2 as Button, Card2 as Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Checkbox, CheckboxGroup, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, formatDate, formatRange, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
+export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, formatDate, formatRange, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

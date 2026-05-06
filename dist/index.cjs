@@ -1109,12 +1109,24 @@ function Card2({ className, ...props }) {
     Card,
     {
       className: cn(
-        "border-gray-300 bg-white p-3 sm:p-4 md:p-5 text-sm text-[#6B7280] shadow-none",
+        "border-gray-300 bg-white p-3 sm:p-4 md:p-5 text-sm text-[#202020] shadow-none",
         className
       ),
       ...props
     }
   );
+}
+function CardHeader2({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(CardHeader, { className: cn("text-[#202020]", className), ...props });
+}
+function CardTitle2({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(CardTitle, { className: cn("text-[#202020]", className), ...props });
+}
+function CardContent2({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(CardContent, { className: cn("text-[#202020]", className), ...props });
+}
+function CardFooter2({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(CardFooter, { className: cn("text-[#202020]", className), ...props });
 }
 Card2.displayName = "Card";
 function Input({ className, type, ...props }) {
@@ -2830,10 +2842,10 @@ var inputIconSlotVariants = classVarianceAuthority.cva(
 );
 var PATTERN_REGEX = {
   alphanumeric: "[^a-zA-Z0-9]",
-  alpha: "[^a-zA-Z]",
+  alpha: "[^a-zA-Z ]",
   numeric: "[^0-9]",
   decimal: "[^0-9.]",
-  phone: "[^\\d\\s+\\-()]",
+  phone: "[^0-9]",
   none: "(?!)"
 };
 function Label({
@@ -2992,7 +3004,8 @@ function Input2({
     if (allowPattern && allowPattern !== "none") {
       const raw = e.target.value;
       const regex = new RegExp(PATTERN_REGEX[allowPattern], "g");
-      const stripped = raw.replace(regex, "");
+      let stripped = raw.replace(regex, "");
+      if (allowPattern === "phone" && stripped.length > 10) stripped = stripped.slice(0, 10);
       if (stripped !== raw) e.target.value = stripped;
     }
     if (internalError) setInternalError(runValidation(e.target));
@@ -5660,11 +5673,11 @@ exports.AlertDialogTrigger = AlertDialogTrigger;
 exports.Button = Button2;
 exports.Card = Card2;
 exports.CardAction = CardAction;
-exports.CardContent = CardContent;
+exports.CardContent = CardContent2;
 exports.CardDescription = CardDescription;
-exports.CardFooter = CardFooter;
-exports.CardHeader = CardHeader;
-exports.CardTitle = CardTitle;
+exports.CardFooter = CardFooter2;
+exports.CardHeader = CardHeader2;
+exports.CardTitle = CardTitle2;
 exports.Checkbox = Checkbox;
 exports.CheckboxGroup = CheckboxGroup;
 exports.Command = Command;
