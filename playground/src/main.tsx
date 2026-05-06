@@ -26,6 +26,7 @@ import DemoPreview from "./components/Demo";
 import SidebarPreview from "./components/SidebarPreview";
 import LayoutPreview from "./components/Layout";
 import AccordionPreview from "./components/Accordion";
+import InputPreview from "./components/Input";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <FuzzySearchPreview /> */}
@@ -35,8 +36,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <Demo/> */}
     {/* <ButtonPreview /> */}
     {/* <Modalprev/> */}
-    <SearchPreview />
-    <LayoutPreview/>
+    {/* <SearchPreview /> */}
+    <LayoutPreview /> 
     {/* <SelectPreview /> */}
     {/* <CheckboxPreview /> */}
     {/* <RadioPreview /> */}
@@ -48,13 +49,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <AlertDialogPreview /> */}
     {/* <PageContainerDemo /> */}
     {/* <TabsPreview /> */}
-    <AccordionPreview />
-
+    {/* <AccordionPreview /> */}
+    <InputPreview />
     {/* <Loader /> */}
     {/* <DemoPreview /> */}
     {/* <SidebarDemo /> */}
     {/* <TablePreview/> */}
     {/* <ModalPreview /> */}
-    <PaginationPrev />
+    {/* <PaginationPrev /> */}
   </React.StrictMode>,
 );

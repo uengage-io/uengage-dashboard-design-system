@@ -127,7 +127,8 @@ function Input({
     if (allowPattern && allowPattern !== "none") {
       const raw = e.target.value;
       const regex = new RegExp(PATTERN_REGEX[allowPattern], "g");
-      const stripped = raw.replace(regex, "");
+      let stripped = raw.replace(regex, "");
+      if (allowPattern === "phone" && stripped.length > 10) stripped = stripped.slice(0, 10);
       if (stripped !== raw) e.target.value = stripped;
     }
     if (internalError) setInternalError(runValidation(e.target));
