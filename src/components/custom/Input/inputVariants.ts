@@ -88,9 +88,9 @@ export type InputIconSlotVariants = VariantProps<typeof inputIconSlotVariants>;
 
 export const PATTERN_REGEX: Record<AllowPattern, string> = {
   alphanumeric: "[^a-zA-Z0-9]",
-  alpha: "[^a-zA-Z]",
+  alpha: "[^a-zA-Z ]",
   numeric: "[^0-9]",
   decimal: "[^0-9.]",
-  phone: "[^\\d\\s+\\-()]",
+  phone: "[^0-9]",
   none: "(?!)",
 };

@@ -8,6 +8,8 @@ import {
   CardHeader,
   CardTitle,
   SearchBar,
+  CardContent,
+  Input,
 } from "@uengage/ui";
 import type { GridColumns } from "@uengage/ui";
 
@@ -42,9 +44,12 @@ function DemoCard({ index, columns }: { index: number; columns: GridColumns }) {
   return (
     <Card className="min-h-22 flex flex-col justify-center">
       <CardHeader className="text-[11px] uppercase tracking-wide text-[#9CA3AF]">
-        {columns} · item {index + 1}
+        {columns} · item {index + 1} Hello World
+              <CardTitle className="text-sm text-[#111827]">Card {index + 1}</CardTitle>
+        <CardContent>
+          <Input/>
+        </CardContent>
       </CardHeader>
-      <CardTitle className="text-sm text-[#111827]">Card {index + 1}</CardTitle>
     </Card>
   );
 }
@@ -105,6 +110,7 @@ export default function LayoutPreview() {
         />
         <Grid columns="8">
           <Card>
+            <CardHeader></CardHeader>
             <h1 style={{ fontSize: 13, margin: 0, color: "#111827" }}>
               Long heading to verify that content remains inside the column
             </h1>

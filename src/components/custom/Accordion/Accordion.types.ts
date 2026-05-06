@@ -34,4 +34,4 @@ interface AccordionMultipleProps extends AccordionBaseProps {
   onChange?: (value: string[]) => void;
 }
 
-export type CustomAccordionProps = AccordionSingleProps | AccordionMultipleProps;
+export type   CustomAccordionProps = AccordionSingleProps | AccordionMultipleProps;
