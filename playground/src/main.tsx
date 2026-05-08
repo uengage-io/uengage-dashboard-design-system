@@ -9,7 +9,6 @@ import CheckboxPreview from "./components/Checkbox";
 import RadioPreview from "./components/Radio";
 import TabsPreview from "./components/Tabs";
 import BadgePreview from "./components/Badge";
-import DatePickerPreview from "./components/DatePicker";
 import TogglePreview from "./Toggle";
 import AlertDialogPreview from "./components/AlertDialog";
 import PageContainerDemo from "./components/PageContainer";
@@ -27,6 +26,7 @@ import SidebarPreview from "./components/SidebarPreview";
 import LayoutPreview from "./components/Layout";
 import AccordionPreview from "./components/Accordion";
 import InputPreview from "./components/Input";
+import DatePickerPreview from "./components/DatePicker";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <FuzzySearchPreview /> */}
@@ -37,20 +37,20 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <ButtonPreview /> */}
     {/* <Modalprev/> */}
     {/* <SearchPreview /> */}
-    <LayoutPreview /> 
+    {/* <LayoutPreview /> */}
     {/* <SelectPreview /> */}
     {/* <CheckboxPreview /> */}
     {/* <RadioPreview /> */}
     {/* <TabsPreview /> */}
     {/* <BadgePreview /> */}
-    {/* <DatePickerPreview /> */}
+    <DatePickerPreview />
     {/* <br /> */}
     {/* <TogglePreview /> */}
     {/* <AlertDialogPreview /> */}
     {/* <PageContainerDemo /> */}
     {/* <TabsPreview /> */}
     {/* <AccordionPreview /> */}
-    <InputPreview />
+    {/* <InputPreview /> */}
     {/* <Loader /> */}
     {/* <DemoPreview /> */}
     {/* <SidebarDemo /> */}
