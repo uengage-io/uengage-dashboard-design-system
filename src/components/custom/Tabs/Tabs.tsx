@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createPortal } from "react-dom";
+
 import { Tabs as T, TabsList } from "@/components/ui/tabs";
 import { CustomTabsTrigger } from "@/components/custom/Tabs/CustomTabsTrigger";
 import {
@@ -205,160 +205,94 @@ function OverflowTabsSelect({
   );
 }
 
-// ── Line-tab variants (primary + secondary) share the same overflow trigger/panel
-//    pattern; variant controls text colours and active-item style.
-
-function LineTabsOverflowTrigger({
-  label,
-  open,
-  onClick,
-  btnRef,
-  variant,
-}: {
-  label: string;
-  open: boolean;
-  onClick: () => void;
-  btnRef: React.RefObject<HTMLButtonElement | null>;
-  variant: "primary" | "secondary";
-}) {
-  const isPrimary = variant === "primary";
-
-  return (
-    <button
-      ref={btnRef}
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-        isPrimary
-          ? "relative flex-none gap-1 p-[10px] text-[15px] font-semibold text-gray-500 hover:text-gray-900"
-          : "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
-        FOCUS_RING,
-      )}
-    >
-      <span>{label}</span>
-      <ChevronDown
-        size={16}
-        strokeWidth={2.25}
-        className={cn(
-          isPrimary ? "text-gray-500" : "text-[#0A5A2A]",
-          "transition-transform duration-200",
-          open && "rotate-180",
-        )}
-      />
-    </button>
-  );
-}
-
-function LineTabsOverflowPanel({
+// Used by PrimaryTabs and SecondaryTabs overflow — Popover handles positioning on all screen sizes
+function LineTabsOverflow({
   overflowTabs,
+  overflowLabel,
   activeValue,
   onChange,
-  onClose,
-  triggerRef,
   variant,
 }: {
   overflowTabs: TabItem[];
+  overflowLabel: string;
   activeValue: string;
   onChange: (value: string) => void;
-  onClose: () => void;
-  triggerRef: React.RefObject<HTMLButtonElement | null>;
   variant: "primary" | "secondary";
 }) {
-  const panelRef = React.useRef<HTMLDivElement>(null);
-  const [panelStyle, setPanelStyle] = React.useState<React.CSSProperties>({});
+  const [open, setOpen] = React.useState(false);
+  const isPrimary = variant === "primary";
 
-  React.useLayoutEffect(() => {
-    const btn = triggerRef.current;
-    if (!btn) return;
-    const rect = btn.getBoundingClientRect();
-    setPanelStyle({
-      position: "fixed",
-      top: rect.bottom + 8,
-      right: Math.max(0, window.innerWidth - rect.right),
-      zIndex: 9999,
-    });
-  }, [triggerRef]);
+  if (overflowTabs.length === 0) return null;
 
-  React.useEffect(() => {
-    const handleOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (
-        panelRef.current?.contains(target) ||
-        triggerRef.current?.contains(target)
-      )
-        return;
-      onClose();
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    // Close on scroll so the panel doesn't drift away from the trigger.
-    const handleScroll = () => onClose();
-    document.addEventListener("mousedown", handleOutside);
-    document.addEventListener("keydown", handleKey);
-    window.addEventListener("scroll", handleScroll, { capture: true });
-    return () => {
-      document.removeEventListener("mousedown", handleOutside);
-      document.removeEventListener("keydown", handleKey);
-      window.removeEventListener("scroll", handleScroll, { capture: true });
-    };
-  }, [onClose, triggerRef]);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
+            isPrimary
+              ? "relative flex-none gap-1 p-[10px] text-[15px] font-semibold text-gray-500 hover:text-gray-900"
+              : "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
+            FOCUS_RING,
+          )}
+        >
+          <span>{overflowLabel}</span>
+          <ChevronDown
+            size={16}
+            strokeWidth={2.25}
+            className={cn(
+              isPrimary ? "text-gray-500" : "text-[#0A5A2A]",
+              "transition-transform duration-200",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        sideOffset={8}
+        className="w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
+      >
+        <div className="flex flex-col">
+          {overflowTabs.map((tab) => {
+            const isActive = tab.value === activeValue;
+            const activeItemClass = isPrimary
+              ? "bg-[#F3F4F6] font-semibold text-[#111827]"
+              : "bg-[#F0F9F4] font-semibold text-[#0A5A2A]";
+            const checkClass = isPrimary ? "text-[#111827]" : "text-[#0A5A2A]";
 
-  const activeItemClass =
-    variant === "primary"
-      ? "bg-[#F3F4F6] font-semibold text-[#111827]"
-      : "bg-[#F0F9F4] font-semibold text-[#0A5A2A]";
-  const checkClass =
-    variant === "primary" ? "text-[#111827]" : "text-[#0A5A2A]";
-
-  return createPortal(
-    <div
-      ref={panelRef}
-      style={panelStyle}
-      className={cn(
-        "w-[220px] max-w-[calc(100vw-1rem)]",
-        "rounded-[10px] border border-[#E5E7EB] bg-white p-1",
-        "shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
-        "animate-[uengage-popover-in_140ms_ease-out]",
-      )}
-    >
-      <div className="flex flex-col">
-        {overflowTabs.map((tab) => {
-          const isActive = tab.value === activeValue;
-          return (
-            <button
-              key={tab.value}
-              type="button"
-              disabled={tab.disabled}
-              className={cn(
-                "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
-                "transition-colors duration-150",
-                isActive
-                  ? activeItemClass
-                  : "text-[#374151] hover:bg-[#F8FAFC]",
-                tab.disabled && "cursor-not-allowed opacity-50",
-              )}
-              onClick={() => {
-                if (tab.disabled) return;
-                onChange(tab.value);
-                onClose();
-              }}
-            >
-              <span className="truncate">{tab.label}</span>
-              {isActive && (
-                <Check
-                  size={16}
-                  strokeWidth={2.5}
-                  className={cn("shrink-0", checkClass)}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </div>,
-    document.body,
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                disabled={tab.disabled}
+                className={cn(
+                  "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
+                  "transition-colors duration-150",
+                  isActive ? activeItemClass : "text-[#374151] hover:bg-[#F8FAFC]",
+                  tab.disabled && "cursor-not-allowed opacity-50",
+                )}
+                onClick={() => {
+                  if (tab.disabled) return;
+                  onChange(tab.value);
+                  setOpen(false);
+                }}
+              >
+                <span className="truncate">{tab.label}</span>
+                {isActive && (
+                  <Check
+                    size={16}
+                    strokeWidth={2.5}
+                    className={cn("shrink-0", checkClass)}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -380,8 +314,6 @@ function PrimaryTabs({
   className,
 }: CustomTabsProps) {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
-  const overflowBtnRef = React.useRef<HTMLButtonElement>(null);
-  const [overflowOpen, setOverflowOpen] = React.useState(false);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
@@ -397,14 +329,6 @@ function PrimaryTabs({
   const { visibleTabs, overflowTabs } = React.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit],
-  );
-
-  const handleChangeAndClose = React.useCallback(
-    (v: string) => {
-      handleChange(v);
-      setOverflowOpen(false);
-    },
-    [handleChange],
   );
 
   React.useLayoutEffect(() => {
@@ -445,7 +369,7 @@ function PrimaryTabs({
   return (
     <T
       value={activeValue}
-      onValueChange={handleChangeAndClose}
+      onValueChange={handleChange}
       className={cn("w-full", className)}
     >
       <div className="relative w-full border-b border-[#E5E7EB]">
@@ -473,11 +397,11 @@ function PrimaryTabs({
           </TabsList>
 
           {overflowTabs.length > 0 && (
-            <LineTabsOverflowTrigger
-              label={overflowLabel}
-              open={overflowOpen}
-              onClick={() => setOverflowOpen((o) => !o)}
-              btnRef={overflowBtnRef}
+            <LineTabsOverflow
+              overflowTabs={overflowTabs}
+              overflowLabel={overflowLabel}
+              activeValue={activeValue}
+              onChange={handleChange}
               variant="primary"
             />
           )}
@@ -500,17 +424,6 @@ function PrimaryTabs({
             }}
           />
         </div>
-
-        {overflowOpen && overflowTabs.length > 0 && (
-          <LineTabsOverflowPanel
-            overflowTabs={overflowTabs}
-            activeValue={activeValue}
-            onChange={handleChangeAndClose}
-            onClose={() => setOverflowOpen(false)}
-            triggerRef={overflowBtnRef}
-            variant="primary"
-          />
-        )}
       </div>
     </T>
   );
@@ -527,8 +440,6 @@ function SecondaryTabs({
   className,
 }: CustomTabsProps) {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
-  const overflowBtnRef = React.useRef<HTMLButtonElement>(null);
-  const [overflowOpen, setOverflowOpen] = React.useState(false);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
@@ -544,14 +455,6 @@ function SecondaryTabs({
   const { visibleTabs, overflowTabs } = React.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit],
-  );
-
-  const handleChangeAndClose = React.useCallback(
-    (v: string) => {
-      handleChange(v);
-      setOverflowOpen(false);
-    },
-    [handleChange],
   );
 
   React.useLayoutEffect(() => {
@@ -596,7 +499,7 @@ function SecondaryTabs({
   return (
     <T
       value={activeValue}
-      onValueChange={handleChangeAndClose}
+      onValueChange={handleChange}
       className={cn("w-full", className)}
     >
       <div className="relative w-full border-b border-[#E5E7EB]">
@@ -624,11 +527,11 @@ function SecondaryTabs({
           </TabsList>
 
           {overflowTabs.length > 0 && (
-            <LineTabsOverflowTrigger
-              label={overflowLabel}
-              open={overflowOpen}
-              onClick={() => setOverflowOpen((o) => !o)}
-              btnRef={overflowBtnRef}
+            <LineTabsOverflow
+              overflowTabs={overflowTabs}
+              overflowLabel={overflowLabel}
+              activeValue={activeValue}
+              onChange={handleChange}
               variant="secondary"
             />
           )}
@@ -647,17 +550,6 @@ function SecondaryTabs({
             }}
           />
         </div>
-
-        {overflowOpen && overflowTabs.length > 0 && (
-          <LineTabsOverflowPanel
-            overflowTabs={overflowTabs}
-            activeValue={activeValue}
-            onChange={handleChangeAndClose}
-            onClose={() => setOverflowOpen(false)}
-            triggerRef={overflowBtnRef}
-            variant="secondary"
-          />
-        )}
       </div>
     </T>
   );

@@ -321,7 +321,7 @@ function DatePicker({
       </PopoverTrigger>
 
       <PopoverContent
-        align="start"
+        align="center"
         className="w-auto max-w-[calc(100vw-1rem)] p-0"
       >
         <div className="overflow-hidden rounded-lg bg-white shadow-md">
