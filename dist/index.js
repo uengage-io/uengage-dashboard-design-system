@@ -2316,11 +2316,6 @@ function LineTabsOverflowPanel({
   );
 }
 function Tabs2(props) {
-  if (!props.tabs || props.tabs.length < 2) {
-    throw new Error(
-      `Tabs: at least two tabs are required to render (received ${props.tabs?.length ?? 0}).`
-    );
-  }
   const variant = props.variant ?? "primary";
   if (variant === "tertiary") return /* @__PURE__ */ jsx(TertiaryTabs, { ...props });
   if (variant === "secondary") return /* @__PURE__ */ jsx(SecondaryTabs, { ...props });
@@ -3674,13 +3669,12 @@ function DatePickerCalendar({
           months: "flex flex-col",
           month: "flex flex-col gap-1",
           month_caption: "hidden",
-          month_grid: "!block w-full",
-          weekdays: "grid grid-cols-7 mb-1",
+          weekdays: "rdp-weekdays",
           weekday: "text-center text-[11px] font-medium text-[#9CA3AF] h-7 flex items-center justify-center select-none",
-          weeks: "flex flex-col gap-0.5",
-          week: "grid grid-cols-7 w-full",
-          day: "flex items-center justify-center p-0 relative",
-          day_button: "",
+          weeks: "rdp-weeks flex flex-col gap-0.5",
+          week: "rdp-week",
+          day: "rdp-day flex items-center justify-center p-0 relative",
+          day_button: "rdp-day_button",
           // dark green range band
           range_start: "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",
           range_middle: "bg-[#006F42]",

@@ -363,11 +363,6 @@ function LineTabsOverflowPanel({
 }
 
 function Tabs(props: CustomTabsProps) {
-  if (!props.tabs || props.tabs.length < 2) {
-    throw new Error(
-      `Tabs: at least two tabs are required to render (received ${props.tabs?.length ?? 0}).`,
-    );
-  }
   const variant = props.variant ?? "primary";
   if (variant === "tertiary") return <TertiaryTabs {...props} />;
   if (variant === "secondary") return <SecondaryTabs {...props} />;
