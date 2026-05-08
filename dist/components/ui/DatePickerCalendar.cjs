@@ -654,47 +654,55 @@ function DatePickerCalendar({
         }
       )
     ] }),
-    /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 pb-3", children: /* @__PURE__ */ jsxRuntime.jsx(
-      reactDayPicker.DayPicker,
-      {
-        mode,
-        selected: selected ?? void 0,
-        onSelect,
-        month: viewMonth,
-        onMonthChange: setViewMonth,
-        hideNavigation: true,
-        showOutsideDays: true,
-        disabled,
-        onDayClick,
-        onDayMouseEnter,
-        onDayMouseLeave,
-        startMonth: minDate ? new Date(minDate.getFullYear(), minDate.getMonth()) : void 0,
-        endMonth: maxDate ? new Date(maxDate.getFullYear(), maxDate.getMonth()) : void 0,
-        classNames: {
-          months: "flex flex-col",
-          month: "flex flex-col gap-1",
-          month_caption: "hidden",
-          weekdays: "rdp-weekdays",
-          weekday: "text-center text-[11px] font-medium text-[#9CA3AF] h-7 flex items-center justify-center select-none",
-          weeks: "rdp-weeks flex flex-col gap-0.5",
-          week: "rdp-week",
-          day: "rdp-day flex items-center justify-center p-0 relative",
-          day_button: "rdp-day_button",
-          // dark green range band
-          range_start: "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",
-          range_middle: "bg-[#006F42]",
-          range_end: "bg-[linear-gradient(to_right,#006F42_50%,transparent_50%)]",
-          selected: "",
-          today: "",
-          outside: "",
-          disabled: "",
-          hidden: "invisible"
+    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-3 pb-3", children: [
+      /* @__PURE__ */ jsxRuntime.jsx("div", { className: "grid grid-cols-7 mb-1", children: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => /* @__PURE__ */ jsxRuntime.jsx(
+        "div",
+        {
+          className: "flex h-7 items-center justify-center text-[11px] font-medium text-[#9CA3AF] select-none",
+          children: d
         },
-        components: {
-          DayButton: StyledDayButton
+        d
+      )) }),
+      /* @__PURE__ */ jsxRuntime.jsx(
+        reactDayPicker.DayPicker,
+        {
+          mode,
+          selected: selected ?? void 0,
+          onSelect,
+          month: viewMonth,
+          onMonthChange: setViewMonth,
+          hideNavigation: true,
+          hideWeekdays: true,
+          showOutsideDays: true,
+          disabled,
+          onDayClick,
+          onDayMouseEnter,
+          onDayMouseLeave,
+          startMonth: minDate ? new Date(minDate.getFullYear(), minDate.getMonth()) : void 0,
+          endMonth: maxDate ? new Date(maxDate.getFullYear(), maxDate.getMonth()) : void 0,
+          classNames: {
+            months: "flex flex-col w-full",
+            month: "flex flex-col gap-1 w-full",
+            month_caption: "hidden",
+            weeks: "rdp-weeks flex flex-col gap-0.5",
+            week: "rdp-week",
+            day: "rdp-day flex items-center justify-center p-0 relative",
+            day_button: "rdp-day_button",
+            range_start: "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",
+            range_middle: "bg-[#006F42]",
+            range_end: "bg-[linear-gradient(to_right,#006F42_50%,transparent_50%)]",
+            selected: "",
+            today: "",
+            outside: "",
+            disabled: "",
+            hidden: "invisible"
+          },
+          components: {
+            DayButton: StyledDayButton
+          }
         }
-      }
-    ) })
+      )
+    ] })
   ] });
 }
 

@@ -55,7 +55,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <DemoPreview /> */}
     {/* <SidebarDemo /> */}
     {/* <TablePreview/> */}
-    {/* <ModalPreview /> */}
+    {/* <ModalPreview /> */} 
     {/* <PaginationPrev /> */}
   </React.StrictMode>,
 );
