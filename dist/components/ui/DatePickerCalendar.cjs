@@ -674,13 +674,12 @@ function DatePickerCalendar({
           months: "flex flex-col",
           month: "flex flex-col gap-1",
           month_caption: "hidden",
-          weekdays: "flex mb-1",
-          // flex-1 so weekday columns match day cell columns exactly
-          weekday: "flex-1 text-center text-[11px] font-medium text-[#9CA3AF] h-7 flex items-center justify-center select-none",
+          month_grid: "!block w-full",
+          weekdays: "grid grid-cols-7 mb-1",
+          weekday: "text-center text-[11px] font-medium text-[#9CA3AF] h-7 flex items-center justify-center select-none",
           weeks: "flex flex-col gap-0.5",
-          week: "flex",
-          // flex-1 — cells fill row proportionally for seamless band
-          day: "flex-1 flex items-center justify-center p-0 relative",
+          week: "grid grid-cols-7 w-full",
+          day: "flex items-center justify-center p-0 relative",
           day_button: "",
           // dark green range band
           range_start: "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",

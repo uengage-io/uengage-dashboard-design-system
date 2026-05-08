@@ -2,14 +2,16 @@
    served at the web root (e.g. via vite's publicDir). */
 @font-face {
   font-family: "Figtree";
-  src: url("/Figtree/Figtree-VariableFont_wght.ttf") format("truetype-variations");
+  src: url("/Figtree/Figtree-VariableFont_wght.ttf")
+    format("truetype-variations");
   font-weight: 300 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Figtree";
-  src: url("/Figtree/Figtree-Italic-VariableFont_wght.ttf") format("truetype-variations");
+  src: url("/Figtree/Figtree-Italic-VariableFont_wght.ttf")
+    format("truetype-variations");
   font-weight: 300 900;
   font-style: italic;
   font-display: swap;
@@ -22,7 +24,7 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -45,6 +47,35 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+}
+
+@keyframes uengage-popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes uengage-popover-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+}
+[data-slot="popover-content"].uengage-ui[data-state="open"] {
+  animation: uengage-popover-in 140ms ease-out;
+  transform-origin: var(--radix-popover-content-transform-origin, top);
+}
+[data-slot="popover-content"].uengage-ui[data-state="closed"] {
+  animation: uengage-popover-out 100ms ease-in;
+  transform-origin: var(--radix-popover-content-transform-origin, top);
 }
 
 /* Accordion content height animations — Radix exposes --radix-accordion-content-height */
@@ -291,52 +322,108 @@
   animation: ue-side-pulse 1s ease-in-out infinite;
 }
 
-
 @keyframes ue-glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes ue-image-rotate-y {
-  0%   { transform: perspective(700px) rotateY(0deg); }
-  50%  { transform: perspective(700px) rotateY(180deg); }
-  100% { transform: perspective(700px) rotateY(360deg); }
+  0% {
+    transform: perspective(700px) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(700px) rotateY(180deg);
+  }
+  100% {
+    transform: perspective(700px) rotateY(360deg);
+  }
 }
 
 @keyframes ue-inner-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes ue-side-pulse {
-  0%   { opacity: 0.3; transform: translateY(-50%) scaleY(0.6); }
-  50%  { opacity: 1;   transform: translateY(-50%) scaleY(1); }
-  100% { opacity: 0.3; transform: translateY(-50%) scaleY(0.6); }
+  0% {
+    opacity: 0.3;
+    transform: translateY(-50%) scaleY(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: translateY(-50%) scaleY(0.6);
+  }
 }
 
 /* ─── Alert Dialog — SweetAlert-style animations ─────────────────────────── */
 @keyframes uengage-dialog-in {
-  0%   { opacity: 0; scale: 0.65; }
-  55%  { opacity: 1; scale: 1.04; }
-  80%  { scale: 0.97; }
-  100% { opacity: 1; scale: 1; }
+  0% {
+    opacity: 0;
+    scale: 0.65;
+  }
+  55% {
+    opacity: 1;
+    scale: 1.04;
+  }
+  80% {
+    scale: 0.97;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
 }
 @keyframes uengage-dialog-out {
-  from { opacity: 1; scale: 1; }
-  to   { opacity: 0; scale: 0.65; }
+  from {
+    opacity: 1;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 0.65;
+  }
 }
 @keyframes uengage-overlay-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes uengage-overlay-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 @keyframes uengage-icon-pop {
-  0%   { opacity: 0; scale: 0; }
-  60%  { scale: 1.25; }
-  80%  { scale: 0.9; }
-  100% { opacity: 1; scale: 1; }
+  0% {
+    opacity: 0;
+    scale: 0;
+  }
+  60% {
+    scale: 1.25;
+  }
+  80% {
+    scale: 0.9;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
 }
 
 /* Icon badge pop — generic utility kept for backwards compat */
@@ -348,14 +435,33 @@
 
 /* Success — quarter-spin + overshoot settle (mirrors SweetAlert2's circular feel) */
 @keyframes uengage-icon-success {
-  0%   { opacity: 0; scale: 0;    rotate: -90deg; }
-  50%  { opacity: 1; scale: 1.1;  rotate: 10deg;  }
-  70%  {             scale: 0.95; rotate: -5deg;  }
-  85%  {             scale: 1.03; rotate: 2deg;   }
-  100% { opacity: 1; scale: 1;    rotate: 0deg;   }
+  0% {
+    opacity: 0;
+    scale: 0;
+    rotate: -90deg;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.1;
+    rotate: 10deg;
+  }
+  70% {
+    scale: 0.95;
+    rotate: -5deg;
+  }
+  85% {
+    scale: 1.03;
+    rotate: 2deg;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
 }
 .uengage-icon-success {
-  animation: uengage-icon-success 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  animation: uengage-icon-success 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s
+    both;
 }
 
 /* Error — elastic pop (same keyframe as generic pop, just aliased here) */
@@ -365,15 +471,39 @@
 
 /* Warning — pop in then horizontal shake */
 @keyframes uengage-icon-warning {
-  0%   { opacity: 0; scale: 0;    translate: 0 0;   }
-  30%  { opacity: 1; scale: 1.15; }
-  45%  {             scale: 0.95; }
-  55%  {             scale: 1;    translate: -5px 0; }
-  65%  {                          translate:  5px 0; }
-  75%  {                          translate: -3px 0; }
-  83%  {                          translate:  2px 0; }
-  90%  {                          translate: -1px 0; }
-  100% { opacity: 1; scale: 1;    translate: 0 0;   }
+  0% {
+    opacity: 0;
+    scale: 0;
+    translate: 0 0;
+  }
+  30% {
+    opacity: 1;
+    scale: 1.15;
+  }
+  45% {
+    scale: 0.95;
+  }
+  55% {
+    scale: 1;
+    translate: -5px 0;
+  }
+  65% {
+    translate: 5px 0;
+  }
+  75% {
+    translate: -3px 0;
+  }
+  83% {
+    translate: 2px 0;
+  }
+  90% {
+    translate: -1px 0;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
 }
 .uengage-icon-warning {
   animation: uengage-icon-warning 0.7s ease-out 0.08s both;
@@ -381,10 +511,21 @@
 
 /* Info — gentle scale-up with soft settle */
 @keyframes uengage-icon-info {
-  0%   { opacity: 0; scale: 0.3; }
-  60%  { opacity: 1; scale: 1.08; }
-  80%  {             scale: 0.96; }
-  100% { opacity: 1; scale: 1;    }
+  0% {
+    opacity: 0;
+    scale: 0.3;
+  }
+  60% {
+    opacity: 1;
+    scale: 1.08;
+  }
+  80% {
+    scale: 0.96;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
 }
 .uengage-icon-info {
   animation: uengage-icon-info 0.5s cubic-bezier(0.34, 1.3, 0.64, 1) 0.1s both;
@@ -392,13 +533,68 @@
 
 /* Question — pop in then a gentle pendulum swing to evoke "hmm?" */
 @keyframes uengage-icon-question {
-  0%   { opacity: 0; scale: 0;    rotate: -20deg; }
-  45%  { opacity: 1; scale: 1.12; rotate: 12deg;  }
-  65%  {             scale: 0.95; rotate: -7deg;  }
-  80%  {             scale: 1.03; rotate: 4deg;   }
-  90%  {             scale: 1;    rotate: -2deg;  }
-  100% { opacity: 1; scale: 1;    rotate: 0deg;   }
+  0% {
+    opacity: 0;
+    scale: 0;
+    rotate: -20deg;
+  }
+  45% {
+    opacity: 1;
+    scale: 1.12;
+    rotate: 12deg;
+  }
+  65% {
+    scale: 0.95;
+    rotate: -7deg;
+  }
+  80% {
+    scale: 1.03;
+    rotate: 4deg;
+  }
+  90% {
+    scale: 1;
+    rotate: -2deg;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
 }
 .uengage-icon-question {
-  animation: uengage-icon-question 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  animation: uengage-icon-question 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s
+    both;
+}
+
+/* ── DatePicker calendar grid (react-day-picker v9) ──────────────────────── */
+
+.rdp-month_grid {
+  display: block !important;
+  width: 100%;
+}
+
+.rdp-month_grid thead {
+  display: block;
+  width: 100%;
+}
+
+.rdp-month_grid tbody {
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.rdp-month_grid tr {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+}
+
+.rdp-month_grid td,
+.rdp-month_grid th {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
 }
