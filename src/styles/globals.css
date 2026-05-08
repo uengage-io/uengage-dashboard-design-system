@@ -568,16 +568,19 @@
 
 /* ── DatePicker calendar grid (react-day-picker v9) ──────────────────────── */
 
+/* Remove table formatting context so flex/grid on children works */
 .rdp-month_grid {
   display: block !important;
   width: 100%;
 }
 
+/* thead must be block so its child <tr> participates in normal flow */
 .rdp-month_grid thead {
   display: block;
   width: 100%;
 }
 
+/* tbody is a flex column — one week row per line */
 .rdp-month_grid tbody {
   display: flex !important;
   flex-direction: column;
@@ -585,16 +588,29 @@
   width: 100%;
 }
 
+/* Both weekday header row and week rows: 7-column grid */
 .rdp-month_grid tr {
   display: grid !important;
   grid-template-columns: repeat(7, 1fr);
   width: 100%;
 }
 
+/* Cells center their content */
 .rdp-month_grid td,
 .rdp-month_grid th {
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 0;
+}
+
+/* Day button: always a perfect 32 × 32 px circle */
+.rdp-day_button {
+  width: 2rem !important;
+  height: 2rem !important;
+  border-radius: 9999px !important;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

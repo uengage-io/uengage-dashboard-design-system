@@ -41,7 +41,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <SelectPreview /> */}
     {/* <CheckboxPreview /> */}
     {/* <RadioPreview /> */}
-    {/* <TabsPreview /> */}
+    <TabsPreview />
     {/* <BadgePreview /> */}
     <DatePickerPreview />
     {/* <br /> */}
