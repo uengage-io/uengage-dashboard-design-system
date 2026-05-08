@@ -20,6 +20,7 @@ function PopoverContent({
   className,
   align = "start",
   sideOffset = 4,
+  style,
   ...props
 }) {
   return /* @__PURE__ */ jsxRuntime.jsx(radixUi.Popover.Portal, { children: /* @__PURE__ */ jsxRuntime.jsx(
@@ -30,9 +31,10 @@ function PopoverContent({
       sideOffset,
       className: cn(
         "uengage-ui",
-        "z-50 min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
+        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
         className
       ),
+      style: { zIndex: 9999, ...style },
       ...props
     }
   ) });
