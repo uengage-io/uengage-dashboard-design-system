@@ -3449,6 +3449,20 @@ function CheckboxGroup({
   ] });
 }
 CheckboxGroup.displayName = "CheckboxGroup";
+var MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
 var MONTH_OPTIONS = [
   "January",
   "February",
@@ -3646,6 +3660,68 @@ function DatePickerCalendar({
     ] })
   ] });
 }
+function MonthPickerCalendar({
+  selected,
+  minDate,
+  maxDate,
+  onSelect
+}) {
+  const today = React16__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React16__namespace.useState(
+    selected?.getFullYear() ?? today.getFullYear()
+  );
+  const isPrevDisabled = !!minDate && viewYear <= minDate.getFullYear();
+  const isNextDisabled = !!maxDate && viewYear >= maxDate.getFullYear();
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "w-[280px] max-w-full bg-white", children: [
+    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-between px-3 py-2", children: [
+      /* @__PURE__ */ jsxRuntime.jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => setViewYear((y) => y - 1),
+          disabled: isPrevDisabled,
+          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
+          "aria-label": "Previous year",
+          children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ChevronLeft, { size: 14, strokeWidth: 2.5 })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-semibold text-[#374151] select-none", children: viewYear }),
+      /* @__PURE__ */ jsxRuntime.jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => setViewYear((y) => y + 1),
+          disabled: isNextDisabled,
+          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
+          "aria-label": "Next year",
+          children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ChevronRight, { size: 14, strokeWidth: 2.5 })
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntime.jsx("div", { className: "grid grid-cols-3 gap-1.5 px-3 pb-3", children: MONTH_LABELS.map((label, i) => {
+      const isSelected = !!selected && selected.getFullYear() === viewYear && selected.getMonth() === i;
+      const isToday = today.getFullYear() === viewYear && today.getMonth() === i;
+      const isDisabled = !!minDate && new Date(viewYear, i) < new Date(minDate.getFullYear(), minDate.getMonth()) || !!maxDate && new Date(viewYear, i) > new Date(maxDate.getFullYear(), maxDate.getMonth());
+      return /* @__PURE__ */ jsxRuntime.jsx(
+        "button",
+        {
+          type: "button",
+          disabled: isDisabled,
+          onClick: () => onSelect(new Date(viewYear, i, 1)),
+          className: cn(
+            "h-9 rounded-lg text-sm font-medium transition-colors select-none",
+            isSelected && "bg-[#006F42] text-white",
+            isToday && !isSelected && "underline decoration-[#006F42] decoration-2 underline-offset-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
+            !isSelected && !isToday && !isDisabled && "text-[#374151] hover:bg-[#F3F4F6]",
+            isDisabled && "text-[#D1D5DB] opacity-50 cursor-not-allowed"
+          ),
+          children: label
+        },
+        label
+      );
+    }) })
+  ] });
+}
 var triggerVariants2 = classVarianceAuthority.cva(
   "inline-flex items-center w-full rounded-[4px] border border-gray-400 bg-white transition-colors",
   {
@@ -3706,6 +3782,10 @@ function formatRange(from, to) {
   const t = formatDate(to);
   if (!f && !t) return null;
   return `${f ?? "\u2014"} \u2013 ${t ?? "\u2014"}`;
+}
+function formatMonthYear(date) {
+  if (!date) return null;
+  return `${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 }
 function isSameDay(a, b) {
   if (!a || !b) return false;
@@ -3783,6 +3863,8 @@ function DatePicker({
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return formatDate(committed);
+    if (mode === "month" && committed instanceof Date)
+      return formatMonthYear(committed);
     if (mode === "range" && isDateRange(committed))
       return formatRange(committed.from, committed.to) ?? null;
     return null;
@@ -3956,7 +4038,20 @@ function DatePicker({
             /* @__PURE__ */ jsxRuntime.jsx(DateBox, { label: fromLabel, active: !!fromLabel }),
             /* @__PURE__ */ jsxRuntime.jsx(DateBox, { label: toLabel, active: false })
           ] }),
-          /* @__PURE__ */ jsxRuntime.jsx(
+          mode === "month" && /* @__PURE__ */ jsxRuntime.jsx(
+            MonthPickerCalendar,
+            {
+              selected: committed instanceof Date ? committed : null,
+              minDate,
+              maxDate,
+              onSelect: (date) => {
+                setCommitted(date);
+                onChange?.(date);
+                setOpen(false);
+              }
+            }
+          ),
+          mode !== "month" && /* @__PURE__ */ jsxRuntime.jsx(
             DatePickerCalendar,
             {
               mode,
@@ -5667,6 +5762,7 @@ exports.customButtonVariants = buttonVariants2;
 exports.datePickerTriggerVariants = triggerVariants2;
 exports.dayCellVariants = dayCellVariants;
 exports.formatDate = formatDate;
+exports.formatMonthYear = formatMonthYear;
 exports.formatRange = formatRange;
 exports.input = Input;
 exports.inputFieldVariants = inputFieldVariants;

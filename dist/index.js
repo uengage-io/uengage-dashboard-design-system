@@ -3424,6 +3424,20 @@ function CheckboxGroup({
   ] });
 }
 CheckboxGroup.displayName = "CheckboxGroup";
+var MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
 var MONTH_OPTIONS = [
   "January",
   "February",
@@ -3621,6 +3635,68 @@ function DatePickerCalendar({
     ] })
   ] });
 }
+function MonthPickerCalendar({
+  selected,
+  minDate,
+  maxDate,
+  onSelect
+}) {
+  const today = React16.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React16.useState(
+    selected?.getFullYear() ?? today.getFullYear()
+  );
+  const isPrevDisabled = !!minDate && viewYear <= minDate.getFullYear();
+  const isNextDisabled = !!maxDate && viewYear >= maxDate.getFullYear();
+  return /* @__PURE__ */ jsxs("div", { className: "w-[280px] max-w-full bg-white", children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between px-3 py-2", children: [
+      /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => setViewYear((y) => y - 1),
+          disabled: isPrevDisabled,
+          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
+          "aria-label": "Previous year",
+          children: /* @__PURE__ */ jsx(ChevronLeft, { size: 14, strokeWidth: 2.5 })
+        }
+      ),
+      /* @__PURE__ */ jsx("span", { className: "text-sm font-semibold text-[#374151] select-none", children: viewYear }),
+      /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => setViewYear((y) => y + 1),
+          disabled: isNextDisabled,
+          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
+          "aria-label": "Next year",
+          children: /* @__PURE__ */ jsx(ChevronRight, { size: 14, strokeWidth: 2.5 })
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsx("div", { className: "grid grid-cols-3 gap-1.5 px-3 pb-3", children: MONTH_LABELS.map((label, i) => {
+      const isSelected = !!selected && selected.getFullYear() === viewYear && selected.getMonth() === i;
+      const isToday = today.getFullYear() === viewYear && today.getMonth() === i;
+      const isDisabled = !!minDate && new Date(viewYear, i) < new Date(minDate.getFullYear(), minDate.getMonth()) || !!maxDate && new Date(viewYear, i) > new Date(maxDate.getFullYear(), maxDate.getMonth());
+      return /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          disabled: isDisabled,
+          onClick: () => onSelect(new Date(viewYear, i, 1)),
+          className: cn(
+            "h-9 rounded-lg text-sm font-medium transition-colors select-none",
+            isSelected && "bg-[#006F42] text-white",
+            isToday && !isSelected && "underline decoration-[#006F42] decoration-2 underline-offset-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
+            !isSelected && !isToday && !isDisabled && "text-[#374151] hover:bg-[#F3F4F6]",
+            isDisabled && "text-[#D1D5DB] opacity-50 cursor-not-allowed"
+          ),
+          children: label
+        },
+        label
+      );
+    }) })
+  ] });
+}
 var triggerVariants2 = cva(
   "inline-flex items-center w-full rounded-[4px] border border-gray-400 bg-white transition-colors",
   {
@@ -3681,6 +3757,10 @@ function formatRange(from, to) {
   const t = formatDate(to);
   if (!f && !t) return null;
   return `${f ?? "\u2014"} \u2013 ${t ?? "\u2014"}`;
+}
+function formatMonthYear(date) {
+  if (!date) return null;
+  return `${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 }
 function isSameDay(a, b) {
   if (!a || !b) return false;
@@ -3758,6 +3838,8 @@ function DatePicker({
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return formatDate(committed);
+    if (mode === "month" && committed instanceof Date)
+      return formatMonthYear(committed);
     if (mode === "range" && isDateRange(committed))
       return formatRange(committed.from, committed.to) ?? null;
     return null;
@@ -3931,7 +4013,20 @@ function DatePicker({
             /* @__PURE__ */ jsx(DateBox, { label: fromLabel, active: !!fromLabel }),
             /* @__PURE__ */ jsx(DateBox, { label: toLabel, active: false })
           ] }),
-          /* @__PURE__ */ jsx(
+          mode === "month" && /* @__PURE__ */ jsx(
+            MonthPickerCalendar,
+            {
+              selected: committed instanceof Date ? committed : null,
+              minDate,
+              maxDate,
+              onSelect: (date) => {
+                setCommitted(date);
+                onChange?.(date);
+                setOpen(false);
+              }
+            }
+          ),
+          mode !== "month" && /* @__PURE__ */ jsx(
             DatePickerCalendar,
             {
               mode,
@@ -5555,6 +5650,6 @@ function Accordion(props) {
 }
 Accordion.displayName = "Accordion";
 
-export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, formatDate, formatRange, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
+export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, formatDate, formatMonthYear, formatRange, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

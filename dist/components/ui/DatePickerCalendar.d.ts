@@ -17,5 +17,12 @@ interface DatePickerCalendarProps {
     onDayMouseLeave?: DayHandler;
 }
 declare function DatePickerCalendar({ mode, selected, onSelect, disabled, defaultMonth, minDate, maxDate, className, onDayClick, onDayMouseEnter, onDayMouseLeave, }: DatePickerCalendarProps): react_jsx_runtime.JSX.Element;
+interface MonthPickerCalendarProps {
+    selected?: Date | null;
+    minDate?: Date;
+    maxDate?: Date;
+    onSelect: (date: Date) => void;
+}
+declare function MonthPickerCalendar({ selected, minDate, maxDate, onSelect, }: MonthPickerCalendarProps): react_jsx_runtime.JSX.Element;
 
-export { DatePickerCalendar };
+export { DatePickerCalendar, MonthPickerCalendar };

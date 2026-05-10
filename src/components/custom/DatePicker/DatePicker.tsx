@@ -7,9 +7,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DatePickerCalendar } from "../../ui/DatePickerCalendar";
+import { DatePickerCalendar, MonthPickerCalendar } from "../../ui/DatePickerCalendar";
 import { triggerVariants } from "./datepickerVariants";
-import { formatDate, formatRange } from "./dateHelpers";
+import { formatDate, formatRange, formatMonthYear } from "./dateHelpers";
 import type { DatePickerProps, DateRange } from "./DatePicker.types";
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
@@ -120,6 +120,8 @@ function DatePicker({
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return formatDate(committed);
+    if (mode === "month" && committed instanceof Date)
+      return formatMonthYear(committed);
     if (mode === "range" && isDateRange(committed))
       return formatRange(committed.from, committed.to) ?? null;
     return null;
@@ -333,18 +335,34 @@ function DatePicker({
             </div>
           )}
 
-          {/* ── Calendar ── */}
-          <DatePickerCalendar
-            mode={mode}
-            selected={calendarSelected}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            disabled={calendarDisabled as any}
-            minDate={minDate}
-            maxDate={maxDate}
-            onDayClick={(date, modifiers) => handleDayClick(date, modifiers)}
-            onDayMouseEnter={(date) => handleDayMouseEnter(date)}
-            onDayMouseLeave={() => handleDayMouseLeave()}
-          />
+          {/* ── Month picker calendar ── */}
+          {mode === "month" && (
+            <MonthPickerCalendar
+              selected={committed instanceof Date ? committed : null}
+              minDate={minDate}
+              maxDate={maxDate}
+              onSelect={(date) => {
+                setCommitted(date);
+                onChange?.(date);
+                setOpen(false);
+              }}
+            />
+          )}
+
+          {/* ── Day calendar (single / range) ── */}
+          {mode !== "month" && (
+            <DatePickerCalendar
+              mode={mode}
+              selected={calendarSelected}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              disabled={calendarDisabled as any}
+              minDate={minDate}
+              maxDate={maxDate}
+              onDayClick={(date, modifiers) => handleDayClick(date, modifiers)}
+              onDayMouseEnter={(date) => handleDayMouseEnter(date)}
+              onDayMouseLeave={() => handleDayMouseLeave()}
+            />
+          )}
 
           {/* ── Cancel / Apply footer (range mode only) ── */}
           {mode === "range" && (
