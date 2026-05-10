@@ -10,10 +10,14 @@ var jsxRuntime = require('react/jsx-runtime');
 function cn(...inputs) {
   return tailwindMerge.twMerge(clsx.clsx(inputs));
 }
-function Popover({ ...props }) {
+function Popover({
+  ...props
+}) {
   return /* @__PURE__ */ jsxRuntime.jsx(radixUi.Popover.Root, { "data-slot": "popover", ...props });
 }
-function PopoverTrigger({ ...props }) {
+function PopoverTrigger({
+  ...props
+}) {
   return /* @__PURE__ */ jsxRuntime.jsx(radixUi.Popover.Trigger, { "data-slot": "popover-trigger", ...props });
 }
 function PopoverContent({
@@ -31,7 +35,7 @@ function PopoverContent({
       sideOffset,
       className: cn(
         "uengage-ui",
-        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
+        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none z-9999",
         className
       ),
       style: { zIndex: 9999, ...style },

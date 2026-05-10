@@ -253,10 +253,10 @@ export function DatePickerCalendar({
             months: "flex flex-col w-full",
             month: "flex flex-col gap-1 w-full",
             month_caption: "hidden",
-            weeks: "rdp-weeks flex flex-col gap-0.5",
-            week: "rdp-week",
-            day: "rdp-day flex items-center justify-center p-0 relative",
-            day_button: "rdp-day_button",
+            weeks: "flex flex-col gap-0.5 w-full",
+            week: "grid grid-cols-7 w-full",
+            day: "flex items-center justify-center p-0 relative",
+            day_button: "",
             range_start:
               "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",
             range_middle: "bg-[#006F42]",
@@ -269,6 +269,14 @@ export function DatePickerCalendar({
             hidden: "invisible",
           }}
           components={{
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            MonthGrid: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            Weeks: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            Week: ({ week: _week, children, ...props }: any) => <div {...props}>{children}</div>,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            Day: ({ day: _day, modifiers: _modifiers, children, ...props }: any) => <div {...props}>{children}</div>,
             DayButton: StyledDayButton,
           }}
         />

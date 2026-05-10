@@ -8,10 +8,14 @@ import { jsx } from 'react/jsx-runtime';
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
-function Popover({ ...props }) {
+function Popover({
+  ...props
+}) {
   return /* @__PURE__ */ jsx(Popover$1.Root, { "data-slot": "popover", ...props });
 }
-function PopoverTrigger({ ...props }) {
+function PopoverTrigger({
+  ...props
+}) {
   return /* @__PURE__ */ jsx(Popover$1.Trigger, { "data-slot": "popover-trigger", ...props });
 }
 function PopoverContent({
@@ -29,7 +33,7 @@ function PopoverContent({
       sideOffset,
       className: cn(
         "uengage-ui",
-        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
+        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none z-9999",
         className
       ),
       style: { zIndex: 9999, ...style },
