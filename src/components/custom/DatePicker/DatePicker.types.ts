@@ -3,7 +3,7 @@ export interface DateRange {
   to: Date;
 }
 
-export type DatePickerMode = "single" | "range";
+export type DatePickerMode = "single" | "range" | "month";
 
 export interface DatePickerProps {
   mode?: DatePickerMode;

@@ -498,6 +498,20 @@ function Select({
   ] });
 }
 Select.displayName = "Select";
+var MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
 var MONTH_OPTIONS = [
   "January",
   "February",
@@ -695,7 +709,69 @@ function DatePickerCalendar({
     ] })
   ] });
 }
+function MonthPickerCalendar({
+  selected,
+  minDate,
+  maxDate,
+  onSelect
+}) {
+  const today = React.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React.useState(
+    selected?.getFullYear() ?? today.getFullYear()
+  );
+  const isPrevDisabled = !!minDate && viewYear <= minDate.getFullYear();
+  const isNextDisabled = !!maxDate && viewYear >= maxDate.getFullYear();
+  return /* @__PURE__ */ jsxs("div", { className: "w-[280px] max-w-full bg-white", children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between px-3 py-2", children: [
+      /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => setViewYear((y) => y - 1),
+          disabled: isPrevDisabled,
+          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
+          "aria-label": "Previous year",
+          children: /* @__PURE__ */ jsx(ChevronLeft, { size: 14, strokeWidth: 2.5 })
+        }
+      ),
+      /* @__PURE__ */ jsx("span", { className: "text-sm font-semibold text-[#374151] select-none", children: viewYear }),
+      /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => setViewYear((y) => y + 1),
+          disabled: isNextDisabled,
+          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
+          "aria-label": "Next year",
+          children: /* @__PURE__ */ jsx(ChevronRight, { size: 14, strokeWidth: 2.5 })
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsx("div", { className: "grid grid-cols-3 gap-1.5 px-3 pb-3", children: MONTH_LABELS.map((label, i) => {
+      const isSelected = !!selected && selected.getFullYear() === viewYear && selected.getMonth() === i;
+      const isToday = today.getFullYear() === viewYear && today.getMonth() === i;
+      const isDisabled = !!minDate && new Date(viewYear, i) < new Date(minDate.getFullYear(), minDate.getMonth()) || !!maxDate && new Date(viewYear, i) > new Date(maxDate.getFullYear(), maxDate.getMonth());
+      return /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          disabled: isDisabled,
+          onClick: () => onSelect(new Date(viewYear, i, 1)),
+          className: cn(
+            "h-9 rounded-lg text-sm font-medium transition-colors select-none",
+            isSelected && "bg-[#006F42] text-white",
+            isToday && !isSelected && "underline decoration-[#006F42] decoration-2 underline-offset-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
+            !isSelected && !isToday && !isDisabled && "text-[#374151] hover:bg-[#F3F4F6]",
+            isDisabled && "text-[#D1D5DB] opacity-50 cursor-not-allowed"
+          ),
+          children: label
+        },
+        label
+      );
+    }) })
+  ] });
+}
 
-export { DatePickerCalendar };
+export { DatePickerCalendar, MonthPickerCalendar };
 //# sourceMappingURL=DatePickerCalendar.js.map
 //# sourceMappingURL=DatePickerCalendar.js.map

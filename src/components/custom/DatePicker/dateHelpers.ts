@@ -17,6 +17,12 @@ export function formatRange(from: Date | null | undefined, to: Date | null | und
   return `${f ?? "—"} – ${t ?? "—"}`;
 }
 
+/** Returns e.g. "May 2026" */
+export function formatMonthYear(date: Date | null | undefined): string | null {
+  if (!date) return null;
+  return `${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+}
+
 export function isSameDay(a: Date | null | undefined, b: Date | null | undefined): boolean {
   if (!a || !b) return false;
   return (

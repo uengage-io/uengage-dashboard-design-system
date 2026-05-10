@@ -165,6 +165,7 @@ export {
 } from "./components/custom/DatePicker/datepickerVariants";
 export {
   formatDate,
+  formatMonthYear,
   formatRange,
   isSameDay,
 } from "./components/custom/DatePicker/dateHelpers";
