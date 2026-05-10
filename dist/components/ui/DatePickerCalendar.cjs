@@ -56,10 +56,14 @@ function useFuzzySearch(items, query) {
     return fuse.search(q).map((r) => r.item);
   }, [fuse, query, items]);
 }
-function Popover({ ...props }) {
+function Popover({
+  ...props
+}) {
   return /* @__PURE__ */ jsxRuntime.jsx(radixUi.Popover.Root, { "data-slot": "popover", ...props });
 }
-function PopoverTrigger({ ...props }) {
+function PopoverTrigger({
+  ...props
+}) {
   return /* @__PURE__ */ jsxRuntime.jsx(radixUi.Popover.Trigger, { "data-slot": "popover-trigger", ...props });
 }
 function PopoverContent({
@@ -77,7 +81,7 @@ function PopoverContent({
       sideOffset,
       className: cn(
         "uengage-ui",
-        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
+        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none z-9999",
         className
       ),
       style: { zIndex: 9999, ...style },
@@ -686,10 +690,10 @@ function DatePickerCalendar({
             months: "flex flex-col w-full",
             month: "flex flex-col gap-1 w-full",
             month_caption: "hidden",
-            weeks: "rdp-weeks flex flex-col gap-0.5",
-            week: "rdp-week",
-            day: "rdp-day flex items-center justify-center p-0 relative",
-            day_button: "rdp-day_button",
+            weeks: "flex flex-col gap-0.5 w-full",
+            week: "grid grid-cols-7 w-full",
+            day: "flex items-center justify-center p-0 relative",
+            day_button: "",
             range_start: "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",
             range_middle: "bg-[#006F42]",
             range_end: "bg-[linear-gradient(to_right,#006F42_50%,transparent_50%)]",
@@ -700,6 +704,14 @@ function DatePickerCalendar({
             hidden: "invisible"
           },
           components: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            MonthGrid: ({ children, ...props }) => /* @__PURE__ */ jsxRuntime.jsx("div", { ...props, children }),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            Weeks: ({ children, ...props }) => /* @__PURE__ */ jsxRuntime.jsx("div", { ...props, children }),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            Week: ({ week: _week, children, ...props }) => /* @__PURE__ */ jsxRuntime.jsx("div", { ...props, children }),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            Day: ({ day: _day, modifiers: _modifiers, children, ...props }) => /* @__PURE__ */ jsxRuntime.jsx("div", { ...props, children }),
             DayButton: StyledDayButton
           }
         }
