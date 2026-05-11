@@ -56,6 +56,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   onSearch,
   onClear,
   onTouch,
+  clearable = false,
   dropdownClassName,
   dropdownItems,
   getLabel,
@@ -147,14 +148,14 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
     }
   };
 
-  const showClear = displayValue.length > 0;
+  const showClear = clearable && displayValue.length > 0;
   const iconSize = ICON_SIZES[size];
   const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
 
   return (
     <div
       ref={wrapperRef}
-      className={cn("uengage-ui relative block w-full", width, className)}
+      className={cn("uengage-ui relative block min-w-0", width, className)}
       onBlur={handleBlur}
     >
       <div

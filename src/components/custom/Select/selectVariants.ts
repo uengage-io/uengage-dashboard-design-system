@@ -6,7 +6,7 @@ export type TriggerSize = "xs" | "sm" | "md" | "lg";
 
 export const triggerVariants = cva(
   [
-    "flex w-full items-center justify-between",
+    "flex min-w-0 items-center justify-between",
     "rounded-[4px] border border-gray-400 bg-white",
     "transition-colors duration-150 cursor-pointer select-none",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",

@@ -52,6 +52,7 @@ function Select<TItem = unknown>({
   onChange,
   onTouch,
   spellCheck = true,
+  clearable = false,
 }: SelectProps<TItem>) {
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
@@ -265,19 +266,21 @@ function Select<TItem = unknown>({
                         className="inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]"
                       >
                         <span className="truncate">{opt.label}</span>
-                        <button
-                          type="button"
-                          tabIndex={-1}
-                          onClick={(e) => removePill(val, e)}
-                          className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
-                          aria-label={`Remove ${opt.label}`}
-                        >
-                          <X
-                            size={10}
-                            strokeWidth={2}
-                            className="hover:text-red-500"
-                          />
-                        </button>
+                        {clearable && (
+                          <button
+                            type="button"
+                            tabIndex={-1}
+                            onClick={(e) => removePill(val, e)}
+                            className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
+                            aria-label={`Remove ${opt.label}`}
+                          >
+                            <X
+                              size={10}
+                              strokeWidth={2}
+                              className="hover:text-red-500"
+                            />
+                          </button>
+                        )}
                       </span>
                     );
                   })}
@@ -312,7 +315,7 @@ function Select<TItem = unknown>({
           </div>
 
           <div className="flex shrink-0 items-center gap-1">
-            {hasSelection && (
+            {clearable && hasSelection && (
               <button
                 type="button"
                 tabIndex={-1}
