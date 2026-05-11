@@ -67,8 +67,8 @@ function SubHeader({
           ALIGN_CLASS[align],
         )}
         style={{
-          paddingTop: toCssSize(LAYOUT.subHeaderPaddingTop),
-          paddingBottom: toCssSize(LAYOUT.subHeaderPaddingBottom),
+          paddingTop: "clamp(12px, 2.5vw, 16px)",
+          paddingBottom: "clamp(12px, 2.5vw, 16px)",
         }}
       >
         {/* Left: title / subtitle / children */}
@@ -100,11 +100,11 @@ function SubHeader({
           )}
         </div>
 
-        {/* Right slot: wraps below the title on mobile */}
+        {/* Right slot: wraps below the title on mobile; self-start prevents full-width stretch in flex-col */}
         {right != null && (
           <div
             data-slot="sub-header-right"
-            className="flex shrink-0 flex-wrap items-center gap-3"
+            className="flex shrink-0 flex-wrap items-center gap-3 self-start sm:self-auto"
           >
             {right}
           </div>
