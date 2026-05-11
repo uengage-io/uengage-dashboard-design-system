@@ -127,38 +127,46 @@ function DatePicker({
     return null;
   }, [committed, mode]);
 
-  // ── Calendar selection (draft + hover preview) ────────────────────────
+  // ── Effective display range (draft + hover preview, including elongation) ──
+  // Returns { from, to? } — to may be undefined when only the first click is done.
+  const effectiveDisplayRange = React.useMemo((): { from: Date; to?: Date } | null => {
+    if (mode !== "range") return null;
+    const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
+
+    if (pendingFrom) {
+      // Mid two-click selection: show from→hover (or just from if no hover yet)
+      return hoverDate ? orderedRange(pendingFrom, hoverDate) : { from: pendingFrom };
+    }
+
+    // Elongation hover preview: hovering outside the existing range
+    if (hoverDate && existingRange) {
+      if (hoverDate < existingRange.from)
+        return { from: hoverDate, to: existingRange.to };
+      if (hoverDate > existingRange.to)
+        return { from: existingRange.from, to: hoverDate };
+    }
+
+    return existingRange;
+  }, [mode, committed, pendingFrom, draftRange, hoverDate]);
+
+  // ── Calendar selection ────────────────────────────────────────────────
   const calendarSelected = React.useMemo(() => {
     if (mode === "single") {
       return committed instanceof Date ? committed : undefined;
     }
-    // Range: show draft/preview
-    if (pendingFrom) {
-      const end = hoverDate ?? pendingFrom;
-      return orderedRange(pendingFrom, end);
-    }
-    if (draftRange) return draftRange;
-    if (isDateRange(committed)) return committed;
-    return undefined;
-  }, [mode, committed, pendingFrom, draftRange, hoverDate]);
+    return effectiveDisplayRange ?? undefined;
+  }, [mode, committed, effectiveDisplayRange]);
 
   // ── From/To box labels ────────────────────────────────────────────────
   const fromLabel = React.useMemo((): string | null => {
-    if (pendingFrom) return formatDate(pendingFrom);
-    if (draftRange) return formatDate(draftRange.from);
-    if (isDateRange(committed)) return formatDate(committed.from);
-    return null;
-  }, [pendingFrom, draftRange, committed]);
+    if (!effectiveDisplayRange) return null;
+    return formatDate(effectiveDisplayRange.from);
+  }, [effectiveDisplayRange]);
 
   const toLabel = React.useMemo((): string | null => {
-    if (pendingFrom)
-      return hoverDate
-        ? formatDate(orderedRange(pendingFrom, hoverDate).to)
-        : null;
-    if (draftRange) return formatDate(draftRange.to);
-    if (isDateRange(committed)) return formatDate(committed.to);
-    return null;
-  }, [pendingFrom, hoverDate, draftRange, committed]);
+    if (!effectiveDisplayRange?.to) return null;
+    return formatDate(effectiveDisplayRange.to);
+  }, [effectiveDisplayRange]);
 
 
   // ── Event handlers ────────────────────────────────────────────────────
@@ -175,9 +183,21 @@ function DatePicker({
 
     // Range mode state machine
     if (pendingFrom === null) {
-      // First click: start a new selection
-      setPendingFrom(date);
-      setDraftRange(null);
+      const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
+      if (existingRange && (date < existingRange.from || date > existingRange.to)) {
+        // Single-click elongation: extend the existing range to the clicked date
+        const newRange: DateRange =
+          date < existingRange.from
+            ? { from: date, to: existingRange.to }
+            : { from: existingRange.from, to: date };
+        setDraftRange(newRange);
+        setHoverDate(null);
+      } else {
+        // Click within (or on edge of) existing range: start a fresh two-click selection
+        setPendingFrom(date);
+        setDraftRange(null);
+        setHoverDate(null);
+      }
     } else {
       // Second click: complete the draft range
       const range = orderedRange(pendingFrom, date);
@@ -188,7 +208,17 @@ function DatePicker({
   };
 
   const handleDayMouseEnter = (date: Date) => {
-    if (pendingFrom) setHoverDate(date);
+    if (pendingFrom) {
+      setHoverDate(date);
+      return;
+    }
+    // Show elongation preview when hovering outside the existing range
+    const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
+    if (existingRange && (date < existingRange.from || date > existingRange.to)) {
+      setHoverDate(date);
+    } else {
+      setHoverDate(null);
+    }
   };
 
   const handleDayMouseLeave = () => {
