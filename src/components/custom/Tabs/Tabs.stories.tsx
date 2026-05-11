@@ -12,12 +12,12 @@ const meta = {
     docs: {
       description: {
         component:
-          "uEngage-branded tab bar built on the shadcn `Tabs` primitives. Feed it a `tabs` array of `{ value, label, disabled? }` and drive it either uncontrolled via `defaultValue` or controlled via `value` + `onChange`. Three variants: `primary` (bold dark text + thick green underline), `secondary` (green active text + subtle underline + overlay), `tertiary` (animated pill/chip).",
+          "uEngage-branded tab bar built on the shadcn `Tabs` primitives. Feed it a `tabs` array of `{ value, label, disabled? }` and drive it either uncontrolled via `defaultValue` or controlled via `value` + `onChange`. Two variants: `primary` (green active text + subtle underline + overlay), `secondary` (animated pill/chip).",
       },
     },
   },
   argTypes: {
-    variant: { control: "radio", options: ["primary", "secondary", "tertiary"] },
+    variant: { control: "radio", options: ["primary", "secondary"] },
     defaultValue: { control: "text" },
     className: { control: "text" },
     onChange: { action: "change" },
@@ -61,14 +61,14 @@ export const Secondary: Story = {
   ),
 };
 
-export const Tertiary: Story = {
+export const SecondaryPill: Story = {
   args: {
     tabs: [
       { value: "riders", label: "My Riders" },
       { value: "tasks", label: "Live Tasks" },
     ],
     defaultValue: "riders",
-    variant: "tertiary",
+    variant: "secondary",
   },
   render: (args: CustomTabsProps) => (
     <div className="w-180">
@@ -124,7 +124,6 @@ export const WithOverflowDropdown: Story = {
   render: function OverflowStory() {
     const [primaryTab, setPrimaryTab] = React.useState("tab-1");
     const [secondaryTab, setSecondaryTab] = React.useState("tab-1");
-    const [tertiaryTab, setTertiaryTab] = React.useState("tab-1");
 
     return (
       <div className="min-h-screen bg-[#F6F8FB] p-8">
@@ -168,21 +167,6 @@ export const WithOverflowDropdown: Story = {
             />
             <div className="rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-2.5 text-sm text-[#374151]">
               Active: <strong>{secondaryTab}</strong>
-            </div>
-          </section>
-
-          <section className="flex flex-col gap-3">
-            <h2 className="text-sm font-semibold text-[#374151]">Tertiary — limit 4</h2>
-            <Tabs
-              variant="tertiary"
-              value={tertiaryTab}
-              tabs={MANY_TABS}
-              visibleTabLimit={4}
-              overflowLabel="More Options"
-              onChange={setTertiaryTab}
-            />
-            <div className="rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-2.5 text-sm text-[#374151]">
-              Active: <strong>{tertiaryTab}</strong>
             </div>
           </section>
         </div>

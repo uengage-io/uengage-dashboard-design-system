@@ -15,8 +15,6 @@ import type {
   TabItem,
 } from "@/components/custom/Tabs/Tabs.types";
 
-const TAB_COLOR = "#0A5A2A";
-
 function getInitialValue(
   tabs: TabItem[],
   value?: string,
@@ -205,22 +203,19 @@ function OverflowTabsSelect({
   );
 }
 
-// Used by PrimaryTabs and SecondaryTabs overflow — Popover handles positioning on all screen sizes
+// Used by PrimaryTabs overflow — Popover handles positioning on all screen sizes
 function LineTabsOverflow({
   overflowTabs,
   overflowLabel,
   activeValue,
   onChange,
-  variant,
 }: {
   overflowTabs: TabItem[];
   overflowLabel: string;
   activeValue: string;
   onChange: (value: string) => void;
-  variant: "primary" | "secondary";
 }) {
   const [open, setOpen] = React.useState(false);
-  const isPrimary = variant === "primary";
 
   if (overflowTabs.length === 0) return null;
 
@@ -231,9 +226,7 @@ function LineTabsOverflow({
           type="button"
           className={cn(
             "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-            isPrimary
-              ? "relative flex-none gap-1 p-[10px] text-[15px] font-semibold text-gray-500 hover:text-gray-900"
-              : "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
+            "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
             FOCUS_RING,
           )}
         >
@@ -242,8 +235,7 @@ function LineTabsOverflow({
             size={16}
             strokeWidth={2.25}
             className={cn(
-              isPrimary ? "text-gray-500" : "text-[#0A5A2A]",
-              "transition-transform duration-200",
+              "text-[#0A5A2A] transition-transform duration-200",
               open && "rotate-180",
             )}
           />
@@ -257,10 +249,6 @@ function LineTabsOverflow({
         <div className="flex flex-col">
           {overflowTabs.map((tab) => {
             const isActive = tab.value === activeValue;
-            const activeItemClass = isPrimary
-              ? "bg-[#F3F4F6] font-semibold text-[#111827]"
-              : "bg-[#F0F9F4] font-semibold text-[#0A5A2A]";
-            const checkClass = isPrimary ? "text-[#111827]" : "text-[#0A5A2A]";
 
             return (
               <button
@@ -270,7 +258,9 @@ function LineTabsOverflow({
                 className={cn(
                   "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
                   "transition-colors duration-150",
-                  isActive ? activeItemClass : "text-[#374151] hover:bg-[#F8FAFC]",
+                  isActive
+                    ? "bg-[#F0F9F4] font-semibold text-[#0A5A2A]"
+                    : "text-[#374151] hover:bg-[#F8FAFC]",
                   tab.disabled && "cursor-not-allowed opacity-50",
                 )}
                 onClick={() => {
@@ -284,7 +274,7 @@ function LineTabsOverflow({
                   <Check
                     size={16}
                     strokeWidth={2.5}
-                    className={cn("shrink-0", checkClass)}
+                    className="shrink-0 text-[#0A5A2A]"
                   />
                 )}
               </button>
@@ -298,138 +288,11 @@ function LineTabsOverflow({
 
 function Tabs(props: CustomTabsProps) {
   const variant = props.variant ?? "primary";
-  if (variant === "tertiary") return <TertiaryTabs {...props} />;
-  if (variant === "secondary") return <SecondaryTabs {...props} />;
-  return <PrimaryTabs {...props} />;
+  if (variant === "secondary") return <TertiaryTabs {...props} />;
+  return <SecondaryTabs {...props} />;
 }
 
-// Primary: sliding gradient indicator with glow, bold dark text when active
-function PrimaryTabs({
-  tabs,
-  defaultValue,
-  value,
-  onChange,
-  visibleTabLimit,
-  overflowLabel = "More Options",
-  className,
-}: CustomTabsProps) {
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
-  const { activeValue, handleChange } = useTabValue(
-    tabs,
-    value,
-    defaultValue,
-    onChange,
-  );
-  const [indicator, setIndicator] = React.useState<{
-    left: number;
-    width: number;
-    ready: boolean;
-  }>({ left: 0, width: 0, ready: false });
-
-  const { visibleTabs, overflowTabs } = React.useMemo(
-    () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
-    [activeValue, tabs, visibleTabLimit],
-  );
-
-  React.useLayoutEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper || !activeValue) return;
-    const btn = wrapper.querySelector(
-      `[data-tab-value="${escapeTabValue(activeValue)}"]`,
-    ) as HTMLElement | null;
-    if (!btn) {
-      setIndicator((i) => ({ ...i, ready: false }));
-      return;
-    }
-    setIndicator({ left: btn.offsetLeft, width: btn.offsetWidth, ready: true });
-  }, [
-    activeValue,
-    visibleTabs.length,
-    visibleTabs.map((t) => t.value).join("|"),
-  ]);
-
-  React.useEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return;
-    const handle = () => {
-      const btn = wrapper.querySelector(
-        `[data-tab-value="${escapeTabValue(activeValue)}"]`,
-      ) as HTMLElement | null;
-      if (!btn) return;
-      setIndicator((prev) => ({
-        left: btn.offsetLeft,
-        width: btn.offsetWidth,
-        ready: prev.ready,
-      }));
-    };
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, [activeValue]);
-
-  return (
-    <T
-      value={activeValue}
-      onValueChange={handleChange}
-      className={cn("w-full", className)}
-    >
-      <div className="relative w-full border-b border-[#E5E7EB]">
-        <div
-          ref={wrapperRef}
-          className="relative flex min-w-0 items-end overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          <TabsList
-            variant="line"
-            className={cn(
-              "flex w-max min-w-0 flex-row items-center justify-start",
-              "h-auto! rounded-none bg-transparent p-0 gap-6",
-            )}
-          >
-            {visibleTabs.map((tab) => (
-              <CustomTabsTrigger
-                key={tab.value}
-                value={tab.value}
-                disabled={tab.disabled}
-                variant="primary"
-              >
-                {tab.label}
-              </CustomTabsTrigger>
-            ))}
-          </TabsList>
-
-          {overflowTabs.length > 0 && (
-            <LineTabsOverflow
-              overflowTabs={overflowTabs}
-              overflowLabel={overflowLabel}
-              activeValue={activeValue}
-              onChange={handleChange}
-              variant="primary"
-            />
-          )}
-
-          {/* Single sliding indicator shared across all tabs */}
-          <div
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute bottom-0 left-0 h-[8px] rounded-t-full",
-              "shadow-[0_-3px_10px_rgba(0,168,107,0.45)]",
-              indicator.ready
-                ? "transition-all duration-300 ease-out opacity-100"
-                : "opacity-0",
-            )}
-            style={{
-              background:
-                "linear-gradient(189.6deg, #003C1B -188.01%, #00A86B 92.12%)",
-              transform: `translateX(${indicator.left}px)`,
-              width: indicator.width,
-            }}
-          />
-        </div>
-      </div>
-    </T>
-  );
-}
-
-// Secondary (formerly primary): green active text, thin indicator, subtle overlay
+// Primary: green active text, thin indicator, subtle overlay
 function SecondaryTabs({
   tabs,
   defaultValue,
@@ -532,7 +395,6 @@ function SecondaryTabs({
               overflowLabel={overflowLabel}
               activeValue={activeValue}
               onChange={handleChange}
-              variant="secondary"
             />
           )}
 
@@ -555,7 +417,7 @@ function SecondaryTabs({
   );
 }
 
-// Tertiary (formerly secondary): pill/chip style with animated background slab
+// Secondary: pill/chip style with animated background slab
 function TertiaryTabs({
   tabs,
   defaultValue,
