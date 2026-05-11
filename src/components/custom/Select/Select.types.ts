@@ -43,4 +43,6 @@ export interface SelectProps<TItem = unknown> {
   onTouch?: () => void;
   /** Toggle the browser's native spell-check on the dropdown search input. Defaults to `true`. */
   spellCheck?: boolean;
+  /** Show the X clear button (and pill remove buttons) when a value is selected. Defaults to `false`. */
+  clearable?: boolean;
 }

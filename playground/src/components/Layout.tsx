@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
   SearchBar,
+  DatePicker,
   CardContent,
   Input,
 } from "@uengage/ui";
@@ -143,6 +144,7 @@ export default function LayoutPreview() {
   return (
     < >
       <PageContainer>
+        <DatePicker/>
         <TopHeader
           title="Hello"
           helper={

@@ -149,7 +149,7 @@ function Input({
       : undefined;
 
   return (
-    <div className={cn("flex w-full flex-col gap-1.5", width, className)}>
+    <div className={cn("flex flex-col gap-1.5 min-w-0", width, className)}>
       {label && (
         <InputLabel htmlFor={inputId} size={size} required={required}>
           {label}

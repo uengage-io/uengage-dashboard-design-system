@@ -4,7 +4,7 @@ import { COMPONENT_HEIGHT, TEXT_SIZE } from "@/utils/tokens";
 export type DatePickerTriggerState = "default" | "open" | "disabled";
 
 export const triggerVariants = cva(
-  "inline-flex items-center w-full rounded-[4px] border border-gray-400 bg-white transition-colors",
+  "flex items-center min-w-0 rounded-[4px] border border-gray-400 bg-white transition-colors",
   {
     variants: {
       state: {

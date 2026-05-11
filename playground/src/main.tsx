@@ -27,16 +27,17 @@ import LayoutPreview from "./components/Layout";
 import AccordionPreview from "./components/Accordion";
 import InputPreview from "./components/Input";
 import DatePickerPreview from "./components/DatePicker";
+import PrevDemo from "./components/Prev";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <FuzzySearchPreview /> */}
     {/* <PaginationPreview /> */}
-
+<PrevDemo/>
     {/* <Dialog/> */}
     {/* <Demo/> */}
     {/* <ButtonPreview /> */}
     {/* <Modalprev/> */}
-    {/* <SearchPreview /> */}
+    <SearchPreview />
      <LayoutPreview /> 
     <SelectPreview />
     {/* <CheckboxPreview /> */}
