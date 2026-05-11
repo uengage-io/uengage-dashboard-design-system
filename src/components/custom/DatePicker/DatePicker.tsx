@@ -355,6 +355,7 @@ function DatePicker({
       <PopoverContent
         align="center"
         className="w-auto max-w-[calc(100vw-1rem)] p-0"
+        style={{ zIndex: 40 }}
       >
         <div className="overflow-hidden rounded-lg bg-white shadow-md">
           {/* ── From / To boxes (range mode only) ── */}
