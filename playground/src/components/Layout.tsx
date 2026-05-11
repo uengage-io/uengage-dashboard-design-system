@@ -21,23 +21,93 @@ type Variant = {
 };
 
 const EQUAL_VARIANTS: Variant[] = [
-  { label: "1 Column", columns: "1", count: 2, description: 'columns="1" · full-width stack' },
-  { label: "2 Equal Columns", columns: "2", count: 2, description: 'columns="2" · 20px gap' },
-  { label: "3 Equal Columns", columns: "3", count: 3, description: 'columns="3" · 20px gap' },
-  { label: "4 Equal Columns", columns: "4", count: 4, description: 'columns="4" · 12px gap' },
-  { label: "5 Equal Columns", columns: "5", count: 5, description: 'columns="5" · 12px gap' },
-  { label: "6 Equal Columns", columns: "6", count: 6, description: 'columns="6" · 0px gap' },
-  { label: "7 Equal Columns", columns: "7", count: 7, description: 'columns="7" · 0px gap' },
-  { label: "8 Equal Columns", columns: "8", count: 8, description: 'columns="8" · 0px gap' },
+  {
+    label: "1 Column",
+    columns: "1",
+    count: 2,
+    description: 'columns="1" · full-width stack',
+  },
+  {
+    label: "2 Equal Columns",
+    columns: "2",
+    count: 2,
+    description: 'columns="2" · 20px gap',
+  },
+  {
+    label: "3 Equal Columns",
+    columns: "3",
+    count: 3,
+    description: 'columns="3" · 20px gap',
+  },
+  {
+    label: "4 Equal Columns",
+    columns: "4",
+    count: 4,
+    description: 'columns="4" · 12px gap',
+  },
+  {
+    label: "5 Equal Columns",
+    columns: "5",
+    count: 5,
+    description: 'columns="5" · 12px gap',
+  },
+  {
+    label: "6 Equal Columns",
+    columns: "6",
+    count: 6,
+    description: 'columns="6" · 0px gap',
+  },
+  {
+    label: "7 Equal Columns",
+    columns: "7",
+    count: 7,
+    description: 'columns="7" · 0px gap',
+  },
+  {
+    label: "8 Equal Columns",
+    columns: "8",
+    count: 8,
+    description: 'columns="8" · 0px gap',
+  },
 ];
 
 const RATIO_VARIANTS: Variant[] = [
-  { label: "2 : 1 Ratio", columns: "2:1", count: 2, description: 'columns="2:1" · primary + sidebar' },
-  { label: "1 : 2 Ratio", columns: "1:2", count: 2, description: 'columns="1:2" · sidebar + primary' },
-  { label: "3 : 1 Ratio", columns: "3:1", count: 2, description: 'columns="3:1" · wide + narrow' },
-  { label: "1 : 3 Ratio", columns: "1:3", count: 2, description: 'columns="1:3" · narrow + wide' },
-  { label: "1 : 1 : 2 Ratio", columns: "1:1:2", count: 3, description: 'columns="1:1:2" · two narrow + wide' },
-  { label: "2 : 1 : 1 Ratio", columns: "2:1:1", count: 3, description: 'columns="2:1:1" · wide + two narrow' },
+  {
+    label: "2 : 1 Ratio",
+    columns: "2:1",
+    count: 2,
+    description: 'columns="2:1" · primary + sidebar',
+  },
+  {
+    label: "1 : 2 Ratio",
+    columns: "1:2",
+    count: 2,
+    description: 'columns="1:2" · sidebar + primary',
+  },
+  {
+    label: "3 : 1 Ratio",
+    columns: "3:1",
+    count: 2,
+    description: 'columns="3:1" · wide + narrow',
+  },
+  {
+    label: "1 : 3 Ratio",
+    columns: "1:3",
+    count: 2,
+    description: 'columns="1:3" · narrow + wide',
+  },
+  {
+    label: "1 : 1 : 2 Ratio",
+    columns: "1:1:2",
+    count: 3,
+    description: 'columns="1:1:2" · two narrow + wide',
+  },
+  {
+    label: "2 : 1 : 1 Ratio",
+    columns: "2:1:1",
+    count: 3,
+    description: 'columns="2:1:1" · wide + two narrow',
+  },
 ];
 
 function DemoCard({ index, columns }: { index: number; columns: GridColumns }) {
@@ -45,9 +115,11 @@ function DemoCard({ index, columns }: { index: number; columns: GridColumns }) {
     <Card className="min-h-22 flex flex-col justify-center">
       <CardHeader className="text-[11px] uppercase tracking-wide text-[#9CA3AF]">
         {columns} · item {index + 1} Hello World
-              <CardTitle className="text-sm text-[#111827]">Card {index + 1}</CardTitle>
+        <CardTitle className="text-sm text-[#111827]">
+          Card {index + 1}
+        </CardTitle>
         <CardContent>
-          <Input/>
+          <Input />
         </CardContent>
       </CardHeader>
     </Card>
@@ -69,19 +141,29 @@ function VariantSection({ variant }: { variant: Variant }) {
 
 export default function LayoutPreview() {
   return (
-    <div style={{ display: "flex", margin: "0 auto", background: "#F3F4F6" }}>
+    < >
       <PageContainer>
         <TopHeader
           title="Hello"
           helper={
             <a
               href="#"
-              style={{ color: "#006F42", textDecoration: "underline", fontWeight: 500 }}
+              style={{
+                color: "#006F42",
+                textDecoration: "underline",
+                fontWeight: 500,
+              }}
             >
               (How it Works?)
             </a>
           }
-          action={<Button variant="secondary">Quick Actions</Button>}
+          action={
+              <>
+            <Button variant="secondary">Quick Actions</Button>
+              <Button variant="secondary">Quick Actions</Button>
+              <Button variant="secondary">Quick Actions</Button>
+            </>
+          }
           divider
         />
 
@@ -89,6 +171,11 @@ export default function LayoutPreview() {
           title="Equal-Width Grids"
           subtitle="1 – 8 columns. Gap is auto-picked per preset."
           divider
+          right={ <>
+            <Button variant="secondary">Quick Actions</Button>
+              <Button variant="secondary">Quick Actions</Button>
+              <Button variant="secondary">Quick Actions</Button>
+            </>}
         />
         {EQUAL_VARIANTS.map((v) => (
           <VariantSection key={v.columns} variant={v} />
@@ -117,7 +204,6 @@ export default function LayoutPreview() {
           </Card>
           {Array.from({ length: 7 }).map((_, i) => (
             <Card key={i} className="min-h-16" />
-            
           ))}
         </Grid>
 
@@ -132,11 +218,11 @@ export default function LayoutPreview() {
           <SearchBar placeholder="size='lg' (default h-12)" size="lg" />
           <SearchBar placeholder="height={36}" />
           <SearchBar placeholder="height={48}" />
-          <SearchBar placeholder='height="3.5rem"'/>
+          <SearchBar placeholder='height="3.5rem"' />
         </Grid>
 
         <div style={{ height: 40 }} />
       </PageContainer>
-    </div>
+    </>
   );
 }
