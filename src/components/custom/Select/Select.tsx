@@ -341,6 +341,7 @@ function Select<TItem = unknown>({
       <PopoverContent
         className="max-w-[calc(100vw-1rem)]"
         style={{
+          zIndex: 40,
           width: "var(--radix-popover-trigger-width)",
         }}
       >
