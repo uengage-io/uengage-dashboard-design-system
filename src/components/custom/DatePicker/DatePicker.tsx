@@ -7,7 +7,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DatePickerCalendar, MonthPickerCalendar } from "../../ui/DatePickerCalendar";
+import {
+  DatePickerCalendar,
+  MonthPickerCalendar,
+} from "../../ui/DatePickerCalendar";
 import { triggerVariants } from "./datepickerVariants";
 import { formatDate, formatRange, formatMonthYear } from "./dateHelpers";
 import type { DatePickerProps, DateRange } from "./DatePicker.types";
@@ -20,7 +23,8 @@ function isDateRange(v: unknown): v is DateRange {
     typeof v === "object" &&
     "from" in v &&
     "to" in v &&
-    ((v as DateRange).from instanceof Date || (v as DateRange).to instanceof Date)
+    ((v as DateRange).from instanceof Date ||
+      (v as DateRange).to instanceof Date)
   );
 }
 
@@ -128,23 +132,21 @@ function DatePicker({
     return null;
   }, [committed, mode]);
 
-  // ── Effective display range (draft + hover preview, including elongation) ──
+  // ── Effective display range (draft + hover preview) ──
   // Returns { from, to? } — to may be undefined when only the first click is done.
-  const effectiveDisplayRange = React.useMemo((): { from: Date; to?: Date } | null => {
+  const effectiveDisplayRange = React.useMemo((): {
+    from: Date;
+    to?: Date;
+  } | null => {
     if (mode !== "range") return null;
-    const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
+    const existingRange =
+      draftRange ?? (isDateRange(committed) ? committed : null);
 
     if (pendingFrom) {
       // Mid two-click selection: show from→hover (or just from if no hover yet)
-      return hoverDate ? orderedRange(pendingFrom, hoverDate) : { from: pendingFrom };
-    }
-
-    // Elongation hover preview: hovering outside the existing range
-    if (hoverDate && existingRange) {
-      if (hoverDate < existingRange.from)
-        return { from: hoverDate, to: existingRange.to };
-      if (hoverDate > existingRange.to)
-        return { from: existingRange.from, to: hoverDate };
+      return hoverDate
+        ? orderedRange(pendingFrom, hoverDate)
+        : { from: pendingFrom };
     }
 
     return existingRange;
@@ -169,7 +171,6 @@ function DatePicker({
     return formatDate(effectiveDisplayRange.to);
   }, [effectiveDisplayRange]);
 
-
   // ── Event handlers ────────────────────────────────────────────────────
 
   const handleDayClick = (date: Date, modifiers: Modifiers) => {
@@ -184,21 +185,10 @@ function DatePicker({
 
     // Range mode state machine
     if (pendingFrom === null) {
-      const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
-      if (existingRange && (date < existingRange.from || date > existingRange.to)) {
-        // Single-click elongation: extend the existing range to the clicked date
-        const newRange: DateRange =
-          date < existingRange.from
-            ? { from: date, to: existingRange.to }
-            : { from: existingRange.from, to: date };
-        setDraftRange(newRange);
-        setHoverDate(null);
-      } else {
-        // Click within (or on edge of) existing range: start a fresh two-click selection
-        setPendingFrom(date);
-        setDraftRange(null);
-        setHoverDate(null);
-      }
+      // Always start a fresh two-click selection
+      setPendingFrom(date);
+      setDraftRange(null);
+      setHoverDate(null);
     } else {
       // Second click: complete the draft range
       const range = orderedRange(pendingFrom, date);
@@ -214,8 +204,12 @@ function DatePicker({
       return;
     }
     // Show elongation preview when hovering outside the existing range
-    const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
-    if (existingRange && (date < existingRange.from || date > existingRange.to)) {
+    const existingRange =
+      draftRange ?? (isDateRange(committed) ? committed : null);
+    if (
+      existingRange &&
+      (date < existingRange.from || date > existingRange.to)
+    ) {
       setHoverDate(date);
     } else {
       setHoverDate(null);
@@ -344,11 +338,7 @@ function DatePicker({
                 <X size={13} strokeWidth={2} className="hover:text-red-500" />
               </button>
             )}
-            <CalendarIcon
-              size={15}
-              strokeWidth={2}
-              className="text-gray-600"
-            />
+            <CalendarIcon size={15} strokeWidth={2} className="text-gray-600" />
           </div>
         </div>
       </PopoverTrigger>

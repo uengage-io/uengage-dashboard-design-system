@@ -521,9 +521,11 @@ interface DatePickerProps {
     maxDate?: Date;
     /** Fires once the first time the trigger is blurred after interacting (Angular-style `touched`). */
     onTouch?: () => void;
+    /** When true, shows a clear button to reset the selected value. Defaults to false. */
+    clearable?: boolean;
 }
 
-declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, }: DatePickerProps): react_jsx_runtime.JSX.Element;
+declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, }: DatePickerProps): react_jsx_runtime.JSX.Element;
 declare namespace DatePicker {
     var displayName: string;
 }

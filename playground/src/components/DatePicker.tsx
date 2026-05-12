@@ -42,6 +42,7 @@ export default function DatePickerPreview() {
         minDate={new Date(2025, 0, 1)}
         maxDate={new Date(2026, 11, 31)}
         onTouch={() => console.log("Range picker touched")}
+        clearable={true}
       />
       <DatePicker
         mode="single"
