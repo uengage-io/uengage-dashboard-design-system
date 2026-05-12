@@ -25,4 +25,6 @@ export interface DatePickerProps {
   maxDate?: Date;
   /** Fires once the first time the trigger is blurred after interacting (Angular-style `touched`). */
   onTouch?: () => void;
+  /** When true, shows a clear button to reset the selected value. Defaults to false. */
+  clearable?: boolean;
 }
