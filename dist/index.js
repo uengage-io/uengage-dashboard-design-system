@@ -3656,7 +3656,8 @@ function DatePicker({
   disabled = false,
   minDate,
   maxDate,
-  onTouch
+  onTouch,
+  clearable = false
 }) {
   const [open, setOpen] = React16.useState(false);
   const touchedRef = React16.useRef(false);
@@ -3707,12 +3708,6 @@ function DatePicker({
     if (pendingFrom) {
       return hoverDate ? orderedRange(pendingFrom, hoverDate) : { from: pendingFrom };
     }
-    if (hoverDate && existingRange) {
-      if (hoverDate < existingRange.from)
-        return { from: hoverDate, to: existingRange.to };
-      if (hoverDate > existingRange.to)
-        return { from: existingRange.from, to: hoverDate };
-    }
     return existingRange;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
   const calendarSelected = React16.useMemo(() => {
@@ -3738,16 +3733,9 @@ function DatePicker({
       return;
     }
     if (pendingFrom === null) {
-      const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
-      if (existingRange && (date < existingRange.from || date > existingRange.to)) {
-        const newRange = date < existingRange.from ? { from: date, to: existingRange.to } : { from: existingRange.from, to: date };
-        setDraftRange(newRange);
-        setHoverDate(null);
-      } else {
-        setPendingFrom(date);
-        setDraftRange(null);
-        setHoverDate(null);
-      }
+      setPendingFrom(date);
+      setDraftRange(null);
+      setHoverDate(null);
     } else {
       const range = orderedRange(pendingFrom, date);
       setPendingFrom(null);
@@ -3857,7 +3845,7 @@ function DatePicker({
             }
           ),
           /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
-            committed && /* @__PURE__ */ jsx(
+            clearable && committed && /* @__PURE__ */ jsx(
               "button",
               {
                 type: "button",
@@ -3868,14 +3856,7 @@ function DatePicker({
                 children: /* @__PURE__ */ jsx(X, { size: 13, strokeWidth: 2, className: "hover:text-red-500" })
               }
             ),
-            /* @__PURE__ */ jsx(
-              CalendarIcon,
-              {
-                size: 15,
-                strokeWidth: 2,
-                className: "text-gray-600"
-              }
-            )
+            /* @__PURE__ */ jsx(CalendarIcon, { size: 15, strokeWidth: 2, className: "text-gray-600" })
           ] })
         ]
       }
