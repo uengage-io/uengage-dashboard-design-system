@@ -79,10 +79,10 @@ interface TopHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"
     action?: React.ReactNode;
     /** Render a bottom divider. Defaults to true. */
     divider?: boolean;
-    /** Horizontal gap between title and helper. Defaults to 10px. */
+    /** Gap between title and helper. Defaults to 10px. */
     titleGap?: CssSize;
 }
-declare function TopHeader({ title, helper, action, divider, className, style, ...props }: TopHeaderProps): react_jsx_runtime.JSX.Element;
+declare function TopHeader({ title, helper, action, divider, titleGap, className, style, ...props }: TopHeaderProps): react_jsx_runtime.JSX.Element;
 declare namespace TopHeader {
     var displayName: string;
 }
@@ -179,6 +179,8 @@ interface SearchBarProps<T extends string | number = string, TItem = unknown> {
     onTouch?: () => void;
     /** Toggle the browser's native spell-check. Defaults to `true`. */
     spellCheck?: boolean;
+    /** Show the X clear button when the input has a value. Defaults to `false`. */
+    clearable?: boolean;
     /** Pre-mapped string list. Component auto-filters with fuzzy matching. */
     dropdownContent?: string[];
     /**
@@ -201,7 +203,7 @@ interface SearchBarProps<T extends string | number = string, TItem = unknown> {
     fallbackText?: string;
 }
 
-declare function SearchBar<T extends string | number = string, TItem = unknown>({ value: controlledValue, defaultValue, valueType, size, placeholder, width, className, inputClassName, disabled, spellCheck, onChange, onSearch, onClear, onTouch, dropdownClassName, dropdownItems, getLabel, getValue, onSelect, fallbackText, }: SearchBarProps<T, TItem>): react_jsx_runtime.JSX.Element;
+declare function SearchBar<T extends string | number = string, TItem = unknown>({ value: controlledValue, defaultValue, valueType, size, placeholder, width, className, inputClassName, disabled, spellCheck, onChange, onSearch, onClear, onTouch, clearable, dropdownClassName, dropdownItems, getLabel, getValue, onSelect, fallbackText, }: SearchBarProps<T, TItem>): react_jsx_runtime.JSX.Element;
 declare namespace SearchBar {
     var displayName: string;
 }
@@ -245,9 +247,11 @@ interface SelectProps<TItem = unknown> {
     onTouch?: () => void;
     /** Toggle the browser's native spell-check on the dropdown search input. Defaults to `true`. */
     spellCheck?: boolean;
+    /** Show the X clear button (and pill remove buttons) when a value is selected. Defaults to `false`. */
+    clearable?: boolean;
 }
 
-declare function Select<TItem = unknown>({ options, items, getLabel, getValue, getDisabled, value: controlledValue, defaultValue, mode, size, placeholder, disabled, width, className, onChange, onTouch, spellCheck, }: SelectProps<TItem>): react_jsx_runtime.JSX.Element;
+declare function Select<TItem = unknown>({ options, items, getLabel, getValue, getDisabled, value: controlledValue, defaultValue, mode, size, placeholder, disabled, width, className, onChange, onTouch, spellCheck, clearable, }: SelectProps<TItem>): react_jsx_runtime.JSX.Element;
 declare namespace Select {
     var displayName: string;
 }
@@ -270,7 +274,7 @@ interface CustomTabsProps {
     defaultValue?: string;
     value?: string;
     onChange?: (value: string) => void;
-    variant?: "primary" | "secondary" | "tertiary";
+    variant?: "primary" | "secondary";
     visibleTabLimit?: number;
     overflowLabel?: string;
     className?: string;
@@ -282,7 +286,7 @@ declare namespace Tabs {
 }
 
 interface CustomTabsTriggerProps extends React.ComponentProps<typeof TabsTrigger> {
-    variant?: "primary" | "secondary" | "tertiary";
+    variant?: "secondary" | "tertiary";
 }
 declare function CustomTabsTrigger({ className, children, disabled, variant, ...props }: CustomTabsTriggerProps): react_jsx_runtime.JSX.Element;
 declare namespace CustomTabsTrigger {

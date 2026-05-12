@@ -171,7 +171,7 @@ var PLACEHOLDER_SIZE = {
 // src/components/custom/Select/selectVariants.ts
 var triggerVariants = classVarianceAuthority.cva(
   [
-    "flex w-full items-center justify-between",
+    "flex min-w-0 items-center justify-between",
     "rounded-[4px] border border-gray-400 bg-white",
     "transition-colors duration-150 cursor-pointer select-none",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0"
@@ -233,7 +233,8 @@ function Select({
   className,
   onChange,
   onTouch,
-  spellCheck = true
+  spellCheck = true,
+  clearable = false
 }) {
   const touchedRef = React__namespace.useRef(false);
   const interactedRef = React__namespace.useRef(false);
@@ -386,7 +387,7 @@ function Select({
                       className: "inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]",
                       children: [
                         /* @__PURE__ */ jsxRuntime.jsx("span", { className: "truncate", children: opt.label }),
-                        /* @__PURE__ */ jsxRuntime.jsx(
+                        clearable && /* @__PURE__ */ jsxRuntime.jsx(
                           "button",
                           {
                             type: "button",
@@ -435,7 +436,7 @@ function Select({
             }
           ),
           /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
-            hasSelection && /* @__PURE__ */ jsxRuntime.jsx(
+            clearable && hasSelection && /* @__PURE__ */ jsxRuntime.jsx(
               "button",
               {
                 type: "button",
@@ -466,6 +467,7 @@ function Select({
       {
         className: "max-w-[calc(100vw-1rem)]",
         style: {
+          zIndex: 20,
           width: "var(--radix-popover-trigger-width)"
         },
         children: /* @__PURE__ */ jsxRuntime.jsxs(Command, { shouldFilter: false, children: [

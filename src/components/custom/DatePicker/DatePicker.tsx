@@ -66,6 +66,7 @@ function DatePicker({
   minDate,
   maxDate,
   onTouch,
+  clearable = false,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
   const touchedRef = React.useRef(false);
@@ -332,7 +333,7 @@ function DatePicker({
           </span>
 
           <div className="flex shrink-0 items-center gap-1">
-            {committed && (
+            {clearable && committed && (
               <button
                 type="button"
                 tabIndex={-1}

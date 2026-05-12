@@ -753,69 +753,6 @@ function PageContainer({
   );
 }
 PageContainer.displayName = "PageContainer";
-function TopHeader({
-  title,
-  helper,
-  action,
-  divider = true,
-  className,
-  style,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxs(
-    "header",
-    {
-      "data-slot": "top-header",
-      className: cn("uengage-ui flex w-full shrink-0 flex-col", className),
-      style,
-      ...props,
-      children: [
-        /* @__PURE__ */ jsxs(
-          "div",
-          {
-            "data-slot": "top-header-row",
-            className: "flex w-full flex-row items-center justify-between gap-3 py-[6px] sm:py-[8px]",
-            children: [
-              /* @__PURE__ */ jsxs(
-                "div",
-                {
-                  "data-slot": "top-header-title",
-                  className: "flex min-w-0 flex-1 items-center gap-[10px] overflow-hidden",
-                  children: [
-                    React16.isValidElement(title) ? title : /* @__PURE__ */ jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
-                    helper != null && /* @__PURE__ */ jsx("span", { className: "shrink-0 text-xs sm:text-sm leading-none", children: helper })
-                  ]
-                }
-              ),
-              action != null && /* @__PURE__ */ jsx(
-                "div",
-                {
-                  "data-slot": "top-header-action",
-                  className: "flex shrink-0 flex-wrap items-center gap-2",
-                  children: action
-                }
-              )
-            ]
-          }
-        ),
-        divider && /* @__PURE__ */ jsx(
-          Separator,
-          {
-            "data-slot": "top-header-divider",
-            style: {
-              // Use CSS vars set by PageContainer so the separator always
-              // bleeds to the container edge regardless of viewport width.
-              marginLeft: "calc(-1 * var(--pc-pl, 22px))",
-              marginRight: "calc(-1 * var(--pc-pr, 20px))",
-              width: "calc(100% + var(--pc-pl, 22px) + var(--pc-pr, 20px))"
-            }
-          }
-        )
-      ]
-    }
-  );
-}
-TopHeader.displayName = "TopHeader";
 
 // src/utils/layoutTokens.ts
 var LAYOUT = {
@@ -843,6 +780,71 @@ var LAYOUT = {
 function toCssSize(value) {
   return typeof value === "number" ? `${value}px` : value;
 }
+function TopHeader({
+  title,
+  helper,
+  action,
+  divider = true,
+  titleGap = 10,
+  className,
+  style,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxs(
+    "header",
+    {
+      "data-slot": "top-header",
+      className: cn("uengage-ui flex w-full shrink-0 flex-col", className),
+      style,
+      ...props,
+      children: [
+        /* @__PURE__ */ jsxs(
+          "div",
+          {
+            "data-slot": "top-header-row",
+            className: "flex w-full flex-col gap-3 py-[6px] sm:flex-row sm:items-center sm:justify-between sm:py-[8px]",
+            children: [
+              /* @__PURE__ */ jsxs(
+                "div",
+                {
+                  "data-slot": "top-header-title",
+                  className: "flex min-w-0 flex-1 items-center overflow-hidden",
+                  style: { gap: toCssSize(titleGap) },
+                  children: [
+                    React16.isValidElement(title) ? title : /* @__PURE__ */ jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
+                    helper != null && /* @__PURE__ */ jsx("span", { className: "shrink-0 text-xs leading-none sm:text-sm", children: helper })
+                  ]
+                }
+              ),
+              action != null && /* @__PURE__ */ jsx(
+                "div",
+                {
+                  "data-slot": "top-header-action",
+                  className: "flex shrink-0 flex-wrap items-center gap-2 self-start sm:self-auto",
+                  children: action
+                }
+              )
+            ]
+          }
+        ),
+        divider && /* @__PURE__ */ jsx(
+          Separator,
+          {
+            "data-slot": "top-header-divider",
+            style: {
+              // Use CSS vars set by PageContainer so the separator always
+              // bleeds to the container edge regardless of viewport width.
+              marginLeft: "calc(-1 * var(--pc-pl, 22px))",
+              marginRight: "calc(-1 * var(--pc-pr, 20px))",
+              width: "calc(100% + var(--pc-pl, 22px) + var(--pc-pr, 20px))"
+            }
+          }
+        )
+      ]
+    }
+  );
+}
+TopHeader.displayName = "TopHeader";
 var ALIGN_CLASS = {
   start: "sm:items-start",
   center: "sm:items-center",
@@ -881,8 +883,8 @@ function SubHeader({
               ALIGN_CLASS[align]
             ),
             style: {
-              paddingTop: toCssSize(LAYOUT.subHeaderPaddingTop),
-              paddingBottom: toCssSize(LAYOUT.subHeaderPaddingBottom)
+              paddingTop: "clamp(12px, 2.5vw, 16px)",
+              paddingBottom: "clamp(12px, 2.5vw, 16px)"
             },
             children: [
               /* @__PURE__ */ jsxs(
@@ -904,7 +906,7 @@ function SubHeader({
                 "div",
                 {
                   "data-slot": "sub-header-right",
-                  className: "flex shrink-0 flex-wrap items-center gap-3",
+                  className: "flex shrink-0 flex-wrap items-center gap-3 self-start sm:self-auto",
                   children: right
                 }
               )
@@ -1181,6 +1183,7 @@ function SearchBar({
   onSearch,
   onClear,
   onTouch,
+  clearable = false,
   dropdownClassName,
   dropdownItems,
   getLabel,
@@ -1267,14 +1270,14 @@ function SearchBar({
       }
     }
   };
-  const showClear = displayValue.length > 0;
+  const showClear = clearable && displayValue.length > 0;
   const iconSize = ICON_SIZES[size];
   const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
   return /* @__PURE__ */ jsxs(
     "div",
     {
       ref: wrapperRef,
-      className: cn("uengage-ui relative block w-full", width, className),
+      className: cn("uengage-ui relative block min-w-0", width, className),
       onBlur: handleBlur,
       children: [
         /* @__PURE__ */ jsxs(
@@ -1492,7 +1495,7 @@ var PLACEHOLDER_SIZE = {
 // src/components/custom/Select/selectVariants.ts
 var triggerVariants = cva(
   [
-    "flex w-full items-center justify-between",
+    "flex min-w-0 items-center justify-between",
     "rounded-[4px] border border-gray-400 bg-white",
     "transition-colors duration-150 cursor-pointer select-none",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0"
@@ -1554,7 +1557,8 @@ function Select({
   className,
   onChange,
   onTouch,
-  spellCheck = true
+  spellCheck = true,
+  clearable = false
 }) {
   const touchedRef = React16.useRef(false);
   const interactedRef = React16.useRef(false);
@@ -1707,7 +1711,7 @@ function Select({
                       className: "inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]",
                       children: [
                         /* @__PURE__ */ jsx("span", { className: "truncate", children: opt.label }),
-                        /* @__PURE__ */ jsx(
+                        clearable && /* @__PURE__ */ jsx(
                           "button",
                           {
                             type: "button",
@@ -1756,7 +1760,7 @@ function Select({
             }
           ),
           /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
-            hasSelection && /* @__PURE__ */ jsx(
+            clearable && hasSelection && /* @__PURE__ */ jsx(
               "button",
               {
                 type: "button",
@@ -1787,6 +1791,7 @@ function Select({
       {
         className: "max-w-[calc(100vw-1rem)]",
         style: {
+          zIndex: 20,
           width: "var(--radix-popover-trigger-width)"
         },
         children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
@@ -1944,7 +1949,7 @@ function CustomTabsTrigger({
   className,
   children,
   disabled,
-  variant = "primary",
+  variant = "secondary",
   ...props
 }) {
   const state = disabled ? "disabled" : "inactive";
@@ -1972,67 +1977,44 @@ function CustomTabsTrigger({
       }
     );
   }
-  if (variant === "secondary") {
-    return /* @__PURE__ */ jsxs(
-      TabsTrigger,
-      {
-        disabled,
-        "data-tab-value": props.value,
-        className: cn(
-          "group/tab flex-none w-auto",
-          tabTriggerVariants({ state }),
-          STRIP_SHADCN_DEFAULTS,
-          "data-[state=active]:!text-[#0A5A2A]! data-[state=active]:!font-semibold!",
-          className
-        ),
-        ...props,
-        children: [
-          /* @__PURE__ */ jsx(
-            "span",
-            {
-              className: cn(
-                tabPillClass,
-                "transition-colors duration-300 ease-out",
-                "text-gray-500 group-hover/tab:text-[#0A5A2A]",
-                "group-data-[state=active]/tab:text-[#0A5A2A] group-data-[state=active]/tab:font-semibold"
-              ),
-              children
-            }
-          ),
-          /* @__PURE__ */ jsx(
-            "span",
-            {
-              "aria-hidden": "true",
-              className: cn(
-                tabOverlayClass,
-                "transition-colors duration-300 ease-out",
-                "group-data-[state=active]/tab:bg-[#0A5A2A]/5"
-              )
-            }
-          )
-        ]
-      }
-    );
-  }
-  return /* @__PURE__ */ jsx(
+  return /* @__PURE__ */ jsxs(
     TabsTrigger,
     {
       disabled,
       "data-tab-value": props.value,
       className: cn(
-        "group/tab relative flex-none w-auto cursor-pointer select-none whitespace-nowrap",
-        "p-[10px] text-[15px] font-semibold",
-        "transition-colors duration-200 outline-none",
-        "bg-transparent data-[state=active]:bg-transparent",
-        "border-0 shadow-none after:hidden after:content-none",
-        "data-[state=active]:border-0 data-[state=active]:shadow-none",
-        FOCUS_RING,
-        "disabled:pointer-events-none",
+        "group/tab flex-none w-auto",
+        tabTriggerVariants({ state }),
         STRIP_SHADCN_DEFAULTS,
+        "data-[state=active]:!text-[#0A5A2A]! data-[state=active]:!font-semibold!",
         className
       ),
       ...props,
-      children: /* @__PURE__ */ jsx("span", { className: "relative z-10 transition-colors duration-200 text-gray-500 group-hover/tab:text-[#0A5A2A] group-data-[state=active]/tab:text-[#0A5A2A] group-disabled/tab:text-[#D1D5DB]", children })
+      children: [
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            className: cn(
+              tabPillClass,
+              "transition-colors duration-300 ease-out",
+              "text-gray-500 group-hover/tab:text-[#0A5A2A]",
+              "group-data-[state=active]/tab:text-[#0A5A2A] group-data-[state=active]/tab:font-semibold"
+            ),
+            children
+          }
+        ),
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            "aria-hidden": "true",
+            className: cn(
+              tabOverlayClass,
+              "transition-colors duration-300 ease-out",
+              "group-data-[state=active]/tab:bg-[#0A5A2A]/5"
+            )
+          }
+        )
+      ]
     }
   );
 }
@@ -2194,11 +2176,9 @@ function LineTabsOverflow({
   overflowTabs,
   overflowLabel,
   activeValue,
-  onChange,
-  variant
+  onChange
 }) {
   const [open, setOpen] = React16.useState(false);
-  const isPrimary = variant === "primary";
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
@@ -2207,7 +2187,7 @@ function LineTabsOverflow({
         type: "button",
         className: cn(
           "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-          isPrimary ? "relative flex-none gap-1 p-[10px] text-[15px] font-semibold text-gray-500 hover:text-gray-900" : "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
+          "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
           FOCUS_RING
         ),
         children: [
@@ -2218,8 +2198,7 @@ function LineTabsOverflow({
               size: 16,
               strokeWidth: 2.25,
               className: cn(
-                isPrimary ? "text-gray-500" : "text-[#0A5A2A]",
-                "transition-transform duration-200",
+                "text-[#0A5A2A] transition-transform duration-200",
                 open && "rotate-180"
               )
             }
@@ -2235,8 +2214,6 @@ function LineTabsOverflow({
         className: "w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
         children: /* @__PURE__ */ jsx("div", { className: "flex flex-col", children: overflowTabs.map((tab) => {
           const isActive = tab.value === activeValue;
-          const activeItemClass = isPrimary ? "bg-[#F3F4F6] font-semibold text-[#111827]" : "bg-[#F0F9F4] font-semibold text-[#0A5A2A]";
-          const checkClass = isPrimary ? "text-[#111827]" : "text-[#0A5A2A]";
           return /* @__PURE__ */ jsxs(
             "button",
             {
@@ -2245,7 +2222,7 @@ function LineTabsOverflow({
               className: cn(
                 "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
                 "transition-colors duration-150",
-                isActive ? activeItemClass : "text-[#374151] hover:bg-[#F8FAFC]",
+                isActive ? "bg-[#F0F9F4] font-semibold text-[#0A5A2A]" : "text-[#374151] hover:bg-[#F8FAFC]",
                 tab.disabled && "cursor-not-allowed opacity-50"
               ),
               onClick: () => {
@@ -2260,7 +2237,7 @@ function LineTabsOverflow({
                   {
                     size: 16,
                     strokeWidth: 2.5,
-                    className: cn("shrink-0", checkClass)
+                    className: "shrink-0 text-[#0A5A2A]"
                   }
                 )
               ]
@@ -2274,127 +2251,8 @@ function LineTabsOverflow({
 }
 function Tabs2(props) {
   const variant = props.variant ?? "primary";
-  if (variant === "tertiary") return /* @__PURE__ */ jsx(TertiaryTabs, { ...props });
-  if (variant === "secondary") return /* @__PURE__ */ jsx(SecondaryTabs, { ...props });
-  return /* @__PURE__ */ jsx(PrimaryTabs, { ...props });
-}
-function PrimaryTabs({
-  tabs,
-  defaultValue,
-  value,
-  onChange,
-  visibleTabLimit,
-  overflowLabel = "More Options",
-  className
-}) {
-  const wrapperRef = React16.useRef(null);
-  const { activeValue, handleChange } = useTabValue(
-    tabs,
-    value,
-    defaultValue,
-    onChange
-  );
-  const [indicator, setIndicator] = React16.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React16.useMemo(
-    () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
-    [activeValue, tabs, visibleTabLimit]
-  );
-  React16.useLayoutEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper || !activeValue) return;
-    const btn = wrapper.querySelector(
-      `[data-tab-value="${escapeTabValue(activeValue)}"]`
-    );
-    if (!btn) {
-      setIndicator((i) => ({ ...i, ready: false }));
-      return;
-    }
-    setIndicator({ left: btn.offsetLeft, width: btn.offsetWidth, ready: true });
-  }, [
-    activeValue,
-    visibleTabs.length,
-    visibleTabs.map((t) => t.value).join("|")
-  ]);
-  React16.useEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return;
-    const handle = () => {
-      const btn = wrapper.querySelector(
-        `[data-tab-value="${escapeTabValue(activeValue)}"]`
-      );
-      if (!btn) return;
-      setIndicator((prev) => ({
-        left: btn.offsetLeft,
-        width: btn.offsetWidth,
-        ready: prev.ready
-      }));
-    };
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, [activeValue]);
-  return /* @__PURE__ */ jsx(
-    Tabs,
-    {
-      value: activeValue,
-      onValueChange: handleChange,
-      className: cn("w-full", className),
-      children: /* @__PURE__ */ jsx("div", { className: "relative w-full border-b border-[#E5E7EB]", children: /* @__PURE__ */ jsxs(
-        "div",
-        {
-          ref: wrapperRef,
-          className: "relative flex min-w-0 items-end overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-          children: [
-            /* @__PURE__ */ jsx(
-              TabsList,
-              {
-                variant: "line",
-                className: cn(
-                  "flex w-max min-w-0 flex-row items-center justify-start",
-                  "h-auto! rounded-none bg-transparent p-0 gap-6"
-                ),
-                children: visibleTabs.map((tab) => /* @__PURE__ */ jsx(
-                  CustomTabsTrigger,
-                  {
-                    value: tab.value,
-                    disabled: tab.disabled,
-                    variant: "primary",
-                    children: tab.label
-                  },
-                  tab.value
-                ))
-              }
-            ),
-            overflowTabs.length > 0 && /* @__PURE__ */ jsx(
-              LineTabsOverflow,
-              {
-                overflowTabs,
-                overflowLabel,
-                activeValue,
-                onChange: handleChange,
-                variant: "primary"
-              }
-            ),
-            /* @__PURE__ */ jsx(
-              "div",
-              {
-                "aria-hidden": "true",
-                className: cn(
-                  "pointer-events-none absolute bottom-0 left-0 h-[8px] rounded-t-full",
-                  "shadow-[0_-3px_10px_rgba(0,168,107,0.45)]",
-                  indicator.ready ? "transition-all duration-300 ease-out opacity-100" : "opacity-0"
-                ),
-                style: {
-                  background: "linear-gradient(189.6deg, #003C1B -188.01%, #00A86B 92.12%)",
-                  transform: `translateX(${indicator.left}px)`,
-                  width: indicator.width
-                }
-              }
-            )
-          ]
-        }
-      ) })
-    }
-  );
+  if (variant === "secondary") return /* @__PURE__ */ jsx(TertiaryTabs, { ...props });
+  return /* @__PURE__ */ jsx(SecondaryTabs, { ...props });
 }
 function SecondaryTabs({
   tabs,
@@ -2492,8 +2350,7 @@ function SecondaryTabs({
                 overflowTabs,
                 overflowLabel,
                 activeValue,
-                onChange: handleChange,
-                variant: "secondary"
+                onChange: handleChange
               }
             ),
             /* @__PURE__ */ jsx(
@@ -2901,7 +2758,7 @@ function Input2({
     onSuggestionSelect?.(item.value);
   };
   const describedById = effectiveError ? `${inputId}-error` : helperText ? `${inputId}-helper` : void 0;
-  return /* @__PURE__ */ jsxs("div", { className: cn("flex w-full flex-col gap-1.5", width, className), children: [
+  return /* @__PURE__ */ jsxs("div", { className: cn("flex flex-col gap-1.5 min-w-0", width, className), children: [
     label && /* @__PURE__ */ jsx(InputLabel, { htmlFor: inputId, size, required, children: label }),
     /* @__PURE__ */ jsxs("div", { ref: wrapperRef, className: "relative", children: [
       /* @__PURE__ */ jsxs("div", { className: cn(inputWrapperVariants({ size, state })), children: [
@@ -3698,7 +3555,7 @@ function MonthPickerCalendar({
   ] });
 }
 var triggerVariants2 = cva(
-  "inline-flex items-center w-full rounded-[4px] border border-gray-400 bg-white transition-colors",
+  "flex items-center min-w-0 rounded-[4px] border border-gray-400 bg-white transition-colors",
   {
     variants: {
       state: {
@@ -3844,31 +3701,34 @@ function DatePicker({
       return formatRange(committed.from, committed.to) ?? null;
     return null;
   }, [committed, mode]);
+  const effectiveDisplayRange = React16.useMemo(() => {
+    if (mode !== "range") return null;
+    const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
+    if (pendingFrom) {
+      return hoverDate ? orderedRange(pendingFrom, hoverDate) : { from: pendingFrom };
+    }
+    if (hoverDate && existingRange) {
+      if (hoverDate < existingRange.from)
+        return { from: hoverDate, to: existingRange.to };
+      if (hoverDate > existingRange.to)
+        return { from: existingRange.from, to: hoverDate };
+    }
+    return existingRange;
+  }, [mode, committed, pendingFrom, draftRange, hoverDate]);
   const calendarSelected = React16.useMemo(() => {
     if (mode === "single") {
       return committed instanceof Date ? committed : void 0;
     }
-    if (pendingFrom) {
-      const end = hoverDate ?? pendingFrom;
-      return orderedRange(pendingFrom, end);
-    }
-    if (draftRange) return draftRange;
-    if (isDateRange(committed)) return committed;
-    return void 0;
-  }, [mode, committed, pendingFrom, draftRange, hoverDate]);
+    return effectiveDisplayRange ?? void 0;
+  }, [mode, committed, effectiveDisplayRange]);
   const fromLabel = React16.useMemo(() => {
-    if (pendingFrom) return formatDate(pendingFrom);
-    if (draftRange) return formatDate(draftRange.from);
-    if (isDateRange(committed)) return formatDate(committed.from);
-    return null;
-  }, [pendingFrom, draftRange, committed]);
+    if (!effectiveDisplayRange) return null;
+    return formatDate(effectiveDisplayRange.from);
+  }, [effectiveDisplayRange]);
   const toLabel = React16.useMemo(() => {
-    if (pendingFrom)
-      return hoverDate ? formatDate(orderedRange(pendingFrom, hoverDate).to) : null;
-    if (draftRange) return formatDate(draftRange.to);
-    if (isDateRange(committed)) return formatDate(committed.to);
-    return null;
-  }, [pendingFrom, hoverDate, draftRange, committed]);
+    if (!effectiveDisplayRange?.to) return null;
+    return formatDate(effectiveDisplayRange.to);
+  }, [effectiveDisplayRange]);
   const handleDayClick = (date, modifiers) => {
     if (modifiers.disabled) return;
     if (mode === "single") {
@@ -3878,8 +3738,16 @@ function DatePicker({
       return;
     }
     if (pendingFrom === null) {
-      setPendingFrom(date);
-      setDraftRange(null);
+      const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
+      if (existingRange && (date < existingRange.from || date > existingRange.to)) {
+        const newRange = date < existingRange.from ? { from: date, to: existingRange.to } : { from: existingRange.from, to: date };
+        setDraftRange(newRange);
+        setHoverDate(null);
+      } else {
+        setPendingFrom(date);
+        setDraftRange(null);
+        setHoverDate(null);
+      }
     } else {
       const range = orderedRange(pendingFrom, date);
       setPendingFrom(null);
@@ -3888,7 +3756,16 @@ function DatePicker({
     }
   };
   const handleDayMouseEnter = (date) => {
-    if (pendingFrom) setHoverDate(date);
+    if (pendingFrom) {
+      setHoverDate(date);
+      return;
+    }
+    const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
+    if (existingRange && (date < existingRange.from || date > existingRange.to)) {
+      setHoverDate(date);
+    } else {
+      setHoverDate(null);
+    }
   };
   const handleDayMouseLeave = () => {
     setHoverDate(null);
@@ -4008,6 +3885,7 @@ function DatePicker({
       {
         align: "center",
         className: "w-auto max-w-[calc(100vw-1rem)] p-0",
+        style: { zIndex: 20 },
         children: /* @__PURE__ */ jsxs("div", { className: "overflow-hidden rounded-lg bg-white shadow-md", children: [
           mode === "range" && /* @__PURE__ */ jsxs("div", { className: "flex gap-2 px-3 pt-3", children: [
             /* @__PURE__ */ jsx(DateBox, { label: fromLabel, active: !!fromLabel }),
