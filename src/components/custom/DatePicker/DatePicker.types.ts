@@ -7,7 +7,7 @@ export type DatePickerMode = "single" | "range" | "month";
 
 export interface DatePickerProps {
   mode?: DatePickerMode;
-  value?: Date | DateRange | null;
+  value?: Date | DateRange  |null;
   onChange?: (value: Date | DateRange | null) => void;
   placeholder?: string;
   /** Controls the trigger height via a preset. */

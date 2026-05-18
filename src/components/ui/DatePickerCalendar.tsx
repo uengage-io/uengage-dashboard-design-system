@@ -234,7 +234,8 @@ export function DatePickerCalendar({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           mode={mode as any}
           selected={selected ?? undefined}
-          onSelect={onSelect}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onSelect={(onSelect ?? (() => {})) as any}
           month={viewMonth}
           onMonthChange={setViewMonth}
           hideNavigation
