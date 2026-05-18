@@ -2134,7 +2134,8 @@ function OverflowTabsSelect({
       {
         align: "end",
         sideOffset: 8,
-        className: "w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
+        collisionPadding: 8,
+        className: "w-[220px] max-w-[calc(100vw-1rem)] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
         children: /* @__PURE__ */ jsx("div", { className: "flex flex-col", children: overflowTabs.map((tab) => {
           const isActive = tab.value === activeValue;
           return /* @__PURE__ */ jsxs(
@@ -2186,8 +2187,9 @@ function LineTabsOverflow({
       {
         type: "button",
         className: cn(
-          "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-          "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
+          "inline-flex flex-none items-center gap-1 whitespace-nowrap cursor-pointer select-none",
+          "rounded-t-lg px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium",
+          "text-gray-500 hover:text-[#0A5A2A] hover:bg-gray-50 transition-all duration-200",
           FOCUS_RING
         ),
         children: [
@@ -2211,7 +2213,8 @@ function LineTabsOverflow({
       {
         align: "end",
         sideOffset: 8,
-        className: "w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
+        collisionPadding: 8,
+        className: "w-[220px] max-w-[calc(100vw-1rem)] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
         children: /* @__PURE__ */ jsx("div", { className: "flex flex-col", children: overflowTabs.map((tab) => {
           const isActive = tab.value === activeValue;
           return /* @__PURE__ */ jsxs(
@@ -2318,58 +2321,60 @@ function SecondaryTabs({
       value: activeValue,
       onValueChange: handleChange,
       className: cn("w-full", className),
-      children: /* @__PURE__ */ jsx("div", { className: "relative w-full border-b border-[#E5E7EB]", children: /* @__PURE__ */ jsxs(
-        "div",
-        {
-          ref: wrapperRef,
-          className: "relative flex min-w-0 items-end gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-          children: [
-            /* @__PURE__ */ jsx(
-              TabsList,
-              {
-                variant: "line",
-                className: cn(
-                  "flex w-max min-w-0 flex-row items-center justify-start",
-                  "h-auto! rounded-none bg-transparent p-0 gap-2"
-                ),
-                children: visibleTabs.map((tab) => /* @__PURE__ */ jsx(
-                  CustomTabsTrigger,
-                  {
-                    value: tab.value,
-                    disabled: tab.disabled,
-                    variant: "secondary",
-                    children: tab.label
-                  },
-                  tab.value
-                ))
-              }
-            ),
-            overflowTabs.length > 0 && /* @__PURE__ */ jsx(
-              LineTabsOverflow,
-              {
-                overflowTabs,
-                overflowLabel,
-                activeValue,
-                onChange: handleChange
-              }
-            ),
-            /* @__PURE__ */ jsx(
-              "span",
-              {
-                "aria-hidden": "true",
-                className: cn(
-                  "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
-                  indicator.ready ? "transition-all duration-300 ease-out opacity-100" : "opacity-0"
-                ),
-                style: {
-                  transform: `translateX(${indicator.left}px)`,
-                  width: indicator.width
+      children: /* @__PURE__ */ jsx("div", { className: "relative w-full border-b border-[#E5E7EB]", children: /* @__PURE__ */ jsxs("div", { className: "flex items-end min-w-0", children: [
+        /* @__PURE__ */ jsxs(
+          "div",
+          {
+            ref: wrapperRef,
+            className: "relative min-w-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+            children: [
+              /* @__PURE__ */ jsx(
+                TabsList,
+                {
+                  variant: "line",
+                  className: cn(
+                    "flex w-max min-w-0 flex-row items-center justify-start",
+                    "h-auto! rounded-none bg-transparent p-0 gap-2"
+                  ),
+                  children: visibleTabs.map((tab) => /* @__PURE__ */ jsx(
+                    CustomTabsTrigger,
+                    {
+                      value: tab.value,
+                      disabled: tab.disabled,
+                      variant: "secondary",
+                      children: tab.label
+                    },
+                    tab.value
+                  ))
                 }
-              }
-            )
-          ]
-        }
-      ) })
+              ),
+              /* @__PURE__ */ jsx(
+                "span",
+                {
+                  "aria-hidden": "true",
+                  className: cn(
+                    "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
+                    indicator.ready ? "transition-all duration-300 ease-out opacity-100" : "opacity-0"
+                  ),
+                  style: {
+                    transform: `translateX(${indicator.left}px)`,
+                    width: indicator.width
+                  }
+                }
+              )
+            ]
+          }
+        ),
+        overflowTabs.length > 0 && /* @__PURE__ */ jsx(
+          LineTabsOverflow,
+          {
+            overflowTabs,
+            overflowLabel,
+            activeValue,
+            onChange: handleChange
+          }
+        )
+      ] }) })
     }
   );
 }
@@ -3447,7 +3452,8 @@ function DatePickerCalendar({
         {
           mode,
           selected: selected ?? void 0,
-          onSelect,
+          onSelect: onSelect ?? (() => {
+          }),
           month: viewMonth,
           onMonthChange: setViewMonth,
           hideNavigation: true,
@@ -4650,6 +4656,30 @@ function useIsDesktop(breakpoint = 768) {
   }, [breakpoint]);
   return isDesktop;
 }
+function SidebarHeader({
+  heading,
+  closeIcon,
+  divider,
+  onClose
+}) {
+  if (!heading && !closeIcon) return null;
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between px-4 py-3", children: [
+      heading ? /* @__PURE__ */ jsx("span", { className: "text-base font-semibold leading-none", children: heading }) : /* @__PURE__ */ jsx("span", {}),
+      closeIcon ? /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          onClick: onClose,
+          className: "rounded-sm p-1 text-[#202020] opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "aria-label": "Close sidebar",
+          children: /* @__PURE__ */ jsx(X, { className: "h-5 w-5 " })
+        }
+      ) : null
+    ] }),
+    divider ? /* @__PURE__ */ jsx("div", { className: "border-b" }) : null
+  ] });
+}
 function Sidebar({
   open,
   defaultOpen = false,
@@ -4661,6 +4691,9 @@ function Sidebar({
   closeOnOutsideClick = true,
   persistentOnDesktop = false,
   trigger,
+  heading,
+  closeIcon = false,
+  divider = false,
   className,
   contentClassName,
   children
@@ -4712,7 +4745,7 @@ function Sidebar({
     if (!resolvedOpen) {
       return null;
     }
-    return /* @__PURE__ */ jsx(
+    return /* @__PURE__ */ jsxs(
       "aside",
       {
         className: cn(
@@ -4721,7 +4754,18 @@ function Sidebar({
           contentClassName
         ),
         style: customSizeStyle,
-        children
+        children: [
+          /* @__PURE__ */ jsx(
+            SidebarHeader,
+            {
+              heading,
+              closeIcon,
+              divider,
+              onClose: () => handleOpenChange(false)
+            }
+          ),
+          children
+        ]
       }
     );
   }
@@ -4737,7 +4781,7 @@ function Sidebar({
         }
       }
     ) : null,
-    /* @__PURE__ */ jsx(
+    /* @__PURE__ */ jsxs(
       DrawerContent,
       {
         "aria-label": `${side} sidebar`,
@@ -4755,7 +4799,18 @@ function Sidebar({
           contentClassName
         ),
         style: { ...animDurationStyle, ...customSizeStyle },
-        children
+        children: [
+          /* @__PURE__ */ jsx(
+            SidebarHeader,
+            {
+              heading,
+              closeIcon,
+              divider,
+              onClose: () => handleOpenChange(false)
+            }
+          ),
+          children
+        ]
       }
     )
   ] });

@@ -702,12 +702,15 @@ interface SidebarProps {
     closeOnOutsideClick?: boolean;
     persistentOnDesktop?: boolean;
     trigger?: React.ReactNode;
+    heading?: React.ReactNode;
+    closeIcon?: boolean;
+    divider?: boolean;
     className?: string;
     contentClassName?: string;
     children?: React.ReactNode;
 }
 
-declare function Sidebar({ open, defaultOpen, onOpenChange, side, size, sizePercent, overlay, closeOnOutsideClick, persistentOnDesktop, trigger, className, contentClassName, children, }: SidebarProps): react_jsx_runtime.JSX.Element | null;
+declare function Sidebar({ open, defaultOpen, onOpenChange, side, size, sizePercent, overlay, closeOnOutsideClick, persistentOnDesktop, trigger, heading, closeIcon, divider, className, contentClassName, children, }: SidebarProps): react_jsx_runtime.JSX.Element | null;
 
 declare const sidebarContentVariants: (props?: ({
     side?: "bottom" | "left" | "right" | "top" | null | undefined;
