@@ -3,7 +3,6 @@ node_modules/
 playground/node_modules/
 
 # Build output
-dist/
 playground/dist/
 storybook-static/
 

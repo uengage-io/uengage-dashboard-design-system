@@ -1,9 +1,9 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-export const tableWrapperVariants = cva("w-full overflow-hidden", {
+export const tableWrapperVariants = cva("w-full", {
   variants: {
     bordered: {
-      true: "border border-blue-200 rounded-lg",
+      true: "border rounded-lg",
       false: "",
     },
   },
@@ -17,9 +17,9 @@ export const tableHeaderRowVariants = cva(
   {
     variants: {
       size: {
-        sm: "py-2",
-        md: "py-3",
-        lg: "py-4",
+        sm: "py-1.5 sm:py-2",
+        md: "py-2 sm:py-3",
+        lg: "py-3 sm:py-4",
       },
     },
     defaultVariants: {
@@ -31,9 +31,9 @@ export const tableHeaderRowVariants = cva(
 export const tableBodyRowVariants = cva("transition-colors", {
   variants: {
     size: {
-      sm: "py-2 text-xs",
-      md: "py-3 text-sm",
-      lg: "py-4 text-base",
+      sm: "py-1.5 sm:py-2 text-xs",
+      md: "py-2 sm:py-3 text-sm",
+      lg: "py-3 sm:py-4 text-sm sm:text-base",
     },
     clickable: {
       true: "hover:bg-gray-50 cursor-pointer",
@@ -45,7 +45,6 @@ export const tableBodyRowVariants = cva("transition-colors", {
     clickable: false,
   },
 });
-
 
 export const statusBadgeVariants = cva(
   "inline-flex items-center rounded-full font-medium gap-1 transition-colors border",
@@ -68,9 +67,8 @@ export const statusBadgeVariants = cva(
       variant: "success",
       size: "md",
     },
-  }
+  },
 );
-
 
 export type TableWrapperVariants = VariantProps<typeof tableWrapperVariants>;
 export type TableHeaderRowVariants = VariantProps<

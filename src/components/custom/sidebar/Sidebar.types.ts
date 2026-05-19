@@ -10,11 +10,18 @@ export interface SidebarProps {
 
   side?: SidebarSide
   size?: SidebarSize
+  /** Percentage of the viewport (1–100) the sidebar should occupy.
+   *  Overrides `size` when provided. Uses vw for left/right, vh for top/bottom. */
+  sizePercent?: number
 
   overlay?: boolean
   closeOnOutsideClick?: boolean
   persistentOnDesktop?: boolean
   trigger?: React.ReactNode
+
+  heading?: React.ReactNode
+  closeIcon?: boolean
+  divider?: boolean
 
   className?: string
   contentClassName?: string

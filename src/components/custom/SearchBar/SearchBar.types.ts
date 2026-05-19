@@ -30,6 +30,8 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   onTouch?: () => void;
   /** Toggle the browser's native spell-check. Defaults to `true`. */
   spellCheck?: boolean;
+  /** Show the X clear button when the input has a value. Defaults to `false`. */
+  clearable?: boolean;
 
   // ── Static string list (simple case) ──────────────────────────
   /** Pre-mapped string list. Component auto-filters with fuzzy matching. */

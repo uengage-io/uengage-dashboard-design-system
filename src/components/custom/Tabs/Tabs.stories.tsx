@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Tabs } from "./Tabs";
-import type { TabItem } from "./Tabs.types";
+import type { TabItem, CustomTabsProps } from "./Tabs.types";
 
 const meta = {
   title: "Components/Tabs",
@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Underlined, uEngage-branded tab bar built on the shadcn `Tabs` primitives. Feed it a `tabs` array of `{ value, label, disabled? }` and drive it either uncontrolled via `defaultValue` or controlled via `value` + `onChange`.",
+          "uEngage-branded tab bar built on the shadcn `Tabs` primitives. Feed it a `tabs` array of `{ value, label, disabled? }` and drive it either uncontrolled via `defaultValue` or controlled via `value` + `onChange`. Two variants: `primary` (green active text + subtle underline + overlay), `secondary` (animated pill/chip).",
       },
     },
   },
@@ -41,7 +41,7 @@ export const Default: Story = {
     tabs: BASE_TABS,
     defaultValue: "tickets",
   },
-  render: (args) => (
+  render: (args: CustomTabsProps) => (
     <div className="w-180">
       <Tabs {...args} />
     </div>
@@ -50,6 +50,19 @@ export const Default: Story = {
 
 export const Secondary: Story = {
   args: {
+    tabs: BASE_TABS,
+    defaultValue: "tickets",
+    variant: "secondary",
+  },
+  render: (args: CustomTabsProps) => (
+    <div className="w-180">
+      <Tabs {...args} />
+    </div>
+  ),
+};
+
+export const SecondaryPill: Story = {
+  args: {
     tabs: [
       { value: "riders", label: "My Riders" },
       { value: "tasks", label: "Live Tasks" },
@@ -57,7 +70,7 @@ export const Secondary: Story = {
     defaultValue: "riders",
     variant: "secondary",
   },
-  render: (args) => (
+  render: (args: CustomTabsProps) => (
     <div className="w-180">
       <Tabs {...args} />
     </div>
@@ -75,7 +88,7 @@ export const WithDisabledTab: Story = {
     ],
     defaultValue: "tickets",
   },
-  render: (args) => (
+  render: (args: CustomTabsProps) => (
     <div className="w-180">
       <Tabs {...args} />
     </div>
@@ -84,7 +97,7 @@ export const WithDisabledTab: Story = {
 
 export const Controlled: Story = {
   args: { tabs: BASE_TABS },
-  render: function ControlledStory(args) {
+  render: function ControlledStory(args:CustomTabsProps) {
     const [value, setValue] = React.useState<string>("tickets");
     return (
       <div className="flex w-180 flex-col gap-3">
@@ -95,10 +108,75 @@ export const Controlled: Story = {
   },
 };
 
+const MANY_TABS: TabItem[] = [
+  { value: "tab-1", label: "Tab 1" },
+  { value: "tab-2", label: "Tabs" },
+  { value: "tab-3", label: "Tabs" },
+  { value: "tab-4", label: "Tabs" },
+  { value: "tab-5", label: "Tabs" },
+  { value: "tab-6", label: "Tabs" },
+  { value: "tab-7", label: "Tabs" },
+];
+
+export const WithOverflowDropdown: Story = {
+  args: { tabs: MANY_TABS },
+  parameters: { layout: "fullscreen" },
+  render: function OverflowStory() {
+    const [primaryTab, setPrimaryTab] = React.useState("tab-1");
+    const [secondaryTab, setSecondaryTab] = React.useState("tab-1");
+
+    return (
+      <div className="min-h-screen bg-[#F6F8FB] p-8">
+        <div className="mx-auto flex max-w-3xl flex-col gap-8 rounded-[24px] bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6B7280]">
+              Overflow Playground
+            </p>
+            <h1 className="mt-2 text-2xl font-semibold text-[#111827]">
+              Tab limit &amp; overflow dropdown
+            </h1>
+            <p className="mt-1 text-sm text-[#6B7280]">
+              Tabs beyond <code className="rounded bg-[#F3F4F6] px-1 py-0.5 text-xs">visibleTabLimit</code> collapse into a "More Options" menu.
+            </p>
+          </div>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-sm font-semibold text-[#374151]">Primary — limit 5</h2>
+            <Tabs
+              variant="primary"
+              value={primaryTab}
+              tabs={MANY_TABS}
+              visibleTabLimit={5}
+              overflowLabel="More Options"
+              onChange={setPrimaryTab}
+            />
+            <div className="rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-2.5 text-sm text-[#374151]">
+              Active: <strong>{primaryTab}</strong>
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-sm font-semibold text-[#374151]">Secondary — limit 5</h2>
+            <Tabs
+              variant="secondary"
+              value={secondaryTab}
+              tabs={MANY_TABS}
+              visibleTabLimit={5}
+              overflowLabel="More Options"
+              onChange={setSecondaryTab}
+            />
+            <div className="rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-2.5 text-sm text-[#374151]">
+              Active: <strong>{secondaryTab}</strong>
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  },
+};
+
 export const Dynamic: Story = {
-  args: { tabs: BASE_TABS }
-  
-  ,
+  args: { tabs: BASE_TABS },
   render: function DynamicStory() {
     const [tabs, setTabs] = React.useState<TabItem[]>([
       { value: "tab-1", label: "Tab 1" },

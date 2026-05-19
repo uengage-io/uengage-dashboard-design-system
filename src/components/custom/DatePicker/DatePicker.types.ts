@@ -3,11 +3,11 @@ export interface DateRange {
   to: Date;
 }
 
-export type DatePickerMode = "single" | "range";
+export type DatePickerMode = "single" | "range" | "month";
 
 export interface DatePickerProps {
   mode?: DatePickerMode;
-  value?: Date | DateRange | null;
+  value?: Date | DateRange  |null;
   onChange?: (value: Date | DateRange | null) => void;
   placeholder?: string;
   /** Controls the trigger height via a preset. */
@@ -25,4 +25,6 @@ export interface DatePickerProps {
   maxDate?: Date;
   /** Fires once the first time the trigger is blurred after interacting (Angular-style `touched`). */
   onTouch?: () => void;
+  /** When true, shows a clear button to reset the selected value. Defaults to false. */
+  clearable?: boolean;
 }

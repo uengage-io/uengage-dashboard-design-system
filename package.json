@@ -3,22 +3,25 @@
   "version": "0.0.1",
   "description": "Shared UI component library built with React, TypeScript, Tailwind CSS, and CVA.",
   "type": "module",
+  "style": "./dist/styles.css",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./styled.js"
   ],
   "files": [
     "dist",
-    "styles.d.ts"
+    "styles.d.ts",
+    "styled.js",
+    "styled.d.ts"
   ],
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./styled.js",
+  "module": "./styled.js",
+  "types": "./styled.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.js"
+      "types": "./styled.d.ts",
+      "import": "./styled.js",
+      "default": "./styled.js"
     },
     "./styles.css": {
       "types": "./styles.d.ts",
@@ -39,9 +42,9 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "prepare": "npm run clean && npm run build",
-    "build": "tsup && npm run build:css",
+    "build": "tsup && npm run build:css && npm run build:inject-directive",
     "build:css": "tailwindcss -i ./src/styles/globals.css -o ./dist/styles.css --minify",
+    "build:inject-directive": "node scripts/inject-use-client.mjs",
     "dev": "tsup --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -60,6 +63,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "fuse.js": "^7.3.0",
     "lucide-react": "^0.469.0",
     "radix-ui": "^1.4.3",
     "react-day-picker": "^9.14.0",

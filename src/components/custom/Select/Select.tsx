@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronDown, Check, X } from "lucide-react";
-import { defaultFilter } from "cmdk";
+import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -52,6 +52,7 @@ function Select<TItem = unknown>({
   onChange,
   onTouch,
   spellCheck = true,
+  clearable = false,
 }: SelectProps<TItem>) {
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
@@ -67,6 +68,8 @@ function Select<TItem = unknown>({
   }, [items, getLabel, getValue, getDisabled, options]);
 
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+  const filteredOptions = useFuzzySearch(resolvedOptions, search);
   const [selected, setSelected] = React.useState<string | string[]>(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : ""),
   );
@@ -199,6 +202,7 @@ function Select<TItem = unknown>({
   const handleOpenChange = (next: boolean) => {
     if (disabled) return;
     setOpen(next);
+    if (!next) setSearch(""); // reset search so next open starts fresh
     if (next) {
       interactedRef.current = true;
     } else if (interactedRef.current && !touchedRef.current) {
@@ -262,19 +266,21 @@ function Select<TItem = unknown>({
                         className="inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]"
                       >
                         <span className="truncate">{opt.label}</span>
-                        <button
-                          type="button"
-                          tabIndex={-1}
-                          onClick={(e) => removePill(val, e)}
-                          className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
-                          aria-label={`Remove ${opt.label}`}
-                        >
-                          <X
-                            size={10}
-                            strokeWidth={2}
-                            className="hover:text-red-500"
-                          />
-                        </button>
+                        {clearable && (
+                          <button
+                            type="button"
+                            tabIndex={-1}
+                            onClick={(e) => removePill(val, e)}
+                            className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
+                            aria-label={`Remove ${opt.label}`}
+                          >
+                            <X
+                              size={10}
+                              strokeWidth={2}
+                              className="hover:text-red-500"
+                            />
+                          </button>
+                        )}
                       </span>
                     );
                   })}
@@ -309,7 +315,7 @@ function Select<TItem = unknown>({
           </div>
 
           <div className="flex shrink-0 items-center gap-1">
-            {hasSelection && (
+            {clearable && hasSelection && (
               <button
                 type="button"
                 tabIndex={-1}
@@ -335,21 +341,23 @@ function Select<TItem = unknown>({
       <PopoverContent
         className="max-w-[calc(100vw-1rem)]"
         style={{
+          zIndex: 20,
           width: "var(--radix-popover-trigger-width)",
         }}
       >
-        <Command
-          filter={(value, search) =>
-            value === SELECT_ALL ? 1 : defaultFilter(value, search)
-          }
-        >
+        {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
+        <Command shouldFilter={false}>
           <CommandInput
             placeholder="Search..."
+            value={search}
+            onValueChange={setSearch}
             spellCheck={spellCheck}
             className={commandInputSizeClass}
           />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            {filteredOptions.length === 0 && search.trim() ? (
+              <CommandEmpty>No results found.</CommandEmpty>
+            ) : null}
 
             {mode === "multi" && (
               <CommandItem
@@ -365,7 +373,7 @@ function Select<TItem = unknown>({
               </CommandItem>
             )}
 
-            {resolvedOptions.map((option) => (
+            {filteredOptions.map((option) => (
               <CommandItem
                 key={option.value}
                 value={option.value}

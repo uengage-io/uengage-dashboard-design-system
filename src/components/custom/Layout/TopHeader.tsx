@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "../../../lib/utils";
 import { Separator } from "../../ui/separator";
-import { LAYOUT, toCssSize, type CssSize } from "../../../utils/layoutTokens";
+import { toCssSize, type CssSize } from "../../../utils/layoutTokens";
 
 export interface TopHeaderProps
   extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
@@ -9,14 +9,13 @@ export interface TopHeaderProps
   title: React.ReactNode;
   /**
    * Optional helper element beside the title (e.g. a "How it Works?" link).
-   * Accepts any ReactNode so callers pass their own styled <a> / Link.
    */
   helper?: React.ReactNode;
-  /** Right-side slot (e.g. a "Quick Actions" Button). */
+  /** Right-side slot (e.g. action buttons). */
   action?: React.ReactNode;
-  /** Render a bottom divider (shadcn <Separator />). Defaults to true. */
+  /** Render a bottom divider. Defaults to true. */
   divider?: boolean;
-  /** Horizontal gap between title and helper. Defaults to 10px. */
+  /** Gap between title and helper. Defaults to 10px. */
   titleGap?: CssSize;
 }
 
@@ -25,6 +24,7 @@ function TopHeader({
   helper,
   action,
   divider = true,
+  titleGap = 10,
   className,
   style,
   ...props
@@ -32,30 +32,37 @@ function TopHeader({
   return (
     <header
       data-slot="top-header"
-      className={cn("flex w-full shrink-0 flex-col", className)}
+      className={cn("uengage-ui flex w-full shrink-0 flex-col", className)}
       style={style}
       {...props}
     >
       <div
         data-slot="top-header-row"
-        className="flex w-full items-center justify-between py-[8px]"
+        className="flex w-full flex-col gap-3 py-[6px] sm:flex-row sm:items-center sm:justify-between sm:py-[8px]"
       >
+        {/* Title + helper */}
         <div
           data-slot="top-header-title"
-          className="flex min-w-0 flex-1 overflow-hidden items-center gap-[10px]"
+          className="flex min-w-0 flex-1 items-center overflow-hidden"
+          style={{ gap: toCssSize(titleGap) }}
         >
-          <h1 className="truncate text-[18px] font-semibold leading-tight text-foreground">
-            {title}
-          </h1>
+          {React.isValidElement(title) ? (
+            title
+          ) : (
+            <h1 className="truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]">
+              {title}
+            </h1>
+          )}
           {helper != null && (
-            <span className="shrink-0 text-sm leading-none">{helper}</span>
+            <span className="shrink-0 text-xs leading-none sm:text-sm">{helper}</span>
           )}
         </div>
 
+        {/* Action slot — self-start prevents full-width stretch in the mobile flex-col */}
         {action != null && (
           <div
             data-slot="top-header-action"
-            className="flex shrink-0 flex-wrap items-center gap-2"
+            className="flex shrink-0 flex-wrap items-center gap-2 self-start sm:self-auto"
           >
             {action}
           </div>
@@ -66,9 +73,11 @@ function TopHeader({
         <Separator
           data-slot="top-header-divider"
           style={{
-            marginLeft: -LAYOUT.contentPaddingLeft,
-            marginRight: -LAYOUT.contentPaddingRight,
-            width: `calc(100% + ${LAYOUT.contentPaddingLeft}px + ${LAYOUT.contentPaddingRight}px)`,
+            // Use CSS vars set by PageContainer so the separator always
+            // bleeds to the container edge regardless of viewport width.
+            marginLeft: "calc(-1 * var(--pc-pl, 22px))",
+            marginRight: "calc(-1 * var(--pc-pr, 20px))",
+            width: "calc(100% + var(--pc-pl, 22px) + var(--pc-pr, 20px))",
           }}
         />
       )}

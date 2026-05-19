@@ -7,15 +7,25 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DatePickerCalendar } from "../../ui/DatePickerCalendar";
+import {
+  DatePickerCalendar,
+  MonthPickerCalendar,
+} from "../../ui/DatePickerCalendar";
 import { triggerVariants } from "./datepickerVariants";
-import { formatDate, formatRange } from "./dateHelpers";
+import { formatDate, formatRange, formatMonthYear } from "./dateHelpers";
 import type { DatePickerProps, DateRange } from "./DatePicker.types";
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
 
 function isDateRange(v: unknown): v is DateRange {
-  return !!v && typeof v === "object" && "from" in v && "to" in v;
+  return (
+    !!v &&
+    typeof v === "object" &&
+    "from" in v &&
+    "to" in v &&
+    ((v as DateRange).from instanceof Date ||
+      (v as DateRange).to instanceof Date)
+  );
 }
 
 function orderedRange(a: Date, b: Date): DateRange {
@@ -60,6 +70,7 @@ function DatePicker({
   minDate,
   maxDate,
   onTouch,
+  clearable = false,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
   const touchedRef = React.useRef(false);
@@ -114,43 +125,51 @@ function DatePicker({
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return formatDate(committed);
+    if (mode === "month" && committed instanceof Date)
+      return formatMonthYear(committed);
     if (mode === "range" && isDateRange(committed))
-      return formatRange(committed.from, committed.to);
+      return formatRange(committed.from, committed.to) ?? null;
     return null;
   }, [committed, mode]);
 
-  // ── Calendar selection (draft + hover preview) ────────────────────────
+  // ── Effective display range (draft + hover preview) ──
+  // Returns { from, to? } — to may be undefined when only the first click is done.
+  const effectiveDisplayRange = React.useMemo((): {
+    from: Date;
+    to?: Date;
+  } | null => {
+    if (mode !== "range") return null;
+    const existingRange =
+      draftRange ?? (isDateRange(committed) ? committed : null);
+
+    if (pendingFrom) {
+      // Mid two-click selection: show from→hover (or just from if no hover yet)
+      return hoverDate
+        ? orderedRange(pendingFrom, hoverDate)
+        : { from: pendingFrom };
+    }
+
+    return existingRange;
+  }, [mode, committed, pendingFrom, draftRange, hoverDate]);
+
+  // ── Calendar selection ────────────────────────────────────────────────
   const calendarSelected = React.useMemo(() => {
     if (mode === "single") {
       return committed instanceof Date ? committed : undefined;
     }
-    // Range: show draft/preview
-    if (pendingFrom) {
-      const end = hoverDate ?? pendingFrom;
-      return orderedRange(pendingFrom, end);
-    }
-    if (draftRange) return draftRange;
-    if (isDateRange(committed)) return committed;
-    return undefined;
-  }, [mode, committed, pendingFrom, draftRange, hoverDate]);
+    return effectiveDisplayRange ?? undefined;
+  }, [mode, committed, effectiveDisplayRange]);
 
   // ── From/To box labels ────────────────────────────────────────────────
   const fromLabel = React.useMemo((): string | null => {
-    if (pendingFrom) return formatDate(pendingFrom);
-    if (draftRange) return formatDate(draftRange.from);
-    if (isDateRange(committed)) return formatDate(committed.from);
-    return null;
-  }, [pendingFrom, draftRange, committed]);
+    if (!effectiveDisplayRange) return null;
+    return formatDate(effectiveDisplayRange.from);
+  }, [effectiveDisplayRange]);
 
   const toLabel = React.useMemo((): string | null => {
-    if (pendingFrom)
-      return hoverDate
-        ? formatDate(orderedRange(pendingFrom, hoverDate).to)
-        : null;
-    if (draftRange) return formatDate(draftRange.to);
-    if (isDateRange(committed)) return formatDate(committed.to);
-    return null;
-  }, [pendingFrom, hoverDate, draftRange, committed]);
+    if (!effectiveDisplayRange?.to) return null;
+    return formatDate(effectiveDisplayRange.to);
+  }, [effectiveDisplayRange]);
 
   // ── Event handlers ────────────────────────────────────────────────────
 
@@ -166,9 +185,10 @@ function DatePicker({
 
     // Range mode state machine
     if (pendingFrom === null) {
-      // First click: start a new selection
+      // Always start a fresh two-click selection
       setPendingFrom(date);
       setDraftRange(null);
+      setHoverDate(null);
     } else {
       // Second click: complete the draft range
       const range = orderedRange(pendingFrom, date);
@@ -179,7 +199,21 @@ function DatePicker({
   };
 
   const handleDayMouseEnter = (date: Date) => {
-    if (pendingFrom) setHoverDate(date);
+    if (pendingFrom) {
+      setHoverDate(date);
+      return;
+    }
+    // Show elongation preview when hovering outside the existing range
+    const existingRange =
+      draftRange ?? (isDateRange(committed) ? committed : null);
+    if (
+      existingRange &&
+      (date < existingRange.from || date > existingRange.to)
+    ) {
+      setHoverDate(date);
+    } else {
+      setHoverDate(null);
+    }
   };
 
   const handleDayMouseLeave = () => {
@@ -293,7 +327,7 @@ function DatePicker({
           </span>
 
           <div className="flex shrink-0 items-center gap-1">
-            {committed && (
+            {clearable && committed && (
               <button
                 type="button"
                 tabIndex={-1}
@@ -304,18 +338,15 @@ function DatePicker({
                 <X size={13} strokeWidth={2} className="hover:text-red-500" />
               </button>
             )}
-            <CalendarIcon
-              size={15}
-              strokeWidth={2}
-              className="text-gray-600"
-            />
+            <CalendarIcon size={15} strokeWidth={2} className="text-gray-600" />
           </div>
         </div>
       </PopoverTrigger>
 
       <PopoverContent
-        align="start"
+        align="center"
         className="w-auto max-w-[calc(100vw-1rem)] p-0"
+        style={{ zIndex: 20 }}
       >
         <div className="overflow-hidden rounded-lg bg-white shadow-md">
           {/* ── From / To boxes (range mode only) ── */}
@@ -326,18 +357,34 @@ function DatePicker({
             </div>
           )}
 
-          {/* ── Calendar ── */}
-          <DatePickerCalendar
-            mode={mode}
-            selected={calendarSelected}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            disabled={calendarDisabled as any}
-            minDate={minDate}
-            maxDate={maxDate}
-            onDayClick={(date, modifiers) => handleDayClick(date, modifiers)}
-            onDayMouseEnter={(date) => handleDayMouseEnter(date)}
-            onDayMouseLeave={() => handleDayMouseLeave()}
-          />
+          {/* ── Month picker calendar ── */}
+          {mode === "month" && (
+            <MonthPickerCalendar
+              selected={committed instanceof Date ? committed : null}
+              minDate={minDate}
+              maxDate={maxDate}
+              onSelect={(date) => {
+                setCommitted(date);
+                onChange?.(date);
+                setOpen(false);
+              }}
+            />
+          )}
+
+          {/* ── Day calendar (single / range) ── */}
+          {mode !== "month" && (
+            <DatePickerCalendar
+              mode={mode}
+              selected={calendarSelected}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              disabled={calendarDisabled as any}
+              minDate={minDate}
+              maxDate={maxDate}
+              onDayClick={(date, modifiers) => handleDayClick(date, modifiers)}
+              onDayMouseEnter={(date) => handleDayMouseEnter(date)}
+              onDayMouseLeave={() => handleDayMouseLeave()}
+            />
+          )}
 
           {/* ── Cancel / Apply footer (range mode only) ── */}
           {mode === "range" && (

@@ -18,6 +18,7 @@ export default function SearchPreview() {
     value={value}
     valueType="string"
     size="sm"
+    clearable={true}
     // disabled={true}
     onChange={(val)=>setValue(val)}
     onSearch={()=>console.log("Search:", value)}

@@ -1,7 +1,9 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { FOCUS_RING } from "./tokens";
 
+// Checked color: brand.green.darkGreen (#006F42)
 export const checkboxBoxVariants = cva(
-  "relative inline-flex shrink-0 items-center justify-center rounded-[4px] border transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1a5c38]",
+  `relative inline-flex shrink-0 items-center justify-center rounded-[4px] border transition-colors outline-none ${FOCUS_RING}`,
   {
     variants: {
       size: {
@@ -11,8 +13,8 @@ export const checkboxBoxVariants = cva(
       },
       state: {
         unchecked: "bg-white border-gray-300",
-        checked: "bg-[#1a5c38] border-[#1a5c38] text-white",
-        indeterminate: "bg-[#1a5c38] border-[#1a5c38] text-white",
+        checked: "bg-[#006F42] border-[#006F42] text-white",
+        indeterminate: "bg-[#006F42] border-[#006F42] text-white",
         disabled: "bg-gray-100 border-gray-200 opacity-60 cursor-not-allowed",
         error: "bg-white border-red-500",
       },

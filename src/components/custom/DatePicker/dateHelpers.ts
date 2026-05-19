@@ -4,16 +4,27 @@ const MONTHS = [
 ];
 
 /** Returns e.g. "Apr 17, 2026" */
-export function formatDate(date: Date): string {
+export function formatDate(date: Date | null | undefined): string | null {
+  if (!date) return null;
   return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
 /** Returns e.g. "Apr 1, 2026 – Apr 17, 2026" */
-export function formatRange(from: Date, to: Date): string {
-  return `${formatDate(from)} – ${formatDate(to)}`;
+export function formatRange(from: Date | null | undefined, to: Date | null | undefined): string | null {
+  const f = formatDate(from);
+  const t = formatDate(to);
+  if (!f && !t) return null;
+  return `${f ?? "—"} – ${t ?? "—"}`;
 }
 
-export function isSameDay(a: Date, b: Date): boolean {
+/** Returns e.g. "May 2026" */
+export function formatMonthYear(date: Date | null | undefined): string | null {
+  if (!date) return null;
+  return `${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+export function isSameDay(a: Date | null | undefined, b: Date | null | undefined): boolean {
+  if (!a || !b) return false;
   return (
     a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&

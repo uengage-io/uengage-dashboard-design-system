@@ -1,31 +1,30 @@
-@import "tailwindcss";
-
-@custom-variant dark (&:is(.dark *));
-
 /* Local Figtree font — files live in src/public/Figtree and should be
    served at the web root (e.g. via vite's publicDir). */
 @font-face {
   font-family: "Figtree";
-  src: url("/Figtree/Figtree-VariableFont_wght.ttf") format("truetype-variations");
+  src: url("/Figtree/Figtree-VariableFont_wght.ttf")
+    format("truetype-variations");
   font-weight: 300 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Figtree";
-  src: url("/Figtree/Figtree-Italic-VariableFont_wght.ttf") format("truetype-variations");
+  src: url("/Figtree/Figtree-Italic-VariableFont_wght.ttf")
+    format("truetype-variations");
   font-weight: 300 900;
   font-style: italic;
   font-display: swap;
 }
 
-/* Tell Tailwind to scan our component source for class names */
-@source "../components/**/*.{ts,tsx}";
-
 @theme inline {
+  /* Accordion height animations — used by data-[state=open/closed] classes on AccordionContent */
+  --animate-accordion-down: accordion-down 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-accordion-up: accordion-up 180ms cubic-bezier(0.4, 0, 0.2, 1);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -48,6 +47,58 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+}
+
+@keyframes uengage-popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes uengage-popover-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+}
+[data-slot="popover-content"].uengage-ui[data-state="open"] {
+  animation: uengage-popover-in 140ms ease-out;
+  transform-origin: var(--radix-popover-content-transform-origin, top);
+}
+[data-slot="popover-content"].uengage-ui[data-state="closed"] {
+  animation: uengage-popover-out 100ms ease-in;
+  transform-origin: var(--radix-popover-content-transform-origin, top);
+}
+
+/* Accordion content height animations — Radix exposes --radix-accordion-content-height */
+@keyframes accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
 }
 
 :root {
@@ -73,6 +124,7 @@
   --radius: 0.625rem;
 }
 
+:root.dark,
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -96,24 +148,96 @@
 }
 
 @layer base {
-  * {
+  .uengage-ui,
+  .uengage-ui * {
     border-color: var(--border);
   }
-  body {
+  .uengage-ui {
     background-color: var(--background);
     color: var(--foreground);
     font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
     font-weight: 500;
   }
-  button,
-  input,
-  select,
-  textarea {
+  .uengage-ui button,
+  .uengage-ui input,
+  .uengage-ui select,
+  .uengage-ui textarea {
     font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
     font-weight: 500;
   }
 }
 
+/* ── Sidebar animations ──────────────────────────────────────────────────────
+   Right side: custom scale animation from the bottom-right corner.
+   Left / top / bottom: standard shadcn slide animations.                       */
+
+/* ── Right: custom scale-from-corner animation ── */
+[data-slot="drawer-content"][data-side="right"] {
+  will-change: transform, opacity;
+  transform-origin: bottom right;
+}
+[data-slot="drawer-content"][data-side="right"][data-state="open"] {
+  animation: uengage-sidebar-rb-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-slot="drawer-content"][data-side="right"][data-state="closed"] {
+  animation: uengage-sidebar-rb-out 280ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+@keyframes uengage-sidebar-rb-in {
+  from { opacity: 0; transform: scale(0); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes uengage-sidebar-rb-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0); }
+}
+
+/* ── Left: slide in/out from the left edge ── */
+[data-slot="drawer-content"][data-side="left"][data-state="open"] {
+  animation: sidebar-slide-in-from-left 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-slot="drawer-content"][data-side="left"][data-state="closed"] {
+  animation: sidebar-slide-out-to-left 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+@keyframes sidebar-slide-in-from-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes sidebar-slide-out-to-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+/* ── Top: slide in/out from the top edge ── */
+[data-slot="drawer-content"][data-side="top"][data-state="open"] {
+  animation: sidebar-slide-in-from-top 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-slot="drawer-content"][data-side="top"][data-state="closed"] {
+  animation: sidebar-slide-out-to-top 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+@keyframes sidebar-slide-in-from-top {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes sidebar-slide-out-to-top {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
+}
+
+/* ── Bottom: slide in/out from the bottom edge ── */
+[data-slot="drawer-content"][data-side="bottom"][data-state="open"] {
+  animation: sidebar-slide-in-from-bottom 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-slot="drawer-content"][data-side="bottom"][data-state="closed"] {
+  animation: sidebar-slide-out-to-bottom 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+@keyframes sidebar-slide-in-from-bottom {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes sidebar-slide-out-to-bottom {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
 /* Popover / dropdown open/close transitions.
    Driven by Radix's data-state attribute on the portaled content. */
 @keyframes uengage-popover-in {
@@ -136,11 +260,369 @@
     transform: scale(0.96) translateY(-4px);
   }
 }
-[data-slot="popover-content"][data-state="open"] {
+[data-slot="popover-content"].uengage-ui[data-state="open"] {
   animation: uengage-popover-in 140ms ease-out;
   transform-origin: var(--radix-popover-content-transform-origin, top);
 }
-[data-slot="popover-content"][data-state="closed"] {
+[data-slot="popover-content"].uengage-ui[data-state="closed"] {
   animation: uengage-popover-out 100ms ease-in;
   transform-origin: var(--radix-popover-content-transform-origin, top);
+}
+
+/* ── uEngage Loader ──────────────────────────────────────────────────────── */
+
+.ue-loader-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+}
+
+.ue-loader {
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.15);
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.ue-loader img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  animation: ue-image-rotate-y 1.4s linear infinite;
+}
+
+.ue-loader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(11, 77, 58, 0.12),
+    transparent 60%
+  );
+  animation: ue-glow 1.3s ease-in-out infinite;
+}
+
+.ue-loader .ue-inner-loader {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 4px solid rgba(217, 229, 226, 0.73);
+  border-top-color: #0b4d3a;
+  animation: ue-inner-spin 0.8s linear infinite;
+}
+
+.ue-loader .ue-side-indicator {
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 28px;
+  border-radius: 4px;
+  background: #0b4d3a;
+  animation: ue-side-pulse 1s ease-in-out infinite;
+}
+
+@keyframes ue-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ue-image-rotate-y {
+  0% {
+    transform: perspective(700px) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(700px) rotateY(180deg);
+  }
+  100% {
+    transform: perspective(700px) rotateY(360deg);
+  }
+}
+
+@keyframes ue-inner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ue-side-pulse {
+  0% {
+    opacity: 0.3;
+    transform: translateY(-50%) scaleY(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: translateY(-50%) scaleY(0.6);
+  }
+}
+
+/* ─── Alert Dialog — SweetAlert-style animations ─────────────────────────── */
+@keyframes uengage-dialog-in {
+  0% {
+    opacity: 0;
+    scale: 0.65;
+  }
+  55% {
+    opacity: 1;
+    scale: 1.04;
+  }
+  80% {
+    scale: 0.97;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes uengage-dialog-out {
+  from {
+    opacity: 1;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 0.65;
+  }
+}
+@keyframes uengage-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes uengage-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes uengage-icon-pop {
+  0% {
+    opacity: 0;
+    scale: 0;
+  }
+  60% {
+    scale: 1.25;
+  }
+  80% {
+    scale: 0.9;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* Icon badge pop — generic utility kept for backwards compat */
+.uengage-icon-pop {
+  animation: uengage-icon-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s both;
+}
+
+/* ── Per-variant icon entrance animations ──────────────────────────────────── */
+
+/* Success — quarter-spin + overshoot settle (mirrors SweetAlert2's circular feel) */
+@keyframes uengage-icon-success {
+  0% {
+    opacity: 0;
+    scale: 0;
+    rotate: -90deg;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.1;
+    rotate: 10deg;
+  }
+  70% {
+    scale: 0.95;
+    rotate: -5deg;
+  }
+  85% {
+    scale: 1.03;
+    rotate: 2deg;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+.uengage-icon-success {
+  animation: uengage-icon-success 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s
+    both;
+}
+
+/* Error — elastic pop (same keyframe as generic pop, just aliased here) */
+.uengage-icon-error {
+  animation: uengage-icon-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s both;
+}
+
+/* Warning — pop in then horizontal shake */
+@keyframes uengage-icon-warning {
+  0% {
+    opacity: 0;
+    scale: 0;
+    translate: 0 0;
+  }
+  30% {
+    opacity: 1;
+    scale: 1.15;
+  }
+  45% {
+    scale: 0.95;
+  }
+  55% {
+    scale: 1;
+    translate: -5px 0;
+  }
+  65% {
+    translate: 5px 0;
+  }
+  75% {
+    translate: -3px 0;
+  }
+  83% {
+    translate: 2px 0;
+  }
+  90% {
+    translate: -1px 0;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+}
+.uengage-icon-warning {
+  animation: uengage-icon-warning 0.7s ease-out 0.08s both;
+}
+
+/* Info — gentle scale-up with soft settle */
+@keyframes uengage-icon-info {
+  0% {
+    opacity: 0;
+    scale: 0.3;
+  }
+  60% {
+    opacity: 1;
+    scale: 1.08;
+  }
+  80% {
+    scale: 0.96;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+.uengage-icon-info {
+  animation: uengage-icon-info 0.5s cubic-bezier(0.34, 1.3, 0.64, 1) 0.1s both;
+}
+
+/* Question — pop in then a gentle pendulum swing to evoke "hmm?" */
+@keyframes uengage-icon-question {
+  0% {
+    opacity: 0;
+    scale: 0;
+    rotate: -20deg;
+  }
+  45% {
+    opacity: 1;
+    scale: 1.12;
+    rotate: 12deg;
+  }
+  65% {
+    scale: 0.95;
+    rotate: -7deg;
+  }
+  80% {
+    scale: 1.03;
+    rotate: 4deg;
+  }
+  90% {
+    scale: 1;
+    rotate: -2deg;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+.uengage-icon-question {
+  animation: uengage-icon-question 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s
+    both;
+}
+
+/* ── DatePicker calendar grid (react-day-picker v9) ──────────────────────── */
+
+/* Remove table formatting context so flex/grid on children works */
+.rdp-month_grid {
+  display: block !important;
+  width: 100%;
+}
+
+/* thead must be block so its child <tr> participates in normal flow */
+.rdp-month_grid thead {
+  display: block;
+  width: 100%;
+}
+
+/* tbody is a flex column — one week row per line */
+.rdp-month_grid tbody {
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+/* Both weekday header row and week rows: 7-column grid */
+.rdp-month_grid tr {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+}
+
+/* Cells center their content */
+.rdp-month_grid td,
+.rdp-month_grid th {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* Day button: always a perfect 32 × 32 px circle */
+.rdp-day_button {
+  width: 2rem !important;
+  height: 2rem !important;
+  border-radius: 9999px !important;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

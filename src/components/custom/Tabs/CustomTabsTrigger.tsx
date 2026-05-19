@@ -1,6 +1,7 @@
 import * as React from "react";
 import { TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { FOCUS_RING } from "@/utils/tokens";
 import {
   tabTriggerVariants,
   tabPillClass,
@@ -9,7 +10,7 @@ import {
 
 interface CustomTabsTriggerProps
   extends React.ComponentProps<typeof TabsTrigger> {
-  variant?: "primary" | "secondary";
+  variant?: "secondary" | "tertiary";
 }
 
 const STRIP_SHADCN_DEFAULTS = [
@@ -23,26 +24,26 @@ function CustomTabsTrigger({
   className,
   children,
   disabled,
-  variant = "primary",
+  variant = "secondary",
   ...props
 }: CustomTabsTriggerProps) {
   const state = disabled ? "disabled" : "inactive";
 
-  if (variant === "secondary") {
+  if (variant === "tertiary") {
     return (
       <TabsTrigger
         disabled={disabled}
         data-tab-value={props.value}
         className={cn(
           "relative z-10 flex-none w-auto cursor-pointer select-none whitespace-nowrap",
-          "rounded-full px-3 py-1 text-[14px] font-semibold",
+          "rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold",
           "transition-colors duration-300 ease-out outline-none",
           "text-[#595959] hover:text-black data-[state=active]:!text-black!",
           "bg-transparent data-[state=active]:bg-transparent",
           "border-0 shadow-none",
           "data-[state=active]:border-0 data-[state=active]:shadow-none",
           "after:hidden after:content-none",
-          "focus-visible:ring-2 focus-visible:ring-[#0A5A2A]/30",
+          FOCUS_RING,
           "disabled:pointer-events-none disabled:text-[#D1D5DB]",
           className,
         )}
@@ -53,6 +54,7 @@ function CustomTabsTrigger({
     );
   }
 
+  // "secondary" — span+group ensures color wins over shadcn's own data-[state=active] rule
   return (
     <TabsTrigger
       disabled={disabled}
