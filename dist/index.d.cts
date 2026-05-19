@@ -971,6 +971,74 @@ declare namespace Loader {
     var displayName: string;
 }
 
+interface AppHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, "children"> {
+    /**
+     * Brand / logo slot — rendered in a fixed-width zone on the left.
+     * On mobile this zone is hidden so the center slot leads.
+     */
+    logo?: React.ReactNode;
+    /**
+     * Width of the logo zone on desktop.
+     * Set this to match your sidebar width so the center slot aligns
+     * precisely with the page-content left boundary.
+     * @default 252
+     */
+    logoZoneWidth?: CssSize;
+    /**
+     * Center-left slot — typically a business-selector dropdown.
+     * On mobile (logo zone hidden) this becomes the leading element.
+     */
+    center?: React.ReactNode;
+    /** Right-side slot — action icons, wallet balance, user profile, etc. */
+    right?: React.ReactNode;
+    /** Render a bottom border divider. @default true */
+    divider?: boolean;
+}
+declare function AppHeader({ logo, logoZoneWidth, center, right, divider, className, style, ...props }: AppHeaderProps): react_jsx_runtime.JSX.Element;
+declare namespace AppHeader {
+    var displayName: string;
+}
+
+interface AppSidebarProduct {
+    id: string | number;
+    name: string;
+    /** URL or ReactNode icon */
+    icon?: React.ReactNode;
+}
+interface AppSidebarModule {
+    /** Unique page/slug identifier */
+    page: string;
+    /** Display name */
+    label: string;
+}
+interface AppSidebarProps extends React.HTMLAttributes<HTMLElement> {
+    /** List of products shown in the left column */
+    products?: AppSidebarProduct[];
+    /** List of modules shown in the right column for the active product */
+    modules?: AppSidebarModule[];
+    /** id of the currently active product */
+    activeProductId?: string | number;
+    /** page slug of the currently active module */
+    activeModulePage?: string;
+    /** Called when a product button is clicked */
+    onProductSelect?: (product: AppSidebarProduct) => void;
+    /** Called when a module button is clicked */
+    onModuleClick?: (module: AppSidebarModule) => void;
+    /** Collapse/expand the sidebar */
+    collapsed?: boolean;
+    /**
+     * Distance from the top of the viewport (to clear the fixed header).
+     * @default 75
+     */
+    offsetTop?: CssSize;
+    /** Optional slot rendered at the bottom of the right column (e.g. version badge) */
+    footer?: React.ReactNode;
+}
+declare function AppSidebar({ products, modules, activeProductId, activeModulePage, onProductSelect, onModuleClick, collapsed, offsetTop, footer, className, style, ...props }: AppSidebarProps): react_jsx_runtime.JSX.Element;
+declare namespace AppSidebar {
+    var displayName: string;
+}
+
 interface AccordionItem {
     value: string;
     title: string;
@@ -1027,4 +1095,4 @@ type AccordionItemVariants = VariantProps<typeof accordionItemVariants>;
 type AccordionTriggerVariants = VariantProps<typeof accordionTriggerVariants>;
 type AccordionContentVariants = VariantProps<typeof accordionContentVariants>;
 
-export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, formatDate, formatMonthYear, formatRange, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
+export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, formatDate, formatMonthYear, formatRange, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
