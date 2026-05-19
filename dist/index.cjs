@@ -5578,7 +5578,7 @@ function AppSidebar({
                     isActive ? "bg-[#C8E7B8]" : "hover:bg-[#E3F5E3]"
                   ),
                   children: [
-                    product.icon != null && /* @__PURE__ */ jsxRuntime.jsx("span", { "data-slot": "app-sidebar-product-icon", className: "shrink-0", children: product.icon }),
+                    product.icon != null && /* @__PURE__ */ jsxRuntime.jsx("span", { "data-slot": "app-sidebar-product-icon", className: "shrink-0 [&_svg]:h-5 [&_svg]:w-5", children: product.icon }),
                     /* @__PURE__ */ jsxRuntime.jsx(
                       "span",
                       {

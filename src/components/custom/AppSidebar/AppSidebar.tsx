@@ -86,7 +86,7 @@ function AppSidebar({
               )}
             >
               {product.icon != null && (
-                <span data-slot="app-sidebar-product-icon" className="shrink-0">
+                <span data-slot="app-sidebar-product-icon" className="shrink-0 [&_svg]:h-5 [&_svg]:w-5">
                   {product.icon}
                 </span>
               )}
