@@ -19,6 +19,10 @@ export interface SidebarProps {
   persistentOnDesktop?: boolean
   trigger?: React.ReactNode
 
+  heading?: React.ReactNode
+  closeIcon?: boolean
+  divider?: boolean
+
   className?: string
   contentClassName?: string
 

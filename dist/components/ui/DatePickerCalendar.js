@@ -666,7 +666,8 @@ function DatePickerCalendar({
         {
           mode,
           selected: selected ?? void 0,
-          onSelect,
+          onSelect: onSelect ?? (() => {
+          }),
           month: viewMonth,
           onMonthChange: setViewMonth,
           hideNavigation: true,

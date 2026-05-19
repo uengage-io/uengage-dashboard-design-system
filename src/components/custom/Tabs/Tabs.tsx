@@ -161,7 +161,8 @@ function OverflowTabsSelect({
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
+        collisionPadding={8}
+        className="w-[220px] max-w-[calc(100vw-1rem)] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
       >
         <div className="flex flex-col">
           {overflowTabs.map((tab) => {
@@ -225,8 +226,9 @@ function LineTabsOverflow({
         <button
           type="button"
           className={cn(
-            "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-            "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
+            "inline-flex flex-none items-center gap-1 whitespace-nowrap cursor-pointer select-none",
+            "rounded-t-lg px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium",
+            "text-gray-500 hover:text-[#0A5A2A] hover:bg-gray-50 transition-all duration-200",
             FOCUS_RING,
           )}
         >
@@ -244,7 +246,8 @@ function LineTabsOverflow({
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
+        collisionPadding={8}
+        className="w-[220px] max-w-[calc(100vw-1rem)] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
       >
         <div className="flex flex-col">
           {overflowTabs.map((tab) => {
@@ -366,28 +369,49 @@ function SecondaryTabs({
       className={cn("w-full", className)}
     >
       <div className="relative w-full border-b border-[#E5E7EB]">
-        <div
-          ref={wrapperRef}
-          className="relative flex min-w-0 items-end gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          <TabsList
-            variant="line"
-            className={cn(
-              "flex w-max min-w-0 flex-row items-center justify-start",
-              "h-auto! rounded-none bg-transparent p-0 gap-2",
-            )}
+        {/*
+          Two-part layout:
+          - Left: scrollable tabs area (shrinks on mobile, natural width on desktop)
+          - Right: More Options button outside the scroll — never overlaps tabs
+        */}
+        <div className="flex items-end min-w-0">
+          <div
+            ref={wrapperRef}
+            className="relative min-w-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
-            {visibleTabs.map((tab) => (
-              <CustomTabsTrigger
-                key={tab.value}
-                value={tab.value}
-                disabled={tab.disabled}
-                variant="secondary"
-              >
-                {tab.label}
-              </CustomTabsTrigger>
-            ))}
-          </TabsList>
+            <TabsList
+              variant="line"
+              className={cn(
+                "flex w-max min-w-0 flex-row items-center justify-start",
+                "h-auto! rounded-none bg-transparent p-0 gap-2",
+              )}
+            >
+              {visibleTabs.map((tab) => (
+                <CustomTabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  disabled={tab.disabled}
+                  variant="secondary"
+                >
+                  {tab.label}
+                </CustomTabsTrigger>
+              ))}
+            </TabsList>
+
+            <span
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
+                indicator.ready
+                  ? "transition-all duration-300 ease-out opacity-100"
+                  : "opacity-0",
+              )}
+              style={{
+                transform: `translateX(${indicator.left}px)`,
+                width: indicator.width,
+              }}
+            />
+          </div>
 
           {overflowTabs.length > 0 && (
             <LineTabsOverflow
@@ -397,20 +421,6 @@ function SecondaryTabs({
               onChange={handleChange}
             />
           )}
-
-          <span
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
-              indicator.ready
-                ? "transition-all duration-300 ease-out opacity-100"
-                : "opacity-0",
-            )}
-            style={{
-              transform: `translateX(${indicator.left}px)`,
-              width: indicator.width,
-            }}
-          />
         </div>
       </div>
     </T>

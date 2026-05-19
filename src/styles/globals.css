@@ -167,64 +167,76 @@
   }
 }
 
-/* ── Sidebar scale animations ────────────────────────────────────────────────
-   All four variants share the same scale keyframes (uengage-sidebar-rb-in/out).
-   Timing is hardcoded to 520ms open / 280ms close for uniform smoothness.
-   transform-origin sets the growth corner:
-     right  → bottom right
-     bottom → bottom right
-     left   → bottom left
-     top    → top left                                                          */
+/* ── Sidebar animations ──────────────────────────────────────────────────────
+   Right side: custom scale animation from the bottom-right corner.
+   Left / top / bottom: standard shadcn slide animations.                       */
 
-[data-slot="drawer-content"][data-side="right"],
-[data-slot="drawer-content"][data-side="bottom"] {
+/* ── Right: custom scale-from-corner animation ── */
+[data-slot="drawer-content"][data-side="right"] {
   will-change: transform, opacity;
   transform-origin: bottom right;
 }
-
-[data-slot="drawer-content"][data-side="left"] {
-  will-change: transform, opacity;
-  transform-origin: bottom left;
-}
-
-[data-slot="drawer-content"][data-side="top"] {
-  will-change: transform, opacity;
-  transform-origin: top left;
-}
-
-[data-slot="drawer-content"][data-side="left"][data-state="open"],
-[data-slot="drawer-content"][data-side="right"][data-state="open"],
-[data-slot="drawer-content"][data-side="top"][data-state="open"],
-[data-slot="drawer-content"][data-side="bottom"][data-state="open"] {
+[data-slot="drawer-content"][data-side="right"][data-state="open"] {
   animation: uengage-sidebar-rb-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-
-[data-slot="drawer-content"][data-side="left"][data-state="closed"],
-[data-slot="drawer-content"][data-side="right"][data-state="closed"],
-[data-slot="drawer-content"][data-side="top"][data-state="closed"],
-[data-slot="drawer-content"][data-side="bottom"][data-state="closed"] {
+[data-slot="drawer-content"][data-side="right"][data-state="closed"] {
   animation: uengage-sidebar-rb-out 280ms cubic-bezier(0.4, 0, 1, 1) both;
 }
-
 @keyframes uengage-sidebar-rb-in {
-  from {
-    opacity: 0;
-    transform: scale(0);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0); }
+  to   { opacity: 1; transform: scale(1); }
 }
 @keyframes uengage-sidebar-rb-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0);
-  }
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0); }
+}
+
+/* ── Left: slide in/out from the left edge ── */
+[data-slot="drawer-content"][data-side="left"][data-state="open"] {
+  animation: sidebar-slide-in-from-left 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-slot="drawer-content"][data-side="left"][data-state="closed"] {
+  animation: sidebar-slide-out-to-left 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+@keyframes sidebar-slide-in-from-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes sidebar-slide-out-to-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+/* ── Top: slide in/out from the top edge ── */
+[data-slot="drawer-content"][data-side="top"][data-state="open"] {
+  animation: sidebar-slide-in-from-top 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-slot="drawer-content"][data-side="top"][data-state="closed"] {
+  animation: sidebar-slide-out-to-top 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+@keyframes sidebar-slide-in-from-top {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes sidebar-slide-out-to-top {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
+}
+
+/* ── Bottom: slide in/out from the bottom edge ── */
+[data-slot="drawer-content"][data-side="bottom"][data-state="open"] {
+  animation: sidebar-slide-in-from-bottom 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-slot="drawer-content"][data-side="bottom"][data-state="closed"] {
+  animation: sidebar-slide-out-to-bottom 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+@keyframes sidebar-slide-in-from-bottom {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes sidebar-slide-out-to-bottom {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
 }
 /* Popover / dropdown open/close transitions.
    Driven by Radix's data-state attribute on the portaled content. */

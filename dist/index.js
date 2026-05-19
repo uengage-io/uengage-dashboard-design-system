@@ -371,25 +371,29 @@ var button = {
       background: [g.green, g.deepGreen],
       border: [g.mintGreen, g.darkerGreen],
       borderWidth: 2,
-      text: "#FFFFFF"
+      text: "#FFFFFF",
+      backgroundGradient: "linear-gradient(128.73deg, #00A86B -0.83%, #003C1B 95.78%)"
     },
     hover: {
       background: [g.darkGreen, g.darkestGreen],
       border: [g.mintGreen, g.darkerGreen],
       borderWidth: 2,
-      text: "#FFFFFF"
+      text: "#FFFFFF",
+      backgroundGradient: "linear-gradient(92.3deg, #006F42 -11.82%, #001E00 101.34%)"
     },
     pressed: {
       background: [g.darkGreen, g.darkestGreen],
       border: [g.mintGreen, g.darkerGreen],
       borderWidth: 2,
-      text: "#FFFFFF"
+      text: "#FFFFFF",
+      backgroundGradient: "linear-gradient(92.3deg, #006F42 -11.82%, #001E00 101.34%)"
     },
     focused: {
       background: [g.green, g.deepGreen],
       border: [g.mintGreen],
       borderWidth: 2,
-      text: "#FFFFFF"
+      text: "#FFFFFF",
+      backgroundGradient: "linear-gradient(128.73deg, #00A86B -0.83%, #003C1B 95.78%)"
     },
     disabled: {
       background: ["#DDDDDD"],
@@ -410,7 +414,8 @@ var button = {
       background: ["#EDEDED", "#FFFFFF"],
       border: ["#E4E4E4", "#9C9C9C"],
       borderWidth: 2,
-      text: g.forestGreen
+      text: g.forestGreen,
+      backgroundGradient: "linear-gradient(0deg, #EDEDED 0%, rgba(255, 255, 255, 0.6) 100%)"
     },
     pressed: {
       background: ["#EDEDED"],
@@ -437,17 +442,19 @@ var button = {
       background: "transparent",
       border: "transparent",
       borderWidth: 2,
-      text: g.forestGreen
+      text: g.forestGreen,
+      backgroundGradient: "linear-gradient(180deg, rgba(200, 231, 184, 0.01) 0%, rgba(200, 231, 184, 0.07) 100%)"
     },
     hover: {
-      background: "transparent",
-      border: [g.lightGreen],
+      background: [g.paleGreen],
+      border: [g.paleGreen],
       borderWidth: 2,
-      text: g.forestGreen
+      text: g.forestGreen,
+      backgroundGradient: "linear-gradient(180deg, rgba(200, 231, 184, 0.01) 0%, rgba(200, 231, 184, 0.07) 100%)"
     },
     pressed: {
       background: [g.paleGreen],
-      border: [g.softGreen],
+      border: [g.lightGreen],
       borderWidth: 2,
       text: g.forestGreen
     },
@@ -571,14 +578,14 @@ var buttonVariants2 = cva(BASE_CLASSES, {
   },
   defaultVariants: { size: "md" }
 });
-function toGradientCSS(value) {
+function toGradientCSS(value, direction = "to bottom") {
   if (typeof value === "string") {
     return `linear-gradient(${value}, ${value})`;
   }
   if (value.length === 1) {
     return `linear-gradient(${value[0]}, ${value[0]})`;
   }
-  return `linear-gradient(to bottom, ${value[0]}, ${value[1]})`;
+  return `linear-gradient(${direction}, ${value[0]}, ${value[1]})`;
 }
 function resolveStateColors(variant, state) {
   const variantColors = button[variant];
@@ -600,7 +607,7 @@ function getButtonStyle(variant, state) {
   const borderWidth = VARIANT_BORDER_WIDTH[variant] ?? colors.borderWidth;
   const borderRadius = VARIANT_BORDER_RADIUS[variant] ?? 30;
   if (variant === "tertiary") {
-    const bg = colors.background === "transparent" ? "transparent" : Array.isArray(colors.background) ? colors.background[0] : colors.background;
+    const bg = colors.backgroundGradient ? colors.backgroundGradient : colors.background === "transparent" ? "transparent" : Array.isArray(colors.background) ? colors.background[0] : colors.background;
     const borderColor = colors.border === "transparent" ? "transparent" : Array.isArray(colors.border) ? colors.border[0] : colors.border;
     const style2 = {
       background: bg,
@@ -614,13 +621,15 @@ function getButtonStyle(variant, state) {
     }
     return style2;
   }
-  const borderCSS = toGradientCSS(colors.border);
-  const innerCSS = colors.background === "transparent" ? "linear-gradient(var(--btn-stroke-bg, #fff), var(--btn-stroke-bg, #fff))" : toGradientCSS(colors.background);
+  const dir = colors.gradientDirection ?? "to bottom";
+  const borderCSS = toGradientCSS(colors.border, dir);
+  const innerCSS = colors.backgroundGradient ? colors.backgroundGradient : colors.background === "transparent" ? "linear-gradient(var(--btn-stroke-bg, #fff), var(--btn-stroke-bg, #fff))" : toGradientCSS(colors.background, dir);
   const insetShadow = "0px 2px 4px 0px #0000000A inset";
   const liftShadow = "2px 2px 4px 0px #0000001F";
   const boxShadow = state === "disabled" ? "none" : state === "hover" || state === "pressed" ? `${insetShadow}, ${liftShadow}` : insetShadow;
+  const backgroundValue = colors.backgroundGradient ? `${innerCSS} padding-box, linear-gradient(#FFFFFF, #FFFFFF) padding-box, ${borderCSS} border-box` : `${innerCSS} padding-box, ${borderCSS} border-box`;
   const style = {
-    background: `${innerCSS} padding-box, ${borderCSS} border-box`,
+    background: backgroundValue,
     border: `${borderWidth}px solid transparent`,
     borderRadius,
     color: colors.text,
@@ -2134,7 +2143,8 @@ function OverflowTabsSelect({
       {
         align: "end",
         sideOffset: 8,
-        className: "w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
+        collisionPadding: 8,
+        className: "w-[220px] max-w-[calc(100vw-1rem)] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
         children: /* @__PURE__ */ jsx("div", { className: "flex flex-col", children: overflowTabs.map((tab) => {
           const isActive = tab.value === activeValue;
           return /* @__PURE__ */ jsxs(
@@ -2186,8 +2196,9 @@ function LineTabsOverflow({
       {
         type: "button",
         className: cn(
-          "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-          "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959] hover:text-[#0A5A2A]",
+          "inline-flex flex-none items-center gap-1 whitespace-nowrap cursor-pointer select-none",
+          "rounded-t-lg px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium",
+          "text-gray-500 hover:text-[#0A5A2A] hover:bg-gray-50 transition-all duration-200",
           FOCUS_RING
         ),
         children: [
@@ -2211,7 +2222,8 @@ function LineTabsOverflow({
       {
         align: "end",
         sideOffset: 8,
-        className: "w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
+        collisionPadding: 8,
+        className: "w-[220px] max-w-[calc(100vw-1rem)] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
         children: /* @__PURE__ */ jsx("div", { className: "flex flex-col", children: overflowTabs.map((tab) => {
           const isActive = tab.value === activeValue;
           return /* @__PURE__ */ jsxs(
@@ -2318,58 +2330,60 @@ function SecondaryTabs({
       value: activeValue,
       onValueChange: handleChange,
       className: cn("w-full", className),
-      children: /* @__PURE__ */ jsx("div", { className: "relative w-full border-b border-[#E5E7EB]", children: /* @__PURE__ */ jsxs(
-        "div",
-        {
-          ref: wrapperRef,
-          className: "relative flex min-w-0 items-end gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-          children: [
-            /* @__PURE__ */ jsx(
-              TabsList,
-              {
-                variant: "line",
-                className: cn(
-                  "flex w-max min-w-0 flex-row items-center justify-start",
-                  "h-auto! rounded-none bg-transparent p-0 gap-2"
-                ),
-                children: visibleTabs.map((tab) => /* @__PURE__ */ jsx(
-                  CustomTabsTrigger,
-                  {
-                    value: tab.value,
-                    disabled: tab.disabled,
-                    variant: "secondary",
-                    children: tab.label
-                  },
-                  tab.value
-                ))
-              }
-            ),
-            overflowTabs.length > 0 && /* @__PURE__ */ jsx(
-              LineTabsOverflow,
-              {
-                overflowTabs,
-                overflowLabel,
-                activeValue,
-                onChange: handleChange
-              }
-            ),
-            /* @__PURE__ */ jsx(
-              "span",
-              {
-                "aria-hidden": "true",
-                className: cn(
-                  "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
-                  indicator.ready ? "transition-all duration-300 ease-out opacity-100" : "opacity-0"
-                ),
-                style: {
-                  transform: `translateX(${indicator.left}px)`,
-                  width: indicator.width
+      children: /* @__PURE__ */ jsx("div", { className: "relative w-full border-b border-[#E5E7EB]", children: /* @__PURE__ */ jsxs("div", { className: "flex items-end min-w-0", children: [
+        /* @__PURE__ */ jsxs(
+          "div",
+          {
+            ref: wrapperRef,
+            className: "relative min-w-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+            children: [
+              /* @__PURE__ */ jsx(
+                TabsList,
+                {
+                  variant: "line",
+                  className: cn(
+                    "flex w-max min-w-0 flex-row items-center justify-start",
+                    "h-auto! rounded-none bg-transparent p-0 gap-2"
+                  ),
+                  children: visibleTabs.map((tab) => /* @__PURE__ */ jsx(
+                    CustomTabsTrigger,
+                    {
+                      value: tab.value,
+                      disabled: tab.disabled,
+                      variant: "secondary",
+                      children: tab.label
+                    },
+                    tab.value
+                  ))
                 }
-              }
-            )
-          ]
-        }
-      ) })
+              ),
+              /* @__PURE__ */ jsx(
+                "span",
+                {
+                  "aria-hidden": "true",
+                  className: cn(
+                    "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
+                    indicator.ready ? "transition-all duration-300 ease-out opacity-100" : "opacity-0"
+                  ),
+                  style: {
+                    transform: `translateX(${indicator.left}px)`,
+                    width: indicator.width
+                  }
+                }
+              )
+            ]
+          }
+        ),
+        overflowTabs.length > 0 && /* @__PURE__ */ jsx(
+          LineTabsOverflow,
+          {
+            overflowTabs,
+            overflowLabel,
+            activeValue,
+            onChange: handleChange
+          }
+        )
+      ] }) })
     }
   );
 }
@@ -3447,7 +3461,8 @@ function DatePickerCalendar({
         {
           mode,
           selected: selected ?? void 0,
-          onSelect,
+          onSelect: onSelect ?? (() => {
+          }),
           month: viewMonth,
           onMonthChange: setViewMonth,
           hideNavigation: true,
@@ -4650,6 +4665,30 @@ function useIsDesktop(breakpoint = 768) {
   }, [breakpoint]);
   return isDesktop;
 }
+function SidebarHeader({
+  heading,
+  closeIcon,
+  divider,
+  onClose
+}) {
+  if (!heading && !closeIcon) return null;
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between px-4 py-3", children: [
+      heading ? /* @__PURE__ */ jsx("span", { className: "text-base font-semibold leading-none", children: heading }) : /* @__PURE__ */ jsx("span", {}),
+      closeIcon ? /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          onClick: onClose,
+          className: "rounded-sm p-1 text-[#202020] opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "aria-label": "Close sidebar",
+          children: /* @__PURE__ */ jsx(X, { className: "h-5 w-5 " })
+        }
+      ) : null
+    ] }),
+    divider ? /* @__PURE__ */ jsx("div", { className: "border-b" }) : null
+  ] });
+}
 function Sidebar({
   open,
   defaultOpen = false,
@@ -4661,6 +4700,9 @@ function Sidebar({
   closeOnOutsideClick = true,
   persistentOnDesktop = false,
   trigger,
+  heading,
+  closeIcon = false,
+  divider = false,
   className,
   contentClassName,
   children
@@ -4712,7 +4754,7 @@ function Sidebar({
     if (!resolvedOpen) {
       return null;
     }
-    return /* @__PURE__ */ jsx(
+    return /* @__PURE__ */ jsxs(
       "aside",
       {
         className: cn(
@@ -4721,7 +4763,18 @@ function Sidebar({
           contentClassName
         ),
         style: customSizeStyle,
-        children
+        children: [
+          /* @__PURE__ */ jsx(
+            SidebarHeader,
+            {
+              heading,
+              closeIcon,
+              divider,
+              onClose: () => handleOpenChange(false)
+            }
+          ),
+          children
+        ]
       }
     );
   }
@@ -4737,7 +4790,7 @@ function Sidebar({
         }
       }
     ) : null,
-    /* @__PURE__ */ jsx(
+    /* @__PURE__ */ jsxs(
       DrawerContent,
       {
         "aria-label": `${side} sidebar`,
@@ -4755,7 +4808,18 @@ function Sidebar({
           contentClassName
         ),
         style: { ...animDurationStyle, ...customSizeStyle },
-        children
+        children: [
+          /* @__PURE__ */ jsx(
+            SidebarHeader,
+            {
+              heading,
+              closeIcon,
+              divider,
+              onClose: () => handleOpenChange(false)
+            }
+          ),
+          children
+        ]
       }
     )
   ] });
