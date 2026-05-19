@@ -371,25 +371,29 @@ var button = {
       background: [g.green, g.deepGreen],
       border: [g.mintGreen, g.darkerGreen],
       borderWidth: 2,
-      text: "#FFFFFF"
+      text: "#FFFFFF",
+      backgroundGradient: "linear-gradient(128.73deg, #00A86B -0.83%, #003C1B 95.78%)"
     },
     hover: {
       background: [g.darkGreen, g.darkestGreen],
       border: [g.mintGreen, g.darkerGreen],
       borderWidth: 2,
-      text: "#FFFFFF"
+      text: "#FFFFFF",
+      backgroundGradient: "linear-gradient(92.3deg, #006F42 -11.82%, #001E00 101.34%)"
     },
     pressed: {
       background: [g.darkGreen, g.darkestGreen],
       border: [g.mintGreen, g.darkerGreen],
       borderWidth: 2,
-      text: "#FFFFFF"
+      text: "#FFFFFF",
+      backgroundGradient: "linear-gradient(92.3deg, #006F42 -11.82%, #001E00 101.34%)"
     },
     focused: {
       background: [g.green, g.deepGreen],
       border: [g.mintGreen],
       borderWidth: 2,
-      text: "#FFFFFF"
+      text: "#FFFFFF",
+      backgroundGradient: "linear-gradient(128.73deg, #00A86B -0.83%, #003C1B 95.78%)"
     },
     disabled: {
       background: ["#DDDDDD"],
@@ -410,7 +414,8 @@ var button = {
       background: ["#EDEDED", "#FFFFFF"],
       border: ["#E4E4E4", "#9C9C9C"],
       borderWidth: 2,
-      text: g.forestGreen
+      text: g.forestGreen,
+      backgroundGradient: "linear-gradient(0deg, #EDEDED 0%, rgba(255, 255, 255, 0.6) 100%)"
     },
     pressed: {
       background: ["#EDEDED"],
@@ -437,17 +442,19 @@ var button = {
       background: "transparent",
       border: "transparent",
       borderWidth: 2,
-      text: g.forestGreen
+      text: g.forestGreen,
+      backgroundGradient: "linear-gradient(180deg, rgba(200, 231, 184, 0.01) 0%, rgba(200, 231, 184, 0.07) 100%)"
     },
     hover: {
-      background: "transparent",
-      border: [g.lightGreen],
+      background: [g.paleGreen],
+      border: [g.paleGreen],
       borderWidth: 2,
-      text: g.forestGreen
+      text: g.forestGreen,
+      backgroundGradient: "linear-gradient(180deg, rgba(200, 231, 184, 0.01) 0%, rgba(200, 231, 184, 0.07) 100%)"
     },
     pressed: {
       background: [g.paleGreen],
-      border: [g.softGreen],
+      border: [g.lightGreen],
       borderWidth: 2,
       text: g.forestGreen
     },
@@ -571,14 +578,14 @@ var buttonVariants2 = cva(BASE_CLASSES, {
   },
   defaultVariants: { size: "md" }
 });
-function toGradientCSS(value) {
+function toGradientCSS(value, direction = "to bottom") {
   if (typeof value === "string") {
     return `linear-gradient(${value}, ${value})`;
   }
   if (value.length === 1) {
     return `linear-gradient(${value[0]}, ${value[0]})`;
   }
-  return `linear-gradient(to bottom, ${value[0]}, ${value[1]})`;
+  return `linear-gradient(${direction}, ${value[0]}, ${value[1]})`;
 }
 function resolveStateColors(variant, state) {
   const variantColors = button[variant];
@@ -600,7 +607,7 @@ function getButtonStyle(variant, state) {
   const borderWidth = VARIANT_BORDER_WIDTH[variant] ?? colors.borderWidth;
   const borderRadius = VARIANT_BORDER_RADIUS[variant] ?? 30;
   if (variant === "tertiary") {
-    const bg = colors.background === "transparent" ? "transparent" : Array.isArray(colors.background) ? colors.background[0] : colors.background;
+    const bg = colors.backgroundGradient ? colors.backgroundGradient : colors.background === "transparent" ? "transparent" : Array.isArray(colors.background) ? colors.background[0] : colors.background;
     const borderColor = colors.border === "transparent" ? "transparent" : Array.isArray(colors.border) ? colors.border[0] : colors.border;
     const style2 = {
       background: bg,
@@ -614,13 +621,15 @@ function getButtonStyle(variant, state) {
     }
     return style2;
   }
-  const borderCSS = toGradientCSS(colors.border);
-  const innerCSS = colors.background === "transparent" ? "linear-gradient(var(--btn-stroke-bg, #fff), var(--btn-stroke-bg, #fff))" : toGradientCSS(colors.background);
+  const dir = colors.gradientDirection ?? "to bottom";
+  const borderCSS = toGradientCSS(colors.border, dir);
+  const innerCSS = colors.backgroundGradient ? colors.backgroundGradient : colors.background === "transparent" ? "linear-gradient(var(--btn-stroke-bg, #fff), var(--btn-stroke-bg, #fff))" : toGradientCSS(colors.background, dir);
   const insetShadow = "0px 2px 4px 0px #0000000A inset";
   const liftShadow = "2px 2px 4px 0px #0000001F";
   const boxShadow = state === "disabled" ? "none" : state === "hover" || state === "pressed" ? `${insetShadow}, ${liftShadow}` : insetShadow;
+  const backgroundValue = colors.backgroundGradient ? `${innerCSS} padding-box, linear-gradient(#FFFFFF, #FFFFFF) padding-box, ${borderCSS} border-box` : `${innerCSS} padding-box, ${borderCSS} border-box`;
   const style = {
-    background: `${innerCSS} padding-box, ${borderCSS} border-box`,
+    background: backgroundValue,
     border: `${borderWidth}px solid transparent`,
     borderRadius,
     color: colors.text,

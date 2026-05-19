@@ -15,7 +15,6 @@ import PageContainerDemo from "./components/PageContainer";
 import TablePreview from "./components/Table";
 import ModalPreview from "./components/Modal";
 import Dialog from "./components/Dialog";
-import Modalprev from "./components/ModalPreview";
 import SidebarPreview from "./components/Sidebar";
 import PaginationPreview from "./components/Pagination";
 import FuzzySearchPreview from "./components/FuzzySearch";
@@ -30,6 +29,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
    
     {/* <AlertDialogPreview/> */}
-    <SidebarPreview/>
+    {/* <SidebarPreview/> */}
+   {/* <ModalPreview/> */}
+   {/* <Loader/> */}
+   <ButtonPreview/>
+  
   </React.StrictMode>,
 );
