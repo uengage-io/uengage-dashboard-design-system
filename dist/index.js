@@ -5553,7 +5553,7 @@ function AppSidebar({
                     isActive ? "bg-[#C8E7B8]" : "hover:bg-[#E3F5E3]"
                   ),
                   children: [
-                    product.icon != null && /* @__PURE__ */ jsx("span", { "data-slot": "app-sidebar-product-icon", className: "shrink-0 [&_svg]:h-5 [&_svg]:w-5", children: product.icon }),
+                    product.icon != null && /* @__PURE__ */ jsx("span", { "data-slot": "app-sidebar-product-icon", className: "shrink-0 [&_svg]:h-[13px] [&_svg]:w-[13px]", children: product.icon }),
                     /* @__PURE__ */ jsx(
                       "span",
                       {
@@ -5600,7 +5600,7 @@ function AppSidebar({
                           children: /* @__PURE__ */ jsx("span", { className: "block w-full whitespace-normal break-normal", children: module.label })
                         }
                       ),
-                      index < modules.length - 1 && !isActive && modules[index + 1]?.page !== activeModulePage && /* @__PURE__ */ jsx("div", { className: "w-[85%] border-b border-[#E0E0E0]" })
+                      !isActive && modules[index + 1]?.page !== activeModulePage && /* @__PURE__ */ jsx("div", { className: "w-[85%] border-b border-[#E0E0E0]" })
                     ] }, module.page);
                   })
                 }

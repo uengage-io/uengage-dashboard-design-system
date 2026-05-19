@@ -86,7 +86,7 @@ function AppSidebar({
               )}
             >
               {product.icon != null && (
-                <span data-slot="app-sidebar-product-icon" className="shrink-0 [&_svg]:h-5 [&_svg]:w-5">
+                <span data-slot="app-sidebar-product-icon" className="shrink-0 [&_svg]:h-[13px] [&_svg]:w-[13px]">
                   {product.icon}
                 </span>
               )}
@@ -139,8 +139,7 @@ function AppSidebar({
                     {module.label}
                   </span>
                 </button>
-                {index < modules.length - 1 &&
-                  !isActive &&
+                {!isActive &&
                   modules[index + 1]?.page !== activeModulePage && (
                     <div className="w-[85%] border-b border-[#E0E0E0]" />
                   )}
