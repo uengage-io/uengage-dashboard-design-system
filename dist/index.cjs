@@ -5462,6 +5462,188 @@ function Loader(_props) {
   ] }) });
 }
 Loader.displayName = "Loader";
+function AppHeader({
+  logo,
+  logoZoneWidth = 252,
+  center,
+  right,
+  divider = true,
+  className,
+  style,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    "header",
+    {
+      "data-slot": "app-header",
+      className: cn(
+        "uengage-ui fixed left-0 right-0 top-0 z-30 w-full bg-[#FAFFF7]",
+        className
+      ),
+      style,
+      ...props,
+      children: [
+        /* @__PURE__ */ jsxRuntime.jsxs(
+          "div",
+          {
+            "data-slot": "app-header-inner",
+            className: "flex min-h-[65px] items-center justify-between px-[10px] py-[7px] sm:min-h-[75px] sm:px-[13px] sm:py-[10px]",
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsxs(
+                "div",
+                {
+                  "data-slot": "app-header-left",
+                  className: "flex min-w-0 flex-1 items-center",
+                  children: [
+                    logo != null && /* @__PURE__ */ jsxRuntime.jsx(
+                      "div",
+                      {
+                        "data-slot": "app-header-logo",
+                        className: "hidden shrink-0 items-center md:flex",
+                        style: { width: toCssSize(logoZoneWidth) },
+                        children: logo
+                      }
+                    ),
+                    center != null && /* @__PURE__ */ jsxRuntime.jsx(
+                      "div",
+                      {
+                        "data-slot": "app-header-center",
+                        className: "min-w-0 flex-[0_0_69%] md:w-auto md:flex-none",
+                        children: center
+                      }
+                    )
+                  ]
+                }
+              ),
+              right != null && /* @__PURE__ */ jsxRuntime.jsx(
+                "div",
+                {
+                  "data-slot": "app-header-right",
+                  className: "flex shrink-0 items-center gap-[2vw] md:gap-[2px]",
+                  children: right
+                }
+              )
+            ]
+          }
+        ),
+        divider && /* @__PURE__ */ jsxRuntime.jsx(Separator, { "data-slot": "app-header-divider" })
+      ]
+    }
+  );
+}
+AppHeader.displayName = "AppHeader";
+function AppSidebar({
+  products = [],
+  modules = [],
+  activeProductId,
+  activeModulePage,
+  onProductSelect,
+  onModuleClick,
+  collapsed = false,
+  offsetTop = 75,
+  footer,
+  className,
+  style,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    "aside",
+    {
+      "data-slot": "app-sidebar",
+      "data-collapsed": collapsed,
+      className: cn(
+        "uengage-ui fixed bottom-0 left-0 z-40 flex w-full md:w-[240px]",
+        "bg-[#FAFFF7] transition-transform duration-[250ms] ease-in-out",
+        collapsed && "-translate-x-full",
+        className
+      ),
+      style: { top: toCssSize(offsetTop), ...style },
+      ...props,
+      children: [
+        /* @__PURE__ */ jsxRuntime.jsx(
+          "div",
+          {
+            "data-slot": "app-sidebar-products",
+            className: "relative flex w-[35%] flex-col items-end bg-[#FAFDF8]",
+            children: products.map((product) => {
+              const isActive = product.id === activeProductId;
+              return /* @__PURE__ */ jsxRuntime.jsxs(
+                "button",
+                {
+                  type: "button",
+                  "data-active": isActive,
+                  onClick: () => onProductSelect?.(product),
+                  className: cn(
+                    "mt-2 flex h-[70px] w-[70px] cursor-pointer flex-col items-center justify-center rounded-l-lg transition-colors",
+                    isActive ? "bg-[#C8E7B8]" : "hover:bg-[#E3F5E3]"
+                  ),
+                  children: [
+                    product.icon != null && /* @__PURE__ */ jsxRuntime.jsx("span", { "data-slot": "app-sidebar-product-icon", className: "shrink-0", children: product.icon }),
+                    /* @__PURE__ */ jsxRuntime.jsx(
+                      "span",
+                      {
+                        "data-slot": "app-sidebar-product-name",
+                        className: "mt-1.5 text-center text-[0.75rem] font-bold text-[#003C1B]",
+                        children: product.name.split(" ").map((word, i) => /* @__PURE__ */ jsxRuntime.jsx("span", { className: "block", children: word }, i))
+                      }
+                    )
+                  ]
+                },
+                product.id
+              );
+            })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntime.jsxs(
+          "div",
+          {
+            "data-slot": "app-sidebar-modules",
+            className: "flex h-full w-[65%] flex-col bg-[#FAFFF7]",
+            style: {
+              borderLeft: "1px solid",
+              borderImage: "linear-gradient(134.33deg, #C8E7B8 3.98%, #00A86B 104.92%) 1"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "div",
+                {
+                  "data-slot": "app-sidebar-modules-scroll",
+                  className: "mt-2 flex-1 cursor-pointer overflow-y-auto pb-24 scrollbar-thin",
+                  children: modules.map((module) => {
+                    const isActive = module.page === activeModulePage;
+                    return /* @__PURE__ */ jsxRuntime.jsx(
+                      "button",
+                      {
+                        type: "button",
+                        "data-active": isActive,
+                        onClick: () => onModuleClick?.(module),
+                        className: cn(
+                          "w-[90%] cursor-pointer rounded-r-lg py-[13px] pl-2 text-left text-[14px] text-[#003C1B] transition-all",
+                          isActive ? "border-[#003C1B] bg-[#C8E7B8] font-bold" : "font-normal hover:bg-[#E8F5E3]"
+                        ),
+                        children: /* @__PURE__ */ jsxRuntime.jsx("span", { className: "block w-full whitespace-normal break-normal", children: module.label })
+                      },
+                      module.page
+                    );
+                  })
+                }
+              ),
+              footer != null && /* @__PURE__ */ jsxRuntime.jsx(
+                "div",
+                {
+                  "data-slot": "app-sidebar-footer",
+                  className: "shrink-0 border-t bg-white",
+                  children: footer
+                }
+              )
+            ]
+          }
+        )
+      ]
+    }
+  );
+}
+AppSidebar.displayName = "AppSidebar";
 var accordionRootVariants = classVarianceAuthority.cva("w-full", {
   variants: {
     variant: {
@@ -5611,6 +5793,8 @@ exports.AlertDialogOverlay = AlertDialogOverlay;
 exports.AlertDialogPortal = AlertDialogPortal;
 exports.AlertDialogTitle = AlertDialogTitle;
 exports.AlertDialogTrigger = AlertDialogTrigger;
+exports.AppHeader = AppHeader;
+exports.AppSidebar = AppSidebar;
 exports.Button = Button2;
 exports.Card = Card2;
 exports.CardAction = CardAction;

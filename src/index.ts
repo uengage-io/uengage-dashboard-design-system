@@ -265,6 +265,17 @@ export { UengageProvider } from "./components/custom/Provider";
 // Loader
 export { Loader } from "./components/custom/Loader";
 
+// AppHeader
+export { AppHeader, type AppHeaderProps } from "./components/custom/AppHeader";
+
+// AppSidebar
+export {
+  AppSidebar,
+  type AppSidebarProps,
+  type AppSidebarProduct,
+  type AppSidebarModule,
+} from "./components/custom/AppSidebar";
+
 // Accordion
 export {
   Accordion,
