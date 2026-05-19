@@ -5609,22 +5609,24 @@ function AppSidebar({
                 {
                   "data-slot": "app-sidebar-modules-scroll",
                   className: "mt-2 flex-1 cursor-pointer overflow-y-auto pb-24 scrollbar-thin",
-                  children: modules.map((module) => {
+                  children: modules.map((module, index) => {
                     const isActive = module.page === activeModulePage;
-                    return /* @__PURE__ */ jsxRuntime.jsx(
-                      "button",
-                      {
-                        type: "button",
-                        "data-active": isActive,
-                        onClick: () => onModuleClick?.(module),
-                        className: cn(
-                          "w-[90%] cursor-pointer rounded-r-lg py-[13px] pl-2 text-left text-[14px] text-[#003C1B] transition-all",
-                          isActive ? "border-[#003C1B] bg-[#C8E7B8] font-bold" : "font-normal hover:bg-[#E8F5E3]"
-                        ),
-                        children: /* @__PURE__ */ jsxRuntime.jsx("span", { className: "block w-full whitespace-normal break-normal", children: module.label })
-                      },
-                      module.page
-                    );
+                    return /* @__PURE__ */ jsxRuntime.jsxs(React16__namespace.Fragment, { children: [
+                      /* @__PURE__ */ jsxRuntime.jsx(
+                        "button",
+                        {
+                          type: "button",
+                          "data-active": isActive,
+                          onClick: () => onModuleClick?.(module),
+                          className: cn(
+                            "w-[90%] cursor-pointer rounded-r-lg py-[13px] pl-2 text-left text-[14px] text-[#003C1B] transition-all",
+                            isActive ? "border-[#003C1B] bg-[#C8E7B8] font-bold" : "font-semibold hover:bg-[#E8F5E3]"
+                          ),
+                          children: /* @__PURE__ */ jsxRuntime.jsx("span", { className: "block w-full whitespace-normal break-normal", children: module.label })
+                        }
+                      ),
+                      index < modules.length - 1 && !isActive && modules[index + 1]?.page !== activeModulePage && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-[85%] border-b border-[#E0E0E0]" })
+                    ] }, module.page);
                   })
                 }
               ),
