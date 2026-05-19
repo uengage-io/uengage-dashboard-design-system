@@ -25,14 +25,14 @@ import AccordionPreview from "./components/Accordion";
 import InputPreview from "./components/Input";
 import DatePickerPreview from "./components/DatePicker";
 import PrevDemo from "./components/Prev";
+import AppLayoutPreview from "./components/AppLayout";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-   
+    <AppLayoutPreview />
+    {/* <ButtonPreview/> */}
     {/* <AlertDialogPreview/> */}
     {/* <SidebarPreview/> */}
-   {/* <ModalPreview/> */}
-   {/* <Loader/> */}
-   <ButtonPreview/>
-  
+    {/* <ModalPreview/> */}
+    {/* <Loader/> */}
   </React.StrictMode>,
 );

@@ -50,7 +50,7 @@ function AppHeader({
     >
       <div
         data-slot="app-header-inner"
-        className="flex min-h-[65px] items-center justify-between px-[10px] py-[7px] sm:min-h-[75px] sm:px-[13px] sm:py-[10px]"
+        className="flex min-h-[56px] items-center justify-between px-[10px] py-[4px] sm:min-h-[64px] sm:px-[13px] sm:py-[6px]"
       >
         {/* ── Left: logo zone + center slot ── */}
         <div
