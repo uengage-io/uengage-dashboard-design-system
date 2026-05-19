@@ -33,7 +33,7 @@ export interface AppSidebarProps extends React.HTMLAttributes<HTMLElement> {
   collapsed?: boolean;
   /**
    * Distance from the top of the viewport (to clear the fixed header).
-   * @default 75
+   * @default 64
    */
   offsetTop?: CssSize;
   /** Optional slot rendered at the bottom of the right column (e.g. version badge) */
@@ -48,7 +48,7 @@ function AppSidebar({
   onProductSelect,
   onModuleClick,
   collapsed = false,
-  offsetTop = 75,
+  offsetTop = 64,
   footer,
   className,
   style,

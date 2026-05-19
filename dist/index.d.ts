@@ -1028,7 +1028,7 @@ interface AppSidebarProps extends React.HTMLAttributes<HTMLElement> {
     collapsed?: boolean;
     /**
      * Distance from the top of the viewport (to clear the fixed header).
-     * @default 75
+     * @default 64
      */
     offsetTop?: CssSize;
     /** Optional slot rendered at the bottom of the right column (e.g. version badge) */
