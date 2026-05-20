@@ -30,8 +30,14 @@ export default function TabsPreview() {
             </h1>
           </div>
           <div className="flex items-center gap-3 rounded-full bg-[#F8FAF8] px-4 py-2">
-            <span className="text-sm font-medium text-[#4B5563]">Live Toggle</span>
-            <Toggle checked={enabled} onChange={setEnabled} aria-label="Enable toggle" />
+            <span className="text-sm font-medium text-[#4B5563]">
+              Live Toggle
+            </span>
+            <Toggle
+              checked={enabled}
+              onChange={setEnabled}
+              aria-label="Enable toggle"
+            />
           </div>
         </div>
 
@@ -39,7 +45,8 @@ export default function TabsPreview() {
           <div>
             <h2 className="text-lg font-semibold text-[#111827]">Primary</h2>
             <p className="text-sm text-[#6B7280]">
-              Visible tabs plus overflow menu. Selecting from either path updates the same state.
+              Visible tabs plus overflow menu. Selecting from either path
+              updates the same state.
             </p>
           </div>
           <Tabs
@@ -83,7 +90,7 @@ export default function TabsPreview() {
             </p>
           </div>
           <Tabs
-            variant="tertiary"
+            variant="secondary"
             value={tertiaryTab}
             tabs={tabs}
             visibleTabLimit={4}

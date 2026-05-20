@@ -12,15 +12,15 @@ const meta = {
     docs: {
       description: {
         component:
-          "Popover-based date picker with `single` and `range` modes. Uses `react-day-picker` under the hood. Width is parent-driven — wrap the component to constrain it. Height is set via the `size` preset.",
+          "Popover-based date picker with `single`, `range`, and `month` modes. Uses `react-day-picker` under the hood. In `month` mode the header renders a year `<Select>` dropdown instead of chevron navigation. Width is parent-driven — wrap the component to constrain it. Height is set via the `size` preset.",
       },
     },
   },
   argTypes: {
     mode: {
       control: "radio",
-      options: ["single", "range"],
-      description: "Pick one date or a start/end range.",
+      options: ["single", "range", "month"],
+      description: "Pick one date, a start/end range, or a whole month.",
     },
     size: {
       control: "radio",
@@ -29,6 +29,7 @@ const meta = {
     },
     placeholder: { control: "text" },
     disabled: { control: "boolean" },
+    clearable: { control: "boolean" },
     className: { control: "text" },
     minDate: { control: "date" },
     maxDate: { control: "date" },
@@ -38,6 +39,7 @@ const meta = {
   args: {
     mode: "single",
     disabled: false,
+    clearable: false,
   },
   decorators: [
     (Story) => (
@@ -51,13 +53,82 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/* ── Single ──────────────────────────────────────────────────────────── */
+
 export const Single: Story = {
   args: { mode: "single", placeholder: "Select a date" },
 };
 
+export const SingleClearable: Story = {
+  render: function SingleClearableStory(args) {
+    const [value, setValue] = React.useState<Date | DateRange | null>(null);
+    return <DatePicker {...args} value={value} onChange={setValue} />;
+  },
+  args: { mode: "single", clearable: true, placeholder: "Select a date" },
+};
+
+/* ── Range ───────────────────────────────────────────────────────────── */
+
 export const Range: Story = {
   args: { mode: "range", placeholder: "Date range" },
 };
+
+/* ── Month ───────────────────────────────────────────────────────────── */
+
+export const Month: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Month mode shows a 3×4 month grid. The header contains a year `<Select>` dropdown — scroll or search to jump to any year in range.",
+      },
+    },
+  },
+  args: { mode: "month", placeholder: "Select month" },
+};
+
+export const MonthControlled: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Controlled month picker — selected value is displayed below the trigger.",
+      },
+    },
+  },
+  render: function MonthControlledStory(args) {
+    const [value, setValue] = React.useState<Date | DateRange | null>(null);
+    return (
+      <div className="flex flex-col gap-2">
+        <DatePicker {...args} value={value} onChange={setValue} />
+        <code className="text-xs text-[#6B7280]">
+          {value instanceof Date
+            ? value.toLocaleString("default", { month: "long", year: "numeric" })
+            : "null"}
+        </code>
+      </div>
+    );
+  },
+  args: { mode: "month", clearable: true, placeholder: "Select month" },
+};
+
+export const MonthWithMinMax: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The year dropdown is bounded by `minDate` / `maxDate`. Months outside the range are disabled.",
+      },
+    },
+  },
+  args: {
+    mode: "month",
+    placeholder: "2025 – 2027 only",
+    minDate: new Date(2025, 0, 1),
+    maxDate: new Date(2027, 11, 31),
+  },
+};
+
+/* ── States ──────────────────────────────────────────────────────────── */
 
 export const Disabled: Story = {
   args: { mode: "single", disabled: true, placeholder: "Disabled" },
@@ -107,7 +178,7 @@ export const Controlled: Story = {
           {value instanceof Date
             ? value.toDateString()
             : value
-              ? `${value.from.toDateString()} → ${value.to.toDateString()}`
+              ? `${(value as DateRange).from.toDateString()} → ${(value as DateRange).to.toDateString()}`
               : "null"}
         </code>
       </div>

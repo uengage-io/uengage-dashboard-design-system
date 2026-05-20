@@ -311,36 +311,28 @@ export function MonthPickerCalendar({
     selected?.getFullYear() ?? today.getFullYear(),
   );
 
-  const isPrevDisabled =
-    !!minDate && viewYear <= minDate.getFullYear();
-  const isNextDisabled =
-    !!maxDate && viewYear >= maxDate.getFullYear();
+  const yearOptions = React.useMemo((): SelectOption[] => {
+    const center = today.getFullYear();
+    const minYear = minDate ? minDate.getFullYear() : center - 10;
+    const maxYear = maxDate ? maxDate.getFullYear() : center + 10;
+    const opts: SelectOption[] = [];
+    for (let y = minYear; y <= maxYear; y++) {
+      opts.push({ label: String(y), value: String(y) });
+    }
+    return opts;
+  }, [today, minDate, maxDate]);
 
   return (
     <div className="w-[280px] max-w-full bg-white">
-      {/* Year navigation */}
-      <div className="flex items-center justify-between px-3 py-2">
-        <button
-          type="button"
-          onClick={() => setViewYear((y) => y - 1)}
-          disabled={isPrevDisabled}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30"
-          aria-label="Previous year"
-        >
-          <ChevronLeft size={14} strokeWidth={2.5} />
-        </button>
-        <span className="text-sm font-semibold text-[#374151] select-none">
-          {viewYear}
-        </span>
-        <button
-          type="button"
-          onClick={() => setViewYear((y) => y + 1)}
-          disabled={isNextDisabled}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30"
-          aria-label="Next year"
-        >
-          <ChevronRight size={14} strokeWidth={2.5} />
-        </button>
+      {/* Year select */}
+      <div className="flex items-center justify-center px-3 py-2">
+        <Select
+          options={yearOptions}
+          value={String(viewYear)}
+          onChange={(val) => setViewYear(Number(val as string))}
+          size="sm"
+          className="w-28"
+        />
       </div>
 
       {/* Month grid */}

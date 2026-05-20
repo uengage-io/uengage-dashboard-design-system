@@ -19,7 +19,6 @@ import SidebarPreview from "./components/Sidebar";
 import PaginationPreview from "./components/Pagination";
 import FuzzySearchPreview from "./components/FuzzySearch";
 import Loader from "./components/Loader";
-import DemoPreview from "./components/Demo";
 import LayoutPreview from "./components/Layout";
 import AccordionPreview from "./components/Accordion";
 import InputPreview from "./components/Input";
@@ -28,8 +27,9 @@ import PrevDemo from "./components/Prev";
 import AppLayoutPreview from "./components/AppLayout";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <AppLayoutPreview />
-    {/* <ButtonPreview/> */}
+    {/* <AppLayoutPreview /> */}
+    {/* <ButtonPreview /> */}
+    <DatePickerPreview />
     {/* <AlertDialogPreview/> */}
     {/* <SidebarPreview/> */}
     {/* <ModalPreview/> */}

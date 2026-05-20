@@ -45,14 +45,14 @@ const VARIANT_SIZE_OVERRIDES: Partial<
   Record<ColorVariant, Partial<Record<ButtonSize, string>>>
 > = {
   alertPrimary: {
-    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[12px] [&_svg]:size-[12px]",
-    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[14px] [&_svg]:size-[14px]",
+    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
+    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[12px] [&_svg]:size-[14px]",
     md: "pt-[6px] pr-[12px] pb-[6px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
     lg: "pt-[10px] pr-[16px] pb-[10px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]",
   },
   alertSecondary: {
-    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[12px] [&_svg]:size-[12px]",
-    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[14px] [&_svg]:size-[14px]",
+    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
+    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[12px] [&_svg]:size-[14px]",
     md: "pt-[6px] pr-[12px] pb-[6px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
     lg: "pt-[10px] pr-[16px] pb-[10px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]",
   },
@@ -164,11 +164,14 @@ function getButtonStyle(
 
   const insetShadow = "0px 2px 4px 0px #0000000A inset";
   const liftShadow = "2px 2px 4px 0px #0000001F";
+  const noLiftVariants: ColorVariant[] = ["secondary"];
   const boxShadow =
     state === "disabled"
       ? "none"
       : state === "hover" || state === "pressed"
-        ? `${insetShadow}, ${liftShadow}`
+        ? noLiftVariants.includes(variant)
+          ? insetShadow
+          : `${insetShadow}, ${liftShadow}`
         : insetShadow;
 
   // When backgroundGradient contains rgba transparency a solid white backing is
