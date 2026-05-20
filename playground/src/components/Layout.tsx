@@ -10,6 +10,9 @@ import {
   SearchBar,
   DatePicker,
   CardContent,
+  CardAction,
+  CardDescription,
+  CardFooter,
   Input,
 } from "@uengage/ui";
 import type { GridColumns } from "@uengage/ui";
@@ -114,15 +117,21 @@ const RATIO_VARIANTS: Variant[] = [
 function DemoCard({ index, columns }: { index: number; columns: GridColumns }) {
   return (
     <Card className="min-h-22 flex flex-col justify-center">
-      <CardHeader className="text-[11px] uppercase tracking-wide text-[#9CA3AF]">
-        {columns} · item {index + 1} Hello World
-        <CardTitle className="text-sm text-[#111827]">
-          Card {index + 1}
-        </CardTitle>
-        <CardContent>
-          <Input />
-        </CardContent>
+       <CardHeader>
+        <CardTitle>Login to your account</CardTitle>
+        <CardDescription>
+          Enter your email below to login to your account
+        </CardDescription>
+        {/* <CardAction>
+          <Button variant="primary">Sign Up</Button>
+        </CardAction> */}
       </CardHeader>
+      <CardContent>
+        <p>Hello this is demo card content</p>
+      </CardContent>
+      <CardFooter>
+        This is a demo card footer
+      </CardFooter>
     </Card>
   );
 }
@@ -221,6 +230,34 @@ export default function LayoutPreview() {
           <SearchBar placeholder="height={36}" />
           <SearchBar placeholder="height={48}" />
           <SearchBar placeholder='height="3.5rem"' />
+        </Grid>
+
+        <SubHeader
+          title="Grid strip — single card with dividers (> 4 items)"
+          subtitle='Use strip prop on Grid to merge cards into one bordered strip.'
+          divider
+        />
+        <Grid strip>
+          {[
+            { value: "3", label: "Open Tickets", color: "" },
+            { value: "1", label: "In Progress", color: "bg-yellow-50" },
+            { value: "2", label: "TAT Breach", color: "bg-orange-50" },
+            { value: "0", label: "Show Stoppers", color: "bg-red-100" },
+            { value: "3", label: "Development", color: "bg-green-50" },
+            { value: "0", label: "Enhancements", color: "" },
+            { value: "0", label: "Bugs", color: "" },
+            { value: "0", label: "Others", color: "" },
+          ].map((item) => (
+            <Card key={item.label} className={item.color}>
+              <CardContent className="flex items-center justify-between ">
+                <div>
+                  <p className="text-xl font-bold text-[#202020]">{item.value}</p>
+                  <p className="text-xs text-gray-500">{item.label}</p>
+                </div>
+                <span className="text-gray-400">→</span>
+              </CardContent>
+            </Card>
+          ))}
         </Grid>
 
         <div style={{ height: 40 }} />

@@ -9,14 +9,19 @@ import {
   CardContent as ShadcnCardContent,
   CardFooter as ShadcnCardFooter,
 } from "../../ui/card";
+import { GridContext } from "../Grid/Grid";
 
 export interface CardProps extends React.ComponentProps<"div"> {}
 
 function Card({ className, ...props }: CardProps) {
+  const { inStrip } = React.useContext(GridContext);
   return (
     <ShadcnCard
       className={cn(
-        "border-gray-300 bg-white p-3 sm:p-4 md:p-5 text-sm text-[#202020] shadow-none",
+        "text-sm text-[#202020] shadow-none",
+        inStrip
+          ? "h-full w-full rounded-none border-0 bg-transparent px-0 py-3 sm:px-1 sm:py-1 md:px-0 md:py-5"
+          : "border-gray-300 bg-white px-0 py-3 sm:px-1 sm:py-1 md:px-0 md:py-5",
         className,
       )}
       {...props}

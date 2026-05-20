@@ -21,6 +21,10 @@ export type GridColumns =
 
 export type GridLimit = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
+export const GridContext = React.createContext<{ inStrip: boolean }>({
+  inStrip: false,
+});
+
 /**
  * Responsive Tailwind classes for each column preset.
  * Mobile-first: columns collapse on small screens and expand at breakpoints.
@@ -76,6 +80,11 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
   gap?: CssSize;
   /** Row gap (if different from column gap). */
   rowGap?: CssSize;
+  /**
+   * Render all children as a single card with vertical dividers between them.
+   * Card borders and shadows are automatically suppressed via GridContext.
+   */
+  strip?: boolean;
 }
 
 function Grid({
@@ -83,37 +92,68 @@ function Grid({
   limit,
   gap,
   rowGap = "20px",
+  strip = false,
   className,
   style,
   children,
   ...props
 }: GridProps) {
+  // ── Strip mode ──────────────────────────────────────────────────────────────
+  if (strip) {
+    const items = React.Children.toArray(children).filter(React.isValidElement);
+    return (
+      <GridContext.Provider value={{ inStrip: true }}>
+        <div
+          data-slot="grid-strip"
+          className={cn(
+            "mt-5 flex w-full overflow-hidden rounded-lg border border-gray-300 bg-white",
+            className,
+          )}
+          style={style}
+          {...props}
+        >
+          {items.map((item, index) => (
+            <React.Fragment key={index}>
+              <div className="flex min-w-0 flex-1 items-stretch">{item}</div>
+              {index < items.length - 1 && (
+                <div className="w-px self-stretch bg-gray-200" />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </GridContext.Provider>
+    );
+  }
+
+  // ── Normal grid mode ─────────────────────────────────────────────────────────
   const effectiveColumns = limit ? String(limit) : columns;
   const isPreset = effectiveColumns in RESPONSIVE_COLUMN_CLASSES;
   const resolvedGap = gap ?? GAP_MAP[effectiveColumns] ?? LAYOUT.gap.sm;
 
   return (
-    <div
-      data-slot="grid-wrapper"
-      className={cn("w-full", className)}
-      style={style}
-      {...props}
-    >
+    <GridContext.Provider value={{ inStrip: false }}>
       <div
-        data-slot="grid"
-        className={cn(
-          "grid w-full mt-5",
-          isPreset && RESPONSIVE_COLUMN_CLASSES[effectiveColumns],
-        )}
-        style={{
-          ...(isPreset ? {} : { gridTemplateColumns: effectiveColumns }),
-          columnGap: toCssSize(resolvedGap),
-          rowGap: toCssSize(rowGap ?? resolvedGap),
-        }}
+        data-slot="grid-wrapper"
+        className={cn("w-full", className)}
+        style={style}
+        {...props}
       >
-        {children}
+        <div
+          data-slot="grid"
+          className={cn(
+            "grid w-full mt-5",
+            isPreset && RESPONSIVE_COLUMN_CLASSES[effectiveColumns],
+          )}
+          style={{
+            ...(isPreset ? {} : { gridTemplateColumns: effectiveColumns }),
+            columnGap: toCssSize(resolvedGap),
+            rowGap: toCssSize(rowGap ?? resolvedGap),
+          }}
+        >
+          {children}
+        </div>
       </div>
-    </div>
+    </GridContext.Provider>
   );
 }
 

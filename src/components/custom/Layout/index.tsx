@@ -7,6 +7,7 @@ export {
 } from "./SubHeader";
 export {
   Grid,
+  GridContext,
   type GridProps,
   type GridColumns,
   type GridLimit,
