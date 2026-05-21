@@ -5830,6 +5830,7 @@ exports.LAYOUT = LAYOUT;
 exports.Label = Label;
 exports.Loader = Loader;
 exports.Modal = Modal;
+exports.MonthPickerCalendar = MonthPickerCalendar;
 exports.PATTERN_REGEX = PATTERN_REGEX;
 exports.PageContainer = PageContainer;
 exports.Pagination = Pagination2;

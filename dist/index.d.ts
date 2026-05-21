@@ -15,7 +15,7 @@ import { TabsTrigger } from './components/ui/tabs.js';
 export { Input as input } from './components/ui/input.js';
 import { Label } from './components/ui/label.js';
 import { RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Switch } from 'radix-ui';
-export { DatePickerCalendar } from './components/ui/DatePickerCalendar.js';
+export { DatePickerCalendar, MonthPickerCalendar } from './components/ui/DatePickerCalendar.js';
 import { LucideIcon } from 'lucide-react';
 export { BrandGreen, brand } from './utils/colors.js';
 export { cn } from './lib/utils.js';

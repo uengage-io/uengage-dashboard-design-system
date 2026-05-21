@@ -33,6 +33,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <AlertDialogPreview/> */}
     {/* <SidebarPreview/> */}
     {/* <ModalPreview/> */}
+    <LayoutPreview/>
     {/* <Loader/> */}
   </React.StrictMode>,
 );
