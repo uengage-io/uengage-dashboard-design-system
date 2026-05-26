@@ -369,13 +369,13 @@ function SecondaryTabs({
       onValueChange={handleChange}
       className={cn("w-full", className)}
     >
-      <div className={cn("relative w-full", showBottomBorder && "border-b border-[#E5E7EB]")}>
+      <div className="relative w-full">
         {/*
           Two-part layout:
           - Left: scrollable tabs area (shrinks on mobile, natural width on desktop)
           - Right: More Options button outside the scroll — never overlaps tabs
         */}
-        <div className="flex items-end min-w-0">
+        <div className={cn("inline-flex max-w-full items-end", showBottomBorder && "border-b border-[#E5E7EB]")}>
           <div
             ref={wrapperRef}
             className="relative min-w-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"

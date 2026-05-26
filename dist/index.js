@@ -2332,7 +2332,7 @@ function SecondaryTabs({
       value: activeValue,
       onValueChange: handleChange,
       className: cn("w-full", className),
-      children: /* @__PURE__ */ jsx("div", { className: cn("relative w-full", showBottomBorder && "border-b border-[#E5E7EB]"), children: /* @__PURE__ */ jsxs("div", { className: "flex items-end min-w-0", children: [
+      children: /* @__PURE__ */ jsx("div", { className: "relative w-full", children: /* @__PURE__ */ jsxs("div", { className: cn("inline-flex max-w-full items-end", showBottomBorder && "border-b border-[#E5E7EB]"), children: [
         /* @__PURE__ */ jsxs(
           "div",
           {
