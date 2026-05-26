@@ -2274,6 +2274,7 @@ function SecondaryTabs({
   onChange,
   visibleTabLimit,
   overflowLabel = "More Options",
+  showBottomBorder = true,
   className
 }) {
   const wrapperRef = React16.useRef(null);
@@ -2331,7 +2332,7 @@ function SecondaryTabs({
       value: activeValue,
       onValueChange: handleChange,
       className: cn("w-full", className),
-      children: /* @__PURE__ */ jsx("div", { className: "relative w-full border-b border-[#E5E7EB]", children: /* @__PURE__ */ jsxs("div", { className: "flex items-end min-w-0", children: [
+      children: /* @__PURE__ */ jsx("div", { className: cn("relative w-full", showBottomBorder && "border-b border-[#E5E7EB]"), children: /* @__PURE__ */ jsxs("div", { className: "flex items-end min-w-0", children: [
         /* @__PURE__ */ jsxs(
           "div",
           {
