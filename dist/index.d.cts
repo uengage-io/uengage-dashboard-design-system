@@ -277,6 +277,7 @@ interface CustomTabsProps {
     variant?: "primary" | "secondary";
     visibleTabLimit?: number;
     overflowLabel?: string;
+    showBottomBorder?: boolean;
     className?: string;
 }
 

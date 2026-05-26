@@ -29,7 +29,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <AppLayoutPreview /> */}
     {/* <ButtonPreview /> */}
-    <DatePickerPreview />
+    <TabsPreview />
     {/* <AlertDialogPreview/> */}
     {/* <SidebarPreview/> */}
     {/* <ModalPreview/> */}

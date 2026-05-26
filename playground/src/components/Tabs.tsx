@@ -56,6 +56,7 @@ export default function TabsPreview() {
             visibleTabLimit={5}
             overflowLabel="More Options"
             onChange={setPrimaryTab}
+            showBottomBorder={false}
           />
           <div className="rounded-[16px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-3 text-sm text-[#374151]">
             Active primary tab: <strong>{primaryTab}</strong>
@@ -76,6 +77,7 @@ export default function TabsPreview() {
             visibleTabLimit={4}
             overflowLabel="More Options"
             onChange={setSecondaryTab}
+            showBottomBorder={false}
           />
           <div className="rounded-[16px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-3 text-sm text-[#374151]">
             Active secondary tab: <strong>{secondaryTab}</strong>

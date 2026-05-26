@@ -303,6 +303,7 @@ function SecondaryTabs({
   onChange,
   visibleTabLimit,
   overflowLabel = "More Options",
+  showBottomBorder = true,
   className,
 }: CustomTabsProps) {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
@@ -368,7 +369,7 @@ function SecondaryTabs({
       onValueChange={handleChange}
       className={cn("w-full", className)}
     >
-      <div className="relative w-full border-b border-[#E5E7EB]">
+      <div className={cn("relative w-full", showBottomBorder && "border-b border-[#E5E7EB]")}>
         {/*
           Two-part layout:
           - Left: scrollable tabs area (shrinks on mobile, natural width on desktop)
