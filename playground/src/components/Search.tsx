@@ -13,8 +13,10 @@ export default function SearchPreview() {
   return (
     <>
     <div className="relative w-[200px]">
-     <SearchBar 
-     placeholder="Search..." 
+     <SearchBar
+     label="Search"
+     required
+     placeholder="Search..."
     value={value}
     valueType="string"
     size="sm"
@@ -28,7 +30,7 @@ export default function SearchPreview() {
     getValue={(i)=>i.value}
     onSelect={(val)=>console.log("Selected:",val)}
     fallbackText="No result found"
-    
+
      />
 
      </div>

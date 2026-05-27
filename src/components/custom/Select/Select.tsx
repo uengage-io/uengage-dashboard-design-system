@@ -59,6 +59,7 @@ function Select<TItem = unknown>({
   required,
   helperText,
   error,
+  readOnly = false,
 }: SelectProps<TItem>) {
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
@@ -182,7 +183,7 @@ function Select<TItem = unknown>({
       ? resolvedOptions.find((o) => o.value === selected)?.label
       : undefined;
 
-  const triggerState = disabled ? "disabled" : open ? "open" : "default";
+  const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
 
   const placeholderSizeClass =
     size === "lg"
@@ -206,7 +207,7 @@ function Select<TItem = unknown>({
         : "px-2.5 py-1.5 text-xs";
 
   const handleOpenChange = (next: boolean) => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setOpen(next);
     if (!next) setSearch(""); // reset search so next open starts fresh
     if (next) {
@@ -249,7 +250,7 @@ function Select<TItem = unknown>({
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              if (!disabled) setOpen((o) => !o);
+              if (!disabled && !readOnly) setOpen((o) => !o);
             } else if (e.key === "Escape") {
               setOpen(false);
             }

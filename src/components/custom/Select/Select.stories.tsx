@@ -24,6 +24,7 @@ const meta = {
     helperText: { control: "text" },
     error: { control: "text" },
     disabled: { control: "boolean" },
+    readOnly: { control: "boolean" },
     width: { control: "text" },
     placeholder: { control: "text" },
     onChange: { action: "changed" },
@@ -34,6 +35,7 @@ const meta = {
     placeholder: "Select…",
     width: "w-full sm:w-80",
     disabled: false,
+    readOnly: false,
     required: false,
   },
 } satisfies Meta<typeof Select>;
@@ -77,6 +79,44 @@ export const WithDisabledOption: Story = {
 
 export const Disabled: Story = {
   args: { mode: "single", options: CITY_OPTIONS, disabled: true },
+};
+
+export const ReadOnly: Story = {
+  name: "Read only · Single",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The trigger displays the selected value with a `bg-gray-50` surface. The dropdown cannot be opened and no hover effects are applied. Unlike `disabled`, full opacity is preserved.",
+      },
+    },
+  },
+  args: {
+    mode: "single",
+    options: CITY_OPTIONS,
+    label: "City",
+    value: "blr",
+    readOnly: true,
+  },
+};
+
+export const ReadOnlyMulti: Story = {
+  name: "Read only · Multi",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Multi-select in read-only mode shows the selected pills but the dropdown cannot be opened and pills cannot be removed.",
+      },
+    },
+  },
+  args: {
+    mode: "multi",
+    options: CITY_OPTIONS,
+    label: "Delivery cities",
+    value: ["chd", "del", "blr"],
+    readOnly: true,
+  },
 };
 
 export const WithDefaultValue: Story = {

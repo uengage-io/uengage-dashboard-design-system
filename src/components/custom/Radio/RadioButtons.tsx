@@ -23,6 +23,9 @@ function RadioGroup<T = RadioOption>({
   helperText,
   error,
   className,
+  borderColor,
+  bgColor,
+  readOnly,
 }: CustomRadioGroupProps<T>) {
   const reactId = React.useId();
   const groupId = `radio-group-${reactId}`;
@@ -67,11 +70,11 @@ function RadioGroup<T = RadioOption>({
         id={groupId}
         value={value}
         defaultValue={defaultValue}
-        onValueChange={onChange}
+        onValueChange={readOnly ? undefined : onChange}
         disabled={disabled}
         aria-invalid={Boolean(error) || undefined}
         aria-describedby={describedById}
-        className={layoutClass}
+        className={cn(layoutClass, readOnly && "pointer-events-none")}
       >
         {options.map((opt) => {
           const optValue = toValue(opt);
@@ -83,6 +86,9 @@ function RadioGroup<T = RadioOption>({
               size={size}
               disabled={disabled || Boolean(toDisabled(opt))}
               error={Boolean(error)}
+              borderColor={borderColor}
+              bgColor={bgColor}
+              readOnly={readOnly}
             />
           );
         })}

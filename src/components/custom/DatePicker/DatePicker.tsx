@@ -77,6 +77,7 @@ function DatePicker({
   required,
   helperText,
   error,
+  readOnly = false,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
   const touchedRef = React.useRef(false);
@@ -261,7 +262,7 @@ function DatePicker({
   };
 
   const handleOpenChange = (next: boolean) => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setOpen(next);
     if (next) {
       interactedRef.current = true;
@@ -284,7 +285,7 @@ function DatePicker({
 
   const canApply = draftRange !== null || pendingFrom !== null;
 
-  const triggerState = disabled ? "disabled" : open ? "open" : "default";
+  const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -308,7 +309,7 @@ function DatePicker({
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              if (!disabled) setOpen((o) => !o);
+              if (!disabled && !readOnly) setOpen((o) => !o);
             } else if (e.key === "Escape") {
               setOpen(false);
             }

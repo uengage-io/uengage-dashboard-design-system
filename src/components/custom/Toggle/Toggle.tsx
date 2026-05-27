@@ -31,6 +31,8 @@ export interface ToggleProps
   onChange?: (checked: boolean) => void;
   /** Extra className applied to the outermost wrapper */
   wrapperClassName?: string;
+  /** When true, the toggle shows its current state but cannot be changed. */
+  readOnly?: boolean;
 }
 
 export const Toggle = React.forwardRef<
@@ -47,6 +49,7 @@ export const Toggle = React.forwardRef<
       defaultChecked,
       onChange,
       disabled,
+      readOnly,
       wrapperClassName,
       ...props
     },
@@ -57,9 +60,9 @@ export const Toggle = React.forwardRef<
         ref={ref}
         checked={checked !== undefined ? checked : undefined}
         defaultChecked={checked !== undefined ? undefined : defaultChecked}
-        onCheckedChange={onChange}
+        onCheckedChange={readOnly ? undefined : onChange}
         disabled={disabled}
-        className={trackVariants({ size })}
+        className={cn(trackVariants({ size }), readOnly && "pointer-events-none cursor-default")}
         {...props}
       >
         <SwitchPrimitive.Thumb className={thumbVariants({ size })} />
@@ -88,6 +91,7 @@ export const Toggle = React.forwardRef<
         className={cn(
           "inline-flex cursor-pointer items-center gap-2",
           labelPosition === "left" && "flex-row-reverse",
+          readOnly && "pointer-events-none cursor-default",
           wrapperClassName,
         )}
       >

@@ -28,12 +28,17 @@ const meta: Meta<typeof Toggle> = {
     disabled: {
       control: { type: "boolean" },
     },
+    readOnly: {
+      control: { type: "boolean" },
+      description: "Shows the current state but prevents toggling.",
+    },
   },
   args: {
     size: "md",
     labelPosition: "right",
     disabled: false,
     required: false,
+    readOnly: false,
   },
 };
 
@@ -106,6 +111,44 @@ export const Disabled: Story = {
     label: "Notifications",
     labelPosition: "right",
     disabled: true,
+    defaultChecked: true,
+  },
+};
+
+export const ReadOnly: Story = {
+  name: "Read only (on)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The toggle shows its current state but cannot be changed. Unlike `disabled`, there is no opacity reduction — it looks fully active, just non-interactive.",
+      },
+    },
+  },
+  args: {
+    label: "Email notifications",
+    labelPosition: "right",
+    readOnly: true,
+    defaultChecked: true,
+  },
+};
+
+export const ReadOnlyOff: Story = {
+  name: "Read only (off)",
+  args: {
+    label: "Email notifications",
+    labelPosition: "right",
+    readOnly: true,
+    defaultChecked: false,
+  },
+};
+
+export const ReadOnlyTopLabel: Story = {
+  name: "Read only · Top label",
+  args: {
+    label: "Dark mode",
+    labelPosition: "top",
+    readOnly: true,
     defaultChecked: true,
   },
 };

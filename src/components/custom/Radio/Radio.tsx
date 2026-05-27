@@ -26,6 +26,8 @@ export interface CustomRadioItemProps extends Omit<
   borderColor?: string;
   /** When provided, the pill wrapper uses this color for its background when checked. Falls back to default green tint if omitted. */
   bgColor?: string;
+  /** When true, the item shows its current state but cannot be selected. */
+  readOnly?: boolean;
 }
 
 const PILL_PADDING: Record<Size, string> = {
@@ -45,6 +47,7 @@ function Radio({
   label,
   size = "md",
   disabled,
+  readOnly,
   error,
   value,
   className,
@@ -100,6 +103,7 @@ function Radio({
             )
           : GAP_ONLY[size],
         disabled && "cursor-not-allowed opacity-60",
+        readOnly && "pointer-events-none cursor-default",
         className,
       )}
     >

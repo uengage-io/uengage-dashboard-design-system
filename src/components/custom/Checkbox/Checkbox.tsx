@@ -38,6 +38,7 @@ function Checkbox({
   size = "md",
   label,
   disabled,
+  readOnly,
   indeterminate,
   error,
   className,
@@ -73,6 +74,7 @@ function Checkbox({
       : internalChecked;
 
   const handleCheckedChange = (next: CheckboxPrimitive.CheckedState) => {
+    if (readOnly) return;
     const nextBool = next === true;
     if (!isControlled) setInternalChecked(nextBool);
     onCheckedChange?.(nextBool);
@@ -100,7 +102,7 @@ function Checkbox({
       : "default";
 
   const hasCustomColors = !!(borderColor || bgColor);
-  const isActive = (visualChecked || !!indeterminate) && !error && !disabled;
+  const isActive = (visualChecked || !!indeterminate) && !error && !disabled && !readOnly;
 
   return (
     <label
@@ -127,6 +129,7 @@ function Checkbox({
             )
           : GAP_ONLY[size],
         disabled && "cursor-not-allowed",
+        readOnly && "pointer-events-none cursor-default",
         className,
       )}
     >

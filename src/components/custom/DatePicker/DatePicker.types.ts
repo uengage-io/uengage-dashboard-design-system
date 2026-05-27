@@ -35,4 +35,6 @@ export interface DatePickerProps {
   helperText?: string;
   /** Error message rendered below the trigger; takes priority over helperText. */
   error?: string;
+  /** When true, the trigger shows the current value but the calendar cannot be opened. */
+  readOnly?: boolean;
 }
