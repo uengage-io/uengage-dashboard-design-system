@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 import { COMPONENT_HEIGHT, TEXT_SIZE } from "@/utils/tokens";
 
-export type DatePickerTriggerState = "default" | "open" | "disabled";
+export type DatePickerTriggerState = "default" | "open" | "disabled" | "readonly";
 
 export const triggerVariants = cva(
   "flex items-center min-w-0 rounded-[4px] border border-gray-400 bg-white transition-colors",
@@ -12,6 +12,8 @@ export const triggerVariants = cva(
         open: "border-gray-500 ring-1 ring-gray-200 text-[#374151]",
         disabled:
           "border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60 pointer-events-none",
+        readonly:
+          "bg-gray-50 border-gray-300 text-gray-700 cursor-default pointer-events-none",
       },
       size: {
         sm: `${COMPONENT_HEIGHT.sm} ${TEXT_SIZE.sm}`,

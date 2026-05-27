@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { COMPONENT_HEIGHT, TEXT_SIZE, PLACEHOLDER_SIZE } from "@/utils/tokens";
 
-export type TriggerState = "default" | "open" | "disabled";
+export type TriggerState = "default" | "open" | "disabled" | "readonly";
 export type TriggerSize = "xs" | "sm" | "md" | "lg";
 
 export const triggerVariants = cva(
@@ -24,6 +24,10 @@ export const triggerVariants = cva(
         disabled: [
           "border-gray-300 text-gray-400",
           "opacity-50 pointer-events-none",
+        ].join(" "),
+        readonly: [
+          "bg-gray-50 border-gray-300 text-gray-700",
+          "cursor-default pointer-events-none",
         ].join(" "),
       },
       size: {

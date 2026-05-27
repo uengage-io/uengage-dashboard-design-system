@@ -61,6 +61,9 @@ const meta = {
     error: { control: "text" },
     disabled: { control: "boolean" },
     defaultValue: { control: "text" },
+    borderColor: { control: "color" },
+    bgColor: { control: "color" },
+    readOnly: { control: "boolean" },
     onChange: { action: "change" },
   },
   args: {
@@ -70,6 +73,7 @@ const meta = {
     columns: 2,
     disabled: false,
     required: false,
+    readOnly: false,
   },
 } satisfies Meta<typeof RadioGroup>;
 
@@ -179,6 +183,30 @@ export const Preselected: Story = {
 
 export const GroupDisabled: Story = {
   args: { defaultValue: "one", disabled: true },
+  render: (args) => (
+    <div className="w-[560px]">
+      <RadioGroup {...args} />
+    </div>
+  ),
+};
+
+export const GroupReadOnly: Story = {
+  name: "Read only",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The selected value is displayed normally but the user cannot change it. Unlike `disabled`, there is no opacity reduction.",
+      },
+    },
+  },
+  args: {
+    label: "Delivery zone",
+    helperText: "Contact support to update this setting.",
+    defaultValue: "two",
+    layout: "horizontal",
+    readOnly: true,
+  },
   render: (args) => (
     <div className="w-[560px]">
       <RadioGroup {...args} />
@@ -411,6 +439,67 @@ export const WithCustomColorsHorizontal: Story = {
           />
         ))}
       </RadioGroupPrimitive.Root>
+    );
+  },
+};
+
+export const GroupWithCustomColors: Story = {
+  name: "Group · Custom pill colors",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass `borderColor` and `bgColor` directly on `RadioGroup` to apply pill styling to every item in the group. The colored pill border and background appear only on the selected item.",
+      },
+    },
+  },
+  render: function GroupCustomColorsStory() {
+    const [value, setValue] = React.useState("morning");
+    const slots = [
+      { value: "morning", label: "Morning (5am – 11:58am)" },
+      { value: "afternoon", label: "Afternoon (12pm – 3:59pm)" },
+      { value: "evening", label: "Evening (4pm – 7:59pm)" },
+      { value: "night", label: "Night (8pm – 11:59pm)" },
+    ];
+    return (
+      <div className="flex w-[480px] flex-col gap-3">
+        <RadioGroup
+          label="Preferred time slot"
+          options={slots}
+          value={value}
+          onChange={setValue}
+          layout="vertical"
+          borderColor="#067D51"
+          bgColor="#EFF9F4"
+        />
+        <code className="text-xs text-gray-500">value: "{value}"</code>
+      </div>
+    );
+  },
+};
+
+export const GroupWithCustomColorsBrandBlue: Story = {
+  name: "Group · Custom pill colors · Brand blue",
+  render: function GroupBrandBlueStory() {
+    const [value, setValue] = React.useState("standard");
+    const plans = [
+      { value: "standard", label: "Standard" },
+      { value: "pro", label: "Pro" },
+      { value: "enterprise", label: "Enterprise" },
+    ];
+    return (
+      <div className="flex w-[480px] flex-col gap-3">
+        <RadioGroup
+          label="Subscription plan"
+          options={plans}
+          value={value}
+          onChange={setValue}
+          layout="horizontal"
+          borderColor="#3B82F6"
+          bgColor="#EFF6FF"
+        />
+        <code className="text-xs text-gray-500">value: "{value}"</code>
+      </div>
     );
   },
 };

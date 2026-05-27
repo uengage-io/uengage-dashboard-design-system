@@ -7,6 +7,10 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   defaultValue?: T;
   valueType?: SearchValueType;
   size?: SearchBarSize;
+  /** Label displayed above the search bar. */
+  label?: string;
+  /** When `true`, appends a red asterisk to the label. */
+  required?: boolean;
   placeholder?: string;
   /**
    * Tailwind width class(es) applied to the outer wrapper. Use any responsive
@@ -18,6 +22,8 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   
   /** Extra classes merged onto the outer wrapper — use this for layout/width. */
   className?: string;
+  /** When true, the input shows its current value but cannot be edited or searched. */
+  readOnly?: boolean;
   inputClassName?: string;
   dropdownClassName?: string;
   disabled?: boolean;

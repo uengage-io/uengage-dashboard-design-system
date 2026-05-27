@@ -33,6 +33,7 @@ const meta = {
     error: { control: "text" },
     placeholder: { control: "text" },
     disabled: { control: "boolean" },
+    readOnly: { control: "boolean" },
     clearable: { control: "boolean" },
     className: { control: "text" },
     minDate: { control: "date" },
@@ -43,6 +44,7 @@ const meta = {
   args: {
     mode: "single",
     disabled: false,
+    readOnly: false,
     clearable: false,
     required: false,
   },
@@ -164,6 +166,61 @@ export const WithError: Story = {
 
 export const Disabled: Story = {
   args: { mode: "single", disabled: true, placeholder: "Disabled" },
+};
+
+export const ReadOnly: Story = {
+  name: "Read only · Single",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The trigger displays a fixed date with the `bg-gray-50` read-only surface. The calendar popover cannot be opened. Unlike `disabled`, full opacity is preserved.",
+      },
+    },
+  },
+  render: (args) => (
+    <DatePicker
+      {...args}
+      label="Order date"
+      value={new Date(2024, 4, 12)}
+      readOnly
+    />
+  ),
+  args: { mode: "single" },
+};
+
+export const ReadOnlyRange: Story = {
+  name: "Read only · Range",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Range picker in read-only mode shows the committed date range but the calendar cannot be opened.",
+      },
+    },
+  },
+  render: (args) => (
+    <DatePicker
+      {...args}
+      label="Campaign period"
+      value={{ from: new Date(2024, 4, 1), to: new Date(2024, 4, 31) }}
+      readOnly
+    />
+  ),
+  args: { mode: "range" },
+};
+
+export const ReadOnlyMonth: Story = {
+  name: "Read only · Month",
+  render: (args) => (
+    <DatePicker
+      {...args}
+      label="Report month"
+      value={new Date(2024, 3, 1)}
+      readOnly
+    />
+  ),
+  args: { mode: "month" },
 };
 
 export const Small: Story = {

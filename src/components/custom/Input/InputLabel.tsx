@@ -25,12 +25,12 @@ function InputLabel({
 }: InputLabelProps) {
   return (
     <Label
-      className={cn(SIZE_TEXT[size], "font-medium text-slate-700", className)}
+      className={cn(SIZE_TEXT[size], "font-medium text-slate-700 gap-0.5", className)}
       {...props}
     >
       {children}
       {required && (
-        <span aria-hidden="true" className="ml-0.5 text-red-500">
+        <span aria-hidden="true" className="text-red-500">
           *
         </span>
       )}

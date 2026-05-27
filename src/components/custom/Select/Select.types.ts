@@ -53,4 +53,6 @@ export interface SelectProps<TItem = unknown> {
   helperText?: string;
   /** Error message rendered below the trigger; takes priority over helperText. */
   error?: string;
+  /** When true, the trigger shows the current selection but the dropdown cannot be opened. */
+  readOnly?: boolean;
 }

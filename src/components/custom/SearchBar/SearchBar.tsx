@@ -4,6 +4,7 @@ import { cn } from "../../../lib/utils";
 import { Input } from "../../ui/input";
 import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import type { SearchBarProps, SearchBarSize } from "./SearchBar.types";
+import { InputLabel } from "@/components/custom/Input/InputLabel";
 
 const SIZE_HEIGHT_CLASSES: Record<SearchBarSize, string> = {
   sm: "h-8",
@@ -46,11 +47,14 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   defaultValue,
   valueType = "string",
   size = "md",
+  label,
+  required,
   placeholder,
   width,
   className,
   inputClassName,
   disabled = false,
+  readOnly = false,
   spellCheck = true,
   onChange,
   onSearch,
@@ -105,6 +109,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (readOnly) return;
     const filtered = filterValue(e.target.value, valueType);
     setInternal(filtered);
     onChange?.(castValue(filtered));
@@ -127,7 +132,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   };
 
   const handleSearchClick = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     if (!hasQuery) { onClear?.(); return; }
     if (filteredItems.length > 0) { handleSelect(filteredItems[0]!); return; }
     onSearch?.(castValue(displayValue));
@@ -135,7 +140,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   };
 
   const handleClear = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setInternal("");
     onClear?.();
     setDropdownOpen(false);
@@ -153,24 +158,32 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
 
   return (
+    <div className={cn("uengage-ui flex flex-col gap-1.5 min-w-0", width, className)}>
+      {label && (
+        <InputLabel size={size === "lg" ? "lg" : size === "sm" ? "sm" : "md"} required={required}>
+          {label}
+        </InputLabel>
+      )}
     <div
       ref={wrapperRef}
-      className={cn("uengage-ui relative block min-w-0", width, className)}
+      className="relative block min-w-0"
       onBlur={handleBlur}
     >
       <div
         className={cn(
           "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
-          !disabled && "hover:border-gray-500 hover:shadow-sm",
+          !disabled && !readOnly && "hover:border-gray-500 hover:shadow-sm",
           SIZE_TEXT_CLASSES[size],
           SIZE_HEIGHT_CLASSES[size],
           disabled && "pointer-events-none opacity-50",
+          readOnly && "bg-gray-50 border-gray-300 text-gray-700 cursor-default",
         )}
       >
         <Input
           value={displayValue}
           placeholder={placeholder}
           disabled={disabled}
+          readOnly={readOnly}
           spellCheck={spellCheck}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -229,6 +242,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
           )}
         </div>
       )}
+    </div>
     </div>
   );
 }

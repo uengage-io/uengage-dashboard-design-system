@@ -24,6 +24,9 @@ function CheckboxGroup<T = CheckboxOption>({
   helperText,
   error,
   selectAll,
+  borderColor,
+  bgColor,
+  readOnly,
 }: CustomCheckboxGroupProps<T>) {
   const reactId = React.useId();
   const groupId = `checkbox-group-${reactId}`;
@@ -99,6 +102,7 @@ function CheckboxGroup<T = CheckboxOption>({
             label="Select all"
             size={size}
             disabled={disabled || enabledOptions.length === 0}
+            readOnly={readOnly}
             error={Boolean(error)}
             checked={allChecked}
             indeterminate={indeterminate}
@@ -119,6 +123,9 @@ function CheckboxGroup<T = CheckboxOption>({
               error={Boolean(error)}
               checked={currentValue.includes(optValue)}
               onCheckedChange={(c) => toggle(optValue, c)}
+              borderColor={borderColor}
+              bgColor={bgColor}
+              readOnly={readOnly}
             />
           );
         })}

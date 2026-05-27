@@ -1173,6 +1173,47 @@ function useFuzzySearch(items, query) {
     return fuse.search(q).map((r) => r.item);
   }, [fuse, query, items]);
 }
+function Label({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    radixUi.Label.Root,
+    {
+      "data-slot": "label",
+      className: cn(
+        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className
+      ),
+      ...props
+    }
+  );
+}
+var SIZE_TEXT = {
+  sm: "text-xs",
+  md: "text-sm",
+  lg: "text-base"
+};
+function InputLabel({
+  size = "md",
+  required = false,
+  className,
+  children,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    Label,
+    {
+      className: cn(SIZE_TEXT[size], "font-medium text-slate-700 gap-0.5", className),
+      ...props,
+      children: [
+        children,
+        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "text-red-500", children: "*" })
+      ]
+    }
+  );
+}
+InputLabel.displayName = "InputLabel";
 var SIZE_HEIGHT_CLASSES = {
   sm: "h-8",
   md: "h-10",
@@ -1208,11 +1249,14 @@ function SearchBar({
   defaultValue,
   valueType = "string",
   size = "md",
+  label,
+  required,
   placeholder,
   width,
   className,
   inputClassName,
   disabled = false,
+  readOnly = false,
   spellCheck = true,
   onChange,
   onSearch,
@@ -1256,6 +1300,7 @@ function SearchBar({
     setDropdownOpen(false);
   };
   const handleChange = (e) => {
+    if (readOnly) return;
     const filtered = filterValue(e.target.value, valueType);
     setInternal(filtered);
     onChange?.(castValue(filtered));
@@ -1278,7 +1323,7 @@ function SearchBar({
     if (e.key === "Escape") setDropdownOpen(false);
   };
   const handleSearchClick = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     if (!hasQuery) {
       onClear?.();
       return;
@@ -1291,7 +1336,7 @@ function SearchBar({
     setDropdownOpen(false);
   };
   const handleClear = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setInternal("");
     onClear?.();
     setDropdownOpen(false);
@@ -1308,90 +1353,95 @@ function SearchBar({
   const showClear = clearable && displayValue.length > 0;
   const iconSize = ICON_SIZES[size];
   const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
-  return /* @__PURE__ */ jsxRuntime.jsxs(
-    "div",
-    {
-      ref: wrapperRef,
-      className: cn("uengage-ui relative block min-w-0", width, className),
-      onBlur: handleBlur,
-      children: [
-        /* @__PURE__ */ jsxRuntime.jsxs(
-          "div",
-          {
-            className: cn(
-              "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
-              !disabled && "hover:border-gray-500 hover:shadow-sm",
-              SIZE_TEXT_CLASSES[size],
-              SIZE_HEIGHT_CLASSES[size],
-              disabled && "pointer-events-none opacity-50"
-            ),
-            children: [
-              /* @__PURE__ */ jsxRuntime.jsx(
-                Input,
-                {
-                  value: displayValue,
-                  placeholder,
-                  disabled,
-                  spellCheck,
-                  onChange: handleChange,
-                  onKeyDown: handleKeyDown,
-                  className: cn(
-                    "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[#C4C9D2]",
-                    SIZE_PLACEHOLDER_CLASSES[size],
-                    inputClassName
-                  )
-                }
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("uengage-ui flex flex-col gap-1.5 min-w-0", width, className), children: [
+    label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size: size === "lg" ? "lg" : size === "sm" ? "sm" : "md", required, children: label }),
+    /* @__PURE__ */ jsxRuntime.jsxs(
+      "div",
+      {
+        ref: wrapperRef,
+        className: "relative block min-w-0",
+        onBlur: handleBlur,
+        children: [
+          /* @__PURE__ */ jsxRuntime.jsxs(
+            "div",
+            {
+              className: cn(
+                "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
+                !disabled && !readOnly && "hover:border-gray-500 hover:shadow-sm",
+                SIZE_TEXT_CLASSES[size],
+                SIZE_HEIGHT_CLASSES[size],
+                disabled && "pointer-events-none opacity-50",
+                readOnly && "bg-gray-50 border-gray-300 text-gray-700 cursor-default"
               ),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1.5 pr-2.5", children: [
-                showClear && /* @__PURE__ */ jsxRuntime.jsx(
-                  "button",
+              children: [
+                /* @__PURE__ */ jsxRuntime.jsx(
+                  Input,
                   {
-                    type: "button",
-                    onClick: handleClear,
+                    value: displayValue,
+                    placeholder,
                     disabled,
-                    className: "flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors",
-                    "aria-label": "Clear search",
-                    children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { className: "hover:text-red-500", strokeWidth: 2, size: iconSize })
+                    readOnly,
+                    spellCheck,
+                    onChange: handleChange,
+                    onKeyDown: handleKeyDown,
+                    className: cn(
+                      "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[#C4C9D2]",
+                      SIZE_PLACEHOLDER_CLASSES[size],
+                      inputClassName
+                    )
                   }
                 ),
-                /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("w-px bg-gray-400", DIVIDER_CLASSES[size]) }),
-                /* @__PURE__ */ jsxRuntime.jsx(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: handleSearchClick,
-                    disabled,
-                    className: "flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer",
-                    "aria-label": "Search",
-                    children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Search, { strokeWidth: 2, size: iconSize })
-                  }
-                )
-              ] })
-            ]
-          }
-        ),
-        isDropdownVisible && /* @__PURE__ */ jsxRuntime.jsx(
-          "div",
-          {
-            className: cn(
-              "absolute left-0 top-full z-50 mt-1 w-full overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg max-h-48",
-              dropdownClassName
-            ),
-            children: filteredItems.length > 0 ? filteredItems.map((item) => /* @__PURE__ */ jsxRuntime.jsx(
-              "button",
-              {
-                type: "button",
-                className: "w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors",
-                onClick: () => handleSelect(item),
-                children: item.label
-              },
-              item.value
-            )) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 py-2 text-sm text-[#9CA3AF]", children: fallbackText })
-          }
-        )
-      ]
-    }
-  );
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1.5 pr-2.5", children: [
+                  showClear && /* @__PURE__ */ jsxRuntime.jsx(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: handleClear,
+                      disabled,
+                      className: "flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors",
+                      "aria-label": "Clear search",
+                      children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { className: "hover:text-red-500", strokeWidth: 2, size: iconSize })
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("w-px bg-gray-400", DIVIDER_CLASSES[size]) }),
+                  /* @__PURE__ */ jsxRuntime.jsx(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: handleSearchClick,
+                      disabled,
+                      className: "flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer",
+                      "aria-label": "Search",
+                      children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Search, { strokeWidth: 2, size: iconSize })
+                    }
+                  )
+                ] })
+              ]
+            }
+          ),
+          isDropdownVisible && /* @__PURE__ */ jsxRuntime.jsx(
+            "div",
+            {
+              className: cn(
+                "absolute left-0 top-full z-50 mt-1 w-full overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg max-h-48",
+                dropdownClassName
+              ),
+              children: filteredItems.length > 0 ? filteredItems.map((item) => /* @__PURE__ */ jsxRuntime.jsx(
+                "button",
+                {
+                  type: "button",
+                  className: "w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors",
+                  onClick: () => handleSelect(item),
+                  children: item.label
+                },
+                item.value
+              )) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 py-2 text-sm text-[#9CA3AF]", children: fallbackText })
+            }
+          )
+        ]
+      }
+    )
+  ] });
 }
 SearchBar.displayName = "SearchBar";
 function Popover({
@@ -1427,47 +1477,6 @@ function PopoverContent({
     }
   ) });
 }
-function Label({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntime.jsx(
-    radixUi.Label.Root,
-    {
-      "data-slot": "label",
-      className: cn(
-        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className
-      ),
-      ...props
-    }
-  );
-}
-var SIZE_TEXT = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base"
-};
-function InputLabel({
-  size = "md",
-  required = false,
-  className,
-  children,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntime.jsxs(
-    Label,
-    {
-      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
-      ...props,
-      children: [
-        children,
-        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
-      ]
-    }
-  );
-}
-InputLabel.displayName = "InputLabel";
 var SIZE_TEXT2 = {
   sm: "text-[11px]",
   md: "text-xs",
@@ -1627,6 +1636,10 @@ var triggerVariants = classVarianceAuthority.cva(
         disabled: [
           "border-gray-300 text-gray-400",
           "opacity-50 pointer-events-none"
+        ].join(" "),
+        readonly: [
+          "bg-gray-50 border-gray-300 text-gray-700",
+          "cursor-default pointer-events-none"
         ].join(" ")
       },
       size: {
@@ -1676,7 +1689,8 @@ function Select({
   label,
   required,
   helperText,
-  error
+  error,
+  readOnly = false
 }) {
   const touchedRef = React16__namespace.useRef(false);
   const interactedRef = React16__namespace.useRef(false);
@@ -1763,12 +1777,12 @@ function Select({
   const overflowCount = visibleCount === null ? 0 : selectedArr.length - visibleCount;
   const hasSelection = mode === "multi" ? selectedArr.length > 0 : !!selected;
   const singleLabel = mode === "single" ? resolvedOptions.find((o) => o.value === selected)?.label : void 0;
-  const triggerState = disabled ? "disabled" : open ? "open" : "default";
+  const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
   const placeholderSizeClass = size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]";
   const commandInputSizeClass = size === "lg" ? "h-10 text-base" : size === "md" ? "h-9 text-sm" : "h-8 text-xs";
   const commandItemSizeClass = size === "lg" ? "px-3 py-2.5 text-base" : size === "md" ? "px-3 py-2 text-sm" : "px-2.5 py-1.5 text-xs";
   const handleOpenChange = (next) => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setOpen(next);
     if (!next) setSearch("");
     if (next) {
@@ -1804,7 +1818,7 @@ function Select({
           onKeyDown: (e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              if (!disabled) setOpen((o) => !o);
+              if (!disabled && !readOnly) setOpen((o) => !o);
             } else if (e.key === "Escape") {
               setOpen(false);
             }
@@ -2977,6 +2991,7 @@ function Radio({
   label,
   size = "md",
   disabled,
+  readOnly,
   error,
   value,
   className,
@@ -3012,6 +3027,7 @@ function Radio({
           )
         ) : GAP_ONLY[size],
         disabled && "cursor-not-allowed opacity-60",
+        readOnly && "pointer-events-none cursor-default",
         className
       ),
       children: [
@@ -3067,7 +3083,10 @@ function RadioGroup({
   required,
   helperText,
   error,
-  className
+  className,
+  borderColor,
+  bgColor,
+  readOnly
 }) {
   const reactId = React16__namespace.useId();
   const groupId = `radio-group-${reactId}`;
@@ -3090,11 +3109,11 @@ function RadioGroup({
         id: groupId,
         value,
         defaultValue,
-        onValueChange: onChange,
+        onValueChange: readOnly ? void 0 : onChange,
         disabled,
         "aria-invalid": Boolean(error) || void 0,
         "aria-describedby": describedById,
-        className: layoutClass,
+        className: cn(layoutClass, readOnly && "pointer-events-none"),
         children: options.map((opt) => {
           const optValue = toValue(opt);
           return /* @__PURE__ */ jsxRuntime.jsx(
@@ -3104,7 +3123,10 @@ function RadioGroup({
               label: toLabel(opt),
               size,
               disabled: disabled || Boolean(toDisabled(opt)),
-              error: Boolean(error)
+              error: Boolean(error),
+              borderColor,
+              bgColor,
+              readOnly
             },
             optValue
           );
@@ -3186,6 +3208,7 @@ function Checkbox({
   size = "md",
   label,
   disabled,
+  readOnly,
   indeterminate,
   error,
   className,
@@ -3205,6 +3228,7 @@ function Checkbox({
   const visualChecked = isControlled ? Boolean(checked) : internalChecked;
   const radixChecked = indeterminate ? "indeterminate" : isControlled ? Boolean(checked) : internalChecked;
   const handleCheckedChange = (next) => {
+    if (readOnly) return;
     const nextBool = next === true;
     if (!isControlled) setInternalChecked(nextBool);
     onCheckedChange?.(nextBool);
@@ -3212,7 +3236,7 @@ function Checkbox({
   const boxState = disabled ? "disabled" : error ? "error" : indeterminate ? "indeterminate" : visualChecked ? "checked" : "unchecked";
   const labelState = disabled ? "disabled" : visualChecked || indeterminate ? "checked" : "default";
   const hasCustomColors = !!(borderColor || bgColor);
-  const isActive = (visualChecked || !!indeterminate) && !error && !disabled;
+  const isActive = (visualChecked || !!indeterminate) && !error && !disabled && !readOnly;
   return /* @__PURE__ */ jsxRuntime.jsxs(
     "label",
     {
@@ -3229,6 +3253,7 @@ function Checkbox({
           error ? "border-red-500" : disabled ? "border-gray-200" : "border-gray-200"
         ) : GAP_ONLY2[size],
         disabled && "cursor-not-allowed",
+        readOnly && "pointer-events-none cursor-default",
         className
       ),
       children: [
@@ -3284,7 +3309,10 @@ function CheckboxGroup({
   required,
   helperText,
   error,
-  selectAll
+  selectAll,
+  borderColor,
+  bgColor,
+  readOnly
 }) {
   const reactId = React16__namespace.useId();
   const groupId = `checkbox-group-${reactId}`;
@@ -3329,6 +3357,7 @@ function CheckboxGroup({
         label: "Select all",
         size,
         disabled: disabled || enabledOptions.length === 0,
+        readOnly,
         error: Boolean(error),
         checked: allChecked,
         indeterminate,
@@ -3345,7 +3374,10 @@ function CheckboxGroup({
           disabled: disabled || Boolean(toDisabled(opt)),
           error: Boolean(error),
           checked: currentValue.includes(optValue),
-          onCheckedChange: (c) => toggle(optValue, c)
+          onCheckedChange: (c) => toggle(optValue, c),
+          borderColor,
+          bgColor,
+          readOnly
         },
         optValue
       );
@@ -3636,7 +3668,8 @@ var triggerVariants2 = classVarianceAuthority.cva(
       state: {
         default: "text-[#374151] hover:border-gray-500 hover:shadow-sm",
         open: "border-gray-500 ring-1 ring-gray-200 text-[#374151]",
-        disabled: "border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60 pointer-events-none"
+        disabled: "border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60 pointer-events-none",
+        readonly: "bg-gray-50 border-gray-300 text-gray-700 cursor-default pointer-events-none"
       },
       size: {
         sm: `${COMPONENT_HEIGHT.sm} ${TEXT_SIZE.sm}`,
@@ -3736,7 +3769,8 @@ function DatePicker({
   label,
   required,
   helperText,
-  error
+  error,
+  readOnly = false
 }) {
   const [open, setOpen] = React16__namespace.useState(false);
   const touchedRef = React16__namespace.useRef(false);
@@ -3863,7 +3897,7 @@ function DatePicker({
     onChange?.(null);
   };
   const handleOpenChange = (next) => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setOpen(next);
     if (next) {
       interactedRef.current = true;
@@ -3881,7 +3915,7 @@ function DatePicker({
     onTouch?.();
   };
   const canApply = draftRange !== null || pendingFrom !== null;
-  const triggerState = disabled ? "disabled" : open ? "open" : "default";
+  const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
   return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1.5", children: [
     label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size, required, children: label }),
     /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
@@ -3900,7 +3934,7 @@ function DatePicker({
           onKeyDown: (e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              if (!disabled) setOpen((o) => !o);
+              if (!disabled && !readOnly) setOpen((o) => !o);
             } else if (e.key === "Escape") {
               setOpen(false);
             }
@@ -4544,6 +4578,7 @@ var Toggle = React16__namespace.forwardRef(
     defaultChecked,
     onChange,
     disabled,
+    readOnly,
     wrapperClassName,
     ...props
   }, ref) => {
@@ -4553,9 +4588,9 @@ var Toggle = React16__namespace.forwardRef(
         ref,
         checked: checked !== void 0 ? checked : void 0,
         defaultChecked: checked !== void 0 ? void 0 : defaultChecked,
-        onCheckedChange: onChange,
+        onCheckedChange: readOnly ? void 0 : onChange,
         disabled,
-        className: trackVariants({ size }),
+        className: cn(trackVariants({ size }), readOnly && "pointer-events-none cursor-default"),
         ...props,
         children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Switch.Thumb, { className: thumbVariants({ size }) })
       }
@@ -4573,6 +4608,7 @@ var Toggle = React16__namespace.forwardRef(
         className: cn(
           "inline-flex cursor-pointer items-center gap-2",
           labelPosition === "left" && "flex-row-reverse",
+          readOnly && "pointer-events-none cursor-default",
           wrapperClassName
         ),
         children: [

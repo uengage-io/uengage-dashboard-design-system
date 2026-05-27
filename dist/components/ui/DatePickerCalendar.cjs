@@ -120,11 +120,11 @@ function InputLabel({
   return /* @__PURE__ */ jsxRuntime.jsxs(
     Label,
     {
-      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
+      className: cn(SIZE_TEXT[size], "font-medium text-slate-700 gap-0.5", className),
       ...props,
       children: [
         children,
-        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
+        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "text-red-500", children: "*" })
       ]
     }
   );
@@ -268,6 +268,10 @@ var triggerVariants = classVarianceAuthority.cva(
         disabled: [
           "border-gray-300 text-gray-400",
           "opacity-50 pointer-events-none"
+        ].join(" "),
+        readonly: [
+          "bg-gray-50 border-gray-300 text-gray-700",
+          "cursor-default pointer-events-none"
         ].join(" ")
       },
       size: {
@@ -317,7 +321,8 @@ function Select({
   label,
   required,
   helperText,
-  error
+  error,
+  readOnly = false
 }) {
   const touchedRef = React__namespace.useRef(false);
   const interactedRef = React__namespace.useRef(false);
@@ -404,12 +409,12 @@ function Select({
   const overflowCount = visibleCount === null ? 0 : selectedArr.length - visibleCount;
   const hasSelection = mode === "multi" ? selectedArr.length > 0 : !!selected;
   const singleLabel = mode === "single" ? resolvedOptions.find((o) => o.value === selected)?.label : void 0;
-  const triggerState = disabled ? "disabled" : open ? "open" : "default";
+  const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
   const placeholderSizeClass = size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]";
   const commandInputSizeClass = size === "lg" ? "h-10 text-base" : size === "md" ? "h-9 text-sm" : "h-8 text-xs";
   const commandItemSizeClass = size === "lg" ? "px-3 py-2.5 text-base" : size === "md" ? "px-3 py-2 text-sm" : "px-2.5 py-1.5 text-xs";
   const handleOpenChange = (next) => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setOpen(next);
     if (!next) setSearch("");
     if (next) {
@@ -445,7 +450,7 @@ function Select({
           onKeyDown: (e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              if (!disabled) setOpen((o) => !o);
+              if (!disabled && !readOnly) setOpen((o) => !o);
             } else if (e.key === "Escape") {
               setOpen(false);
             }

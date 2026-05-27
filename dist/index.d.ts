@@ -157,6 +157,10 @@ interface SearchBarProps<T extends string | number = string, TItem = unknown> {
     defaultValue?: T;
     valueType?: SearchValueType;
     size?: SearchBarSize;
+    /** Label displayed above the search bar. */
+    label?: string;
+    /** When `true`, appends a red asterisk to the label. */
+    required?: boolean;
     placeholder?: string;
     /**
      * Tailwind width class(es) applied to the outer wrapper. Use any responsive
@@ -167,6 +171,8 @@ interface SearchBarProps<T extends string | number = string, TItem = unknown> {
     /** Override the default height from `size`. Accepts any CSS size (number = px). */
     /** Extra classes merged onto the outer wrapper — use this for layout/width. */
     className?: string;
+    /** When true, the input shows its current value but cannot be edited or searched. */
+    readOnly?: boolean;
     inputClassName?: string;
     dropdownClassName?: string;
     disabled?: boolean;
@@ -203,7 +209,7 @@ interface SearchBarProps<T extends string | number = string, TItem = unknown> {
     fallbackText?: string;
 }
 
-declare function SearchBar<T extends string | number = string, TItem = unknown>({ value: controlledValue, defaultValue, valueType, size, placeholder, width, className, inputClassName, disabled, spellCheck, onChange, onSearch, onClear, onTouch, clearable, dropdownClassName, dropdownItems, getLabel, getValue, onSelect, fallbackText, }: SearchBarProps<T, TItem>): react_jsx_runtime.JSX.Element;
+declare function SearchBar<T extends string | number = string, TItem = unknown>({ value: controlledValue, defaultValue, valueType, size, label, required, placeholder, width, className, inputClassName, disabled, readOnly, spellCheck, onChange, onSearch, onClear, onTouch, clearable, dropdownClassName, dropdownItems, getLabel, getValue, onSelect, fallbackText, }: SearchBarProps<T, TItem>): react_jsx_runtime.JSX.Element;
 declare namespace SearchBar {
     var displayName: string;
 }
@@ -257,17 +263,19 @@ interface SelectProps<TItem = unknown> {
     helperText?: string;
     /** Error message rendered below the trigger; takes priority over helperText. */
     error?: string;
+    /** When true, the trigger shows the current selection but the dropdown cannot be opened. */
+    readOnly?: boolean;
 }
 
-declare function Select<TItem = unknown>({ options, items, getLabel, getValue, getDisabled, value: controlledValue, defaultValue, mode, size, placeholder, disabled, width, className, onChange, onTouch, spellCheck, clearable, label, required, helperText, error, }: SelectProps<TItem>): react_jsx_runtime.JSX.Element;
+declare function Select<TItem = unknown>({ options, items, getLabel, getValue, getDisabled, value: controlledValue, defaultValue, mode, size, placeholder, disabled, width, className, onChange, onTouch, spellCheck, clearable, label, required, helperText, error, readOnly, }: SelectProps<TItem>): react_jsx_runtime.JSX.Element;
 declare namespace Select {
     var displayName: string;
 }
 
-type TriggerState = "default" | "open" | "disabled";
+type TriggerState = "default" | "open" | "disabled" | "readonly";
 type TriggerSize = "xs" | "sm" | "md" | "lg";
 declare const triggerVariants$1: (props?: ({
-    state?: "default" | "disabled" | "open" | null | undefined;
+    state?: "default" | "disabled" | "open" | "readonly" | null | undefined;
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type TriggerVariants = VariantProps<typeof triggerVariants$1>;
@@ -399,8 +407,10 @@ interface CustomRadioItemProps extends Omit<React.ComponentProps<typeof RadioGro
     borderColor?: string;
     /** When provided, the pill wrapper uses this color for its background when checked. Falls back to default green tint if omitted. */
     bgColor?: string;
+    /** When true, the item shows its current state but cannot be selected. */
+    readOnly?: boolean;
 }
-declare function Radio({ id, label, size, disabled, error, value, className, borderColor, bgColor, ...rest }: CustomRadioItemProps): react_jsx_runtime.JSX.Element;
+declare function Radio({ id, label, size, disabled, readOnly, error, value, className, borderColor, bgColor, ...rest }: CustomRadioItemProps): react_jsx_runtime.JSX.Element;
 declare namespace Radio {
     var displayName: string;
 }
@@ -431,9 +441,15 @@ interface CustomRadioGroupProps<T = RadioOption> {
     helperText?: string;
     error?: string;
     className?: string;
+    /** When provided, applies this border color to each radio pill when its item is selected. */
+    borderColor?: string;
+    /** When provided, applies this background color to each radio pill when its item is selected. */
+    bgColor?: string;
+    /** When true, all radio items show their current state but cannot be changed. */
+    readOnly?: boolean;
 }
 
-declare function RadioGroup<T = RadioOption>({ options, getLabel, getValue, getDisabled, value, defaultValue, onChange, size, layout, columns, disabled, label, required, helperText, error, className, }: CustomRadioGroupProps<T>): react_jsx_runtime.JSX.Element;
+declare function RadioGroup<T = RadioOption>({ options, getLabel, getValue, getDisabled, value, defaultValue, onChange, size, layout, columns, disabled, label, required, helperText, error, className, borderColor, bgColor, readOnly, }: CustomRadioGroupProps<T>): react_jsx_runtime.JSX.Element;
 declare namespace RadioGroup {
     var displayName: string;
 }
@@ -472,6 +488,8 @@ interface CustomCheckboxProps {
     borderColor?: string;
     /** When provided, the pill wrapper uses this color for its background when checked/indeterminate. Falls back to default green tint if omitted. */
     bgColor?: string;
+    /** When true, the checkbox is visible and shows its current value but cannot be toggled. */
+    readOnly?: boolean;
 }
 interface CustomCheckboxGroupProps<T = CheckboxOption> {
     options: T[];
@@ -492,14 +510,20 @@ interface CustomCheckboxGroupProps<T = CheckboxOption> {
     helperText?: string;
     error?: string;
     selectAll?: boolean;
+    /** When provided, applies this border color to each pill when its item is checked. */
+    borderColor?: string;
+    /** When provided, applies this background color to each pill when its item is checked. */
+    bgColor?: string;
+    /** When true, all checkboxes show their current state but cannot be toggled. */
+    readOnly?: boolean;
 }
 
-declare function Checkbox({ checked, defaultChecked, onCheckedChange, size, label, disabled, indeterminate, error, className, borderColor, bgColor, ...rest }: CustomCheckboxProps & Omit<React.ComponentProps<typeof Checkbox$1.Root>, "checked" | "defaultChecked" | "onCheckedChange" | "disabled" | "className">): react_jsx_runtime.JSX.Element;
+declare function Checkbox({ checked, defaultChecked, onCheckedChange, size, label, disabled, readOnly, indeterminate, error, className, borderColor, bgColor, ...rest }: CustomCheckboxProps & Omit<React.ComponentProps<typeof Checkbox$1.Root>, "checked" | "defaultChecked" | "onCheckedChange" | "disabled" | "className">): react_jsx_runtime.JSX.Element;
 declare namespace Checkbox {
     var displayName: string;
 }
 
-declare function CheckboxGroup<T = CheckboxOption>({ options, getLabel, getValue, getDisabled, value, onChange, size, layout, columns, disabled, label, required, helperText, error, selectAll, }: CustomCheckboxGroupProps<T>): react_jsx_runtime.JSX.Element;
+declare function CheckboxGroup<T = CheckboxOption>({ options, getLabel, getValue, getDisabled, value, onChange, size, layout, columns, disabled, label, required, helperText, error, selectAll, borderColor, bgColor, readOnly, }: CustomCheckboxGroupProps<T>): react_jsx_runtime.JSX.Element;
 declare namespace CheckboxGroup {
     var displayName: string;
 }
@@ -550,16 +574,18 @@ interface DatePickerProps {
     helperText?: string;
     /** Error message rendered below the trigger; takes priority over helperText. */
     error?: string;
+    /** When true, the trigger shows the current value but the calendar cannot be opened. */
+    readOnly?: boolean;
 }
 
-declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, }: DatePickerProps): react_jsx_runtime.JSX.Element;
+declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, readOnly, }: DatePickerProps): react_jsx_runtime.JSX.Element;
 declare namespace DatePicker {
     var displayName: string;
 }
 
-type DatePickerTriggerState = "default" | "open" | "disabled";
+type DatePickerTriggerState = "default" | "open" | "disabled" | "readonly";
 declare const triggerVariants: (props?: ({
-    state?: "default" | "disabled" | "open" | null | undefined;
+    state?: "default" | "disabled" | "open" | "readonly" | null | undefined;
     size?: "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type DayCellVariant = "default" | "today" | "selected" | "inRange" | "rangeStart" | "rangeEnd" | "outsideMonth";
@@ -716,6 +742,8 @@ interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "on
     onChange?: (checked: boolean) => void;
     /** Extra className applied to the outermost wrapper */
     wrapperClassName?: string;
+    /** When true, the toggle shows its current state but cannot be changed. */
+    readOnly?: boolean;
 }
 declare const Toggle: React.ForwardRefExoticComponent<Omit<ToggleProps, "ref"> & React.RefAttributes<HTMLButtonElement>>;
 

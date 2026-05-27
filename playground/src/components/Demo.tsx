@@ -270,6 +270,8 @@ export default function Demo() {
             value={segments}
             onChange={setSegments}
             layout="horizontal"
+            borderColor="#003C1B"
+            bgColor="#003C1B"
           />
         </Row>
 
