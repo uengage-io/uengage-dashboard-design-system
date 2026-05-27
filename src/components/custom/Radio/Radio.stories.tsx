@@ -1,6 +1,8 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
 import { RadioGroup } from "./RadioButtons";
+import { Radio } from "./Radio";
 import type { RadioOption } from "@/types/radio";
 
 const THREE_OPTIONS: RadioOption[] = [
@@ -42,7 +44,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Radix-backed radio group wrapper. Renders a `Radio` (shadcn `RadioGroupItem`) per option with CVA circle, dot, and label variants. Supports `horizontal` (wrap), `vertical`, and `grid` (dynamic `columns`) layouts, group-level `disabled`, per-option `disabled`, group label, helper text, and error display with a `CircleAlert` icon.",
+          "Radix-backed radio group. By default each `Radio` renders a plain radio circle + label (no wrapper). Pass `borderColor` and/or `bgColor` on individual `Radio` items to opt into a pill wrapper that applies those colors when the item is selected. The `RadioGroup` wrapper handles layouts, group-level `disabled`, helper text, and error display.",
       },
     },
   },
@@ -54,6 +56,7 @@ const meta = {
     },
     columns: { control: { type: "number", min: 1, max: 6 } },
     label: { control: "text" },
+    required: { control: "boolean" },
     helperText: { control: "text" },
     error: { control: "text" },
     disabled: { control: "boolean" },
@@ -63,9 +66,10 @@ const meta = {
   args: {
     options: THREE_OPTIONS,
     size: "md",
-    layout: "vertical",
+    layout: "horizontal",
     columns: 2,
     disabled: false,
+    required: false,
   },
 } satisfies Meta<typeof RadioGroup>;
 
@@ -75,8 +79,9 @@ type Story = StoryObj<typeof meta>;
 /* ── Default ────────────────────────────────────────────────── */
 
 export const Default: Story = {
+  args: { defaultValue: "one" },
   render: (args) => (
-    <div className="w-96">
+    <div className="w-[560px]">
       <RadioGroup {...args} />
     </div>
   ),
@@ -157,7 +162,7 @@ export const Grid: Story = {
 
 export const Unselected: Story = {
   render: (args) => (
-    <div className="w-96">
+    <div className="w-[560px]">
       <RadioGroup {...args} />
     </div>
   ),
@@ -166,7 +171,7 @@ export const Unselected: Story = {
 export const Preselected: Story = {
   args: { defaultValue: "two" },
   render: (args) => (
-    <div className="w-96">
+    <div className="w-[560px]">
       <RadioGroup {...args} />
     </div>
   ),
@@ -175,7 +180,7 @@ export const Preselected: Story = {
 export const GroupDisabled: Story = {
   args: { defaultValue: "one", disabled: true },
   render: (args) => (
-    <div className="w-96">
+    <div className="w-[560px]">
       <RadioGroup {...args} />
     </div>
   ),
@@ -211,9 +216,26 @@ export const WithLabelAndHelper: Story = {
   ),
 };
 
+export const WithRequiredLabel: Story = {
+  name: "Required field label",
+  args: {
+    label: "Delivery zone",
+    required: true,
+    helperText: "Select the zone for this order.",
+    defaultValue: "one",
+    layout: "horizontal",
+  },
+  render: (args) => (
+    <div className="w-[560px]">
+      <RadioGroup {...args} />
+    </div>
+  ),
+};
+
 export const WithError: Story = {
   args: {
     label: "Customer segment",
+    required: true,
     error: "Please select a segment before continuing.",
     layout: "horizontal",
   },
@@ -304,6 +326,91 @@ export const CustomOptionShape: Story = {
           selected id: {`"${value}"`} · name: {`"${selected?.name ?? ""}"`}
         </code>
       </div>
+    );
+  },
+};
+
+/* ── Custom pill colors ─────────────────────────────────────────── */
+
+export const WithCustomColors: Story = {
+  name: "Custom pill colors",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass `borderColor` and `bgColor` on each `Radio` item to opt into the pill wrapper. The pill border and background apply only when that item is selected; unselected items show the default plain style.",
+      },
+    },
+  },
+  render: function CustomColorsStory() {
+    const [value, setValue] = React.useState("one");
+    return (
+      <div className="flex flex-col gap-3">
+        <RadioGroupPrimitive.Root
+          value={value}
+          onValueChange={setValue}
+          className="flex flex-col gap-2"
+        >
+          <Radio value="one" label="Option One" borderColor="#067D51" bgColor="#EFF9F4" />
+          <Radio value="two" label="Option Two" borderColor="#067D51" bgColor="#EFF9F4" />
+          <Radio value="three" label="Option Three" borderColor="#067D51" bgColor="#EFF9F4" />
+        </RadioGroupPrimitive.Root>
+        <code className="text-xs text-gray-500">value: "{value}"</code>
+      </div>
+    );
+  },
+};
+
+export const WithCustomColorsBrandBlue: Story = {
+  name: "Custom pill colors · Brand blue",
+  render: function BrandBlueStory() {
+    const [value, setValue] = React.useState("morning");
+    const slots = [
+      { value: "morning", label: "Morning (5am – 11:58am)" },
+      { value: "afternoon", label: "Afternoon (12pm – 3:59pm)" },
+      { value: "evening", label: "Evening (4pm – 7:59pm)" },
+    ];
+    return (
+      <RadioGroupPrimitive.Root
+        value={value}
+        onValueChange={setValue}
+        className="flex flex-col gap-2"
+      >
+        {slots.map((s) => (
+          <Radio
+            key={s.value}
+            value={s.value}
+            label={s.label}
+            borderColor="#3B82F6"
+            bgColor="#EFF6FF"
+          />
+        ))}
+      </RadioGroupPrimitive.Root>
+    );
+  },
+};
+
+export const WithCustomColorsHorizontal: Story = {
+  name: "Custom pill colors · Horizontal",
+  render: function HorizontalCustomStory() {
+    const [value, setValue] = React.useState("sm");
+    return (
+      <RadioGroupPrimitive.Root
+        value={value}
+        onValueChange={setValue}
+        className="flex flex-row flex-wrap gap-2"
+      >
+        {(["sm", "md", "lg"] as const).map((size) => (
+          <Radio
+            key={size}
+            value={size}
+            label={size.toUpperCase()}
+            size={size}
+            borderColor="#7C3AED"
+            bgColor="#F5F3FF"
+          />
+        ))}
+      </RadioGroupPrimitive.Root>
     );
   },
 };

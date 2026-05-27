@@ -7,6 +7,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { InputLabel } from "@/components/custom/Input/InputLabel";
+import { InputHelper } from "@/components/custom/Input/InputHelper";
 import {
   Command,
   CommandEmpty,
@@ -53,6 +55,10 @@ function Select<TItem = unknown>({
   onTouch,
   spellCheck = true,
   clearable = false,
+  label,
+  required,
+  helperText,
+  error,
 }: SelectProps<TItem>) {
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
@@ -222,6 +228,12 @@ function Select<TItem = unknown>({
   };
 
   return (
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <InputLabel size={size === "xs" ? "sm" : size} required={required}>
+          {label}
+        </InputLabel>
+      )}
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <div
@@ -398,6 +410,8 @@ function Select<TItem = unknown>({
         </Command>
       </PopoverContent>
     </Popover>
+    <InputHelper size={size === "xs" ? "sm" : size} helperText={helperText} error={error} />
+    </div>
   );
 }
 

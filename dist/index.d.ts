@@ -249,9 +249,17 @@ interface SelectProps<TItem = unknown> {
     spellCheck?: boolean;
     /** Show the X clear button (and pill remove buttons) when a value is selected. Defaults to `false`. */
     clearable?: boolean;
+    /** Field label rendered above the trigger. */
+    label?: string;
+    /** When true, appends a red asterisk directly after the label text. */
+    required?: boolean;
+    /** Helper text rendered below the trigger. */
+    helperText?: string;
+    /** Error message rendered below the trigger; takes priority over helperText. */
+    error?: string;
 }
 
-declare function Select<TItem = unknown>({ options, items, getLabel, getValue, getDisabled, value: controlledValue, defaultValue, mode, size, placeholder, disabled, width, className, onChange, onTouch, spellCheck, clearable, }: SelectProps<TItem>): react_jsx_runtime.JSX.Element;
+declare function Select<TItem = unknown>({ options, items, getLabel, getValue, getDisabled, value: controlledValue, defaultValue, mode, size, placeholder, disabled, width, className, onChange, onTouch, spellCheck, clearable, label, required, helperText, error, }: SelectProps<TItem>): react_jsx_runtime.JSX.Element;
 declare namespace Select {
     var displayName: string;
 }
@@ -387,8 +395,12 @@ interface CustomRadioItemProps extends Omit<React.ComponentProps<typeof RadioGro
     size?: Size;
     disabled?: boolean;
     error?: boolean;
+    /** When provided, the pill wrapper uses this color for its border when checked. Falls back to default green if omitted. */
+    borderColor?: string;
+    /** When provided, the pill wrapper uses this color for its background when checked. Falls back to default green tint if omitted. */
+    bgColor?: string;
 }
-declare function Radio({ id, label, size, disabled, error, value, className, ...rest }: CustomRadioItemProps): react_jsx_runtime.JSX.Element;
+declare function Radio({ id, label, size, disabled, error, value, className, borderColor, bgColor, ...rest }: CustomRadioItemProps): react_jsx_runtime.JSX.Element;
 declare namespace Radio {
     var displayName: string;
 }
@@ -415,12 +427,13 @@ interface CustomRadioGroupProps<T = RadioOption> {
     columns?: 1 | 2 | 3 | 4;
     disabled?: boolean;
     label?: string;
+    required?: boolean;
     helperText?: string;
     error?: string;
     className?: string;
 }
 
-declare function RadioGroup<T = RadioOption>({ options, getLabel, getValue, getDisabled, value, defaultValue, onChange, size, layout, columns, disabled, label, helperText, error, className, }: CustomRadioGroupProps<T>): react_jsx_runtime.JSX.Element;
+declare function RadioGroup<T = RadioOption>({ options, getLabel, getValue, getDisabled, value, defaultValue, onChange, size, layout, columns, disabled, label, required, helperText, error, className, }: CustomRadioGroupProps<T>): react_jsx_runtime.JSX.Element;
 declare namespace RadioGroup {
     var displayName: string;
 }
@@ -455,6 +468,10 @@ interface CustomCheckboxProps {
     indeterminate?: boolean;
     error?: boolean;
     className?: string;
+    /** When provided, the pill wrapper uses this color for its border when checked/indeterminate. Falls back to default green if omitted. */
+    borderColor?: string;
+    /** When provided, the pill wrapper uses this color for its background when checked/indeterminate. Falls back to default green tint if omitted. */
+    bgColor?: string;
 }
 interface CustomCheckboxGroupProps<T = CheckboxOption> {
     options: T[];
@@ -471,17 +488,18 @@ interface CustomCheckboxGroupProps<T = CheckboxOption> {
     columns?: number;
     disabled?: boolean;
     label?: string;
+    required?: boolean;
     helperText?: string;
     error?: string;
     selectAll?: boolean;
 }
 
-declare function Checkbox({ checked, defaultChecked, onCheckedChange, size, label, disabled, indeterminate, error, className, ...rest }: CustomCheckboxProps & Omit<React.ComponentProps<typeof Checkbox$1.Root>, "checked" | "defaultChecked" | "onCheckedChange" | "disabled" | "className">): react_jsx_runtime.JSX.Element;
+declare function Checkbox({ checked, defaultChecked, onCheckedChange, size, label, disabled, indeterminate, error, className, borderColor, bgColor, ...rest }: CustomCheckboxProps & Omit<React.ComponentProps<typeof Checkbox$1.Root>, "checked" | "defaultChecked" | "onCheckedChange" | "disabled" | "className">): react_jsx_runtime.JSX.Element;
 declare namespace Checkbox {
     var displayName: string;
 }
 
-declare function CheckboxGroup<T = CheckboxOption>({ options, getLabel, getValue, getDisabled, value, onChange, size, layout, columns, disabled, label, helperText, error, selectAll, }: CustomCheckboxGroupProps<T>): react_jsx_runtime.JSX.Element;
+declare function CheckboxGroup<T = CheckboxOption>({ options, getLabel, getValue, getDisabled, value, onChange, size, layout, columns, disabled, label, required, helperText, error, selectAll, }: CustomCheckboxGroupProps<T>): react_jsx_runtime.JSX.Element;
 declare namespace CheckboxGroup {
     var displayName: string;
 }
@@ -524,9 +542,17 @@ interface DatePickerProps {
     onTouch?: () => void;
     /** When true, shows a clear button to reset the selected value. Defaults to false. */
     clearable?: boolean;
+    /** Field label rendered above the trigger. */
+    label?: string;
+    /** When true, appends a red asterisk directly after the label text. */
+    required?: boolean;
+    /** Helper text rendered below the trigger. */
+    helperText?: string;
+    /** Error message rendered below the trigger; takes priority over helperText. */
+    error?: string;
 }
 
-declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, }: DatePickerProps): react_jsx_runtime.JSX.Element;
+declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, }: DatePickerProps): react_jsx_runtime.JSX.Element;
 declare namespace DatePicker {
     var displayName: string;
 }
@@ -661,11 +687,9 @@ declare function StatusBadge({ variant, size, label, icon, iconPosition, classNa
 type ToggleVariantSize = "sm" | "md" | "lg";
 declare const trackVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
-    hasInsideLabel?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const thumbVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
-    hasInsideLabel?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type TrackVariants = VariantProps<typeof trackVariants>;
 type ThumbVariants = VariantProps<typeof thumbVariants>;
@@ -673,17 +697,24 @@ type ThumbVariants = VariantProps<typeof thumbVariants>;
 interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "onChange" | "defaultChecked" | "checked"> {
     /** Size of the toggle */
     size?: ToggleVariantSize;
-    /** Label text to display */
+    /** Label text. Position is controlled by `labelPosition`. */
     label?: string;
-    /** Position of the label: 'inside' (within track), 'left' or 'right' */
-    labelPosition?: "inside" | "left" | "right";
+    /**
+     * Where the label renders:
+     * - `"top"` — above the toggle as a field label (matches Input label style)
+     * - `"right"` — inline, to the right of the switch (default)
+     * - `"left"` — inline, to the left of the switch
+     */
+    labelPosition?: "top" | "left" | "right";
+    /** When true, appends a red asterisk to a `"top"` label. */
+    required?: boolean;
     /** Controlled checked state */
     checked?: boolean;
-    /** Initial unchecked state (uncontrolled mode) */
+    /** Initial state for uncontrolled mode */
     defaultChecked?: boolean;
     /** Callback when toggle state changes */
     onChange?: (checked: boolean) => void;
-    /** Additional className for the wrapper */
+    /** Extra className applied to the outermost wrapper */
     wrapperClassName?: string;
 }
 declare const Toggle: React.ForwardRefExoticComponent<Omit<ToggleProps, "ref"> & React.RefAttributes<HTMLButtonElement>>;

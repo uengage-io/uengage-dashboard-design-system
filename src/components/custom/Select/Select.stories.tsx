@@ -19,8 +19,12 @@ const meta = {
   argTypes: {
     mode: { control: "radio", options: ["single", "multi"] },
     size: { control: "radio", options: ["xs", "sm", "md", "lg"] },
+    label: { control: "text" },
+    required: { control: "boolean" },
+    helperText: { control: "text" },
+    error: { control: "text" },
     disabled: { control: "boolean" },
-     width: { control: "text" },
+    width: { control: "text" },
     placeholder: { control: "text" },
     onChange: { action: "changed" },
   },
@@ -30,6 +34,7 @@ const meta = {
     placeholder: "Select…",
     width: "w-full sm:w-80",
     disabled: false,
+    required: false,
   },
 } satisfies Meta<typeof Select>;
 
@@ -120,6 +125,35 @@ export const Controlled: Story = {
     );
   },
   args: { mode: "multi" },
+};
+
+/* ── Label & helper ──────────────────────────────────────────────────── */
+
+export const WithLabel: Story = {
+  args: { mode: "single", options: CITY_OPTIONS, label: "City", placeholder: "Pick a city" },
+};
+
+export const WithRequiredLabel: Story = {
+  name: "Required field label",
+  args: {
+    mode: "single",
+    options: CITY_OPTIONS,
+    label: "City",
+    required: true,
+    helperText: "Choose the city for this order.",
+    placeholder: "Pick a city",
+  },
+};
+
+export const WithError: Story = {
+  args: {
+    mode: "single",
+    options: CITY_OPTIONS,
+    label: "City",
+    required: true,
+    error: "Please select a city.",
+    placeholder: "Pick a city",
+  },
 };
 
 /* ── Size variants ──────────────────────────────────────────── */

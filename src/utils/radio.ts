@@ -14,7 +14,7 @@ export const radioCircleVariants = cva(
       },
       state: {
         default:
-          "border-gray-300 bg-transparent data-[state=checked]:border-[#006F42]",
+          "border-gray-300 bg-transparent data-[state=checked]:border-[#007A4D]",
         disabled:
           "border-gray-200 bg-transparent opacity-60 cursor-not-allowed",
         error: "border-red-500 bg-transparent",
@@ -27,7 +27,7 @@ export const radioCircleVariants = cva(
   },
 );
 
-export const radioDotVariants = cva("rounded-full bg-[#003C1B]", {
+export const radioDotVariants = cva("rounded-full bg-[#007A4D]", {
   variants: {
     size: {
       sm: "h-[8px] w-[8px]",

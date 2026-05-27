@@ -21,6 +21,7 @@ export interface CustomRadioGroupProps<T = RadioOption> {
   columns?: 1 | 2 | 3 | 4;
   disabled?: boolean;
   label?: string;
+  required?: boolean;
   helperText?: string;
   error?: string;
   className?: string;

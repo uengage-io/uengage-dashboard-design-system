@@ -1,9 +1,9 @@
 import * as React from "react";
-import { CircleAlert } from "lucide-react";
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Radio } from "./Radio";
+import { InputLabel } from "@/components/custom/Input/InputLabel";
+import { InputHelper } from "@/components/custom/Input/InputHelper";
 import type { CustomRadioGroupProps, RadioOption } from "@/types/radio";
 
 function RadioGroup<T = RadioOption>({
@@ -17,9 +17,9 @@ function RadioGroup<T = RadioOption>({
   size = "md",
   layout = "vertical",
   columns = 2,
-  
   disabled,
   label,
+  required,
   helperText,
   error,
   className,
@@ -43,13 +43,10 @@ function RadioGroup<T = RadioOption>({
 
   const layoutClass =
     layout === "horizontal"
-      ? "flex flex-row flex-wrap gap-x-6 gap-y-3"
+      ? "flex flex-row flex-wrap gap-x-3 gap-y-2"
       : layout === "grid"
-        ? cn("grid w-full gap-x-6 gap-y-3", gridColsMap[columns])
-        : "flex flex-col gap-3";
-
-  const helperSize =
-    size === "sm" ? "text-xs" : size === "lg" ? "text-sm" : "text-xs";
+        ? cn("grid w-full gap-x-3 gap-y-2", gridColsMap[columns])
+        : "flex flex-col gap-2";
 
   const toLabel =
     getLabel ?? ((item: T) => (item as unknown as RadioOption).label);
@@ -59,11 +56,11 @@ function RadioGroup<T = RadioOption>({
     getDisabled ?? ((item: T) => (item as unknown as RadioOption).disabled);
 
   return (
-    <div className={cn("flex w-full flex-col gap-2", className)}>
+    <div className={cn("flex w-full flex-col gap-1.5", className)}>
       {label && (
-        <Label htmlFor={groupId} className="text-gray-900">
+        <InputLabel htmlFor={groupId} size={size} required={required}>
           {label}
-        </Label>
+        </InputLabel>
       )}
 
       <RadioGroupPrimitive.Root
@@ -91,22 +88,12 @@ function RadioGroup<T = RadioOption>({
         })}
       </RadioGroupPrimitive.Root>
 
-      {error ? (
-        <p
-          id={`${groupId}-error`}
-          className={cn(
-            "inline-flex items-center gap-1 text-red-500",
-            helperSize,
-          )}
-        >
-          <CircleAlert className="size-3.5" aria-hidden="true" />
-          <span>{error}</span>
-        </p>
-      ) : helperText ? (
-        <p id={`${groupId}-helper`} className={cn("text-gray-500", helperSize)}>
-          {helperText}
-        </p>
-      ) : null}
+      <InputHelper
+        id={error ? `${groupId}-error` : helperText ? `${groupId}-helper` : undefined}
+        size={size}
+        helperText={helperText}
+        error={error}
+      />
     </div>
   );
 }

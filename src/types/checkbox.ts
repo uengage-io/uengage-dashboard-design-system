@@ -14,6 +14,10 @@ export interface CustomCheckboxProps {
   indeterminate?: boolean;
   error?: boolean;
   className?: string;
+  /** When provided, the pill wrapper uses this color for its border when checked/indeterminate. Falls back to default green if omitted. */
+  borderColor?: string;
+  /** When provided, the pill wrapper uses this color for its background when checked/indeterminate. Falls back to default green tint if omitted. */
+  bgColor?: string;
 }
 
 export interface CustomCheckboxGroupProps<T = CheckboxOption> {
@@ -31,6 +35,7 @@ export interface CustomCheckboxGroupProps<T = CheckboxOption> {
   columns?: number;
   disabled?: boolean;
   label?: string;
+  required?: boolean;
   helperText?: string;
   error?: string;
   selectAll?: boolean;

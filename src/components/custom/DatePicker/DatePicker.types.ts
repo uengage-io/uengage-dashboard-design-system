@@ -27,4 +27,12 @@ export interface DatePickerProps {
   onTouch?: () => void;
   /** When true, shows a clear button to reset the selected value. Defaults to false. */
   clearable?: boolean;
+  /** Field label rendered above the trigger. */
+  label?: string;
+  /** When true, appends a red asterisk directly after the label text. */
+  required?: boolean;
+  /** Helper text rendered below the trigger. */
+  helperText?: string;
+  /** Error message rendered below the trigger; takes priority over helperText. */
+  error?: string;
 }
