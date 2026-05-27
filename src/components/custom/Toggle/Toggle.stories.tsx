@@ -5,111 +5,113 @@ import { Toggle } from "./Toggle";
 const meta: Meta<typeof Toggle> = {
   title: "Components/Toggle",
   component: Toggle,
-  parameters: {
-    layout: "padded",
-  },
+  parameters: { layout: "padded" },
   tags: ["autodocs"],
   argTypes: {
     size: {
       control: { type: "select" },
       options: ["sm", "md", "lg"],
-      description: "Size of the toggle",
     },
     label: {
       control: { type: "text" },
-      description: "Label text to display",
+      description: "Label text. Position is controlled by `labelPosition`.",
     },
     labelPosition: {
       control: { type: "select" },
-      options: ["inside", "left", "right"],
-      description: "Position of the label",
+      options: ["top", "left", "right"],
+      description: "`top` renders above the toggle as a field label; `left`/`right` renders inline beside the switch",
+    },
+    required: {
+      control: { type: "boolean" },
+      description: "Appends a red asterisk to a `top` label",
     },
     disabled: {
       control: { type: "boolean" },
-      description: "Disable the toggle",
     },
+  },
+  args: {
+    size: "md",
+    labelPosition: "right",
+    disabled: false,
+    required: false,
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * Default toggle with no label
- */
+/* ── No label ───────────────────────────────────────────────────── */
+
 export const Default: Story = {
+  args: { size: "md" },
+};
+
+/* ── Top label (field label pattern) ───────────────────────────── */
+
+export const WithTopLabel: Story = {
+  name: "Top label",
   args: {
+    label: "Enable notifications",
+    labelPosition: "top",
     size: "md",
   },
 };
 
-/**
- * Toggle with label on the right (default)
- */
-export const WithLabelRight: Story = {
+export const WithTopLabelRequired: Story = {
+  name: "Top label · Required",
   args: {
+    label: "Enable notifications",
+    labelPosition: "top",
+    required: true,
     size: "md",
+  },
+};
+
+/* ── Inline label (beside the switch) ──────────────────────────── */
+
+export const LabelRight: Story = {
+  name: "Label · Right",
+  args: {
     label: "Enable notifications",
     labelPosition: "right",
+    size: "md",
   },
 };
 
-/**
- * Toggle with label on the left
- */
-export const WithLabelLeft: Story = {
+export const LabelLeft: Story = {
+  name: "Label · Left",
   args: {
-    size: "md",
     label: "Dark mode",
     labelPosition: "left",
-  },
-};
-
-/**
- * Toggle with inside label (appears when checked off)
- */
-export const WithInsideLabel: Story = {
-  args: {
     size: "md",
-    label: "ON",
-    labelPosition: "inside",
   },
 };
 
-/**
- * Different sizes
- */
+/* ── Sizes ──────────────────────────────────────────────────────── */
+
 export const Sizes: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-4">
-        <Toggle size="sm" label="Small" labelPosition="right" />
-      </div>
-      <div className="flex items-center gap-4">
-        <Toggle size="md" label="Medium" labelPosition="right" />
-      </div>
-      <div className="flex items-center gap-4">
-        <Toggle size="lg" label="Large" labelPosition="right" />
-      </div>
+      <Toggle size="sm" label="Small" labelPosition="right" />
+      <Toggle size="md" label="Medium" labelPosition="right" />
+      <Toggle size="lg" label="Large" labelPosition="right" />
     </div>
   ),
 };
 
-/**
- * Disabled state
- */
+/* ── Disabled ───────────────────────────────────────────────────── */
+
 export const Disabled: Story = {
   args: {
-    size: "md",
-    label: "Disabled toggle",
+    label: "Notifications",
     labelPosition: "right",
     disabled: true,
+    defaultChecked: true,
   },
 };
 
-/**
- * Controlled component
- */
+/* ── Controlled ─────────────────────────────────────────────────── */
+
 export const Controlled: Story = {
   render: function ControlledStory() {
     const [checked, setChecked] = React.useState(false);
@@ -117,34 +119,16 @@ export const Controlled: Story = {
       <div className="flex flex-col gap-4">
         <Toggle
           size="md"
-          label="Controlled toggle"
-          labelPosition="right"
+          label="Email notifications"
+          labelPosition="top"
+          required
           checked={checked}
           onChange={setChecked}
         />
-        <p className="text-sm text-gray-600">
-          Status: {checked ? "ON" : "OFF"}
-        </p>
+        <code className="text-xs text-[#6B7280]">
+          checked: {String(checked)}
+        </code>
       </div>
     );
   },
 };
-
-/**
- * Inside label with all sizes
- */
-// export const InsideLabelSizes: Story = {
-//   render: () => (
-//     <div className="flex flex-col gap-6">
-//       <div className="flex items-center gap-4">
-//         <Toggle size="sm" label="ON" labelPosition="inside" />
-//       </div>
-//       <div className="flex items-center gap-4">
-//         <Toggle size="md" label="ON" labelPosition="inside" />
-//       </div>
-//       <div className="flex items-center gap-4">
-//         <Toggle size="lg" label="ON" labelPosition="inside" />
-//       </div>
-//     </div>
-//   ),
-// };

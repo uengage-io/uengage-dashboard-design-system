@@ -89,6 +89,85 @@ function PopoverContent({
     }
   ) });
 }
+function Label({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    radixUi.Label.Root,
+    {
+      "data-slot": "label",
+      className: cn(
+        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className
+      ),
+      ...props
+    }
+  );
+}
+var SIZE_TEXT = {
+  sm: "text-xs",
+  md: "text-sm",
+  lg: "text-base"
+};
+function InputLabel({
+  size = "md",
+  required = false,
+  className,
+  children,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    Label,
+    {
+      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
+      ...props,
+      children: [
+        children,
+        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
+      ]
+    }
+  );
+}
+InputLabel.displayName = "InputLabel";
+var SIZE_TEXT2 = {
+  sm: "text-[11px]",
+  md: "text-xs",
+  lg: "text-sm"
+};
+var ICON_SIZE = {
+  sm: "size-3",
+  md: "size-3.5",
+  lg: "size-4"
+};
+function InputHelper({
+  size = "md",
+  helperText,
+  error,
+  className,
+  ...props
+}) {
+  if (!error && !helperText) return null;
+  const showError = Boolean(error);
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    "p",
+    {
+      role: showError ? "alert" : void 0,
+      className: cn(
+        "inline-flex items-center gap-1",
+        SIZE_TEXT2[size],
+        showError ? "text-red-500" : "text-slate-500",
+        className
+      ),
+      ...props,
+      children: [
+        showError && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CircleAlert, { "aria-hidden": "true", className: cn(ICON_SIZE[size], "shrink-0") }),
+        /* @__PURE__ */ jsxRuntime.jsx("span", { children: showError ? error : helperText })
+      ]
+    }
+  );
+}
+InputHelper.displayName = "InputHelper";
 function Command({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntime.jsx(
     cmdk.Command,
@@ -234,7 +313,11 @@ function Select({
   onChange,
   onTouch,
   spellCheck = true,
-  clearable = false
+  clearable = false,
+  label,
+  required,
+  helperText,
+  error
 }) {
   const touchedRef = React__namespace.useRef(false);
   const interactedRef = React__namespace.useRef(false);
@@ -344,183 +427,187 @@ function Select({
     touchedRef.current = true;
     onTouch?.();
   };
-  return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
-    /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
-      "div",
-      {
-        role: "button",
-        tabIndex: disabled ? -1 : 0,
-        "aria-disabled": disabled,
-        "aria-haspopup": "listbox",
-        "aria-expanded": open,
-        onFocus: () => {
-          interactedRef.current = true;
-        },
-        onBlur: handleTriggerBlur,
-        onKeyDown: (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            if (!disabled) setOpen((o) => !o);
-          } else if (e.key === "Escape") {
-            setOpen(false);
-          }
-        },
-        className: cn(
-          triggerVariants({ state: triggerState, size }),
-          width,
-          className
-        ),
-        children: [
-          /* @__PURE__ */ jsxRuntime.jsx(
-            "div",
-            {
-              ref: mode === "multi" ? pillsContainerRef : void 0,
-              className: "flex flex-1 items-center gap-1 overflow-hidden min-w-0",
-              children: mode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-                displayedPills.map((val) => {
-                  const opt = resolvedOptions.find((o) => o.value === val);
-                  if (!opt) return null;
-                  return /* @__PURE__ */ jsxRuntime.jsxs(
-                    "span",
-                    {
-                      "data-pill": true,
-                      className: "inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]",
-                      children: [
-                        /* @__PURE__ */ jsxRuntime.jsx("span", { className: "truncate", children: opt.label }),
-                        clearable && /* @__PURE__ */ jsxRuntime.jsx(
-                          "button",
-                          {
-                            type: "button",
-                            tabIndex: -1,
-                            onClick: (e) => removePill(val, e),
-                            className: "ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]",
-                            "aria-label": `Remove ${opt.label}`,
-                            children: /* @__PURE__ */ jsxRuntime.jsx(
-                              lucideReact.X,
-                              {
-                                size: 10,
-                                strokeWidth: 2,
-                                className: "hover:text-red-500"
-                              }
-                            )
-                          }
-                        )
-                      ]
-                    },
-                    val
-                  );
-                }),
-                overflowCount > 0 && /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]", children: [
-                  "+",
-                  overflowCount
-                ] })
-              ] }) : /* @__PURE__ */ jsxRuntime.jsx(
-                "span",
-                {
-                  className: cn(
-                    "truncate text-[#C4C9D2]",
-                    placeholderSizeClass
-                  ),
-                  children: placeholder
-                }
-              ) : /* @__PURE__ */ jsxRuntime.jsx(
-                "span",
-                {
-                  className: cn(
-                    "truncate",
-                    singleLabel ? "text-[#111827]" : cn("text-[#C4C9D2]", placeholderSizeClass)
-                  ),
-                  children: singleLabel ?? placeholder
-                }
-              )
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1.5", children: [
+    label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size: size === "xs" ? "sm" : size, required, children: label }),
+    /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
+      /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          role: "button",
+          tabIndex: disabled ? -1 : 0,
+          "aria-disabled": disabled,
+          "aria-haspopup": "listbox",
+          "aria-expanded": open,
+          onFocus: () => {
+            interactedRef.current = true;
+          },
+          onBlur: handleTriggerBlur,
+          onKeyDown: (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (!disabled) setOpen((o) => !o);
+            } else if (e.key === "Escape") {
+              setOpen(false);
             }
+          },
+          className: cn(
+            triggerVariants({ state: triggerState, size }),
+            width,
+            className
           ),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
-            clearable && hasSelection && /* @__PURE__ */ jsxRuntime.jsx(
-              "button",
-              {
-                type: "button",
-                tabIndex: -1,
-                onClick: clearAll,
-                className: "flex items-center text-gray-400 hover:text-gray-600",
-                "aria-label": "Clear selection",
-                children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 14, className: "hover:text-red-500", strokeWidth: 2 })
-              }
-            ),
+          children: [
             /* @__PURE__ */ jsxRuntime.jsx(
-              lucideReact.ChevronDown,
+              "div",
               {
-                size: 16,
-                strokeWidth: 2,
-                className: cn(
-                  "text-gray-600 transition-transform duration-200",
-                  open && "rotate-180"
+                ref: mode === "multi" ? pillsContainerRef : void 0,
+                className: "flex flex-1 items-center gap-1 overflow-hidden min-w-0",
+                children: mode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+                  displayedPills.map((val) => {
+                    const opt = resolvedOptions.find((o) => o.value === val);
+                    if (!opt) return null;
+                    return /* @__PURE__ */ jsxRuntime.jsxs(
+                      "span",
+                      {
+                        "data-pill": true,
+                        className: "inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]",
+                        children: [
+                          /* @__PURE__ */ jsxRuntime.jsx("span", { className: "truncate", children: opt.label }),
+                          clearable && /* @__PURE__ */ jsxRuntime.jsx(
+                            "button",
+                            {
+                              type: "button",
+                              tabIndex: -1,
+                              onClick: (e) => removePill(val, e),
+                              className: "ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]",
+                              "aria-label": `Remove ${opt.label}`,
+                              children: /* @__PURE__ */ jsxRuntime.jsx(
+                                lucideReact.X,
+                                {
+                                  size: 10,
+                                  strokeWidth: 2,
+                                  className: "hover:text-red-500"
+                                }
+                              )
+                            }
+                          )
+                        ]
+                      },
+                      val
+                    );
+                  }),
+                  overflowCount > 0 && /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]", children: [
+                    "+",
+                    overflowCount
+                  ] })
+                ] }) : /* @__PURE__ */ jsxRuntime.jsx(
+                  "span",
+                  {
+                    className: cn(
+                      "truncate text-[#C4C9D2]",
+                      placeholderSizeClass
+                    ),
+                    children: placeholder
+                  }
+                ) : /* @__PURE__ */ jsxRuntime.jsx(
+                  "span",
+                  {
+                    className: cn(
+                      "truncate",
+                      singleLabel ? "text-[#111827]" : cn("text-[#C4C9D2]", placeholderSizeClass)
+                    ),
+                    children: singleLabel ?? placeholder
+                  }
                 )
               }
-            )
-          ] })
-        ]
-      }
-    ) }),
-    /* @__PURE__ */ jsxRuntime.jsx(
-      PopoverContent,
-      {
-        className: "max-w-[calc(100vw-1rem)]",
-        style: {
-          zIndex: 20,
-          width: "var(--radix-popover-trigger-width)"
-        },
-        children: /* @__PURE__ */ jsxRuntime.jsxs(Command, { shouldFilter: false, children: [
-          /* @__PURE__ */ jsxRuntime.jsx(
-            CommandInput,
-            {
-              placeholder: "Search...",
-              value: search,
-              onValueChange: setSearch,
-              spellCheck,
-              className: commandInputSizeClass
-            }
-          ),
-          /* @__PURE__ */ jsxRuntime.jsxs(CommandList, { children: [
-            filteredOptions.length === 0 && search.trim() ? /* @__PURE__ */ jsxRuntime.jsx(CommandEmpty, { children: "No results found." }) : null,
-            mode === "multi" && /* @__PURE__ */ jsxRuntime.jsxs(
-              CommandItem,
+            ),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
+              clearable && hasSelection && /* @__PURE__ */ jsxRuntime.jsx(
+                "button",
+                {
+                  type: "button",
+                  tabIndex: -1,
+                  onClick: clearAll,
+                  className: "flex items-center text-gray-400 hover:text-gray-600",
+                  "aria-label": "Clear selection",
+                  children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 14, className: "hover:text-red-500", strokeWidth: 2 })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                lucideReact.ChevronDown,
+                {
+                  size: 16,
+                  strokeWidth: 2,
+                  className: cn(
+                    "text-gray-600 transition-transform duration-200",
+                    open && "rotate-180"
+                  )
+                }
+              )
+            ] })
+          ]
+        }
+      ) }),
+      /* @__PURE__ */ jsxRuntime.jsx(
+        PopoverContent,
+        {
+          className: "max-w-[calc(100vw-1rem)]",
+          style: {
+            zIndex: 20,
+            width: "var(--radix-popover-trigger-width)"
+          },
+          children: /* @__PURE__ */ jsxRuntime.jsxs(Command, { shouldFilter: false, children: [
+            /* @__PURE__ */ jsxRuntime.jsx(
+              CommandInput,
               {
-                value: SELECT_ALL,
-                onSelect: () => handleSelect(SELECT_ALL),
-                className: cn(
-                  "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                  commandItemSizeClass
-                ),
-                children: [
-                  /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: allSelected }),
-                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1", children: "Select all" })
-                ]
+                placeholder: "Search...",
+                value: search,
+                onValueChange: setSearch,
+                spellCheck,
+                className: commandInputSizeClass
               }
             ),
-            filteredOptions.map((option) => /* @__PURE__ */ jsxRuntime.jsxs(
-              CommandItem,
-              {
-                value: option.value,
-                disabled: option.disabled,
-                "aria-selected": isSelected(option.value),
-                onSelect: () => handleSelect(option.value),
-                className: cn(
-                  "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                  commandItemSizeClass
-                ),
-                children: [
-                  mode === "multi" && /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: isSelected(option.value) }),
-                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1 truncate", children: option.label }),
-                  mode === "single" && isSelected(option.value) && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Check, { size: 14, className: "shrink-0 text-[#006F42]" })
-                ]
-              },
-              option.value
-            ))
+            /* @__PURE__ */ jsxRuntime.jsxs(CommandList, { children: [
+              filteredOptions.length === 0 && search.trim() ? /* @__PURE__ */ jsxRuntime.jsx(CommandEmpty, { children: "No results found." }) : null,
+              mode === "multi" && /* @__PURE__ */ jsxRuntime.jsxs(
+                CommandItem,
+                {
+                  value: SELECT_ALL,
+                  onSelect: () => handleSelect(SELECT_ALL),
+                  className: cn(
+                    "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                    commandItemSizeClass
+                  ),
+                  children: [
+                    /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: allSelected }),
+                    /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1", children: "Select all" })
+                  ]
+                }
+              ),
+              filteredOptions.map((option) => /* @__PURE__ */ jsxRuntime.jsxs(
+                CommandItem,
+                {
+                  value: option.value,
+                  disabled: option.disabled,
+                  "aria-selected": isSelected(option.value),
+                  onSelect: () => handleSelect(option.value),
+                  className: cn(
+                    "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                    commandItemSizeClass
+                  ),
+                  children: [
+                    mode === "multi" && /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: isSelected(option.value) }),
+                    /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1 truncate", children: option.label }),
+                    mode === "single" && isSelected(option.value) && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Check, { size: 14, className: "shrink-0 text-[#006F42]" })
+                  ]
+                },
+                option.value
+              ))
+            ] })
           ] })
-        ] })
-      }
-    )
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntime.jsx(InputHelper, { size: size === "xs" ? "sm" : size, helperText, error })
   ] });
 }
 Select.displayName = "Select";

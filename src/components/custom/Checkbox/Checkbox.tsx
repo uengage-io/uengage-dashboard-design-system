@@ -19,10 +19,16 @@ const ICON_SIZE: Record<"sm" | "md" | "lg", string> = {
   lg: "size-5",
 };
 
-const GAP: Record<"sm" | "md" | "lg", string> = {
+const PILL_PADDING: Record<"sm" | "md" | "lg", string> = {
+  sm: "gap-1.5 px-2.5 py-1.5",
+  md: "gap-2 px-3 py-2",
+  lg: "gap-2.5 px-4 py-2.5",
+};
+
+const GAP_ONLY: Record<"sm" | "md" | "lg", string> = {
   sm: "gap-1.5",
-  md: "gap-2.5",
-  lg: "gap-3",
+  md: "gap-2",
+  lg: "gap-2.5",
 };
 
 function Checkbox({
@@ -35,6 +41,8 @@ function Checkbox({
   indeterminate,
   error,
   className,
+  borderColor,
+  bgColor,
   ...rest
 }: CustomCheckboxProps &
   Omit<
@@ -91,12 +99,33 @@ function Checkbox({
       ? "checked"
       : "default";
 
+  const hasCustomColors = !!(borderColor || bgColor);
+  const isActive = (visualChecked || !!indeterminate) && !error && !disabled;
+
   return (
     <label
       htmlFor={itemId}
+      style={
+        hasCustomColors && isActive
+          ? {
+              ...(borderColor ? { borderColor } : {}),
+              ...(bgColor ? { backgroundColor: bgColor } : {}),
+            }
+          : undefined
+      }
       className={cn(
-        "group inline-flex cursor-pointer items-center",
-        GAP[size],
+        "group inline-flex cursor-pointer items-center transition-colors",
+        hasCustomColors
+          ? cn(
+              "rounded-xl border",
+              PILL_PADDING[size],
+              error
+                ? "border-red-500"
+                : disabled
+                  ? "border-gray-200"
+                  : "border-gray-200",
+            )
+          : GAP_ONLY[size],
         disabled && "cursor-not-allowed",
         className,
       )}

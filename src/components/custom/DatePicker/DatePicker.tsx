@@ -13,6 +13,8 @@ import {
 } from "../../ui/DatePickerCalendar";
 import { triggerVariants } from "./datepickerVariants";
 import { formatDate, formatRange, formatMonthYear } from "./dateHelpers";
+import { InputLabel } from "@/components/custom/Input/InputLabel";
+import { InputHelper } from "@/components/custom/Input/InputHelper";
 import type { DatePickerProps, DateRange } from "./DatePicker.types";
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
@@ -71,6 +73,10 @@ function DatePicker({
   maxDate,
   onTouch,
   clearable = false,
+  label,
+  required,
+  helperText,
+  error,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
   const touchedRef = React.useRef(false);
@@ -281,6 +287,12 @@ function DatePicker({
   const triggerState = disabled ? "disabled" : open ? "open" : "default";
 
   return (
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <InputLabel size={size} required={required}>
+          {label}
+        </InputLabel>
+      )}
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <div
@@ -414,6 +426,8 @@ function DatePicker({
         </div>
       </PopoverContent>
     </Popover>
+    <InputHelper size={size} helperText={helperText} error={error} />
+    </div>
   );
 }
 

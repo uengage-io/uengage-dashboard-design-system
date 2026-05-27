@@ -27,6 +27,10 @@ const meta = {
       options: ["sm", "md", "lg"],
       description: "Trigger height preset.",
     },
+    label: { control: "text" },
+    required: { control: "boolean" },
+    helperText: { control: "text" },
+    error: { control: "text" },
     placeholder: { control: "text" },
     disabled: { control: "boolean" },
     clearable: { control: "boolean" },
@@ -40,6 +44,7 @@ const meta = {
     mode: "single",
     disabled: false,
     clearable: false,
+    required: false,
   },
   decorators: [
     (Story) => (
@@ -125,6 +130,33 @@ export const MonthWithMinMax: Story = {
     placeholder: "2025 – 2027 only",
     minDate: new Date(2025, 0, 1),
     maxDate: new Date(2027, 11, 31),
+  },
+};
+
+/* ── Label & helper ──────────────────────────────────────────────────── */
+
+export const WithLabel: Story = {
+  args: { mode: "single", label: "Delivery date", placeholder: "Select a date" },
+};
+
+export const WithRequiredLabel: Story = {
+  name: "Required field label",
+  args: {
+    mode: "single",
+    label: "Delivery date",
+    required: true,
+    helperText: "Choose the expected delivery date.",
+    placeholder: "Select a date",
+  },
+};
+
+export const WithError: Story = {
+  args: {
+    mode: "single",
+    label: "Delivery date",
+    required: true,
+    error: "Delivery date is required.",
+    placeholder: "Select a date",
   },
 };
 

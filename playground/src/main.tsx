@@ -25,15 +25,10 @@ import InputPreview from "./components/Input";
 import DatePickerPreview from "./components/DatePicker";
 import PrevDemo from "./components/Prev";
 import AppLayoutPreview from "./components/AppLayout";
+import Demo from "./components/Demo";
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* <AppLayoutPreview /> */}
-    {/* <ButtonPreview /> */}
-    <TabsPreview />
-    {/* <AlertDialogPreview/> */}
-    {/* <SidebarPreview/> */}
-    {/* <ModalPreview/> */}
-    <LayoutPreview/>
-    {/* <Loader/> */}
+    <Demo />
   </React.StrictMode>,
 );

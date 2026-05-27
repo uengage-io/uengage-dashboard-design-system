@@ -1,8 +1,8 @@
 import * as React from "react";
-import { CircleAlert } from "lucide-react";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "./Checkbox";
+import { InputLabel } from "@/components/custom/Input/InputLabel";
+import { InputHelper } from "@/components/custom/Input/InputHelper";
 import type {
   CheckboxOption,
   CustomCheckboxGroupProps,
@@ -20,6 +20,7 @@ function CheckboxGroup<T = CheckboxOption>({
   columns = 2,
   disabled,
   label,
+  required,
   helperText,
   error,
   selectAll,
@@ -79,20 +80,17 @@ function CheckboxGroup<T = CheckboxOption>({
 
   const layoutClass =
     layout === "horizontal"
-      ? "flex flex-row flex-wrap gap-x-6 gap-y-3"
+      ? "flex flex-row flex-wrap gap-x-3 gap-y-2"
       : layout === "grid"
-        ? `grid grid-cols-[repeat(${columns},minmax(0,1fr))] gap-x-6 gap-y-3`
-        : "flex flex-col gap-3";
-
-  const helperSize =
-    size === "sm" ? "text-xs" : size === "lg" ? "text-sm" : "text-xs";
+        ? `grid grid-cols-[repeat(${columns},minmax(0,1fr))] gap-x-3 gap-y-2`
+        : "flex flex-col gap-2";
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="flex w-full flex-col gap-1.5">
       {label && (
-        <Label htmlFor={groupId} className="text-gray-900">
+        <InputLabel htmlFor={groupId} size={size} required={required}>
           {label}
-        </Label>
+        </InputLabel>
       )}
 
       {selectAll && (
@@ -126,22 +124,12 @@ function CheckboxGroup<T = CheckboxOption>({
         })}
       </div>
 
-      {error ? (
-        <p
-          id={`${groupId}-error`}
-          className={cn(
-            "inline-flex items-center gap-1 text-red-500",
-            helperSize,
-          )}
-        >
-          <CircleAlert className="size-3.5" aria-hidden="true" />
-          <span>{error}</span>
-        </p>
-      ) : helperText ? (
-        <p id={`${groupId}-helper`} className={cn("text-gray-500", helperSize)}>
-          {helperText}
-        </p>
-      ) : describedById ? null : null}
+      <InputHelper
+        id={error ? `${groupId}-error` : helperText ? `${groupId}-helper` : undefined}
+        size={size}
+        helperText={helperText}
+        error={error}
+      />
     </div>
   );
 }

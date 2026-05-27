@@ -1427,6 +1427,85 @@ function PopoverContent({
     }
   ) });
 }
+function Label({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    radixUi.Label.Root,
+    {
+      "data-slot": "label",
+      className: cn(
+        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className
+      ),
+      ...props
+    }
+  );
+}
+var SIZE_TEXT = {
+  sm: "text-xs",
+  md: "text-sm",
+  lg: "text-base"
+};
+function InputLabel({
+  size = "md",
+  required = false,
+  className,
+  children,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    Label,
+    {
+      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
+      ...props,
+      children: [
+        children,
+        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
+      ]
+    }
+  );
+}
+InputLabel.displayName = "InputLabel";
+var SIZE_TEXT2 = {
+  sm: "text-[11px]",
+  md: "text-xs",
+  lg: "text-sm"
+};
+var ICON_SIZE = {
+  sm: "size-3",
+  md: "size-3.5",
+  lg: "size-4"
+};
+function InputHelper({
+  size = "md",
+  helperText,
+  error,
+  className,
+  ...props
+}) {
+  if (!error && !helperText) return null;
+  const showError = Boolean(error);
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    "p",
+    {
+      role: showError ? "alert" : void 0,
+      className: cn(
+        "inline-flex items-center gap-1",
+        SIZE_TEXT2[size],
+        showError ? "text-red-500" : "text-slate-500",
+        className
+      ),
+      ...props,
+      children: [
+        showError && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CircleAlert, { "aria-hidden": "true", className: cn(ICON_SIZE[size], "shrink-0") }),
+        /* @__PURE__ */ jsxRuntime.jsx("span", { children: showError ? error : helperText })
+      ]
+    }
+  );
+}
+InputHelper.displayName = "InputHelper";
 function Command({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntime.jsx(
     cmdk.Command,
@@ -1593,7 +1672,11 @@ function Select({
   onChange,
   onTouch,
   spellCheck = true,
-  clearable = false
+  clearable = false,
+  label,
+  required,
+  helperText,
+  error
 }) {
   const touchedRef = React16__namespace.useRef(false);
   const interactedRef = React16__namespace.useRef(false);
@@ -1703,183 +1786,187 @@ function Select({
     touchedRef.current = true;
     onTouch?.();
   };
-  return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
-    /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
-      "div",
-      {
-        role: "button",
-        tabIndex: disabled ? -1 : 0,
-        "aria-disabled": disabled,
-        "aria-haspopup": "listbox",
-        "aria-expanded": open,
-        onFocus: () => {
-          interactedRef.current = true;
-        },
-        onBlur: handleTriggerBlur,
-        onKeyDown: (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            if (!disabled) setOpen((o) => !o);
-          } else if (e.key === "Escape") {
-            setOpen(false);
-          }
-        },
-        className: cn(
-          triggerVariants({ state: triggerState, size }),
-          width,
-          className
-        ),
-        children: [
-          /* @__PURE__ */ jsxRuntime.jsx(
-            "div",
-            {
-              ref: mode === "multi" ? pillsContainerRef : void 0,
-              className: "flex flex-1 items-center gap-1 overflow-hidden min-w-0",
-              children: mode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-                displayedPills.map((val) => {
-                  const opt = resolvedOptions.find((o) => o.value === val);
-                  if (!opt) return null;
-                  return /* @__PURE__ */ jsxRuntime.jsxs(
-                    "span",
-                    {
-                      "data-pill": true,
-                      className: "inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]",
-                      children: [
-                        /* @__PURE__ */ jsxRuntime.jsx("span", { className: "truncate", children: opt.label }),
-                        clearable && /* @__PURE__ */ jsxRuntime.jsx(
-                          "button",
-                          {
-                            type: "button",
-                            tabIndex: -1,
-                            onClick: (e) => removePill(val, e),
-                            className: "ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]",
-                            "aria-label": `Remove ${opt.label}`,
-                            children: /* @__PURE__ */ jsxRuntime.jsx(
-                              lucideReact.X,
-                              {
-                                size: 10,
-                                strokeWidth: 2,
-                                className: "hover:text-red-500"
-                              }
-                            )
-                          }
-                        )
-                      ]
-                    },
-                    val
-                  );
-                }),
-                overflowCount > 0 && /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]", children: [
-                  "+",
-                  overflowCount
-                ] })
-              ] }) : /* @__PURE__ */ jsxRuntime.jsx(
-                "span",
-                {
-                  className: cn(
-                    "truncate text-[#C4C9D2]",
-                    placeholderSizeClass
-                  ),
-                  children: placeholder
-                }
-              ) : /* @__PURE__ */ jsxRuntime.jsx(
-                "span",
-                {
-                  className: cn(
-                    "truncate",
-                    singleLabel ? "text-[#111827]" : cn("text-[#C4C9D2]", placeholderSizeClass)
-                  ),
-                  children: singleLabel ?? placeholder
-                }
-              )
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1.5", children: [
+    label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size: size === "xs" ? "sm" : size, required, children: label }),
+    /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
+      /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          role: "button",
+          tabIndex: disabled ? -1 : 0,
+          "aria-disabled": disabled,
+          "aria-haspopup": "listbox",
+          "aria-expanded": open,
+          onFocus: () => {
+            interactedRef.current = true;
+          },
+          onBlur: handleTriggerBlur,
+          onKeyDown: (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (!disabled) setOpen((o) => !o);
+            } else if (e.key === "Escape") {
+              setOpen(false);
             }
+          },
+          className: cn(
+            triggerVariants({ state: triggerState, size }),
+            width,
+            className
           ),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
-            clearable && hasSelection && /* @__PURE__ */ jsxRuntime.jsx(
-              "button",
-              {
-                type: "button",
-                tabIndex: -1,
-                onClick: clearAll,
-                className: "flex items-center text-gray-400 hover:text-gray-600",
-                "aria-label": "Clear selection",
-                children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 14, className: "hover:text-red-500", strokeWidth: 2 })
-              }
-            ),
+          children: [
             /* @__PURE__ */ jsxRuntime.jsx(
-              lucideReact.ChevronDown,
+              "div",
               {
-                size: 16,
-                strokeWidth: 2,
-                className: cn(
-                  "text-gray-600 transition-transform duration-200",
-                  open && "rotate-180"
+                ref: mode === "multi" ? pillsContainerRef : void 0,
+                className: "flex flex-1 items-center gap-1 overflow-hidden min-w-0",
+                children: mode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+                  displayedPills.map((val) => {
+                    const opt = resolvedOptions.find((o) => o.value === val);
+                    if (!opt) return null;
+                    return /* @__PURE__ */ jsxRuntime.jsxs(
+                      "span",
+                      {
+                        "data-pill": true,
+                        className: "inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]",
+                        children: [
+                          /* @__PURE__ */ jsxRuntime.jsx("span", { className: "truncate", children: opt.label }),
+                          clearable && /* @__PURE__ */ jsxRuntime.jsx(
+                            "button",
+                            {
+                              type: "button",
+                              tabIndex: -1,
+                              onClick: (e) => removePill(val, e),
+                              className: "ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]",
+                              "aria-label": `Remove ${opt.label}`,
+                              children: /* @__PURE__ */ jsxRuntime.jsx(
+                                lucideReact.X,
+                                {
+                                  size: 10,
+                                  strokeWidth: 2,
+                                  className: "hover:text-red-500"
+                                }
+                              )
+                            }
+                          )
+                        ]
+                      },
+                      val
+                    );
+                  }),
+                  overflowCount > 0 && /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]", children: [
+                    "+",
+                    overflowCount
+                  ] })
+                ] }) : /* @__PURE__ */ jsxRuntime.jsx(
+                  "span",
+                  {
+                    className: cn(
+                      "truncate text-[#C4C9D2]",
+                      placeholderSizeClass
+                    ),
+                    children: placeholder
+                  }
+                ) : /* @__PURE__ */ jsxRuntime.jsx(
+                  "span",
+                  {
+                    className: cn(
+                      "truncate",
+                      singleLabel ? "text-[#111827]" : cn("text-[#C4C9D2]", placeholderSizeClass)
+                    ),
+                    children: singleLabel ?? placeholder
+                  }
                 )
               }
-            )
-          ] })
-        ]
-      }
-    ) }),
-    /* @__PURE__ */ jsxRuntime.jsx(
-      PopoverContent,
-      {
-        className: "max-w-[calc(100vw-1rem)]",
-        style: {
-          zIndex: 20,
-          width: "var(--radix-popover-trigger-width)"
-        },
-        children: /* @__PURE__ */ jsxRuntime.jsxs(Command, { shouldFilter: false, children: [
-          /* @__PURE__ */ jsxRuntime.jsx(
-            CommandInput,
-            {
-              placeholder: "Search...",
-              value: search,
-              onValueChange: setSearch,
-              spellCheck,
-              className: commandInputSizeClass
-            }
-          ),
-          /* @__PURE__ */ jsxRuntime.jsxs(CommandList, { children: [
-            filteredOptions.length === 0 && search.trim() ? /* @__PURE__ */ jsxRuntime.jsx(CommandEmpty, { children: "No results found." }) : null,
-            mode === "multi" && /* @__PURE__ */ jsxRuntime.jsxs(
-              CommandItem,
+            ),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
+              clearable && hasSelection && /* @__PURE__ */ jsxRuntime.jsx(
+                "button",
+                {
+                  type: "button",
+                  tabIndex: -1,
+                  onClick: clearAll,
+                  className: "flex items-center text-gray-400 hover:text-gray-600",
+                  "aria-label": "Clear selection",
+                  children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 14, className: "hover:text-red-500", strokeWidth: 2 })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                lucideReact.ChevronDown,
+                {
+                  size: 16,
+                  strokeWidth: 2,
+                  className: cn(
+                    "text-gray-600 transition-transform duration-200",
+                    open && "rotate-180"
+                  )
+                }
+              )
+            ] })
+          ]
+        }
+      ) }),
+      /* @__PURE__ */ jsxRuntime.jsx(
+        PopoverContent,
+        {
+          className: "max-w-[calc(100vw-1rem)]",
+          style: {
+            zIndex: 20,
+            width: "var(--radix-popover-trigger-width)"
+          },
+          children: /* @__PURE__ */ jsxRuntime.jsxs(Command, { shouldFilter: false, children: [
+            /* @__PURE__ */ jsxRuntime.jsx(
+              CommandInput,
               {
-                value: SELECT_ALL,
-                onSelect: () => handleSelect(SELECT_ALL),
-                className: cn(
-                  "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                  commandItemSizeClass
-                ),
-                children: [
-                  /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: allSelected }),
-                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1", children: "Select all" })
-                ]
+                placeholder: "Search...",
+                value: search,
+                onValueChange: setSearch,
+                spellCheck,
+                className: commandInputSizeClass
               }
             ),
-            filteredOptions.map((option) => /* @__PURE__ */ jsxRuntime.jsxs(
-              CommandItem,
-              {
-                value: option.value,
-                disabled: option.disabled,
-                "aria-selected": isSelected(option.value),
-                onSelect: () => handleSelect(option.value),
-                className: cn(
-                  "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                  commandItemSizeClass
-                ),
-                children: [
-                  mode === "multi" && /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: isSelected(option.value) }),
-                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1 truncate", children: option.label }),
-                  mode === "single" && isSelected(option.value) && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Check, { size: 14, className: "shrink-0 text-[#006F42]" })
-                ]
-              },
-              option.value
-            ))
+            /* @__PURE__ */ jsxRuntime.jsxs(CommandList, { children: [
+              filteredOptions.length === 0 && search.trim() ? /* @__PURE__ */ jsxRuntime.jsx(CommandEmpty, { children: "No results found." }) : null,
+              mode === "multi" && /* @__PURE__ */ jsxRuntime.jsxs(
+                CommandItem,
+                {
+                  value: SELECT_ALL,
+                  onSelect: () => handleSelect(SELECT_ALL),
+                  className: cn(
+                    "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                    commandItemSizeClass
+                  ),
+                  children: [
+                    /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: allSelected }),
+                    /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1", children: "Select all" })
+                  ]
+                }
+              ),
+              filteredOptions.map((option) => /* @__PURE__ */ jsxRuntime.jsxs(
+                CommandItem,
+                {
+                  value: option.value,
+                  disabled: option.disabled,
+                  "aria-selected": isSelected(option.value),
+                  onSelect: () => handleSelect(option.value),
+                  className: cn(
+                    "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                    commandItemSizeClass
+                  ),
+                  children: [
+                    mode === "multi" && /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: isSelected(option.value) }),
+                    /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1 truncate", children: option.label }),
+                    mode === "single" && isSelected(option.value) && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Check, { size: 14, className: "shrink-0 text-[#006F42]" })
+                  ]
+                },
+                option.value
+              ))
+            ] })
           ] })
-        ] })
-      }
-    )
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntime.jsx(InputHelper, { size: size === "xs" ? "sm" : size, helperText, error })
   ] });
 }
 Select.displayName = "Select";
@@ -2630,85 +2717,6 @@ var PATTERN_REGEX = {
   phone: "[^0-9]",
   none: "(?!)"
 };
-function Label({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntime.jsx(
-    radixUi.Label.Root,
-    {
-      "data-slot": "label",
-      className: cn(
-        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className
-      ),
-      ...props
-    }
-  );
-}
-var SIZE_TEXT = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base"
-};
-function InputLabel({
-  size = "md",
-  required = false,
-  className,
-  children,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntime.jsxs(
-    Label,
-    {
-      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
-      ...props,
-      children: [
-        children,
-        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
-      ]
-    }
-  );
-}
-InputLabel.displayName = "InputLabel";
-var SIZE_TEXT2 = {
-  sm: "text-[11px]",
-  md: "text-xs",
-  lg: "text-sm"
-};
-var ICON_SIZE = {
-  sm: "size-3",
-  md: "size-3.5",
-  lg: "size-4"
-};
-function InputHelper({
-  size = "md",
-  helperText,
-  error,
-  className,
-  ...props
-}) {
-  if (!error && !helperText) return null;
-  const showError = Boolean(error);
-  return /* @__PURE__ */ jsxRuntime.jsxs(
-    "p",
-    {
-      role: showError ? "alert" : void 0,
-      className: cn(
-        "inline-flex items-center gap-1",
-        SIZE_TEXT2[size],
-        showError ? "text-red-500" : "text-slate-500",
-        className
-      ),
-      ...props,
-      children: [
-        showError && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CircleAlert, { "aria-hidden": "true", className: cn(ICON_SIZE[size], "shrink-0") }),
-        /* @__PURE__ */ jsxRuntime.jsx("span", { children: showError ? error : helperText })
-      ]
-    }
-  );
-}
-InputHelper.displayName = "InputHelper";
 function Input2({
   size = "md",
   inputType = "text",
@@ -2891,7 +2899,7 @@ var radioCircleVariants = classVarianceAuthority.cva(
         lg: "h-[22px] w-[22px]"
       },
       state: {
-        default: "border-gray-300 bg-transparent data-[state=checked]:border-[#006F42]",
+        default: "border-gray-300 bg-transparent data-[state=checked]:border-[#007A4D]",
         disabled: "border-gray-200 bg-transparent opacity-60 cursor-not-allowed",
         error: "border-red-500 bg-transparent"
       }
@@ -2902,7 +2910,7 @@ var radioCircleVariants = classVarianceAuthority.cva(
     }
   }
 );
-var radioDotVariants = classVarianceAuthority.cva("rounded-full bg-[#003C1B]", {
+var radioDotVariants = classVarianceAuthority.cva("rounded-full bg-[#007A4D]", {
   variants: {
     size: {
       sm: "h-[8px] w-[8px]",
@@ -2954,6 +2962,16 @@ function validateLabelWordLimit(label, component, max = MAX_LABEL_WORDS) {
     );
   }
 }
+var PILL_PADDING = {
+  sm: "gap-1.5 px-2.5 py-1.5",
+  md: "gap-2 px-3 py-2",
+  lg: "gap-2.5 px-4 py-2.5"
+};
+var GAP_ONLY = {
+  sm: "gap-1.5",
+  md: "gap-2",
+  lg: "gap-2.5"
+};
 function Radio({
   id,
   label,
@@ -2962,6 +2980,8 @@ function Radio({
   error,
   value,
   className,
+  borderColor,
+  bgColor,
   ...rest
 }) {
   const reactId = React16__namespace.useId();
@@ -2971,13 +2991,27 @@ function Radio({
   }, [label]);
   const state = disabled ? "disabled" : error ? "error" : "default";
   const labelState = disabled ? "disabled" : "default";
+  const hasCustomColors = !!(borderColor || bgColor);
   return /* @__PURE__ */ jsxRuntime.jsxs(
     "label",
     {
       htmlFor: itemId,
+      style: hasCustomColors ? {
+        ...borderColor ? { "--radio-checked-border": borderColor } : {},
+        ...bgColor ? { "--radio-checked-bg": bgColor } : {}
+      } : void 0,
       className: cn(
-        "group flex w-full cursor-pointer items-center gap-2",
-        disabled && "cursor-not-allowed",
+        "group inline-flex cursor-pointer items-center transition-colors",
+        hasCustomColors ? cn(
+          "rounded-xl border",
+          PILL_PADDING[size],
+          error ? "border-red-500" : cn(
+            "border-gray-200",
+            borderColor && "has-[[data-state=checked]]:[border-color:var(--radio-checked-border)]",
+            bgColor && "has-[[data-state=checked]]:[background-color:var(--radio-checked-bg)]"
+          )
+        ) : GAP_ONLY[size],
+        disabled && "cursor-not-allowed opacity-60",
         className
       ),
       children: [
@@ -3007,7 +3041,7 @@ function Radio({
             className: cn(
               radioLabelVariants({ size, state: labelState }),
               "whitespace-normal break-words",
-              "group-has-[[data-state=checked]]:text-[#006F42]"
+              hasCustomColors && "group-has-[[data-state=checked]]:text-[#0F8055]"
             ),
             children: truncateLabelToWordLimit(label)
           }
@@ -3030,6 +3064,7 @@ function RadioGroup({
   columns = 2,
   disabled,
   label,
+  required,
   helperText,
   error,
   className
@@ -3043,13 +3078,12 @@ function RadioGroup({
     3: "grid-cols-1 sm:grid-cols-2 md:grid-cols-3",
     4: "grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
   };
-  const layoutClass = layout === "horizontal" ? "flex flex-row flex-wrap gap-x-6 gap-y-3" : layout === "grid" ? cn("grid w-full gap-x-6 gap-y-3", gridColsMap[columns]) : "flex flex-col gap-3";
-  const helperSize = size === "sm" ? "text-xs" : size === "lg" ? "text-sm" : "text-xs";
+  const layoutClass = layout === "horizontal" ? "flex flex-row flex-wrap gap-x-3 gap-y-2" : layout === "grid" ? cn("grid w-full gap-x-3 gap-y-2", gridColsMap[columns]) : "flex flex-col gap-2";
   const toLabel = getLabel ?? ((item) => item.label);
   const toValue = getValue ?? ((item) => item.value);
   const toDisabled = getDisabled ?? ((item) => item.disabled);
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex w-full flex-col gap-2", className), children: [
-    label && /* @__PURE__ */ jsxRuntime.jsx(Label, { htmlFor: groupId, className: "text-gray-900", children: label }),
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex w-full flex-col gap-1.5", className), children: [
+    label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { htmlFor: groupId, size, required, children: label }),
     /* @__PURE__ */ jsxRuntime.jsx(
       radixUi.RadioGroup.Root,
       {
@@ -3077,20 +3111,15 @@ function RadioGroup({
         })
       }
     ),
-    error ? /* @__PURE__ */ jsxRuntime.jsxs(
-      "p",
+    /* @__PURE__ */ jsxRuntime.jsx(
+      InputHelper,
       {
-        id: `${groupId}-error`,
-        className: cn(
-          "inline-flex items-center gap-1 text-red-500",
-          helperSize
-        ),
-        children: [
-          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CircleAlert, { className: "size-3.5", "aria-hidden": "true" }),
-          /* @__PURE__ */ jsxRuntime.jsx("span", { children: error })
-        ]
+        id: error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0,
+        size,
+        helperText,
+        error
       }
-    ) : helperText ? /* @__PURE__ */ jsxRuntime.jsx("p", { id: `${groupId}-helper`, className: cn("text-gray-500", helperSize), children: helperText }) : null
+    )
   ] });
 }
 RadioGroup.displayName = "CustomRadioGroup";
@@ -3105,8 +3134,8 @@ var checkboxBoxVariants = classVarianceAuthority.cva(
       },
       state: {
         unchecked: "bg-white border-gray-300",
-        checked: "bg-[#006F42] border-[#006F42] text-white",
-        indeterminate: "bg-[#006F42] border-[#006F42] text-white",
+        checked: "bg-[#007A4D] border-[#007A4D] text-white",
+        indeterminate: "bg-[#007A4D] border-[#007A4D] text-white",
         disabled: "bg-gray-100 border-gray-200 opacity-60 cursor-not-allowed",
         error: "bg-white border-red-500"
       }
@@ -3126,7 +3155,7 @@ var checkboxLabelVariants = classVarianceAuthority.cva("select-none transition-c
     },
     state: {
       default: "text-gray-700",
-      checked: "text-gray-900",
+      checked: "text-[#0F8055]",
       disabled: "text-gray-400 cursor-not-allowed"
     }
   },
@@ -3140,10 +3169,15 @@ var ICON_SIZE2 = {
   md: "size-4",
   lg: "size-5"
 };
-var GAP = {
+var PILL_PADDING2 = {
+  sm: "gap-1.5 px-2.5 py-1.5",
+  md: "gap-2 px-3 py-2",
+  lg: "gap-2.5 px-4 py-2.5"
+};
+var GAP_ONLY2 = {
   sm: "gap-1.5",
-  md: "gap-2.5",
-  lg: "gap-3"
+  md: "gap-2",
+  lg: "gap-2.5"
 };
 function Checkbox({
   checked,
@@ -3155,6 +3189,8 @@ function Checkbox({
   indeterminate,
   error,
   className,
+  borderColor,
+  bgColor,
   ...rest
 }) {
   const reactId = React16__namespace.useId();
@@ -3175,13 +3211,23 @@ function Checkbox({
   };
   const boxState = disabled ? "disabled" : error ? "error" : indeterminate ? "indeterminate" : visualChecked ? "checked" : "unchecked";
   const labelState = disabled ? "disabled" : visualChecked || indeterminate ? "checked" : "default";
+  const hasCustomColors = !!(borderColor || bgColor);
+  const isActive = (visualChecked || !!indeterminate) && !error && !disabled;
   return /* @__PURE__ */ jsxRuntime.jsxs(
     "label",
     {
       htmlFor: itemId,
+      style: hasCustomColors && isActive ? {
+        ...borderColor ? { borderColor } : {},
+        ...bgColor ? { backgroundColor: bgColor } : {}
+      } : void 0,
       className: cn(
-        "group inline-flex cursor-pointer items-center",
-        GAP[size],
+        "group inline-flex cursor-pointer items-center transition-colors",
+        hasCustomColors ? cn(
+          "rounded-xl border",
+          PILL_PADDING2[size],
+          error ? "border-red-500" : disabled ? "border-gray-200" : "border-gray-200"
+        ) : GAP_ONLY2[size],
         disabled && "cursor-not-allowed",
         className
       ),
@@ -3235,13 +3281,13 @@ function CheckboxGroup({
   columns = 2,
   disabled,
   label,
+  required,
   helperText,
   error,
   selectAll
 }) {
   const reactId = React16__namespace.useId();
   const groupId = `checkbox-group-${reactId}`;
-  const describedById = error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0;
   const isControlled = value !== void 0;
   const [internalValue, setInternalValue] = React16__namespace.useState([]);
   const currentValue = isControlled ? value : internalValue;
@@ -3274,10 +3320,9 @@ function CheckboxGroup({
       setValue(keptDisabled);
     }
   };
-  const layoutClass = layout === "horizontal" ? "flex flex-row flex-wrap gap-x-6 gap-y-3" : layout === "grid" ? `grid grid-cols-[repeat(${columns},minmax(0,1fr))] gap-x-6 gap-y-3` : "flex flex-col gap-3";
-  const helperSize = size === "sm" ? "text-xs" : size === "lg" ? "text-sm" : "text-xs";
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex w-full flex-col gap-2", children: [
-    label && /* @__PURE__ */ jsxRuntime.jsx(Label, { htmlFor: groupId, className: "text-gray-900", children: label }),
+  const layoutClass = layout === "horizontal" ? "flex flex-row flex-wrap gap-x-3 gap-y-2" : layout === "grid" ? `grid grid-cols-[repeat(${columns},minmax(0,1fr))] gap-x-3 gap-y-2` : "flex flex-col gap-2";
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex w-full flex-col gap-1.5", children: [
+    label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { htmlFor: groupId, size, required, children: label }),
     selectAll && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "pb-1", children: /* @__PURE__ */ jsxRuntime.jsx(
       Checkbox,
       {
@@ -3305,20 +3350,15 @@ function CheckboxGroup({
         optValue
       );
     }) }),
-    error ? /* @__PURE__ */ jsxRuntime.jsxs(
-      "p",
+    /* @__PURE__ */ jsxRuntime.jsx(
+      InputHelper,
       {
-        id: `${groupId}-error`,
-        className: cn(
-          "inline-flex items-center gap-1 text-red-500",
-          helperSize
-        ),
-        children: [
-          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CircleAlert, { className: "size-3.5", "aria-hidden": "true" }),
-          /* @__PURE__ */ jsxRuntime.jsx("span", { children: error })
-        ]
+        id: error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0,
+        size,
+        helperText,
+        error
       }
-    ) : helperText ? /* @__PURE__ */ jsxRuntime.jsx("p", { id: `${groupId}-helper`, className: cn("text-gray-500", helperSize), children: helperText }) : describedById ? null : null
+    )
   ] });
 }
 CheckboxGroup.displayName = "CheckboxGroup";
@@ -3692,7 +3732,11 @@ function DatePicker({
   minDate,
   maxDate,
   onTouch,
-  clearable = false
+  clearable = false,
+  label,
+  required,
+  helperText,
+  error
 }) {
   const [open, setOpen] = React16__namespace.useState(false);
   const touchedRef = React16__namespace.useRef(false);
@@ -3838,128 +3882,132 @@ function DatePicker({
   };
   const canApply = draftRange !== null || pendingFrom !== null;
   const triggerState = disabled ? "disabled" : open ? "open" : "default";
-  return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
-    /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
-      "div",
-      {
-        role: "button",
-        tabIndex: disabled ? -1 : 0,
-        "aria-disabled": disabled,
-        "aria-haspopup": "dialog",
-        "aria-expanded": open,
-        onFocus: () => {
-          interactedRef.current = true;
-        },
-        onBlur: handleTriggerBlur,
-        onKeyDown: (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            if (!disabled) setOpen((o) => !o);
-          } else if (e.key === "Escape") {
-            setOpen(false);
-          }
-        },
-        className: cn(
-          triggerVariants2({ state: triggerState, size }),
-          "gap-2 px-3 cursor-pointer select-none",
-          width,
-          className
-        ),
-        children: [
-          /* @__PURE__ */ jsxRuntime.jsx(
-            "span",
-            {
-              className: cn(
-                "flex-1 truncate",
-                triggerLabel ? "text-[#111827]" : cn(
-                  "text-[#C4C9D2]",
-                  size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]"
-                )
-              ),
-              children: triggerLabel ?? placeholder
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1.5", children: [
+    label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size, required, children: label }),
+    /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
+      /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          role: "button",
+          tabIndex: disabled ? -1 : 0,
+          "aria-disabled": disabled,
+          "aria-haspopup": "dialog",
+          "aria-expanded": open,
+          onFocus: () => {
+            interactedRef.current = true;
+          },
+          onBlur: handleTriggerBlur,
+          onKeyDown: (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (!disabled) setOpen((o) => !o);
+            } else if (e.key === "Escape") {
+              setOpen(false);
             }
+          },
+          className: cn(
+            triggerVariants2({ state: triggerState, size }),
+            "gap-2 px-3 cursor-pointer select-none",
+            width,
+            className
           ),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
-            clearable && committed && /* @__PURE__ */ jsxRuntime.jsx(
-              "button",
-              {
-                type: "button",
-                tabIndex: -1,
-                onClick: handleClearTrigger,
-                className: "flex items-center text-gray-400 transition-colors hover:text-gray-600",
-                "aria-label": "Clear",
-                children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 13, strokeWidth: 2, className: "hover:text-red-500" })
-              }
-            ),
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CalendarIcon, { size: 15, strokeWidth: 2, className: "text-gray-600" })
-          ] })
-        ]
-      }
-    ) }),
-    /* @__PURE__ */ jsxRuntime.jsx(
-      PopoverContent,
-      {
-        align: "center",
-        className: "w-auto max-w-[calc(100vw-1rem)] p-0",
-        style: { zIndex: 20 },
-        children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "overflow-hidden rounded-lg bg-white shadow-md", children: [
-          mode === "range" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex gap-2 px-3 pt-3", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(DateBox, { label: fromLabel, active: !!fromLabel }),
-            /* @__PURE__ */ jsxRuntime.jsx(DateBox, { label: toLabel, active: false })
-          ] }),
-          mode === "month" && /* @__PURE__ */ jsxRuntime.jsx(
-            MonthPickerCalendar,
-            {
-              selected: committed instanceof Date ? committed : null,
-              minDate,
-              maxDate,
-              onSelect: (date) => {
-                setCommitted(date);
-                onChange?.(date);
-                setOpen(false);
-              }
-            }
-          ),
-          mode !== "month" && /* @__PURE__ */ jsxRuntime.jsx(
-            DatePickerCalendar,
-            {
-              mode,
-              selected: calendarSelected,
-              disabled: calendarDisabled,
-              minDate,
-              maxDate,
-              onDayClick: (date, modifiers) => handleDayClick(date, modifiers),
-              onDayMouseEnter: (date) => handleDayMouseEnter(date),
-              onDayMouseLeave: () => handleDayMouseLeave()
-            }
-          ),
-          mode === "range" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5", children: [
+          children: [
             /* @__PURE__ */ jsxRuntime.jsx(
-              "button",
+              "span",
               {
-                type: "button",
-                onClick: handleCancel,
-                className: "rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]",
-                children: "Cancel"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntime.jsx(
-              "button",
-              {
-                type: "button",
-                onClick: handleApply,
-                disabled: !canApply,
                 className: cn(
-                  "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
-                  canApply ? "border-[#006F42] text-[#006F42]" : "border-gray-300 text-gray-400 cursor-not-allowed"
+                  "flex-1 truncate",
+                  triggerLabel ? "text-[#111827]" : cn(
+                    "text-[#C4C9D2]",
+                    size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]"
+                  )
                 ),
-                children: "Apply"
+                children: triggerLabel ?? placeholder
               }
-            )
+            ),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
+              clearable && committed && /* @__PURE__ */ jsxRuntime.jsx(
+                "button",
+                {
+                  type: "button",
+                  tabIndex: -1,
+                  onClick: handleClearTrigger,
+                  className: "flex items-center text-gray-400 transition-colors hover:text-gray-600",
+                  "aria-label": "Clear",
+                  children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 13, strokeWidth: 2, className: "hover:text-red-500" })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CalendarIcon, { size: 15, strokeWidth: 2, className: "text-gray-600" })
+            ] })
+          ]
+        }
+      ) }),
+      /* @__PURE__ */ jsxRuntime.jsx(
+        PopoverContent,
+        {
+          align: "center",
+          className: "w-auto max-w-[calc(100vw-1rem)] p-0",
+          style: { zIndex: 20 },
+          children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "overflow-hidden rounded-lg bg-white shadow-md", children: [
+            mode === "range" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex gap-2 px-3 pt-3", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(DateBox, { label: fromLabel, active: !!fromLabel }),
+              /* @__PURE__ */ jsxRuntime.jsx(DateBox, { label: toLabel, active: false })
+            ] }),
+            mode === "month" && /* @__PURE__ */ jsxRuntime.jsx(
+              MonthPickerCalendar,
+              {
+                selected: committed instanceof Date ? committed : null,
+                minDate,
+                maxDate,
+                onSelect: (date) => {
+                  setCommitted(date);
+                  onChange?.(date);
+                  setOpen(false);
+                }
+              }
+            ),
+            mode !== "month" && /* @__PURE__ */ jsxRuntime.jsx(
+              DatePickerCalendar,
+              {
+                mode,
+                selected: calendarSelected,
+                disabled: calendarDisabled,
+                minDate,
+                maxDate,
+                onDayClick: (date, modifiers) => handleDayClick(date, modifiers),
+                onDayMouseEnter: (date) => handleDayMouseEnter(date),
+                onDayMouseLeave: () => handleDayMouseLeave()
+              }
+            ),
+            mode === "range" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleCancel,
+                  className: "rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]",
+                  children: "Cancel"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleApply,
+                  disabled: !canApply,
+                  className: cn(
+                    "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
+                    canApply ? "border-[#006F42] text-[#006F42]" : "border-gray-300 text-gray-400 cursor-not-allowed"
+                  ),
+                  children: "Apply"
+                }
+              )
+            ] })
           ] })
-        ] })
-      }
-    )
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntime.jsx(InputHelper, { size, helperText, error })
   ] });
 }
 DatePicker.displayName = "DatePicker";
@@ -4456,38 +4504,13 @@ var trackVariants = classVarianceAuthority.cva(
   {
     variants: {
       size: {
-        sm: "h-7",
-        md: "h-8",
-        lg: "h-9"
-      },
-      hasInsideLabel: {
-        true: "justify-end font-medium text-[#1F6B32]",
-        false: ""
+        sm: "h-7 w-12",
+        md: "h-8 w-[4.2rem]",
+        lg: "h-9 w-[4.75rem]"
       }
     },
-    compoundVariants: [
-      { size: "sm", hasInsideLabel: false, className: "w-12" },
-      { size: "md", hasInsideLabel: false, className: "w-[4.2rem]" },
-      { size: "lg", hasInsideLabel: false, className: "w-[4.75rem]" },
-      {
-        size: "sm",
-        hasInsideLabel: true,
-        className: "w-16 pr-2.5 text-[10px]"
-      },
-      {
-        size: "md",
-        hasInsideLabel: true,
-        className: "w-[4.8rem] pr-3 text-[11px]"
-      },
-      {
-        size: "lg",
-        hasInsideLabel: true,
-        className: "w-[5.25rem] pr-3.5 text-[12px]"
-      }
-    ],
     defaultVariants: {
-      size: "md",
-      hasInsideLabel: false
+      size: "md"
     }
   }
 );
@@ -4501,50 +4524,13 @@ var thumbVariants = classVarianceAuthority.cva(
   {
     variants: {
       size: {
-        sm: "h-5 w-5 shadow-[0_1px_2px_rgba(15,23,42,0.18)]",
-        md: "h-6 w-6 shadow-[0_2px_3px_rgba(15,23,42,0.18)]",
-        lg: "h-7 w-7 shadow-[0_2px_4px_rgba(15,23,42,0.18)]"
-      },
-      hasInsideLabel: {
-        true: "",
-        false: ""
+        sm: "h-5 w-5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-5",
+        md: "h-6 w-6 shadow-[0_2px_3px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-8",
+        lg: "h-7 w-7 shadow-[0_2px_4px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-9"
       }
     },
-    compoundVariants: [
-      {
-        size: "sm",
-        hasInsideLabel: false,
-        className: "data-[state=checked]:translate-x-5"
-      },
-      {
-        size: "md",
-        hasInsideLabel: false,
-        className: "data-[state=checked]:translate-x-8"
-      },
-      {
-        size: "lg",
-        hasInsideLabel: false,
-        className: "data-[state=checked]:translate-x-9"
-      },
-      {
-        size: "sm",
-        hasInsideLabel: true,
-        className: "data-[state=checked]:translate-x-7"
-      },
-      {
-        size: "md",
-        hasInsideLabel: true,
-        className: "data-[state=checked]:translate-x-8"
-      },
-      {
-        size: "lg",
-        hasInsideLabel: true,
-        className: "data-[state=checked]:translate-x-9"
-      }
-    ],
     defaultVariants: {
-      size: "md",
-      hasInsideLabel: false
+      size: "md"
     }
   }
 );
@@ -4553,6 +4539,7 @@ var Toggle = React16__namespace.forwardRef(
     size = "md",
     label,
     labelPosition = "right",
+    required,
     checked,
     defaultChecked,
     onChange,
@@ -4560,41 +4547,36 @@ var Toggle = React16__namespace.forwardRef(
     wrapperClassName,
     ...props
   }, ref) => {
-    const isControlled = checked !== void 0;
-    const hasInsideLabel = Boolean(label) && labelPosition === "inside";
-    const handleChange = (e) => {
-      onChange?.(e);
-    };
-    const switchContent = /* @__PURE__ */ jsxRuntime.jsxs(
+    const switchEl = /* @__PURE__ */ jsxRuntime.jsx(
       radixUi.Switch.Root,
       {
         ref,
-        checked: isControlled ? checked : void 0,
-        defaultChecked: isControlled ? void 0 : defaultChecked,
-        onCheckedChange: handleChange,
+        checked: checked !== void 0 ? checked : void 0,
+        defaultChecked: checked !== void 0 ? void 0 : defaultChecked,
+        onCheckedChange: onChange,
         disabled,
-        className: trackVariants({ size, hasInsideLabel }),
+        className: trackVariants({ size }),
         ...props,
-        children: [
-          hasInsideLabel && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "pointer-events-none absolute left-3 right-3 truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1F6B32]", children: label }),
-          /* @__PURE__ */ jsxRuntime.jsx(
-            radixUi.Switch.Thumb,
-            {
-              className: thumbVariants({ size, hasInsideLabel })
-            }
-          )
-        ]
+        children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Switch.Thumb, { className: thumbVariants({ size }) })
       }
     );
-    if (!label || hasInsideLabel) {
-      return switchContent;
+    if (labelPosition === "top") {
+      return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex flex-col gap-1.5", wrapperClassName), children: [
+        label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size, required, children: label }),
+        switchEl
+      ] });
     }
+    if (!label) return /* @__PURE__ */ jsxRuntime.jsx(jsxRuntime.Fragment, { children: switchEl });
     return /* @__PURE__ */ jsxRuntime.jsxs(
       "label",
       {
-        className: `inline-flex items-center gap-2 cursor-pointer ${labelPosition === "left" ? "flex-row-reverse" : ""} ${wrapperClassName || ""}`,
+        className: cn(
+          "inline-flex cursor-pointer items-center gap-2",
+          labelPosition === "left" && "flex-row-reverse",
+          wrapperClassName
+        ),
         children: [
-          switchContent,
+          switchEl,
           /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-medium text-[#1F2937]", children: label })
         ]
       }
