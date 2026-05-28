@@ -266,6 +266,7 @@ export default function Demo() {
         <Row label="Horizontal" vertical>
           <CheckboxGroup
             label="Customer segments"
+            
             options={SEGMENT_OPTIONS}
             value={segments}
             onChange={setSegments}

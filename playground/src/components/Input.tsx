@@ -13,9 +13,11 @@ export default function InputPreview() {
   return (
 <div className="w-[200px]">
   <Input
-  label="Enter Name"
+  label="Enter Name you want to enter in the given box "
   placeholder="Enter Your Name"
   allowPattern="phone"
+  required
+
   />
 </div>
   );

@@ -12,17 +12,14 @@ export interface ToggleProps
   > {
   /** Size of the toggle */
   size?: ToggleVariantSize;
-  /** Label text. Position is controlled by `labelPosition`. */
+  /** Field label rendered above the toggle. */
   label?: string;
-  /**
-   * Where the label renders:
-   * - `"top"` — above the toggle as a field label (matches Input label style)
-   * - `"right"` — inline, to the right of the switch (default)
-   * - `"left"` — inline, to the left of the switch
-   */
-  labelPosition?: "top" | "left" | "right";
-  /** When true, appends a red asterisk to a `"top"` label. */
+  /** When true, appends a red asterisk to the label. */
   required?: boolean;
+  /** Inline text rendered beside the switch. Position is controlled by `titlePosition`. */
+  title?: string;
+  /** Where the inline title renders relative to the switch. Defaults to `"right"`. */
+  titlePosition?: "left" | "right";
   /** Controlled checked state */
   checked?: boolean;
   /** Initial state for uncontrolled mode */
@@ -43,8 +40,9 @@ export const Toggle = React.forwardRef<
     {
       size = "md",
       label,
-      labelPosition = "right",
       required,
+      title,
+      titlePosition = "right",
       checked,
       defaultChecked,
       onChange,
@@ -69,36 +67,35 @@ export const Toggle = React.forwardRef<
       </SwitchPrimitive.Root>
     );
 
-    // ── "top" label position ─────────────────────────────────────────────
-    if (labelPosition === "top") {
+    const inlineEl = title ? (
+      <label
+        className={cn(
+          "inline-flex cursor-pointer items-center gap-2",
+          readOnly && "pointer-events-none cursor-default",
+        )}
+      >
+        {titlePosition === "left" && (
+          <span className="text-sm font-medium text-[#1F2937]">{title}</span>
+        )}
+        {switchEl}
+        {titlePosition === "right" && (
+          <span className="text-sm font-medium text-[#1F2937]">{title}</span>
+        )}
+      </label>
+    ) : switchEl;
+
+    if (label) {
       return (
         <div className={cn("flex flex-col gap-1.5", wrapperClassName)}>
-          {label && (
-            <InputLabel size={size} required={required}>
-              {label}
-            </InputLabel>
-          )}
-          {switchEl}
+          <InputLabel size={size} required={required}>
+            {label}
+          </InputLabel>
+          {inlineEl}
         </div>
       );
     }
 
-    // ── "left" / "right" label position (inline beside the switch) ───────
-    if (!label) return <>{switchEl}</>;
-
-    return (
-      <label
-        className={cn(
-          "inline-flex cursor-pointer items-center gap-2",
-          labelPosition === "left" && "flex-row-reverse",
-          readOnly && "pointer-events-none cursor-default",
-          wrapperClassName,
-        )}
-      >
-        {switchEl}
-        <span className="text-sm font-medium text-[#1F2937]">{label}</span>
-      </label>
-    );
+    return <>{inlineEl}</>;
   },
 );
 
