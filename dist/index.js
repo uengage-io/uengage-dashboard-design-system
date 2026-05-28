@@ -4602,6 +4602,7 @@ var sidebarContentVariants = cva(
       side: {
         left: "inset-y-0 left-0 border-r",
         right: "inset-y-0 right-0 border-l",
+        "right-slide": "inset-y-0 right-0 border-l",
         top: "inset-x-0 top-0 border-b",
         bottom: "inset-x-0 bottom-0 border-t"
       },
@@ -4619,6 +4620,9 @@ var sidebarContentVariants = cva(
       { side: "right", size: "sm", className: "w-64 max-w-[85vw]" },
       { side: "right", size: "md", className: "w-80 max-w-[90vw]" },
       { side: "right", size: "lg", className: "w-96 max-w-[95vw]" },
+      { side: "right-slide", size: "sm", className: "w-64 max-w-[85vw]" },
+      { side: "right-slide", size: "md", className: "w-80 max-w-[90vw]" },
+      { side: "right-slide", size: "lg", className: "w-96 max-w-[95vw]" },
       { side: "top", size: "sm", className: "h-48 max-h-[80vh]" },
       { side: "top", size: "md", className: "h-64 max-h-[85vh]" },
       { side: "top", size: "lg", className: "h-80 max-h-[90vh]" },
@@ -4637,6 +4641,7 @@ var sidebarPersistentVariants = cva("bg-background border", {
     side: {
       left: "h-full border-r",
       right: "h-full border-l",
+      "right-slide": "h-full border-l",
       top: "w-full border-b",
       bottom: "w-full border-t"
     },
@@ -4654,6 +4659,9 @@ var sidebarPersistentVariants = cva("bg-background border", {
     { side: "right", size: "sm", className: "w-64" },
     { side: "right", size: "md", className: "w-80" },
     { side: "right", size: "lg", className: "w-96" },
+    { side: "right-slide", size: "sm", className: "w-64" },
+    { side: "right-slide", size: "md", className: "w-80" },
+    { side: "right-slide", size: "lg", className: "w-96" },
     { side: "top", size: "sm", className: "h-48" },
     { side: "top", size: "md", className: "h-64" },
     { side: "top", size: "lg", className: "h-80" },
