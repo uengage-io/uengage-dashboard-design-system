@@ -14,7 +14,7 @@ const meta = {
   argTypes: {
     side: {
       control: { type: "select" },
-      options: ["left", "right", "top", "bottom"],
+      options: ["left", "right", "right-slide", "top", "bottom"],
     },
     size: {
       control: { type: "select" },
@@ -72,6 +72,13 @@ export const Default: Story = {
 export const RightSidebar: Story = {
   args: {
     side: "right",
+  },
+  render: Default.render,
+}
+
+export const RightSlideSidebar: Story = {
+  args: {
+    side: "right-slide",
   },
   render: Default.render,
 }

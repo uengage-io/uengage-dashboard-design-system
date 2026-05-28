@@ -744,7 +744,7 @@ interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "on
 }
 declare const Toggle: React.ForwardRefExoticComponent<Omit<ToggleProps, "ref"> & React.RefAttributes<HTMLButtonElement>>;
 
-type SidebarSide = "left" | "right" | "top" | "bottom";
+type SidebarSide = "left" | "right" | "right-slide" | "top" | "bottom";
 type SidebarSize = "sm" | "md" | "lg" | "full";
 interface SidebarProps {
     open?: boolean;
@@ -770,11 +770,11 @@ interface SidebarProps {
 declare function Sidebar({ open, defaultOpen, onOpenChange, side, size, sizePercent, overlay, closeOnOutsideClick, persistentOnDesktop, trigger, heading, closeIcon, divider, className, contentClassName, children, }: SidebarProps): react_jsx_runtime.JSX.Element | null;
 
 declare const sidebarContentVariants: (props?: ({
-    side?: "bottom" | "left" | "right" | "top" | null | undefined;
+    side?: "bottom" | "left" | "right" | "top" | "right-slide" | null | undefined;
     size?: "sm" | "lg" | "md" | "full" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const sidebarPersistentVariants: (props?: ({
-    side?: "bottom" | "left" | "right" | "top" | null | undefined;
+    side?: "bottom" | "left" | "right" | "top" | "right-slide" | null | undefined;
     size?: "sm" | "lg" | "md" | "full" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type SidebarContentVariants = VariantProps<typeof sidebarContentVariants>;
