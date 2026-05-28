@@ -14,16 +14,20 @@ const meta: Meta<typeof Toggle> = {
     },
     label: {
       control: { type: "text" },
-      description: "Label text. Position is controlled by `labelPosition`.",
-    },
-    labelPosition: {
-      control: { type: "select" },
-      options: ["top", "left", "right"],
-      description: "`top` renders above the toggle as a field label; `left`/`right` renders inline beside the switch",
+      description: "Field label rendered above the toggle.",
     },
     required: {
       control: { type: "boolean" },
-      description: "Appends a red asterisk to a `top` label",
+      description: "Appends a red asterisk to the label.",
+    },
+    title: {
+      control: { type: "text" },
+      description: "Inline text rendered beside the switch. Position is controlled by `titlePosition`.",
+    },
+    titlePosition: {
+      control: { type: "select" },
+      options: ["left", "right"],
+      description: "Where the inline title renders relative to the switch.",
     },
     disabled: {
       control: { type: "boolean" },
@@ -35,7 +39,7 @@ const meta: Meta<typeof Toggle> = {
   },
   args: {
     size: "md",
-    labelPosition: "right",
+    titlePosition: "right",
     disabled: false,
     required: false,
     readOnly: false,
@@ -45,49 +49,59 @@ const meta: Meta<typeof Toggle> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/* ── No label ───────────────────────────────────────────────────── */
+/* ── No label / title ───────────────────────────────────────────── */
 
 export const Default: Story = {
   args: { size: "md" },
 };
 
-/* ── Top label (field label pattern) ───────────────────────────── */
+/* ── Label (top) ────────────────────────────────────────────────── */
 
-export const WithTopLabel: Story = {
-  name: "Top label",
+export const WithLabel: Story = {
+  name: "Label (top)",
   args: {
     label: "Enable notifications",
-    labelPosition: "top",
     size: "md",
   },
 };
 
-export const WithTopLabelRequired: Story = {
-  name: "Top label · Required",
+export const WithLabelRequired: Story = {
+  name: "Label (top) · Required",
   args: {
     label: "Enable notifications",
-    labelPosition: "top",
     required: true,
     size: "md",
   },
 };
 
-/* ── Inline label (beside the switch) ──────────────────────────── */
+/* ── Title (inline) ─────────────────────────────────────────────── */
 
-export const LabelRight: Story = {
-  name: "Label · Right",
+export const TitleRight: Story = {
+  name: "Title · Right",
   args: {
-    label: "Enable notifications",
-    labelPosition: "right",
+    title: "Enable notifications",
+    titlePosition: "right",
     size: "md",
   },
 };
 
-export const LabelLeft: Story = {
-  name: "Label · Left",
+export const TitleLeft: Story = {
+  name: "Title · Left",
   args: {
-    label: "Dark mode",
-    labelPosition: "left",
+    title: "Dark mode",
+    titlePosition: "left",
+    size: "md",
+  },
+};
+
+/* ── Label + Title ──────────────────────────────────────────────── */
+
+export const LabelAndTitle: Story = {
+  name: "Label + Title",
+  args: {
+    label: "Notifications",
+    title: "Enable push alerts",
+    titlePosition: "right",
     size: "md",
   },
 };
@@ -97,9 +111,9 @@ export const LabelLeft: Story = {
 export const Sizes: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
-      <Toggle size="sm" label="Small" labelPosition="right" />
-      <Toggle size="md" label="Medium" labelPosition="right" />
-      <Toggle size="lg" label="Large" labelPosition="right" />
+      <Toggle size="sm" title="Small" titlePosition="right" />
+      <Toggle size="md" title="Medium" titlePosition="right" />
+      <Toggle size="lg" title="Large" titlePosition="right" />
     </div>
   ),
 };
@@ -108,8 +122,8 @@ export const Sizes: Story = {
 
 export const Disabled: Story = {
   args: {
-    label: "Notifications",
-    labelPosition: "right",
+    title: "Notifications",
+    titlePosition: "right",
     disabled: true,
     defaultChecked: true,
   },
@@ -126,8 +140,8 @@ export const ReadOnly: Story = {
     },
   },
   args: {
-    label: "Email notifications",
-    labelPosition: "right",
+    title: "Email notifications",
+    titlePosition: "right",
     readOnly: true,
     defaultChecked: true,
   },
@@ -136,18 +150,17 @@ export const ReadOnly: Story = {
 export const ReadOnlyOff: Story = {
   name: "Read only (off)",
   args: {
-    label: "Email notifications",
-    labelPosition: "right",
+    title: "Email notifications",
+    titlePosition: "right",
     readOnly: true,
     defaultChecked: false,
   },
 };
 
-export const ReadOnlyTopLabel: Story = {
-  name: "Read only · Top label",
+export const ReadOnlyWithLabel: Story = {
+  name: "Read only · With label",
   args: {
     label: "Dark mode",
-    labelPosition: "top",
     readOnly: true,
     defaultChecked: true,
   },
@@ -163,7 +176,6 @@ export const Controlled: Story = {
         <Toggle
           size="md"
           label="Email notifications"
-          labelPosition="top"
           required
           checked={checked}
           onChange={setChecked}

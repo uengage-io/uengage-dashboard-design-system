@@ -30,5 +30,6 @@ import Demo from "./components/Demo";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Demo />
+    <InputPreview/>
   </React.StrictMode>,
 );

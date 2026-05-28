@@ -723,17 +723,14 @@ type ThumbVariants = VariantProps<typeof thumbVariants>;
 interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "onChange" | "defaultChecked" | "checked"> {
     /** Size of the toggle */
     size?: ToggleVariantSize;
-    /** Label text. Position is controlled by `labelPosition`. */
+    /** Field label rendered above the toggle. */
     label?: string;
-    /**
-     * Where the label renders:
-     * - `"top"` — above the toggle as a field label (matches Input label style)
-     * - `"right"` — inline, to the right of the switch (default)
-     * - `"left"` — inline, to the left of the switch
-     */
-    labelPosition?: "top" | "left" | "right";
-    /** When true, appends a red asterisk to a `"top"` label. */
+    /** When true, appends a red asterisk to the label. */
     required?: boolean;
+    /** Inline text rendered beside the switch. Position is controlled by `titlePosition`. */
+    title?: string;
+    /** Where the inline title renders relative to the switch. Defaults to `"right"`. */
+    titlePosition?: "left" | "right";
     /** Controlled checked state */
     checked?: boolean;
     /** Initial state for uncontrolled mode */

@@ -93,15 +93,15 @@ function InputLabel({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ jsxs(
+  return /* @__PURE__ */ jsx(
     Label,
     {
-      className: cn(SIZE_TEXT[size], "font-medium text-slate-700 gap-0.5", className),
+      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
       ...props,
-      children: [
+      children: /* @__PURE__ */ jsxs("span", { className: "inline", children: [
         children,
-        required && /* @__PURE__ */ jsx("span", { "aria-hidden": "true", className: "text-red-500", children: "*" })
-      ]
+        required && /* @__PURE__ */ jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
+      ] })
     }
   );
 }

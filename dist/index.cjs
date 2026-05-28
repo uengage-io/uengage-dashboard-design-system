@@ -1201,15 +1201,15 @@ function InputLabel({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ jsxRuntime.jsxs(
+  return /* @__PURE__ */ jsxRuntime.jsx(
     Label,
     {
-      className: cn(SIZE_TEXT[size], "font-medium text-slate-700 gap-0.5", className),
+      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
       ...props,
-      children: [
+      children: /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "inline", children: [
         children,
-        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "text-red-500", children: "*" })
-      ]
+        required && /* @__PURE__ */ jsxRuntime.jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
+      ] })
     }
   );
 }
@@ -4572,8 +4572,9 @@ var Toggle = React16__namespace.forwardRef(
   ({
     size = "md",
     label,
-    labelPosition = "right",
     required,
+    title,
+    titlePosition = "right",
     checked,
     defaultChecked,
     onChange,
@@ -4595,28 +4596,27 @@ var Toggle = React16__namespace.forwardRef(
         children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Switch.Thumb, { className: thumbVariants({ size }) })
       }
     );
-    if (labelPosition === "top") {
-      return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex flex-col gap-1.5", wrapperClassName), children: [
-        label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size, required, children: label }),
-        switchEl
-      ] });
-    }
-    if (!label) return /* @__PURE__ */ jsxRuntime.jsx(jsxRuntime.Fragment, { children: switchEl });
-    return /* @__PURE__ */ jsxRuntime.jsxs(
+    const inlineEl = title ? /* @__PURE__ */ jsxRuntime.jsxs(
       "label",
       {
         className: cn(
           "inline-flex cursor-pointer items-center gap-2",
-          labelPosition === "left" && "flex-row-reverse",
-          readOnly && "pointer-events-none cursor-default",
-          wrapperClassName
+          readOnly && "pointer-events-none cursor-default"
         ),
         children: [
+          titlePosition === "left" && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-medium text-[#1F2937]", children: title }),
           switchEl,
-          /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-medium text-[#1F2937]", children: label })
+          titlePosition === "right" && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-medium text-[#1F2937]", children: title })
         ]
       }
-    );
+    ) : switchEl;
+    if (label) {
+      return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex flex-col gap-1.5", wrapperClassName), children: [
+        /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size, required, children: label }),
+        inlineEl
+      ] });
+    }
+    return /* @__PURE__ */ jsxRuntime.jsx(jsxRuntime.Fragment, { children: inlineEl });
   }
 );
 Toggle.displayName = "Toggle";
