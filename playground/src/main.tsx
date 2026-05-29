@@ -26,9 +26,10 @@ import DatePickerPreview from "./components/DatePicker";
 import PrevDemo from "./components/Prev";
 import AppLayoutPreview from "./components/AppLayout";
 import Demo from "./components/Demo";
-
+import FilterGroupPreview from "./components/FilterGroup"
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <FilterGroupPreview/>
     <Demo />
     <InputPreview/>
   </React.StrictMode>,

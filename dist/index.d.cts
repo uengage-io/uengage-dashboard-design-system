@@ -1152,4 +1152,42 @@ type AccordionItemVariants = VariantProps<typeof accordionItemVariants>;
 type AccordionTriggerVariants = VariantProps<typeof accordionTriggerVariants>;
 type AccordionContentVariants = VariantProps<typeof accordionContentVariants>;
 
-export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, formatDate, formatMonthYear, formatRange, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
+interface FilterGroupProps {
+    /**
+     * Your filter components — <Select />, <SearchBar />, <Input />, <DatePicker />, etc.
+     * Each direct child maps 1-to-1 with an entry in `labels`.
+     */
+    children: React.ReactNode;
+    /**
+     * Category labels shown in the mobile drawer's left panel, in the same order as children.
+     * e.g. ["Outlet", "State", "City", "Date"]
+     */
+    labels: string[];
+    /** Called when the user presses Apply in the mobile drawer. */
+    onApply?: () => void;
+    /** Called when the user presses Reset in the mobile drawer. */
+    onReset?: () => void;
+    /** Drawer title and mobile trigger label. Defaults to "Filters". */
+    drawerTitle?: string;
+    /** Active-filter count badge on the mobile trigger (hidden when 0 or undefined). */
+    activeCount?: number;
+    /** Extra classes on the desktop filter row. */
+    className?: string;
+    /** Extra classes on the mobile drawer panel. */
+    drawerClassName?: string;
+    /** Always render in drawer mode regardless of screen size — useful for demos/testing. */
+    forceDrawer?: boolean;
+}
+
+declare function FilterGroup({ children, labels, onApply, onReset, drawerTitle, activeCount, className, drawerClassName, forceDrawer, }: FilterGroupProps): react_jsx_runtime.JSX.Element;
+declare namespace FilterGroup {
+    var displayName: string;
+}
+
+/**
+ * Set to `true` when a component is rendered inside the FilterGroup mobile drawer.
+ * Components like Select read this to switch to a flat tap-list instead of a popover.
+ */
+declare const FilterGroupMobileContext: React.Context<boolean>;
+
+export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, formatDate, formatMonthYear, formatRange, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
