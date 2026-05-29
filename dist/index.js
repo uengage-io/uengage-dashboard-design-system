@@ -5801,9 +5801,18 @@ function Accordion(props) {
   );
 }
 Accordion.displayName = "Accordion";
-function isDatePickerChild(child) {
-  if (!React17.isValidElement(child)) return false;
-  return child.type.displayName === "DatePicker";
+function findDatePickerInTree(node) {
+  if (!React17.isValidElement(node)) return null;
+  if (node.type.displayName === "DatePicker") {
+    return node;
+  }
+  const children = node.props.children;
+  if (!children) return null;
+  for (const child of React17.Children.toArray(children)) {
+    const found = findDatePickerInTree(child);
+    if (found) return found;
+  }
+  return null;
 }
 function InlineDatePickerPanel({ child }) {
   const p = child.props;
@@ -5972,10 +5981,11 @@ function FilterGroup({
     setOpen(false);
   };
   const renderRightPanel = (item) => {
-    if (isDatePickerChild(item.content)) {
-      return /* @__PURE__ */ jsx(InlineDatePickerPanel, { child: item.content });
+    const datePicker = findDatePickerInTree(item.content);
+    if (datePicker) {
+      return /* @__PURE__ */ jsx(InlineDatePickerPanel, { child: datePicker });
     }
-    return /* @__PURE__ */ jsx(FilterGroupMobileContext.Provider, { value: true, children: item.content });
+    return /* @__PURE__ */ jsx("div", { className: "p-4 [&_span.text-xs]:hidden", children: /* @__PURE__ */ jsx(FilterGroupMobileContext.Provider, { value: true, children: item.content }) });
   };
   const drawer = /* @__PURE__ */ jsxs(Drawer, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsx(DrawerTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
