@@ -1,8 +1,8 @@
 "use client";
-import * as React from 'react';
+import * as React2 from 'react';
 import { useMemo } from 'react';
 import { DayPicker } from 'react-day-picker';
-import { ChevronLeft, ChevronRight, X, ChevronDown, Check, CircleAlert } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, X, ChevronDown, CircleAlert } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import Fuse from 'fuse.js';
@@ -32,6 +32,7 @@ function useFuzzySearch(items, query) {
     return fuse.search(q).map((r) => r.item);
   }, [fuse, query, items]);
 }
+var FilterGroupMobileContext = React2.createContext(false);
 function Popover({
   ...props
 }) {
@@ -300,9 +301,10 @@ function Select({
   error,
   readOnly = false
 }) {
-  const touchedRef = React.useRef(false);
-  const interactedRef = React.useRef(false);
-  const resolvedOptions = React.useMemo(() => {
+  const isMobileDrawer = React2.useContext(FilterGroupMobileContext);
+  const touchedRef = React2.useRef(false);
+  const interactedRef = React2.useRef(false);
+  const resolvedOptions = React2.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -312,13 +314,13 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = React.useState("");
+  const [open, setOpen] = React2.useState(false);
+  const [search, setSearch] = React2.useState("");
   const filteredOptions = useFuzzySearch(resolvedOptions, search);
-  const [selected, setSelected] = React.useState(
+  const [selected, setSelected] = React2.useState(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
   );
-  React.useEffect(() => {
+  React2.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -352,12 +354,12 @@ function Select({
     e.stopPropagation();
     commit(mode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React.useRef(null);
-  const [visibleCount, setVisibleCount] = React.useState(null);
-  React.useLayoutEffect(() => {
+  const pillsContainerRef = React2.useRef(null);
+  const [visibleCount, setVisibleCount] = React2.useState(null);
+  React2.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), mode]);
-  React.useLayoutEffect(() => {
+  React2.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     const container = pillsContainerRef.current;
     if (!container || mode !== "multi" || selectedArr.length === 0) {
@@ -408,6 +410,28 @@ function Select({
     touchedRef.current = true;
     onTouch?.();
   };
+  if (isMobileDrawer) {
+    return /* @__PURE__ */ jsx("ul", { className: "divide-y divide-gray-100", children: resolvedOptions.map((opt) => {
+      const selected2 = isSelected(opt.value);
+      return /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsxs(
+        "button",
+        {
+          type: "button",
+          disabled: opt.disabled,
+          onClick: () => !opt.disabled && handleSelect(opt.value),
+          className: cn(
+            "w-full flex items-center justify-between px-4 py-4 text-sm transition-colors",
+            selected2 ? "text-[#006F42] font-semibold" : "text-gray-800 font-normal",
+            opt.disabled ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
+          ),
+          children: [
+            /* @__PURE__ */ jsx("span", { children: opt.label }),
+            selected2 && /* @__PURE__ */ jsx(Check, { size: 16, strokeWidth: 2.5, className: "shrink-0 text-[#006F42]" })
+          ]
+        }
+      ) }, opt.value);
+    }) });
+  }
   return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1.5", children: [
     label && /* @__PURE__ */ jsx(InputLabel, { size: size === "xs" ? "sm" : size, required, children: label }),
     /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
@@ -633,8 +657,8 @@ function StyledDayButton({
   className,
   ...props
 }) {
-  const ref = React.useRef(null);
-  React.useEffect(() => {
+  const ref = React2.useRef(null);
+  React2.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
   const isEdge = modifiers.range_start || modifiers.range_end;
@@ -682,10 +706,10 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React2.useMemo(() => /* @__PURE__ */ new Date(), []);
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? today;
-  const [viewMonth, setViewMonth] = React.useState(initialMonth);
-  const yearOptions = React.useMemo(
+  const [viewMonth, setViewMonth] = React2.useState(initialMonth);
+  const yearOptions = React2.useMemo(
     () => buildYearOptions(today.getFullYear()),
     [today]
   );
@@ -810,11 +834,11 @@ function MonthPickerCalendar({
   maxDate,
   onSelect
 }) {
-  const today = React.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const [viewYear, setViewYear] = React.useState(
+  const today = React2.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React2.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React.useMemo(() => {
+  const yearOptions = React2.useMemo(() => {
     const center = today.getFullYear();
     const minYear = minDate ? minDate.getFullYear() : center - 10;
     const maxYear = maxDate ? maxDate.getFullYear() : center + 10;

@@ -2,6 +2,7 @@ import * as React from "react";
 import { ChevronDown, Check, X } from "lucide-react";
 import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import { cn } from "@/lib/utils";
+import { FilterGroupMobileContext } from "@/lib/filterGroupContext";
 import {
   Popover,
   PopoverContent,
@@ -61,6 +62,7 @@ function Select<TItem = unknown>({
   error,
   readOnly = false,
 }: SelectProps<TItem>) {
+  const isMobileDrawer = React.useContext(FilterGroupMobileContext);
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
   const resolvedOptions = React.useMemo<SelectOption[]>(() => {
@@ -227,6 +229,38 @@ function Select<TItem = unknown>({
     touchedRef.current = true;
     onTouch?.();
   };
+
+  // ── Flat list mode inside FilterGroup mobile drawer ──────────────────────
+  if (isMobileDrawer) {
+    return (
+      <ul className="divide-y divide-gray-100">
+        {resolvedOptions.map((opt) => {
+          const selected = isSelected(opt.value);
+          return (
+            <li key={opt.value}>
+              <button
+                type="button"
+                disabled={opt.disabled}
+                onClick={() => !opt.disabled && handleSelect(opt.value)}
+                className={cn(
+                  "w-full flex items-center justify-between px-4 py-4 text-sm transition-colors",
+                  selected ? "text-[#006F42] font-semibold" : "text-gray-800 font-normal",
+                  opt.disabled
+                    ? "opacity-40 cursor-not-allowed"
+                    : "hover:bg-gray-50 active:bg-gray-100 cursor-pointer",
+                )}
+              >
+                <span>{opt.label}</span>
+                {selected && (
+                  <Check size={16} strokeWidth={2.5} className="shrink-0 text-[#006F42]" />
+                )}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-1.5">

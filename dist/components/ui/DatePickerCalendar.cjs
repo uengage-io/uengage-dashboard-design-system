@@ -1,7 +1,7 @@
 "use client";
 'use strict';
 
-var React = require('react');
+var React2 = require('react');
 var reactDayPicker = require('react-day-picker');
 var lucideReact = require('lucide-react');
 var clsx = require('clsx');
@@ -32,7 +32,7 @@ function _interopNamespace(e) {
   return Object.freeze(n);
 }
 
-var React__namespace = /*#__PURE__*/_interopNamespace(React);
+var React2__namespace = /*#__PURE__*/_interopNamespace(React2);
 var Fuse__default = /*#__PURE__*/_interopDefault(Fuse);
 
 // src/components/ui/DatePickerCalendar.tsx
@@ -40,7 +40,7 @@ function cn(...inputs) {
   return tailwindMerge.twMerge(clsx.clsx(inputs));
 }
 function useFuzzySearch(items, query) {
-  const fuse = React.useMemo(
+  const fuse = React2.useMemo(
     () => new Fuse__default.default(items, {
       keys: ["label"],
       threshold: 0.35,
@@ -50,12 +50,13 @@ function useFuzzySearch(items, query) {
     }),
     [items]
   );
-  return React.useMemo(() => {
+  return React2.useMemo(() => {
     const q = query.trim();
     if (!q) return items;
     return fuse.search(q).map((r) => r.item);
   }, [fuse, query, items]);
 }
+var FilterGroupMobileContext = React2__namespace.createContext(false);
 function Popover({
   ...props
 }) {
@@ -324,9 +325,10 @@ function Select({
   error,
   readOnly = false
 }) {
-  const touchedRef = React__namespace.useRef(false);
-  const interactedRef = React__namespace.useRef(false);
-  const resolvedOptions = React__namespace.useMemo(() => {
+  const isMobileDrawer = React2__namespace.useContext(FilterGroupMobileContext);
+  const touchedRef = React2__namespace.useRef(false);
+  const interactedRef = React2__namespace.useRef(false);
+  const resolvedOptions = React2__namespace.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -336,13 +338,13 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React__namespace.useState(false);
-  const [search, setSearch] = React__namespace.useState("");
+  const [open, setOpen] = React2__namespace.useState(false);
+  const [search, setSearch] = React2__namespace.useState("");
   const filteredOptions = useFuzzySearch(resolvedOptions, search);
-  const [selected, setSelected] = React__namespace.useState(
+  const [selected, setSelected] = React2__namespace.useState(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
   );
-  React__namespace.useEffect(() => {
+  React2__namespace.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -376,12 +378,12 @@ function Select({
     e.stopPropagation();
     commit(mode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React__namespace.useRef(null);
-  const [visibleCount, setVisibleCount] = React__namespace.useState(null);
-  React__namespace.useLayoutEffect(() => {
+  const pillsContainerRef = React2__namespace.useRef(null);
+  const [visibleCount, setVisibleCount] = React2__namespace.useState(null);
+  React2__namespace.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), mode]);
-  React__namespace.useLayoutEffect(() => {
+  React2__namespace.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     const container = pillsContainerRef.current;
     if (!container || mode !== "multi" || selectedArr.length === 0) {
@@ -432,6 +434,28 @@ function Select({
     touchedRef.current = true;
     onTouch?.();
   };
+  if (isMobileDrawer) {
+    return /* @__PURE__ */ jsxRuntime.jsx("ul", { className: "divide-y divide-gray-100", children: resolvedOptions.map((opt) => {
+      const selected2 = isSelected(opt.value);
+      return /* @__PURE__ */ jsxRuntime.jsx("li", { children: /* @__PURE__ */ jsxRuntime.jsxs(
+        "button",
+        {
+          type: "button",
+          disabled: opt.disabled,
+          onClick: () => !opt.disabled && handleSelect(opt.value),
+          className: cn(
+            "w-full flex items-center justify-between px-4 py-4 text-sm transition-colors",
+            selected2 ? "text-[#006F42] font-semibold" : "text-gray-800 font-normal",
+            opt.disabled ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
+          ),
+          children: [
+            /* @__PURE__ */ jsxRuntime.jsx("span", { children: opt.label }),
+            selected2 && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Check, { size: 16, strokeWidth: 2.5, className: "shrink-0 text-[#006F42]" })
+          ]
+        }
+      ) }, opt.value);
+    }) });
+  }
   return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1.5", children: [
     label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size: size === "xs" ? "sm" : size, required, children: label }),
     /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
@@ -657,8 +681,8 @@ function StyledDayButton({
   className,
   ...props
 }) {
-  const ref = React__namespace.useRef(null);
-  React__namespace.useEffect(() => {
+  const ref = React2__namespace.useRef(null);
+  React2__namespace.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
   const isEdge = modifiers.range_start || modifiers.range_end;
@@ -706,10 +730,10 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React2__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? today;
-  const [viewMonth, setViewMonth] = React__namespace.useState(initialMonth);
-  const yearOptions = React__namespace.useMemo(
+  const [viewMonth, setViewMonth] = React2__namespace.useState(initialMonth);
+  const yearOptions = React2__namespace.useMemo(
     () => buildYearOptions(today.getFullYear()),
     [today]
   );
@@ -834,11 +858,11 @@ function MonthPickerCalendar({
   maxDate,
   onSelect
 }) {
-  const today = React__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const [viewYear, setViewYear] = React__namespace.useState(
+  const today = React2__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React2__namespace.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React__namespace.useMemo(() => {
+  const yearOptions = React2__namespace.useMemo(() => {
     const center = today.getFullYear();
     const minYear = minDate ? minDate.getFullYear() : center - 10;
     const maxYear = maxDate ? maxDate.getFullYear() : center + 10;

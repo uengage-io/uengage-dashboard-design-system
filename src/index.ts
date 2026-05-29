@@ -292,3 +292,10 @@ export {
   type AccordionTriggerVariants,
   type AccordionContentVariants,
 } from "./components/custom/Accordion";
+
+// FilterGroup
+export {
+  FilterGroup,
+  type FilterGroupProps,
+} from "./components/custom/FilterGroup";
+export { FilterGroupMobileContext } from "./lib/filterGroupContext";
