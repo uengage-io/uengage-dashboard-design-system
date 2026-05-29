@@ -22,11 +22,20 @@ import { Button } from "../Button/button";
 
 // ── DatePicker detection ──────────────────────────────────────────────────────
 
-function isDatePickerChild(
-  child: React.ReactNode,
-): child is React.ReactElement {
-  if (!React.isValidElement(child)) return false;
-  return (child.type as { displayName?: string }).displayName === "DatePicker";
+function findDatePickerInTree(
+  node: React.ReactNode,
+): React.ReactElement | null {
+  if (!React.isValidElement(node)) return null;
+  if ((node.type as { displayName?: string }).displayName === "DatePicker") {
+    return node;
+  }
+  const children = (node.props as { children?: React.ReactNode }).children;
+  if (!children) return null;
+  for (const child of React.Children.toArray(children)) {
+    const found = findDatePickerInTree(child);
+    if (found) return found;
+  }
+  return null;
 }
 
 // ── Inline calendar rendered inside the drawer right panel ───────────────────
@@ -223,14 +232,18 @@ export function FilterGroup({
 
   // Renders the right panel for a given item — DatePicker gets inline calendar,
   // everything else goes through FilterGroupMobileContext (Select → flat list, etc.)
+  // Label spans (text-xs) are hidden via CSS since the drawer left panel already names the category.
   const renderRightPanel = (item: typeof items[number]) => {
-    if (isDatePickerChild(item.content)) {
-      return <InlineDatePickerPanel child={item.content} />;
+    const datePicker = findDatePickerInTree(item.content);
+    if (datePicker) {
+      return <InlineDatePickerPanel child={datePicker} />;
     }
     return (
-      <FilterGroupMobileContext.Provider value={true}>
-        {item.content}
-      </FilterGroupMobileContext.Provider>
+      <div className="p-4 [&_span.text-xs]:hidden">
+        <FilterGroupMobileContext.Provider value={true}>
+          {item.content}
+        </FilterGroupMobileContext.Provider>
+      </div>
     );
   };
 

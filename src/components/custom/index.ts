@@ -17,3 +17,4 @@ export {
 export { Sidebar, type SidebarProps } from "./sidebar";
 export { Modal, type ModalProps } from "./Modal";
 export { Loader } from "./Loader";
+export { Banner, type BannerProps, type BannerVariant } from "./Banner";
