@@ -97,7 +97,7 @@ export default function FilterGroupPreview() {
             <Select options={cityOptions} value={city} onChange={setCity} placeholder="Select City" />
             <Select options={dateOptions} value={date} onChange={setDate} placeholder="Today" />
                      
-          <DatePicker/>
+          <DatePicker mode="range"/>
 
           </FilterGroup>
         </div>
@@ -128,7 +128,8 @@ export default function FilterGroupPreview() {
           <Select options={cityOptions} value={city} onChange={setCity} placeholder="Select City" />
           <Select options={dateOptions} value={date} onChange={setDate} placeholder="Today" />
           <SearchBar/>
-          <DatePicker/>
+          <DatePicker  mode="range"
+           />
         </FilterGroup>
       </section>
     </div>
