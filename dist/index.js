@@ -6,7 +6,7 @@ import { twMerge } from 'tailwind-merge';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import * as React17 from 'react';
 import { useState, useMemo, useRef, useLayoutEffect } from 'react';
-import { X, Search, CircleAlert, Check, ChevronDown, EyeOff, Eye, Minus, ChevronLeft, ChevronRight, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronsRight, SlidersHorizontal, Loader2, HelpCircle, Info, AlertTriangle } from 'lucide-react';
+import { X, Search, CircleAlert, Check, ChevronDown, EyeOff, Eye, Minus, ChevronLeft, ChevronRight, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronsRight, SlidersHorizontal, Loader2, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Command as Command$1, CommandInput as CommandInput$1, CommandList as CommandList$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
@@ -3005,18 +3005,18 @@ function Radio({
   }, [label]);
   const state = disabled ? "disabled" : error ? "error" : "default";
   const labelState = disabled ? "disabled" : "default";
-  const hasCustomColors = !!(borderColor || bgColor);
+  const hasCustomColors2 = !!(borderColor || bgColor);
   return /* @__PURE__ */ jsxs(
     "label",
     {
       htmlFor: itemId,
-      style: hasCustomColors ? {
+      style: hasCustomColors2 ? {
         ...borderColor ? { "--radio-checked-border": borderColor } : {},
         ...bgColor ? { "--radio-checked-bg": bgColor } : {}
       } : void 0,
       className: cn(
         "group inline-flex cursor-pointer items-center transition-colors",
-        hasCustomColors ? cn(
+        hasCustomColors2 ? cn(
           "rounded-xl border",
           PILL_PADDING[size],
           error ? "border-red-500" : cn(
@@ -3056,7 +3056,7 @@ function Radio({
             className: cn(
               radioLabelVariants({ size, state: labelState }),
               "whitespace-normal break-words",
-              hasCustomColors && "group-has-[[data-state=checked]]:text-[#0F8055]"
+              hasCustomColors2 && "group-has-[[data-state=checked]]:text-[#0F8055]"
             ),
             children: truncateLabelToWordLimit(label)
           }
@@ -3234,19 +3234,19 @@ function Checkbox({
   };
   const boxState = disabled ? "disabled" : error ? "error" : indeterminate ? "indeterminate" : visualChecked ? "checked" : "unchecked";
   const labelState = disabled ? "disabled" : visualChecked || indeterminate ? "checked" : "default";
-  const hasCustomColors = !!(borderColor || bgColor);
+  const hasCustomColors2 = !!(borderColor || bgColor);
   const isActive = (visualChecked || !!indeterminate) && !error && !disabled && !readOnly;
   return /* @__PURE__ */ jsxs(
     "label",
     {
       htmlFor: itemId,
-      style: hasCustomColors && isActive ? {
+      style: hasCustomColors2 && isActive ? {
         ...borderColor ? { borderColor } : {},
         ...bgColor ? { backgroundColor: bgColor } : {}
       } : void 0,
       className: cn(
         "group inline-flex cursor-pointer items-center transition-colors",
-        hasCustomColors ? cn(
+        hasCustomColors2 ? cn(
           "rounded-xl border",
           PILL_PADDING2[size],
           error ? "border-red-500" : disabled ? "border-gray-200" : "border-gray-200"
@@ -6095,7 +6095,98 @@ function FilterGroup({
   ] });
 }
 FilterGroup.displayName = "FilterGroup";
+var bannerVariants = cva(
+  "flex flex-row items-start gap-3 rounded-xl border border-l-4 p-5 text-sm text-[#131313] font-medium leading-snug min-w-0 break-all",
+  {
+    variants: {
+      variant: {
+        info: "bg-blue-100 border-blue-400 [--banner-icon:#2563EB]",
+        success: "bg-green-100 border-green-400 [--banner-icon:#16A34A]",
+        error: "bg-red-100 border-red-400 [--banner-icon:#DC2626]",
+        warning: "bg-amber-100 border-amber-400 [--banner-icon:#D97706]"
+      }
+    },
+    defaultVariants: { variant: "info" }
+  }
+);
+var BannerRoot = React17.forwardRef(
+  ({ className, variant, ...props }, ref) => /* @__PURE__ */ jsx(
+    "div",
+    {
+      ref,
+      role: "alert",
+      className: cn(bannerVariants({ variant }), className),
+      ...props
+    }
+  )
+);
+BannerRoot.displayName = "Banner";
+var BannerIcon = React17.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsx(
+  "span",
+  {
+    ref,
+    className: cn("mt-0.5 shrink-0 [&_svg]:size-4", className),
+    style: { color: "var(--banner-icon)", ...style },
+    "aria-hidden": "true",
+    ...props
+  }
+));
+BannerIcon.displayName = "BannerIcon";
+var BannerContent = React17.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx("div", { ref, className: cn("flex-1 min-w-0 break-normal", className), ...props }));
+BannerContent.displayName = "BannerContent";
+var DEFAULT_ICONS = {
+  info: /* @__PURE__ */ jsx(Info, {}),
+  success: /* @__PURE__ */ jsx(CircleCheck, {}),
+  error: /* @__PURE__ */ jsx(CircleX, {}),
+  warning: /* @__PURE__ */ jsx(TriangleAlert, {})
+};
+var CUSTOM_COLOR_KEYS = ["backgroundColor", "borderColor", "iconColor", "textColor"];
+function hasCustomColors(props) {
+  return CUSTOM_COLOR_KEYS.some((k) => props[k] !== void 0);
+}
+function Banner({
+  variant = "info",
+  message,
+  children,
+  icon,
+  showIcon = true,
+  className,
+  backgroundColor,
+  borderColor,
+  iconColor,
+  textColor,
+  style,
+  ...rest
+}) {
+  const usingCustom = hasCustomColors({ variant, message, children, icon, showIcon, className, backgroundColor, borderColor, iconColor, textColor });
+  const customStyle = usingCustom ? {
+    ...backgroundColor && { backgroundColor },
+    ...borderColor && { borderColor },
+    ...textColor && { color: textColor }
+  } : {};
+  const resolvedIcon = icon ?? DEFAULT_ICONS[variant ?? "info"];
+  return /* @__PURE__ */ jsxs(
+    BannerRoot,
+    {
+      variant: usingCustom ? void 0 : variant,
+      className: cn(className),
+      style: { ...customStyle, ...style },
+      ...rest,
+      children: [
+        showIcon && /* @__PURE__ */ jsx(
+          BannerIcon,
+          {
+            style: iconColor ? { color: iconColor, ["--banner-icon"]: iconColor } : void 0,
+            children: resolvedIcon
+          }
+        ),
+        /* @__PURE__ */ jsx(BannerContent, { children: children ?? message })
+      ]
+    }
+  );
+}
+Banner.displayName = "Banner";
 
-export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, formatDate, formatMonthYear, formatRange, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
+export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, formatDate, formatMonthYear, formatRange, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

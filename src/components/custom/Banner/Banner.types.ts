@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-export type BannerVariant = "info" | "success" | "error";
+export type BannerVariant = "info" | "success" | "error" | "warning";
 
 export interface BannerProps extends React.HTMLAttributes<HTMLDivElement> {
   /**

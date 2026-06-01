@@ -299,3 +299,10 @@ export {
   type FilterGroupProps,
 } from "./components/custom/FilterGroup";
 export { FilterGroupMobileContext } from "./lib/filterGroupContext";
+
+// Banner
+export {
+  Banner,
+  type BannerProps,
+  type BannerVariant,
+} from "./components/custom/Banner";

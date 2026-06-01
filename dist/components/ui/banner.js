@@ -10,13 +10,14 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 var bannerVariants = cva(
-  "flex items-center gap-[10px] rounded-xl border-[1.5px] px-5 py-3.5 text-sm font-normal leading-snug",
+  "flex flex-row items-start gap-3 rounded-xl border border-l-4 p-5 text-sm text-[#131313] font-medium leading-snug min-w-0 break-all",
   {
     variants: {
       variant: {
-        info: "bg-[#DBEAFE] border-[#60A5FA] text-[#374151] [--banner-icon:#3B82F6]",
-        success: "bg-[#DCFCE7] border-[#4ADE80] text-[#374151] [--banner-icon:#22C55E]",
-        error: "bg-[#FEE2E2] border-[#F87171] text-[#374151] [--banner-icon:#EF4444]"
+        info: "bg-blue-100 border-blue-400 [--banner-icon:#2563EB]",
+        success: "bg-green-100 border-green-400 [--banner-icon:#16A34A]",
+        error: "bg-red-100 border-red-400 [--banner-icon:#DC2626]",
+        warning: "bg-amber-100 border-amber-400 [--banner-icon:#D97706]"
       }
     },
     defaultVariants: { variant: "info" }
@@ -38,14 +39,14 @@ var BannerIcon = React.forwardRef(({ className, style, ...props }, ref) => /* @_
   "span",
   {
     ref,
-    className: cn("shrink-0 [&_svg]:size-[18px]", className),
+    className: cn("mt-0.5 shrink-0 [&_svg]:size-4", className),
     style: { color: "var(--banner-icon)", ...style },
     "aria-hidden": "true",
     ...props
   }
 ));
 BannerIcon.displayName = "BannerIcon";
-var BannerContent = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx("div", { ref, className: cn("flex-1 leading-snug", className), ...props }));
+var BannerContent = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx("div", { ref, className: cn("flex-1 min-w-0 break-normal", className), ...props }));
 BannerContent.displayName = "BannerContent";
 
 export { BannerContent, BannerIcon, BannerRoot, bannerVariants };

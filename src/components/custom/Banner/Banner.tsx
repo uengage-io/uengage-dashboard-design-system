@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Info, CircleCheck, CircleX } from "lucide-react";
+import { Info, CircleCheck, CircleX, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   BannerRoot,
@@ -12,6 +12,7 @@ const DEFAULT_ICONS: Record<string, React.ReactNode> = {
   info: <Info />,
   success: <CircleCheck />,
   error: <CircleX />,
+  warning: <TriangleAlert />,
 };
 
 const CUSTOM_COLOR_KEYS = ["backgroundColor", "borderColor", "iconColor", "textColor"] as const;
@@ -49,7 +50,7 @@ export function Banner({
   return (
     <BannerRoot
       variant={usingCustom ? undefined : variant}
-      className={cn(usingCustom && "border-[1.5px]", className)}
+      className={cn(className)}
       style={{ ...customStyle, ...style }}
       {...rest}
     >
