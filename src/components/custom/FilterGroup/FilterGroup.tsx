@@ -210,6 +210,7 @@ export function FilterGroup({
   labels,
   onApply,
   onReset,
+  onClose,
   drawerTitle = "Filters",
   activeCount,
   className,
@@ -218,6 +219,7 @@ export function FilterGroup({
 }: FilterGroupProps) {
   const [open, setOpen] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(0);
+  const programmaticClose = React.useRef(false);
 
   const childArray = React.Children.toArray(children);
   const items = childArray.map((child, i) => ({
@@ -227,8 +229,14 @@ export function FilterGroup({
 
   const activeItem = items[activeIndex] ?? items[0];
 
-  const handleApply = () => { onApply?.(); setOpen(false); };
-  const handleReset = () => { onReset?.(); setOpen(false); };
+  const handleOpenChange = (next: boolean) => {
+    if (!next && !programmaticClose.current) onClose?.();
+    programmaticClose.current = false;
+    setOpen(next);
+  };
+
+  const handleApply = () => { programmaticClose.current = true; onApply?.(); setOpen(false); };
+  const handleReset = () => { programmaticClose.current = true; onReset?.(); setOpen(false); };
 
   // Renders the right panel for a given item — DatePicker gets inline calendar,
   // everything else goes through FilterGroupMobileContext (Select → flat list, etc.)
@@ -249,7 +257,7 @@ export function FilterGroup({
 
   // ── Mobile drawer ─────────────────────────────────────────────────────────
   const drawer = (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerTrigger asChild>
         <button
           type="button"

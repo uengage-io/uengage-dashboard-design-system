@@ -15,6 +15,8 @@ export interface FilterGroupProps {
   onApply?: () => void;
   /** Called when the user presses Reset in the mobile drawer. */
   onReset?: () => void;
+  /** Called when the drawer is dismissed via the X button or overlay click. */
+  onClose?: () => void;
   /** Drawer title and mobile trigger label. Defaults to "Filters". */
   drawerTitle?: string;
   /** Active-filter count badge on the mobile trigger (hidden when 0 or undefined). */

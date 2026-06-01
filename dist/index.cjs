@@ -5983,6 +5983,7 @@ function FilterGroup({
   labels,
   onApply,
   onReset,
+  onClose,
   drawerTitle = "Filters",
   activeCount,
   className,
@@ -5991,17 +5992,25 @@ function FilterGroup({
 }) {
   const [open, setOpen] = React17__namespace.useState(false);
   const [activeIndex, setActiveIndex] = React17__namespace.useState(0);
+  const programmaticClose = React17__namespace.useRef(false);
   const childArray = React17__namespace.Children.toArray(children);
   const items = childArray.map((child, i) => ({
     label: labels[i] ?? `Filter ${i + 1}`,
     content: child
   }));
   const activeItem = items[activeIndex] ?? items[0];
+  const handleOpenChange = (next) => {
+    if (!next && !programmaticClose.current) onClose?.();
+    programmaticClose.current = false;
+    setOpen(next);
+  };
   const handleApply = () => {
+    programmaticClose.current = true;
     onApply?.();
     setOpen(false);
   };
   const handleReset = () => {
+    programmaticClose.current = true;
     onReset?.();
     setOpen(false);
   };
@@ -6012,7 +6021,7 @@ function FilterGroup({
     }
     return /* @__PURE__ */ jsxRuntime.jsx("div", { className: "p-4 [&_span.text-xs]:hidden", children: /* @__PURE__ */ jsxRuntime.jsx(FilterGroupMobileContext.Provider, { value: true, children: item.content }) });
   };
-  const drawer = /* @__PURE__ */ jsxRuntime.jsxs(Drawer, { open, onOpenChange: setOpen, children: [
+  const drawer = /* @__PURE__ */ jsxRuntime.jsxs(Drawer, { open, onOpenChange: handleOpenChange, children: [
     /* @__PURE__ */ jsxRuntime.jsx(DrawerTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
       "button",
       {

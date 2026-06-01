@@ -150,6 +150,37 @@ function CustomTitleStory() {
   );
 }
 
+// ── Story: onClose callback ───────────────────────────────────────────────────
+
+function WithOnCloseStory() {
+  const [outlet, setOutlet] = React.useState<string | string[]>("");
+  const [state, setState] = React.useState<string | string[]>("");
+  const [closeCount, setCloseCount] = React.useState(0);
+  const [lastAction, setLastAction] = React.useState<string>("—");
+
+  const handleClose = () => {
+    setCloseCount((c) => c + 1);
+    setLastAction("Dismissed via X / overlay");
+  };
+
+  return (
+    <div className="p-6 space-y-6 max-w-5xl">
+      <FilterGroup
+        labels={["Outlet", "State"]}
+        activeCount={[outlet, state].filter((v) => Array.isArray(v) ? v.length > 0 : !!v).length}
+        onApply={() => setLastAction("Applied")}
+        onReset={() => { setOutlet(""); setState(""); setLastAction("Reset"); }}
+        onClose={handleClose}
+        forceDrawer
+      >
+        <Select options={outletOptions} value={outlet} onChange={setOutlet} placeholder="Select Outlet" />
+        <Select options={stateOptions} value={state} onChange={setState} placeholder="Select State" />
+      </FilterGroup>
+      <Readout value={{ outlet, state, lastAction, closeCount }} />
+    </div>
+  );
+}
+
 // ── Story: forceDrawer — mobile preview at any viewport ──────────────────────
 
 function ForceDrawerStory() {
@@ -211,6 +242,10 @@ const meta = {
       description: "Called when the user taps Reset in the mobile drawer.",
       action: "reset",
     },
+    onClose: {
+      description: "Called when the drawer is dismissed via the X button or overlay click (not via Apply or Reset).",
+      action: "closed",
+    },
     className: {
       description: "Extra Tailwind classes applied to the desktop filter row wrapper.",
       control: "text",
@@ -247,4 +282,10 @@ export const CustomTitle: Story = {
 export const MobileDrawerPreview: Story = {
   name: "Mobile drawer (forceDrawer)",
   render: () => <ForceDrawerStory />,
+};
+
+/** `onClose` fires when the drawer is dismissed via the X button or overlay tap — but NOT when the user presses Apply or Reset. The readout tracks `lastAction` and a running `closeCount` to make the distinction visible. */
+export const WithOnClose: Story = {
+  name: "onClose — X / overlay dismiss",
+  render: () => <WithOnCloseStory />,
 };
