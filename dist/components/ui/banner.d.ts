@@ -4,7 +4,7 @@ import { VariantProps } from 'class-variance-authority';
 export { VariantProps } from 'class-variance-authority';
 
 declare const bannerVariants: (props?: ({
-    variant?: "info" | "success" | "error" | null | undefined;
+    variant?: "error" | "success" | "warning" | "info" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 interface BannerRootProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof bannerVariants> {
 }

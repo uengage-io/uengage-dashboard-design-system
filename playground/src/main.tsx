@@ -27,8 +27,10 @@ import PrevDemo from "./components/Prev";
 import AppLayoutPreview from "./components/AppLayout";
 import Demo from "./components/Demo";
 import FilterGroupPreview from "./components/FilterGroup"
+import BannerPreview from "./components/Banner"
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <BannerPreview />
     <FilterGroupPreview/>
     <Demo />
     <InputPreview/>
