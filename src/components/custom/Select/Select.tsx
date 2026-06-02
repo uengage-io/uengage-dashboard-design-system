@@ -185,7 +185,13 @@ function Select<TItem = unknown>({
       ? resolvedOptions.find((o) => o.value === selected)?.label
       : undefined;
 
-  const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
+  const triggerState = disabled
+    ? "disabled"
+    : readOnly
+      ? "readonly"
+      : open
+        ? "open"
+        : "default";
 
   const placeholderSizeClass =
     size === "lg"
@@ -244,7 +250,9 @@ function Select<TItem = unknown>({
                 onClick={() => !opt.disabled && handleSelect(opt.value)}
                 className={cn(
                   "w-full flex items-center justify-between px-4 py-4 text-sm transition-colors",
-                  selected ? "text-[#006F42] font-semibold" : "text-gray-800 font-normal",
+                  selected
+                    ? "text-[#006F42] font-semibold"
+                    : "text-gray-800 font-normal",
                   opt.disabled
                     ? "opacity-40 cursor-not-allowed"
                     : "hover:bg-gray-50 active:bg-gray-100 cursor-pointer",
@@ -252,7 +260,11 @@ function Select<TItem = unknown>({
               >
                 <span>{opt.label}</span>
                 {selected && (
-                  <Check size={16} strokeWidth={2.5} className="shrink-0 text-[#006F42]" />
+                  <Check
+                    size={16}
+                    strokeWidth={2.5}
+                    className="shrink-0 text-[#006F42]"
+                  />
                 )}
               </button>
             </li>
@@ -269,183 +281,187 @@ function Select<TItem = unknown>({
           {label}
         </InputLabel>
       )}
-    <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
-        <div
-          role="button"
-          tabIndex={disabled ? -1 : 0}
-          aria-disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          onFocus={() => {
-            interactedRef.current = true;
-          }}
-          onBlur={handleTriggerBlur}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              if (!disabled && !readOnly) setOpen((o) => !o);
-            } else if (e.key === "Escape") {
-              setOpen(false);
-            }
-          }}
-          className={cn(
-            triggerVariants({ state: triggerState, size }),
-            width,
-            className,
-          )}
-        >
-          {/* ── Left: pills / label ── */}
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
           <div
-            ref={mode === "multi" ? pillsContainerRef : undefined}
-            className="flex flex-1 items-center gap-1 overflow-hidden min-w-0"
+            role="button"
+            tabIndex={disabled ? -1 : 0}
+            aria-disabled={disabled}
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            onFocus={() => {
+              interactedRef.current = true;
+            }}
+            onBlur={handleTriggerBlur}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!disabled && !readOnly) setOpen((o) => !o);
+              } else if (e.key === "Escape") {
+                setOpen(false);
+              }
+            }}
+            className={cn(
+              triggerVariants({ state: triggerState, size }),
+              width,
+              className,
+            )}
           >
-            {mode === "multi" ? (
-              selectedArr.length > 0 ? (
-                <>
-                  {displayedPills.map((val) => {
-                    const opt = resolvedOptions.find((o) => o.value === val);
-                    if (!opt) return null;
-                    return (
-                      <span
-                        key={val}
-                        data-pill
-                        className="inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]"
-                      >
-                        <span className="truncate">{opt.label}</span>
-                        {clearable && (
-                          <button
-                            type="button"
-                            tabIndex={-1}
-                            onClick={(e) => removePill(val, e)}
-                            className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
-                            aria-label={`Remove ${opt.label}`}
-                          >
-                            <X
-                              size={10}
-                              strokeWidth={2}
-                              className="hover:text-red-500"
-                            />
-                          </button>
-                        )}
+            {/* ── Left: pills / label ── */}
+            <div
+              ref={mode === "multi" ? pillsContainerRef : undefined}
+              className="flex flex-1 items-center gap-1 overflow-hidden min-w-0"
+            >
+              {mode === "multi" ? (
+                selectedArr.length > 0 ? (
+                  <>
+                    {displayedPills.map((val) => {
+                      const opt = resolvedOptions.find((o) => o.value === val);
+                      if (!opt) return null;
+                      return (
+                        <span
+                          key={val}
+                          data-pill
+                          className="inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]"
+                        >
+                          <span className="truncate">{opt.label}</span>
+                          {clearable && (
+                            <button
+                              type="button"
+                              tabIndex={-1}
+                              onClick={(e) => removePill(val, e)}
+                              className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
+                              aria-label={`Remove ${opt.label}`}
+                            >
+                              <X
+                                size={10}
+                                strokeWidth={2}
+                                className="hover:text-red-500"
+                              />
+                            </button>
+                          )}
+                        </span>
+                      );
+                    })}
+                    {overflowCount > 0 && (
+                      <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]">
+                        +{overflowCount}
                       </span>
-                    );
-                  })}
-                  {overflowCount > 0 && (
-                    <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]">
-                      +{overflowCount}
-                    </span>
-                  )}
-                </>
+                    )}
+                  </>
+                ) : (
+                  <span
+                    className={cn(
+                      "truncate text-[#C4C9D2]",
+                      placeholderSizeClass,
+                    )}
+                  >
+                    {placeholder}
+                  </span>
+                )
               ) : (
                 <span
                   className={cn(
-                    "truncate text-[#C4C9D2]",
-                    placeholderSizeClass,
+                    "truncate",
+                    singleLabel
+                      ? "text-[#111827]"
+                      : cn("text-[#C4C9D2]", placeholderSizeClass),
                   )}
                 >
-                  {placeholder}
+                  {singleLabel ?? placeholder}
                 </span>
-              )
-            ) : (
-              <span
-                className={cn(
-                  "truncate",
-                  singleLabel
-                    ? "text-[#111827]"
-                    : cn("text-[#C4C9D2]", placeholderSizeClass),
-                )}
-              >
-                {singleLabel ?? placeholder}
-              </span>
-            )}
-          </div>
-
-          <div className="flex shrink-0 items-center gap-1">
-            {clearable && hasSelection && (
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={clearAll}
-                className="flex items-center text-gray-400 hover:text-gray-600"
-                aria-label="Clear selection"
-              >
-                <X size={14} className="hover:text-red-500" strokeWidth={2} />
-              </button>
-            )}
-            <ChevronDown
-              size={16}
-              strokeWidth={2}
-              className={cn(
-                "text-gray-600 transition-transform duration-200",
-                open && "rotate-180",
               )}
-            />
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1">
+              {clearable && hasSelection && (
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={clearAll}
+                  className="flex items-center text-gray-400 hover:text-gray-600"
+                  aria-label="Clear selection"
+                >
+                  <X size={14} className="hover:text-red-500" strokeWidth={2} />
+                </button>
+              )}
+              <ChevronDown
+                size={16}
+                strokeWidth={2}
+                className={cn(
+                  "text-gray-600 transition-transform duration-200",
+                  open && "rotate-180",
+                )}
+              />
+            </div>
           </div>
-        </div>
-      </PopoverTrigger>
+        </PopoverTrigger>
 
-      <PopoverContent
-        className="max-w-[calc(100vw-1rem)]"
-        style={{
-          zIndex: 20,
-          width: "var(--radix-popover-trigger-width)",
-        }}
-      >
-        {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Search..."
-            value={search}
-            onValueChange={setSearch}
-            spellCheck={spellCheck}
-            className={commandInputSizeClass}
-          />
-          <CommandList>
-            {filteredOptions.length === 0 && search.trim() ? (
-              <CommandEmpty>No results found.</CommandEmpty>
-            ) : null}
+        <PopoverContent
+          className="max-w-[calc(100vw-1rem)]"
+          style={{
+            zIndex: 20,
+            width: "var(--radix-popover-trigger-width)",
+          }}
+        >
+          {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
+          <Command shouldFilter={false}>
+            <CommandInput
+              placeholder="Search..."
+              value={search}
+              onValueChange={setSearch}
+              spellCheck={spellCheck}
+              className={commandInputSizeClass}
+            />
+            <CommandList>
+              {filteredOptions.length === 0 && search.trim() ? (
+                <CommandEmpty>No results found.</CommandEmpty>
+              ) : null}
 
-            {mode === "multi" && (
-              <CommandItem
-                value={SELECT_ALL}
-                onSelect={() => handleSelect(SELECT_ALL)}
-                className={cn(
-                  "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                  commandItemSizeClass,
-                )}
-              >
-                <CheckboxIcon checked={allSelected} />
-                <span className="flex-1">Select all</span>
-              </CommandItem>
-            )}
+              {mode === "multi" && (
+                <CommandItem
+                  value={SELECT_ALL}
+                  onSelect={() => handleSelect(SELECT_ALL)}
+                  className={cn(
+                    "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                    commandItemSizeClass,
+                  )}
+                >
+                  <CheckboxIcon checked={allSelected} />
+                  <span className="flex-1">Select all</span>
+                </CommandItem>
+              )}
 
-            {filteredOptions.map((option) => (
-              <CommandItem
-                key={option.value}
-                value={option.value}
-                disabled={option.disabled}
-                aria-selected={isSelected(option.value)}
-                onSelect={() => handleSelect(option.value)}
-                className={cn(
-                  "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                  commandItemSizeClass,
-                )}
-              >
-                {mode === "multi" && (
-                  <CheckboxIcon checked={isSelected(option.value)} />
-                )}
-                <span className="flex-1 truncate">{option.label}</span>
-                {mode === "single" && isSelected(option.value) && (
-                  <Check size={14} className="shrink-0 text-[#006F42]" />
-                )}
-              </CommandItem>
-            ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-    <InputHelper size={size === "xs" ? "sm" : size} helperText={helperText} error={error} />
+              {filteredOptions.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  value={option.value}
+                  disabled={option.disabled}
+                  aria-selected={isSelected(option.value)}
+                  onSelect={() => handleSelect(option.value)}
+                  className={cn(
+                    "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                    commandItemSizeClass,
+                  )}
+                >
+                  {mode === "multi" && (
+                    <CheckboxIcon checked={isSelected(option.value)} />
+                  )}
+                  <span className="flex-1 truncate">{option.label}</span>
+                  {mode === "single" && isSelected(option.value) && (
+                    <Check size={14} className="shrink-0 text-[#006F42]" />
+                  )}
+                </CommandItem>
+              ))}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <InputHelper
+        size={size === "xs" ? "sm" : size}
+        helperText={helperText}
+        error={error}
+      />
     </div>
   );
 }

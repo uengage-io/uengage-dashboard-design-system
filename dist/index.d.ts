@@ -348,12 +348,16 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
     }>;
     /** Fires when the user picks a suggestion. Receives the item's `value` field. */
     onSuggestionSelect?: (value: string) => void;
+    /** Shows an X button to clear the input value. Turns red on hover. */
+    clearable?: boolean;
+    /** Fires when the clear button is clicked. */
+    onClear?: () => void;
 }
 
 interface CustomInputComposedProps extends CustomInputProps {
     required?: boolean;
 }
-declare function Input({ size, inputType, allowPattern, label, helperText, error, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
+declare function Input({ size, inputType, allowPattern, label, helperText, error, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
 declare namespace Input {
     var displayName: string;
 }

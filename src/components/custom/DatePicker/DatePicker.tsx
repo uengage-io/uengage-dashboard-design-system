@@ -285,7 +285,13 @@ function DatePicker({
 
   const canApply = draftRange !== null || pendingFrom !== null;
 
-  const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
+  const triggerState = disabled
+    ? "disabled"
+    : readOnly
+      ? "readonly"
+      : open
+        ? "open"
+        : "default";
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -294,140 +300,146 @@ function DatePicker({
           {label}
         </InputLabel>
       )}
-    <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
-        <div
-          role="button"
-          tabIndex={disabled ? -1 : 0}
-          aria-disabled={disabled}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          onFocus={() => {
-            interactedRef.current = true;
-          }}
-          onBlur={handleTriggerBlur}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              if (!disabled && !readOnly) setOpen((o) => !o);
-            } else if (e.key === "Escape") {
-              setOpen(false);
-            }
-          }}
-          className={cn(
-            triggerVariants({ state: triggerState, size }),
-            "gap-2 px-3 cursor-pointer select-none",
-            width,
-            className,
-          )}
-        >
-          <span
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
+          <div
+            role="button"
+            tabIndex={disabled ? -1 : 0}
+            aria-disabled={disabled}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            onFocus={() => {
+              interactedRef.current = true;
+            }}
+            onBlur={handleTriggerBlur}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!disabled && !readOnly) setOpen((o) => !o);
+              } else if (e.key === "Escape") {
+                setOpen(false);
+              }
+            }}
             className={cn(
-              "flex-1 truncate",
-              triggerLabel
-                ? "text-[#111827]"
-                : cn(
-                    "text-[#C4C9D2]",
-                    size === "lg"
-                      ? "text-[14px]"
-                      : size === "md"
-                        ? "text-[12px]"
-                        : "text-[11px]",
-                  ),
+              triggerVariants({ state: triggerState, size }),
+              "gap-2 px-3 cursor-pointer select-none",
+              width,
+              className,
             )}
           >
-            {triggerLabel ?? placeholder}
-          </span>
+            <span
+              className={cn(
+                "flex-1 truncate",
+                triggerLabel
+                  ? "text-[#111827]"
+                  : cn(
+                      "text-[#C4C9D2]",
+                      size === "lg"
+                        ? "text-[14px]"
+                        : size === "md"
+                          ? "text-[12px]"
+                          : "text-[11px]",
+                    ),
+              )}
+            >
+              {triggerLabel ?? placeholder}
+            </span>
 
-          <div className="flex shrink-0 items-center gap-1">
-            {clearable && committed && (
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={handleClearTrigger}
-                className="flex items-center text-gray-400 transition-colors hover:text-gray-600"
-                aria-label="Clear"
-              >
-                <X size={13} strokeWidth={2} className="hover:text-red-500" />
-              </button>
-            )}
-            <CalendarIcon size={15} strokeWidth={2} className="text-gray-600" />
+            <div className="flex shrink-0 items-center gap-1">
+              {clearable && committed && (
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={handleClearTrigger}
+                  className="flex items-center text-gray-400 transition-colors hover:text-gray-600"
+                  aria-label="Clear"
+                >
+                  <X size={13} strokeWidth={2} className="hover:text-red-500" />
+                </button>
+              )}
+              <CalendarIcon
+                size={15}
+                strokeWidth={2}
+                className="text-gray-600"
+              />
+            </div>
           </div>
-        </div>
-      </PopoverTrigger>
+        </PopoverTrigger>
 
-      <PopoverContent
-        align="center"
-        className="w-auto max-w-[calc(100vw-1rem)] p-0"
-        style={{ zIndex: 20 }}
-      >
-        <div className="overflow-hidden rounded-lg bg-white shadow-md">
-          {/* ── From / To boxes (range mode only) ── */}
-          {mode === "range" && (
-            <div className="flex gap-2 px-3 pt-3">
-              <DateBox label={fromLabel} active={!!fromLabel} />
-              <DateBox label={toLabel} active={false} />
-            </div>
-          )}
+        <PopoverContent
+          align="center"
+          className="w-auto max-w-[calc(100vw-1rem)] p-0"
+          style={{ zIndex: 20 }}
+        >
+          <div className="overflow-hidden rounded-lg bg-white shadow-md">
+            {/* ── From / To boxes (range mode only) ── */}
+            {mode === "range" && (
+              <div className="flex gap-2 px-3 pt-3">
+                <DateBox label={fromLabel} active={!!fromLabel} />
+                <DateBox label={toLabel} active={false} />
+              </div>
+            )}
 
-          {/* ── Month picker calendar ── */}
-          {mode === "month" && (
-            <MonthPickerCalendar
-              selected={committed instanceof Date ? committed : null}
-              minDate={minDate}
-              maxDate={maxDate}
-              onSelect={(date) => {
-                setCommitted(date);
-                onChange?.(date);
-                setOpen(false);
-              }}
-            />
-          )}
+            {/* ── Month picker calendar ── */}
+            {mode === "month" && (
+              <MonthPickerCalendar
+                selected={committed instanceof Date ? committed : null}
+                minDate={minDate}
+                maxDate={maxDate}
+                onSelect={(date) => {
+                  setCommitted(date);
+                  onChange?.(date);
+                  setOpen(false);
+                }}
+              />
+            )}
 
-          {/* ── Day calendar (single / range) ── */}
-          {mode !== "month" && (
-            <DatePickerCalendar
-              mode={mode}
-              selected={calendarSelected}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              disabled={calendarDisabled as any}
-              minDate={minDate}
-              maxDate={maxDate}
-              onDayClick={(date, modifiers) => handleDayClick(date, modifiers)}
-              onDayMouseEnter={(date) => handleDayMouseEnter(date)}
-              onDayMouseLeave={() => handleDayMouseLeave()}
-            />
-          )}
+            {/* ── Day calendar (single / range) ── */}
+            {mode !== "month" && (
+              <DatePickerCalendar
+                mode={mode}
+                selected={calendarSelected}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                disabled={calendarDisabled as any}
+                minDate={minDate}
+                maxDate={maxDate}
+                onDayClick={(date, modifiers) =>
+                  handleDayClick(date, modifiers)
+                }
+                onDayMouseEnter={(date) => handleDayMouseEnter(date)}
+                onDayMouseLeave={() => handleDayMouseLeave()}
+              />
+            )}
 
-          {/* ── Cancel / Apply footer (range mode only) ── */}
-          {mode === "range" && (
-            <div className="flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleApply}
-                disabled={!canApply}
-                className={cn(
-                  "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
-                  canApply
-                    ? "border-[#006F42] text-[#006F42]"
-                    : "border-gray-300 text-gray-400 cursor-not-allowed",
-                )}
-              >
-                Apply
-              </button>
-            </div>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
-    <InputHelper size={size} helperText={helperText} error={error} />
+            {/* ── Cancel / Apply footer (range mode only) ── */}
+            {mode === "range" && (
+              <div className="flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApply}
+                  disabled={!canApply}
+                  className={cn(
+                    "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
+                    canApply
+                      ? "border-[#006F42] text-[#006F42]"
+                      : "border-gray-300 text-gray-400 cursor-not-allowed",
+                  )}
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+      <InputHelper size={size} helperText={helperText} error={error} />
     </div>
   );
 }

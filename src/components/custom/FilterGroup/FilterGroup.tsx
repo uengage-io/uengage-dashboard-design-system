@@ -112,22 +112,8 @@ function InlineDatePickerPanel({ child }: { child: React.ReactElement }) {
     }
   };
 
-  const handleRangeApply = () => {
-    const toCommit = draftRange ?? (pendingFrom ? { from: pendingFrom, to: pendingFrom } : null);
-    if (!toCommit) return;
-    setPendingFrom(null); setHoverDate(null); setDraftRange(null);
-    setCommitted(toCommit);
-    onChange?.(toCommit);
-  };
-
-  const handleRangeCancel = () => {
-    setPendingFrom(null); setHoverDate(null); setDraftRange(null);
-  };
-
-  const canApply = draftRange !== null || pendingFrom !== null;
-
   return (
-    <div className="flex flex-col">
+    <div className="flex w-full flex-col">
       {/* Range: From / To boxes */}
       {mode === "range" && (
         <div className="flex gap-2 px-4 pt-4">
@@ -152,6 +138,7 @@ function InlineDatePickerPanel({ child }: { child: React.ReactElement }) {
           minDate={minDate}
           maxDate={maxDate}
           onSelect={(date) => { setCommitted(date); onChange?.(date); }}
+          className="w-full"
         />
       )}
 
@@ -171,34 +158,10 @@ function InlineDatePickerPanel({ child }: { child: React.ReactElement }) {
             setHoverDate(ex && "to" in ex && (date < ex.from || date > ex.to) ? date : null);
           }}
           onDayMouseLeave={() => setHoverDate(null)}
+          className="w-full"
         />
       )}
 
-      {/* Range: Apply / Cancel */}
-      {mode === "range" && (
-        <div className="flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-4 py-3">
-          <button
-            type="button"
-            onClick={handleRangeCancel}
-            className="rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] hover:bg-[#E8EAED] transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleRangeApply}
-            disabled={!canApply}
-            className={cn(
-              "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
-              canApply
-                ? "border-[#006F42] text-[#006F42]"
-                : "border-gray-300 text-gray-400 cursor-not-allowed",
-            )}
-          >
-            Apply
-          </button>
-        </div>
-      )}
     </div>
   );
 }
@@ -277,10 +240,11 @@ export function FilterGroup({
 
       <DrawerContent
         aria-label={drawerTitle}
+       
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50",
           "rounded-t-2xl bg-white",
-          "h-[50vh] flex flex-col",
+          "h-[70vh] flex flex-col",
           "translate-y-full data-[state=open]:translate-y-0",
           "transition-transform duration-300 ease-out",
           drawerClassName,
@@ -331,7 +295,7 @@ export function FilterGroup({
 
           {/* Right: active filter content */}
           <div className={cn(
-            "flex-1 overflow-y-auto",
+            "flex-1 overflow-y-auto overflow-x-hidden min-w-0",
             "[&::-webkit-scrollbar]:w-1.5",
             "[&::-webkit-scrollbar-track]:bg-gray-100",
             "[&::-webkit-scrollbar-thumb]:rounded-full",

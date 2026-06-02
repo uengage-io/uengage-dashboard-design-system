@@ -426,7 +426,14 @@ function Select({
           ),
           children: [
             /* @__PURE__ */ jsx("span", { children: opt.label }),
-            selected2 && /* @__PURE__ */ jsx(Check, { size: 16, strokeWidth: 2.5, className: "shrink-0 text-[#006F42]" })
+            selected2 && /* @__PURE__ */ jsx(
+              Check,
+              {
+                size: 16,
+                strokeWidth: 2.5,
+                className: "shrink-0 text-[#006F42]"
+              }
+            )
           ]
         }
       ) }, opt.value);
@@ -612,7 +619,14 @@ function Select({
         }
       )
     ] }),
-    /* @__PURE__ */ jsx(InputHelper, { size: size === "xs" ? "sm" : size, helperText, error })
+    /* @__PURE__ */ jsx(
+      InputHelper,
+      {
+        size: size === "xs" ? "sm" : size,
+        helperText,
+        error
+      }
+    )
   ] });
 }
 Select.displayName = "Select";
@@ -832,7 +846,8 @@ function MonthPickerCalendar({
   selected,
   minDate,
   maxDate,
-  onSelect
+  onSelect,
+  className
 }) {
   const today = React2.useMemo(() => /* @__PURE__ */ new Date(), []);
   const [viewYear, setViewYear] = React2.useState(
@@ -848,7 +863,7 @@ function MonthPickerCalendar({
     }
     return opts;
   }, [today, minDate, maxDate]);
-  return /* @__PURE__ */ jsxs("div", { className: "w-[280px] max-w-full bg-white", children: [
+  return /* @__PURE__ */ jsxs("div", { className: cn("w-[280px] max-w-full bg-white", className), children: [
     /* @__PURE__ */ jsx("div", { className: "flex items-center justify-center px-3 py-2", children: /* @__PURE__ */ jsx(
       Select,
       {

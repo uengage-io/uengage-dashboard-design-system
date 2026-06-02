@@ -49,4 +49,8 @@ export interface CustomInputProps
   suggestions?: Array<{ label: string; value: string }>;
   /** Fires when the user picks a suggestion. Receives the item's `value` field. */
   onSuggestionSelect?: (value: string) => void;
+  /** Shows an X button to clear the input value. Turns red on hover. */
+  clearable?: boolean;
+  /** Fires when the clear button is clicked. */
+  onClear?: () => void;
 }

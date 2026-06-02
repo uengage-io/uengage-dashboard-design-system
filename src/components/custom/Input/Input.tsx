@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import { Input as I } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
@@ -41,6 +41,8 @@ function Input({
   onBlur,
   suggestions,
   onSuggestionSelect,
+  clearable,
+  onClear,
   ...rest
 }: CustomInputComposedProps) {
   const reactId = React.useId();
@@ -63,6 +65,7 @@ function Input({
     !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
 
   const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const runValidation = (el: HTMLInputElement): string | undefined => {
     if (!el.validity.valid) {
@@ -120,8 +123,25 @@ function Input({
           ? "focused"
           : "default";
 
+  const showClear = Boolean(clearable) && !disabled && !readOnly && suggestionQuery.length > 0;
+
+  const handleClear = () => {
+    if (!isControlled) {
+      setUncontrolledQuery("");
+      if (inputRef.current) inputRef.current.value = "";
+    }
+    onChange?.({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
+    onClear?.();
+  };
+
   const hasLeftIcon = Boolean(leftIcon);
-  const hasRightIcon = Boolean(resolvedRightIcon);
+  const hasOriginalRightIcon = Boolean(resolvedRightIcon);
+  const hasRightIcon = hasOriginalRightIcon || showClear;
+  const hasDoubleRightIcon = hasOriginalRightIcon && showClear;
+
+  const doubleRightPadding = hasDoubleRightIcon
+    ? ({ sm: "pr-14", md: "pr-16", lg: "pr-20" } as Record<string, string>)[size]
+    : undefined;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (allowPattern && allowPattern !== "none") {
@@ -172,6 +192,7 @@ function Input({
 
           <I
             {...rest}
+            ref={inputRef}
             id={inputId}
             type={effectiveType}
             disabled={disabled}
@@ -202,12 +223,25 @@ function Input({
               }
               onBlur?.(e);
             }}
-            className={cn(inputFieldVariants({ size, hasLeftIcon, hasRightIcon }))}
+            className={cn(inputFieldVariants({ size, hasLeftIcon, hasRightIcon }), doubleRightPadding)}
           />
 
           {hasRightIcon && (
             <span className={cn(inputIconSlotVariants({ size, side: "right" }))}>
-              {resolvedRightIcon}
+              <span className="flex items-center gap-1">
+                {showClear && (
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    aria-label="Clear"
+                    onClick={handleClear}
+                    className="pointer-events-auto inline-flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <X strokeWidth={2} />
+                  </button>
+                )}
+                {resolvedRightIcon}
+              </span>
             </span>
           )}
         </div>

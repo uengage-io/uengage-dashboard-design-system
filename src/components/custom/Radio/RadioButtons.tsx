@@ -95,7 +95,13 @@ function RadioGroup<T = RadioOption>({
       </RadioGroupPrimitive.Root>
 
       <InputHelper
-        id={error ? `${groupId}-error` : helperText ? `${groupId}-helper` : undefined}
+        id={
+          error
+            ? `${groupId}-error`
+            : helperText
+              ? `${groupId}-helper`
+              : undefined
+        }
         size={size}
         helperText={helperText}
         error={error}
