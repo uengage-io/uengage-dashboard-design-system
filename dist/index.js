@@ -1954,6 +1954,7 @@ function Select({
         PopoverContent,
         {
           className: "max-w-[calc(100vw-1rem)]",
+          collisionPadding: { top: 64 },
           style: {
             zIndex: 20,
             width: "var(--radix-popover-trigger-width)"
@@ -4055,6 +4056,7 @@ function DatePicker({
         {
           align: "center",
           className: "w-auto max-w-[calc(100vw-1rem)] p-0",
+          collisionPadding: { top: 64 },
           style: { zIndex: 20 },
           children: /* @__PURE__ */ jsxs("div", { className: "overflow-hidden rounded-lg bg-white shadow-md", children: [
             mode === "range" && /* @__PURE__ */ jsxs("div", { className: "flex gap-2 px-3 pt-3", children: [
