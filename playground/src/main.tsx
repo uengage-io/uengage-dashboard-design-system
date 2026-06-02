@@ -28,11 +28,13 @@ import AppLayoutPreview from "./components/AppLayout";
 import Demo from "./components/Demo";
 import FilterGroupPreview from "./components/FilterGroup"
 import BannerPreview from "./components/Banner"
+import DemoPage from "./components/DemoPage"
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <BannerPreview /> */}
     {/* <FilterGroupPreview/> */}
-    <LayoutPreview />
+    {/* <LayoutPreview /> */}
     {/* <InputPreview/> */}
+    <DemoPage />
   </React.StrictMode>,
 );
