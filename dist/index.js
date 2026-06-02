@@ -1956,7 +1956,7 @@ function Select({
           className: "max-w-[calc(100vw-1rem)]",
           collisionPadding: { top: 64 },
           style: {
-            zIndex: 10,
+            zIndex: 60,
             width: "var(--radix-popover-trigger-width)"
           },
           children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
@@ -4057,7 +4057,7 @@ function DatePicker({
           align: "center",
           className: "w-auto max-w-[calc(100vw-1rem)] p-0",
           collisionPadding: { top: 64 },
-          style: { zIndex: 10 },
+          style: { zIndex: 60 },
           children: /* @__PURE__ */ jsxs("div", { className: "overflow-hidden rounded-lg bg-white shadow-md", children: [
             mode === "range" && /* @__PURE__ */ jsxs("div", { className: "flex gap-2 px-3 pt-3", children: [
               /* @__PURE__ */ jsx(DateBox, { label: fromLabel, active: !!fromLabel }),
