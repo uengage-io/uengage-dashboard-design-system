@@ -1469,7 +1469,7 @@ function PopoverContent({
       sideOffset,
       className: cn(
         "uengage-ui",
-        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none z-9999",
+        "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
         className
       ),
       style: { zIndex: 9999, ...style },
@@ -1956,7 +1956,7 @@ function Select({
           className: "max-w-[calc(100vw-1rem)]",
           collisionPadding: { top: 64 },
           style: {
-            zIndex: 20,
+            zIndex: 10,
             width: "var(--radix-popover-trigger-width)"
           },
           children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
@@ -4057,7 +4057,7 @@ function DatePicker({
           align: "center",
           className: "w-auto max-w-[calc(100vw-1rem)] p-0",
           collisionPadding: { top: 64 },
-          style: { zIndex: 20 },
+          style: { zIndex: 10 },
           children: /* @__PURE__ */ jsxs("div", { className: "overflow-hidden rounded-lg bg-white shadow-md", children: [
             mode === "range" && /* @__PURE__ */ jsxs("div", { className: "flex gap-2 px-3 pt-3", children: [
               /* @__PURE__ */ jsx(DateBox, { label: fromLabel, active: !!fromLabel }),

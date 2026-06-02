@@ -401,7 +401,7 @@ function Select<TItem = unknown>({
           className="max-w-[calc(100vw-1rem)]"
           collisionPadding={{ top: 64 }}
           style={{
-            zIndex: 20,
+            zIndex: 10,
             width: "var(--radix-popover-trigger-width)",
           }}
         >
