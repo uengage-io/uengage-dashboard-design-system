@@ -565,7 +565,7 @@ function Select({
           className: "max-w-[calc(100vw-1rem)]",
           collisionPadding: { top: 64 },
           style: {
-            zIndex: 10,
+            zIndex: 60,
             width: "var(--radix-popover-trigger-width)"
           },
           children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [

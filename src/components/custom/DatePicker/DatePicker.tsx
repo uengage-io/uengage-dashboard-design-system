@@ -370,7 +370,7 @@ function DatePicker({
           align="center"
           className="w-auto max-w-[calc(100vw-1rem)] p-0"
           collisionPadding={{ top: 64 }}
-          style={{ zIndex: 10 }}
+          style={{ zIndex: 60 }}
         >
           <div className="overflow-hidden rounded-lg bg-white shadow-md">
             {/* ── From / To boxes (range mode only) ── */}
