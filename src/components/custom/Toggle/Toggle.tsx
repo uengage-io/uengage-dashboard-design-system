@@ -5,11 +5,10 @@ import { trackVariants, thumbVariants } from "./toggleVariants";
 import type { ToggleVariantSize } from "./toggleVariants";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 
-export interface ToggleProps
-  extends Omit<
-    React.ComponentProps<typeof SwitchPrimitive.Root>,
-    "onChange" | "defaultChecked" | "checked"
-  > {
+export interface ToggleProps extends Omit<
+  React.ComponentProps<typeof SwitchPrimitive.Root>,
+  "onChange" | "defaultChecked" | "checked"
+> {
   /** Size of the toggle */
   size?: ToggleVariantSize;
   /** Field label rendered above the toggle. */
@@ -60,7 +59,10 @@ export const Toggle = React.forwardRef<
         defaultChecked={checked !== undefined ? undefined : defaultChecked}
         onCheckedChange={readOnly ? undefined : onChange}
         disabled={disabled}
-        className={cn(trackVariants({ size }), readOnly && "pointer-events-none cursor-default")}
+        className={cn(
+          trackVariants({ size }),
+          readOnly && "pointer-events-none cursor-default",
+        )}
         {...props}
       >
         <SwitchPrimitive.Thumb className={thumbVariants({ size })} />
@@ -82,7 +84,9 @@ export const Toggle = React.forwardRef<
           <span className="text-sm font-medium text-[#1F2937]">{title}</span>
         )}
       </label>
-    ) : switchEl;
+    ) : (
+      switchEl
+    );
 
     if (label) {
       return (

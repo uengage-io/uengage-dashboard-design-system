@@ -837,14 +837,14 @@ function TopHeader({
           "div",
           {
             "data-slot": "top-header-row",
-            className: "flex w-full flex-col gap-3 py-[6px] sm:flex-row sm:items-center sm:justify-between sm:py-[8px]",
+            className: "flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2 py-[7px]",
             children: [
               /* @__PURE__ */ jsxRuntime.jsxs(
                 "div",
                 {
                   "data-slot": "top-header-title",
                   className: "flex min-w-0 flex-1 items-center overflow-hidden",
-                  style: { gap: toCssSize(titleGap) },
+                  style: { gap: toCssSize(titleGap), minWidth: "160px" },
                   children: [
                     React17__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
                     helper != null && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "shrink-0 text-xs leading-none sm:text-sm", children: helper })
@@ -855,7 +855,7 @@ function TopHeader({
                 "div",
                 {
                   "data-slot": "top-header-action",
-                  className: "flex shrink-0 flex-wrap items-center gap-2 self-start sm:self-auto",
+                  className: "flex shrink-0 flex-wrap items-center gap-2",
                   children: action
                 }
               )
@@ -881,9 +881,9 @@ function TopHeader({
 }
 TopHeader.displayName = "TopHeader";
 var ALIGN_CLASS = {
-  start: "sm:items-start",
-  center: "sm:items-center",
-  end: "sm:items-end"
+  start: "items-start",
+  center: "items-center",
+  end: "items-end"
 };
 function SubHeader({
   title,
@@ -911,10 +911,7 @@ function SubHeader({
           {
             "data-slot": "sub-header-row",
             className: cn(
-              // Mobile: stack vertically with a small gap
-              "flex w-full flex-col gap-3",
-              // sm+: side-by-side with space-between
-              "sm:flex-row sm:justify-between sm:gap-4",
+              "flex w-full flex-wrap justify-between gap-x-4 gap-y-3",
               ALIGN_CLASS[align]
             ),
             style: {
@@ -927,11 +924,14 @@ function SubHeader({
                 {
                   "data-slot": "sub-header-main",
                   className: "flex min-w-0 flex-1 flex-col gap-3",
-                  style: gap !== LAYOUT.gap.xs ? { gap: toCssSize(gap) } : void 0,
+                  style: {
+                    ...gap !== LAYOUT.gap.xs ? { gap: toCssSize(gap) } : {},
+                    minWidth: "160px"
+                  },
                   children: [
                     hasHeading && /* @__PURE__ */ jsxRuntime.jsxs("div", { "data-slot": "sub-header-heading", children: [
-                      title != null && (React17__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h2", { className: "text-sm sm:text-base font-semibold leading-tight text-foreground", children: title })),
-                      subtitle != null && (React17__namespace.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-0.5 text-[12px] sm:text-[13px] leading-tight text-muted-foreground", children: subtitle }))
+                      title != null && (React17__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
+                      subtitle != null && (React17__namespace.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
                     ] }),
                     children != null && /* @__PURE__ */ jsxRuntime.jsx("div", { "data-slot": "sub-header-content", children })
                   ]
@@ -941,7 +941,7 @@ function SubHeader({
                 "div",
                 {
                   "data-slot": "sub-header-right",
-                  className: "flex shrink-0 flex-wrap items-center gap-3 self-start sm:self-auto",
+                  className: "flex shrink-0 flex-wrap items-center gap-3",
                   children: right
                 }
               )
@@ -1353,95 +1353,119 @@ function SearchBar({
   const showClear = clearable && displayValue.length > 0;
   const iconSize = ICON_SIZES[size];
   const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("uengage-ui flex flex-col gap-1.5 min-w-0", width, className), children: [
-    label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size: size === "lg" ? "lg" : size === "sm" ? "sm" : "md", required, children: label }),
-    /* @__PURE__ */ jsxRuntime.jsxs(
-      "div",
-      {
-        ref: wrapperRef,
-        className: "relative block min-w-0",
-        onBlur: handleBlur,
-        children: [
-          /* @__PURE__ */ jsxRuntime.jsxs(
-            "div",
-            {
-              className: cn(
-                "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
-                !disabled && !readOnly && "hover:border-gray-500 hover:shadow-sm",
-                SIZE_TEXT_CLASSES[size],
-                SIZE_HEIGHT_CLASSES[size],
-                disabled && "pointer-events-none opacity-50",
-                readOnly && "bg-gray-50 border-gray-300 text-gray-700 cursor-default"
-              ),
-              children: [
-                /* @__PURE__ */ jsxRuntime.jsx(
-                  Input,
-                  {
-                    value: displayValue,
-                    placeholder,
-                    disabled,
-                    readOnly,
-                    spellCheck,
-                    onChange: handleChange,
-                    onKeyDown: handleKeyDown,
-                    className: cn(
-                      "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[#C4C9D2]",
-                      SIZE_PLACEHOLDER_CLASSES[size],
-                      inputClassName
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1.5 pr-2.5", children: [
-                  showClear && /* @__PURE__ */ jsxRuntime.jsx(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: handleClear,
-                      disabled,
-                      className: "flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors",
-                      "aria-label": "Clear search",
-                      children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { className: "hover:text-red-500", strokeWidth: 2, size: iconSize })
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("w-px bg-gray-400", DIVIDER_CLASSES[size]) }),
-                  /* @__PURE__ */ jsxRuntime.jsx(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: handleSearchClick,
-                      disabled,
-                      className: "flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer",
-                      "aria-label": "Search",
-                      children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Search, { strokeWidth: 2, size: iconSize })
-                    }
-                  )
-                ] })
-              ]
-            }
-          ),
-          isDropdownVisible && /* @__PURE__ */ jsxRuntime.jsx(
-            "div",
-            {
-              className: cn(
-                "absolute left-0 top-full z-50 mt-1 w-full overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg max-h-48",
-                dropdownClassName
-              ),
-              children: filteredItems.length > 0 ? filteredItems.map((item) => /* @__PURE__ */ jsxRuntime.jsx(
-                "button",
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    "div",
+    {
+      className: cn(
+        "uengage-ui flex flex-col gap-1.5 min-w-0",
+        width,
+        className
+      ),
+      children: [
+        label && /* @__PURE__ */ jsxRuntime.jsx(
+          InputLabel,
+          {
+            size: size === "lg" ? "lg" : size === "sm" ? "sm" : "md",
+            required,
+            children: label
+          }
+        ),
+        /* @__PURE__ */ jsxRuntime.jsxs(
+          "div",
+          {
+            ref: wrapperRef,
+            className: "relative block min-w-0",
+            onBlur: handleBlur,
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsxs(
+                "div",
                 {
-                  type: "button",
-                  className: "w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors",
-                  onClick: () => handleSelect(item),
-                  children: item.label
-                },
-                item.value
-              )) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 py-2 text-sm text-[#9CA3AF]", children: fallbackText })
-            }
-          )
-        ]
-      }
-    )
-  ] });
+                  className: cn(
+                    "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
+                    !disabled && !readOnly && "hover:border-gray-500 hover:shadow-sm",
+                    SIZE_TEXT_CLASSES[size],
+                    SIZE_HEIGHT_CLASSES[size],
+                    disabled && "pointer-events-none opacity-50",
+                    readOnly && "bg-gray-50 border-gray-300 text-gray-700 cursor-default"
+                  ),
+                  children: [
+                    /* @__PURE__ */ jsxRuntime.jsx(
+                      Input,
+                      {
+                        value: displayValue,
+                        placeholder,
+                        disabled,
+                        readOnly,
+                        spellCheck,
+                        onChange: handleChange,
+                        onKeyDown: handleKeyDown,
+                        className: cn(
+                          "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[#C4C9D2]",
+                          SIZE_PLACEHOLDER_CLASSES[size],
+                          inputClassName
+                        )
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex shrink-0 items-center gap-1.5 pr-2.5", children: [
+                      showClear && /* @__PURE__ */ jsxRuntime.jsx(
+                        "button",
+                        {
+                          type: "button",
+                          onClick: handleClear,
+                          disabled,
+                          className: "flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors",
+                          "aria-label": "Clear search",
+                          children: /* @__PURE__ */ jsxRuntime.jsx(
+                            lucideReact.X,
+                            {
+                              className: "hover:text-red-500",
+                              strokeWidth: 2,
+                              size: iconSize
+                            }
+                          )
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("w-px bg-gray-400", DIVIDER_CLASSES[size]) }),
+                      /* @__PURE__ */ jsxRuntime.jsx(
+                        "button",
+                        {
+                          type: "button",
+                          onClick: handleSearchClick,
+                          disabled,
+                          className: "flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer",
+                          "aria-label": "Search",
+                          children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Search, { strokeWidth: 2, size: iconSize })
+                        }
+                      )
+                    ] })
+                  ]
+                }
+              ),
+              isDropdownVisible && /* @__PURE__ */ jsxRuntime.jsx(
+                "div",
+                {
+                  className: cn(
+                    "absolute left-0 top-full z-50 mt-1 w-full overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg max-h-48",
+                    dropdownClassName
+                  ),
+                  children: filteredItems.length > 0 ? filteredItems.map((item) => /* @__PURE__ */ jsxRuntime.jsx(
+                    "button",
+                    {
+                      type: "button",
+                      className: "w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors",
+                      onClick: () => handleSelect(item),
+                      children: item.label
+                    },
+                    item.value
+                  )) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 py-2 text-sm text-[#9CA3AF]", children: fallbackText })
+                }
+              )
+            ]
+          }
+        )
+      ]
+    }
+  );
 }
 SearchBar.displayName = "SearchBar";
 var FilterGroupMobileContext = React17__namespace.createContext(false);
@@ -1818,7 +1842,14 @@ function Select({
           ),
           children: [
             /* @__PURE__ */ jsxRuntime.jsx("span", { children: opt.label }),
-            selected2 && /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Check, { size: 16, strokeWidth: 2.5, className: "shrink-0 text-[#006F42]" })
+            selected2 && /* @__PURE__ */ jsxRuntime.jsx(
+              lucideReact.Check,
+              {
+                size: 16,
+                strokeWidth: 2.5,
+                className: "shrink-0 text-[#006F42]"
+              }
+            )
           ]
         }
       ) }, opt.value);
@@ -2004,7 +2035,14 @@ function Select({
         }
       )
     ] }),
-    /* @__PURE__ */ jsxRuntime.jsx(InputHelper, { size: size === "xs" ? "sm" : size, helperText, error })
+    /* @__PURE__ */ jsxRuntime.jsx(
+      InputHelper,
+      {
+        size: size === "xs" ? "sm" : size,
+        helperText,
+        error
+      }
+    )
   ] });
 }
 Select.displayName = "Select";
@@ -2779,6 +2817,8 @@ function Input2({
   onBlur,
   suggestions,
   onSuggestionSelect,
+  clearable,
+  onClear,
   ...rest
 }) {
   const reactId = React17__namespace.useId();
@@ -2795,6 +2835,7 @@ function Input2({
   const fuseResults = useFuzzySearch(suggestions ?? [], suggestionQuery);
   const showSuggestions = !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
   const wrapperRef = React17__namespace.useRef(null);
+  const inputRef = React17__namespace.useRef(null);
   const runValidation = (el) => {
     if (!el.validity.valid) {
       return validationMessage ?? el.validationMessage ?? "Invalid value";
@@ -2826,8 +2867,20 @@ function Input2({
     );
   }, [rightIcon, isPassword, showPassword]);
   const state = disabled ? "disabled" : readOnly ? "readonly" : effectiveError ? "error" : focused ? "focused" : "default";
+  const showClear = Boolean(clearable) && !disabled && !readOnly && suggestionQuery.length > 0;
+  const handleClear = () => {
+    if (!isControlled) {
+      setUncontrolledQuery("");
+      if (inputRef.current) inputRef.current.value = "";
+    }
+    onChange?.({ target: { value: "" } });
+    onClear?.();
+  };
   const hasLeftIcon = Boolean(leftIcon);
-  const hasRightIcon = Boolean(resolvedRightIcon);
+  const hasOriginalRightIcon = Boolean(resolvedRightIcon);
+  const hasRightIcon = hasOriginalRightIcon || showClear;
+  const hasDoubleRightIcon = hasOriginalRightIcon && showClear;
+  const doubleRightPadding = hasDoubleRightIcon ? { sm: "pr-14", md: "pr-16", lg: "pr-20" }[size] : void 0;
   const handleChange = (e) => {
     if (allowPattern && allowPattern !== "none") {
       const raw = e.target.value;
@@ -2863,6 +2916,7 @@ function Input2({
           Input,
           {
             ...rest,
+            ref: inputRef,
             id: inputId,
             type: effectiveType,
             disabled,
@@ -2892,10 +2946,23 @@ function Input2({
               }
               onBlur?.(e);
             },
-            className: cn(inputFieldVariants({ size, hasLeftIcon, hasRightIcon }))
+            className: cn(inputFieldVariants({ size, hasLeftIcon, hasRightIcon }), doubleRightPadding)
           }
         ),
-        hasRightIcon && /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn(inputIconSlotVariants({ size, side: "right" })), children: resolvedRightIcon })
+        hasRightIcon && /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn(inputIconSlotVariants({ size, side: "right" })), children: /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "flex items-center gap-1", children: [
+          showClear && /* @__PURE__ */ jsxRuntime.jsx(
+            "button",
+            {
+              type: "button",
+              tabIndex: -1,
+              "aria-label": "Clear",
+              onClick: handleClear,
+              className: "pointer-events-auto inline-flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors",
+              children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { strokeWidth: 2 })
+            }
+          ),
+          resolvedRightIcon
+        ] }) })
       ] }),
       showSuggestions && /* @__PURE__ */ jsxRuntime.jsx(
         "ul",
@@ -3634,7 +3701,8 @@ function MonthPickerCalendar({
   selected,
   minDate,
   maxDate,
-  onSelect
+  onSelect,
+  className
 }) {
   const today = React17__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
   const [viewYear, setViewYear] = React17__namespace.useState(
@@ -3650,7 +3718,7 @@ function MonthPickerCalendar({
     }
     return opts;
   }, [today, minDate, maxDate]);
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "w-[280px] max-w-full bg-white", children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("w-[280px] max-w-full bg-white", className), children: [
     /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center justify-center px-3 py-2", children: /* @__PURE__ */ jsxRuntime.jsx(
       Select,
       {
@@ -3995,7 +4063,14 @@ function DatePicker({
                   children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 13, strokeWidth: 2, className: "hover:text-red-500" })
                 }
               ),
-              /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CalendarIcon, { size: 15, strokeWidth: 2, className: "text-gray-600" })
+              /* @__PURE__ */ jsxRuntime.jsx(
+                lucideReact.CalendarIcon,
+                {
+                  size: 15,
+                  strokeWidth: 2,
+                  className: "text-gray-600"
+                }
+              )
             ] })
           ]
         }
@@ -4615,7 +4690,10 @@ var Toggle = React17__namespace.forwardRef(
         defaultChecked: checked !== void 0 ? void 0 : defaultChecked,
         onCheckedChange: readOnly ? void 0 : onChange,
         disabled,
-        className: cn(trackVariants({ size }), readOnly && "pointer-events-none cursor-default"),
+        className: cn(
+          trackVariants({ size }),
+          readOnly && "pointer-events-none cursor-default"
+        ),
         ...props,
         children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Switch.Thumb, { className: thumbVariants({ size }) })
       }
@@ -5893,22 +5971,7 @@ function InlineDatePickerPanel({ child }) {
       setDraftRange(range);
     }
   };
-  const handleRangeApply = () => {
-    const toCommit = draftRange ?? (pendingFrom ? { from: pendingFrom, to: pendingFrom } : null);
-    if (!toCommit) return;
-    setPendingFrom(null);
-    setHoverDate(null);
-    setDraftRange(null);
-    setCommitted(toCommit);
-    onChange?.(toCommit);
-  };
-  const handleRangeCancel = () => {
-    setPendingFrom(null);
-    setHoverDate(null);
-    setDraftRange(null);
-  };
-  const canApply = draftRange !== null || pendingFrom !== null;
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col", children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex w-full flex-col", children: [
     mode === "range" && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex gap-2 px-4 pt-4", children: [fromLabel, toLabel].map((lbl, i) => /* @__PURE__ */ jsxRuntime.jsx(
       "div",
       {
@@ -5929,7 +5992,8 @@ function InlineDatePickerPanel({ child }) {
         onSelect: (date) => {
           setCommitted(date);
           onChange?.(date);
-        }
+        },
+        className: "w-full"
       }
     ),
     mode !== "month" && /* @__PURE__ */ jsxRuntime.jsx(
@@ -5949,33 +6013,10 @@ function InlineDatePickerPanel({ child }) {
           const ex = draftRange ?? (isRange(committed) ? committed : null);
           setHoverDate(ex && "to" in ex && (date < ex.from || date > ex.to) ? date : null);
         },
-        onDayMouseLeave: () => setHoverDate(null)
+        onDayMouseLeave: () => setHoverDate(null),
+        className: "w-full"
       }
-    ),
-    mode === "range" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-4 py-3", children: [
-      /* @__PURE__ */ jsxRuntime.jsx(
-        "button",
-        {
-          type: "button",
-          onClick: handleRangeCancel,
-          className: "rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] hover:bg-[#E8EAED] transition-colors",
-          children: "Cancel"
-        }
-      ),
-      /* @__PURE__ */ jsxRuntime.jsx(
-        "button",
-        {
-          type: "button",
-          onClick: handleRangeApply,
-          disabled: !canApply,
-          className: cn(
-            "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
-            canApply ? "border-[#006F42] text-[#006F42]" : "border-gray-300 text-gray-400 cursor-not-allowed"
-          ),
-          children: "Apply"
-        }
-      )
-    ] })
+    )
   ] });
 }
 function FilterGroup({
@@ -6042,7 +6083,7 @@ function FilterGroup({
         className: cn(
           "fixed bottom-0 left-0 right-0 z-50",
           "rounded-t-2xl bg-white",
-          "h-[50vh] flex flex-col",
+          "h-[70vh] flex flex-col",
           "translate-y-full data-[state=open]:translate-y-0",
           "transition-transform duration-300 ease-out",
           drawerClassName
@@ -6081,7 +6122,7 @@ function FilterGroup({
               item.label
             )) }),
             /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn(
-              "flex-1 overflow-y-auto",
+              "flex-1 overflow-y-auto overflow-x-hidden min-w-0",
               "[&::-webkit-scrollbar]:w-1.5",
               "[&::-webkit-scrollbar-track]:bg-gray-100",
               "[&::-webkit-scrollbar-thumb]:rounded-full",

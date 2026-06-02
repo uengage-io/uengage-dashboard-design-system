@@ -22,7 +22,8 @@ interface MonthPickerCalendarProps {
     minDate?: Date;
     maxDate?: Date;
     onSelect: (date: Date) => void;
+    className?: string;
 }
-declare function MonthPickerCalendar({ selected, minDate, maxDate, onSelect, }: MonthPickerCalendarProps): react_jsx_runtime.JSX.Element;
+declare function MonthPickerCalendar({ selected, minDate, maxDate, onSelect, className, }: MonthPickerCalendarProps): react_jsx_runtime.JSX.Element;
 
 export { DatePickerCalendar, MonthPickerCalendar };

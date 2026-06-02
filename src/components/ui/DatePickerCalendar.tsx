@@ -298,6 +298,7 @@ interface MonthPickerCalendarProps {
   minDate?: Date;
   maxDate?: Date;
   onSelect: (date: Date) => void;
+  className?: string;
 }
 
 export function MonthPickerCalendar({
@@ -305,6 +306,7 @@ export function MonthPickerCalendar({
   minDate,
   maxDate,
   onSelect,
+  className,
 }: MonthPickerCalendarProps) {
   const today = React.useMemo(() => new Date(), []);
   const [viewYear, setViewYear] = React.useState(
@@ -323,7 +325,7 @@ export function MonthPickerCalendar({
   }, [today, minDate, maxDate]);
 
   return (
-    <div className="w-[280px] max-w-full bg-white">
+    <div className={cn("w-[280px] max-w-full bg-white", className)}>
       {/* Year select */}
       <div className="flex items-center justify-center px-3 py-2">
         <Select

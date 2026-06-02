@@ -29,11 +29,10 @@ export interface SubHeaderProps
   gap?: CssSize;
 }
 
-// Alignment only applied at sm+ (on mobile the layout stacks, so align is irrelevant)
 const ALIGN_CLASS: Record<SubHeaderAlign, string> = {
-  start: "sm:items-start",
-  center: "sm:items-center",
-  end: "sm:items-end",
+  start: "items-start",
+  center: "items-center",
+  end: "items-end",
 };
 
 function SubHeader({
@@ -60,10 +59,7 @@ function SubHeader({
       <div
         data-slot="sub-header-row"
         className={cn(
-          // Mobile: stack vertically with a small gap
-          "flex w-full flex-col gap-3",
-          // sm+: side-by-side with space-between
-          "sm:flex-row sm:justify-between sm:gap-4",
+          "flex w-full flex-wrap justify-between gap-x-4 gap-y-3",
           ALIGN_CLASS[align],
         )}
         style={{
@@ -71,24 +67,27 @@ function SubHeader({
           paddingBottom: "clamp(12px, 2.5vw, 16px)",
         }}
       >
-        {/* Left: title / subtitle / children */}
+        {/* Left: title / subtitle / children — grows to fill space, wraps right slot below when tight */}
         <div
           data-slot="sub-header-main"
           className="flex min-w-0 flex-1 flex-col gap-3"
-          style={gap !== LAYOUT.gap.xs ? { gap: toCssSize(gap) } : undefined}
+          style={{
+            ...(gap !== LAYOUT.gap.xs ? { gap: toCssSize(gap) } : {}),
+            minWidth: '160px',
+          }}
         >
           {hasHeading && (
             <div data-slot="sub-header-heading">
               {title != null && (
                 React.isValidElement(title) ? title : (
-                  <h2 className="text-sm sm:text-base font-semibold leading-tight text-foreground">
+                  <h2 className="text-sm font-semibold leading-tight text-foreground sm:text-base">
                     {title}
                   </h2>
                 )
               )}
               {subtitle != null && (
                 React.isValidElement(subtitle) ? subtitle : (
-                  <div className="mt-0.5 text-[12px] sm:text-[13px] leading-tight text-muted-foreground">
+                  <div className="mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]">
                     {subtitle}
                   </div>
                 )
@@ -100,11 +99,11 @@ function SubHeader({
           )}
         </div>
 
-        {/* Right slot: wraps below the title on mobile; self-start prevents full-width stretch in flex-col */}
+        {/* Right slot — never shrinks; wraps below left block when viewport is too narrow */}
         {right != null && (
           <div
             data-slot="sub-header-right"
-            className="flex shrink-0 flex-wrap items-center gap-3 self-start sm:self-auto"
+            className="flex shrink-0 flex-wrap items-center gap-3"
           >
             {right}
           </div>

@@ -40,9 +40,13 @@ const meta = {
     max: { control: "number" },
     minLength: { control: "number" },
     maxLength: { control: "number" },
+    clearable: { control: "boolean" },
     onChange: { action: "change" },
     onFocus: { action: "focus" },
     onBlur: { action: "blur" },
+    onClear: { action: "clear" },
+    onTouch: { action: "touch" },
+    onSuggestionSelect: { action: "suggestionSelect" },
   },
   args: {
     size: "md",
@@ -51,6 +55,7 @@ const meta = {
     disabled: false,
     required: false,
     readOnly: false,
+    clearable: false,
   },
 } satisfies Meta<typeof Input>;
 
@@ -425,6 +430,62 @@ export const RegexValidationEmail: Story = {
     validationRegex: /^[^\s@]+@uengage\.in$/,
     validationMessage: "Only @uengage.in addresses are accepted.",
     helperText: "Enter an email ending in @uengage.in.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+/* ── Clearable ──────────────────────────────────────────────── */
+
+export const Clearable: Story = {
+  args: {
+    label: "Search",
+    placeholder: "Type to search…",
+    clearable: true,
+    defaultValue: "Hello world",
+    helperText: "Click the × to clear the value. It turns red on hover.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const ClearableControlled: Story = {
+  args: {
+    label: "Search (controlled)",
+    placeholder: "Type to search…",
+    clearable: true,
+    helperText: "Clearable + controlled: value echoed below.",
+  },
+  render: function ClearableControlledStory(args) {
+    const [value, setValue] = React.useState<string>("Initial value");
+    return (
+      <div className="flex w-90 flex-col gap-2">
+        <Input
+          {...args}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onClear={() => setValue("")}
+        />
+        <code className="text-xs text-[#6B7280]">value: {`"${value}"`}</code>
+      </div>
+    );
+  },
+};
+
+export const ClearableWithPassword: Story = {
+  args: {
+    label: "Password",
+    inputType: "password",
+    placeholder: "••••••••",
+    clearable: true,
+    defaultValue: "secretpass",
+    helperText: "Clear button sits left of the eye toggle.",
   },
   render: (args) => (
     <div className="w-90">
