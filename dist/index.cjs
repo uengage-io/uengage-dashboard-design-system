@@ -5969,6 +5969,8 @@ function InlineDatePickerPanel({ child }) {
       setPendingFrom(null);
       setHoverDate(null);
       setDraftRange(range);
+      setCommitted(range);
+      onChange?.(range);
     }
   };
   return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex w-full flex-col", children: [

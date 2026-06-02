@@ -109,6 +109,8 @@ function InlineDatePickerPanel({ child }: { child: React.ReactElement }) {
       setPendingFrom(null);
       setHoverDate(null);
       setDraftRange(range);
+      setCommitted(range);
+      onChange?.(range);
     }
   };
 
