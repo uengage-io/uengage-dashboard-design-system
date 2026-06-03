@@ -4,7 +4,7 @@ interface ZIndexValues {
   popover: number;
 }
 
-const ZIndexContext = React.createContext<ZIndexValues>({ popover: 100 });
+const ZIndexContext = React.createContext<ZIndexValues>({ popover: 20 });
 
 export function useZIndex() {
   return React.useContext(ZIndexContext);
@@ -12,7 +12,7 @@ export function useZIndex() {
 
 export function SidebarZIndexProvider({ children }: { children: React.ReactNode }) {
   return (
-    <ZIndexContext.Provider value={{ popover: 500 }}>
+    <ZIndexContext.Provider value={{ popover: 50 }}>
       {children}
     </ZIndexContext.Provider>
   );

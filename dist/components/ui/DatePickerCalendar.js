@@ -33,7 +33,7 @@ function useFuzzySearch(items, query) {
   }, [fuse, query, items]);
 }
 var FilterGroupMobileContext = React3.createContext(false);
-var ZIndexContext = React3.createContext({ popover: 100 });
+var ZIndexContext = React3.createContext({ popover: 20 });
 function useZIndex() {
   return React3.useContext(ZIndexContext);
 }
