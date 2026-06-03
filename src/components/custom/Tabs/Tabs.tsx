@@ -506,7 +506,7 @@ function TertiaryTabs({
           ref={listRef}
           className={cn(
             "relative inline-flex max-w-full items-center",
-            "rounded-full bg-[#dde4f0] p-0.5",
+            "rounded-full bg-[#F3F5F9] p-0.5",
             "overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
           )}
         >

@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 // No transition classes needed here — keyframes ensure Radix waits for
 // animationend before unmounting (prevents the close flicker).
 export const sidebarContentVariants = cva(
-  "fixed z-50 bg-background border shadow-lg outline-none will-change-transform",
+  "fixed z-[400] bg-background border shadow-lg outline-none will-change-transform",
   {
     variants: {
       side: {

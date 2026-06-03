@@ -4,7 +4,7 @@ import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Se
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
-import * as React17 from 'react';
+import * as React18 from 'react';
 import { useState, useMemo, useRef, useLayoutEffect } from 'react';
 import { X, Search, CircleAlert, Check, ChevronDown, EyeOff, Eye, Minus, ChevronLeft, ChevronRight, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronsRight, SlidersHorizontal, Loader2, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
 import Fuse from 'fuse.js';
@@ -281,7 +281,7 @@ function DrawerOverlay({
       "data-slot": "drawer-overlay",
       className: cn(
         "uengage-ui",
-        "fixed inset-0 z-50 bg-black/50 transition-opacity opacity-0",
+        "fixed inset-0 z-[400] bg-black/50 transition-opacity opacity-0",
         "data-[state=open]:opacity-100 data-[state=open]:duration-300 data-[state=open]:ease-out",
         "data-[state=closed]:opacity-0 data-[state=closed]:duration-200 data-[state=closed]:ease-in",
         className
@@ -662,9 +662,9 @@ function Button2({
   onBlur,
   ...props
 }) {
-  const [hovered, setHovered] = React17.useState(false);
-  const [pressed, setPressed] = React17.useState(false);
-  const [focused, setFocused] = React17.useState(false);
+  const [hovered, setHovered] = React18.useState(false);
+  const [pressed, setPressed] = React18.useState(false);
+  const [focused, setFocused] = React18.useState(false);
   const interactionBlocked = disabled || loading;
   const state = disabled ? "disabled" : pressed ? "pressed" : hovered ? "hover" : focused ? "focused" : "default";
   const gradientStyle = getButtonStyle(variant, state);
@@ -821,7 +821,7 @@ function TopHeader({
                   className: "flex min-w-0 flex-1 items-center overflow-hidden",
                   style: { gap: toCssSize(titleGap), minWidth: "160px" },
                   children: [
-                    React17.isValidElement(title) ? title : /* @__PURE__ */ jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
+                    React18.isValidElement(title) ? title : /* @__PURE__ */ jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
                     helper != null && /* @__PURE__ */ jsx("span", { className: "shrink-0 text-xs leading-none sm:text-sm", children: helper })
                   ]
                 }
@@ -905,8 +905,8 @@ function SubHeader({
                   },
                   children: [
                     hasHeading && /* @__PURE__ */ jsxs("div", { "data-slot": "sub-header-heading", children: [
-                      title != null && (React17.isValidElement(title) ? title : /* @__PURE__ */ jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
-                      subtitle != null && (React17.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
+                      title != null && (React18.isValidElement(title) ? title : /* @__PURE__ */ jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
+                      subtitle != null && (React18.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
                     ] }),
                     children != null && /* @__PURE__ */ jsx("div", { "data-slot": "sub-header-content", children })
                   ]
@@ -1245,17 +1245,17 @@ function SearchBar({
   onSelect,
   fallbackText = "No results found"
 }) {
-  const [internal, setInternal] = React17.useState(
+  const [internal, setInternal] = React18.useState(
     String(controlledValue ?? defaultValue ?? "")
   );
-  const [dropdownOpen, setDropdownOpen] = React17.useState(false);
-  const wrapperRef = React17.useRef(null);
-  const touchedRef = React17.useRef(false);
-  React17.useEffect(() => {
+  const [dropdownOpen, setDropdownOpen] = React18.useState(false);
+  const wrapperRef = React18.useRef(null);
+  const touchedRef = React18.useRef(false);
+  React18.useEffect(() => {
     if (controlledValue !== void 0) setInternal(String(controlledValue));
   }, [controlledValue]);
   const displayValue = internal;
-  const resolvedItems = React17.useMemo(() => {
+  const resolvedItems = React18.useMemo(() => {
     if (dropdownItems && getLabel) {
       return dropdownItems.map((item) => ({
         label: getLabel(item),
@@ -1443,7 +1443,17 @@ function SearchBar({
   );
 }
 SearchBar.displayName = "SearchBar";
-var FilterGroupMobileContext = React17.createContext(false);
+var FilterGroupMobileContext = React18.createContext(false);
+var ZIndexContext = React18.createContext({ popover: 100 });
+function useZIndex() {
+  return React18.useContext(ZIndexContext);
+}
+function SidebarZIndexProvider({ children }) {
+  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 500 }, children });
+}
+function ModalZIndexProvider({ children }) {
+  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 10001 }, children });
+}
 function Popover({
   ...props
 }) {
@@ -1461,6 +1471,7 @@ function PopoverContent({
   style,
   ...props
 }) {
+  const { popover } = useZIndex();
   return /* @__PURE__ */ jsx(Popover$1.Portal, { children: /* @__PURE__ */ jsx(
     Popover$1.Content,
     {
@@ -1472,7 +1483,7 @@ function PopoverContent({
         "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
         className
       ),
-      style: { zIndex: 9999, ...style },
+      style: { zIndex: popover, ...style },
       ...props
     }
   ) });
@@ -1692,10 +1703,10 @@ function Select({
   error,
   readOnly = false
 }) {
-  const isMobileDrawer = React17.useContext(FilterGroupMobileContext);
-  const touchedRef = React17.useRef(false);
-  const interactedRef = React17.useRef(false);
-  const resolvedOptions = React17.useMemo(() => {
+  const isMobileDrawer = React18.useContext(FilterGroupMobileContext);
+  const touchedRef = React18.useRef(false);
+  const interactedRef = React18.useRef(false);
+  const resolvedOptions = React18.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -1705,13 +1716,13 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React17.useState(false);
-  const [search, setSearch] = React17.useState("");
+  const [open, setOpen] = React18.useState(false);
+  const [search, setSearch] = React18.useState("");
   const filteredOptions = useFuzzySearch(resolvedOptions, search);
-  const [selected, setSelected] = React17.useState(
+  const [selected, setSelected] = React18.useState(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
   );
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -1745,12 +1756,12 @@ function Select({
     e.stopPropagation();
     commit(mode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React17.useRef(null);
-  const [visibleCount, setVisibleCount] = React17.useState(null);
-  React17.useLayoutEffect(() => {
+  const pillsContainerRef = React18.useRef(null);
+  const [visibleCount, setVisibleCount] = React18.useState(null);
+  React18.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), mode]);
-  React17.useLayoutEffect(() => {
+  React18.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     const container = pillsContainerRef.current;
     if (!container || mode !== "multi" || selectedArr.length === 0) {
@@ -1956,7 +1967,6 @@ function Select({
           className: "max-w-[calc(100vw-1rem)]",
           collisionPadding: { top: 64 },
           style: {
-            zIndex: 9999,
             width: "var(--radix-popover-trigger-width)"
           },
           children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
@@ -2135,7 +2145,7 @@ function CustomTabsTrigger({
         "data-tab-value": props.value,
         className: cn(
           "relative z-10 flex-none w-auto cursor-pointer select-none whitespace-nowrap",
-          "rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold",
+          "rounded-full px-2 py-0.5 sm:px-2.5 text-[12px] sm:text-[13px] font-semibold",
           "transition-colors duration-300 ease-out outline-none",
           "text-[#595959] hover:text-black data-[state=active]:!text-black!",
           "bg-transparent data-[state=active]:bg-transparent",
@@ -2203,16 +2213,16 @@ function escapeTabValue(value) {
   return value.replace(/["\\]/g, "\\$&");
 }
 function useTabValue(tabs, value, defaultValue, onChange) {
-  const [uncontrolledValue, setUncontrolledValue] = React17.useState(
+  const [uncontrolledValue, setUncontrolledValue] = React18.useState(
     () => getInitialValue(tabs, value, defaultValue)
   );
   const activeValue = value ?? uncontrolledValue;
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (value !== void 0) return;
     if (tabs.some((tab) => tab.value === uncontrolledValue)) return;
     setUncontrolledValue(getInitialValue(tabs, value, defaultValue));
   }, [defaultValue, tabs, uncontrolledValue, value]);
-  const handleChange = React17.useCallback(
+  const handleChange = React18.useCallback(
     (nextValue) => {
       if (!tabs.some((tab) => tab.value === nextValue && !tab.disabled)) return;
       if (value === void 0) setUncontrolledValue(nextValue);
@@ -2274,7 +2284,7 @@ function OverflowTabsSelect({
   onChange,
   className
 }) {
-  const [open, setOpen] = React17.useState(false);
+  const [open, setOpen] = React18.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
@@ -2353,7 +2363,7 @@ function LineTabsOverflow({
   activeValue,
   onChange
 }) {
-  const [open, setOpen] = React17.useState(false);
+  const [open, setOpen] = React18.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
@@ -2441,19 +2451,19 @@ function SecondaryTabs({
   showBottomBorder = true,
   className
 }) {
-  const wrapperRef = React17.useRef(null);
+  const wrapperRef = React18.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [indicator, setIndicator] = React17.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React17.useMemo(
+  const [indicator, setIndicator] = React18.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React18.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  React17.useLayoutEffect(() => {
+  React18.useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper || !activeValue) return;
     const btn = wrapper.querySelector(
@@ -2473,7 +2483,7 @@ function SecondaryTabs({
     visibleTabs.length,
     visibleTabs.map((t) => t.value).join("|")
   ]);
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
     const handle = () => {
@@ -2562,19 +2572,19 @@ function TertiaryTabs({
   overflowLabel = "More Options",
   className
 }) {
-  const listRef = React17.useRef(null);
+  const listRef = React18.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [chip, setChip] = React17.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React17.useMemo(
+  const [chip, setChip] = React18.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React18.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  React17.useLayoutEffect(() => {
+  React18.useLayoutEffect(() => {
     const list = listRef.current;
     if (!list || !activeValue) return;
     const btn = list.querySelector(
@@ -2594,7 +2604,7 @@ function TertiaryTabs({
     visibleTabs.length,
     visibleTabs.map((t) => t.value).join("|")
   ]);
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     const list = listRef.current;
     if (!list) return;
     const handle = () => {
@@ -2623,7 +2633,7 @@ function TertiaryTabs({
           ref: listRef,
           className: cn(
             "relative inline-flex max-w-full items-center",
-            "rounded-full bg-[#dde4f0] p-0.5",
+            "rounded-full bg-[#F3F5F9] p-0.5",
             "overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           ),
           children: [
@@ -2797,21 +2807,21 @@ function Input2({
   onClear,
   ...rest
 }) {
-  const reactId = React17.useId();
+  const reactId = React18.useId();
   const inputId = id ?? reactId;
-  const [focused, setFocused] = React17.useState(false);
-  const [showPassword, setShowPassword] = React17.useState(false);
-  const [internalError, setInternalError] = React17.useState(void 0);
-  const touchedRef = React17.useRef(false);
+  const [focused, setFocused] = React18.useState(false);
+  const [showPassword, setShowPassword] = React18.useState(false);
+  const [internalError, setInternalError] = React18.useState(void 0);
+  const touchedRef = React18.useRef(false);
   const isControlled = rest.value !== void 0;
-  const [uncontrolledQuery, setUncontrolledQuery] = React17.useState(
+  const [uncontrolledQuery, setUncontrolledQuery] = React18.useState(
     String(rest.defaultValue ?? "")
   );
   const suggestionQuery = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
   const fuseResults = useFuzzySearch(suggestions ?? [], suggestionQuery);
   const showSuggestions = !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
-  const wrapperRef = React17.useRef(null);
-  const inputRef = React17.useRef(null);
+  const wrapperRef = React18.useRef(null);
+  const inputRef = React18.useRef(null);
   const runValidation = (el) => {
     if (!el.validity.valid) {
       return validationMessage ?? el.validationMessage ?? "Invalid value";
@@ -2827,7 +2837,7 @@ function Input2({
   const effectiveError = error ?? internalError;
   const isPassword = inputType === "password";
   const effectiveType = isPassword && showPassword ? "text" : inputType;
-  const resolvedRightIcon = React17.useMemo(() => {
+  const resolvedRightIcon = React18.useMemo(() => {
     if (rightIcon !== void 0) return rightIcon;
     if (!isPassword) return null;
     return /* @__PURE__ */ jsx(
@@ -3066,9 +3076,9 @@ function Radio({
   bgColor,
   ...rest
 }) {
-  const reactId = React17.useId();
+  const reactId = React18.useId();
   const itemId = id ?? reactId;
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     validateLabelWordLimit(label, "Radio");
   }, [label]);
   const state = disabled ? "disabled" : error ? "error" : "default";
@@ -3155,7 +3165,7 @@ function RadioGroup({
   bgColor,
   readOnly
 }) {
-  const reactId = React17.useId();
+  const reactId = React18.useId();
   const groupId = `radio-group-${reactId}`;
   const describedById = error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0;
   const gridColsMap = {
@@ -3283,13 +3293,13 @@ function Checkbox({
   bgColor,
   ...rest
 }) {
-  const reactId = React17.useId();
+  const reactId = React18.useId();
   const itemId = rest.id ?? reactId;
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     validateLabelWordLimit(label, "CustomCheckbox");
   }, [label]);
   const isControlled = checked !== void 0;
-  const [internalChecked, setInternalChecked] = React17.useState(
+  const [internalChecked, setInternalChecked] = React18.useState(
     defaultChecked ?? false
   );
   const visualChecked = isControlled ? Boolean(checked) : internalChecked;
@@ -3381,10 +3391,10 @@ function CheckboxGroup({
   bgColor,
   readOnly
 }) {
-  const reactId = React17.useId();
+  const reactId = React18.useId();
   const groupId = `checkbox-group-${reactId}`;
   const isControlled = value !== void 0;
-  const [internalValue, setInternalValue] = React17.useState([]);
+  const [internalValue, setInternalValue] = React18.useState([]);
   const currentValue = isControlled ? value : internalValue;
   const setValue = (next) => {
     if (!isControlled) setInternalValue(next);
@@ -3502,8 +3512,8 @@ function StyledDayButton({
   className,
   ...props
 }) {
-  const ref = React17.useRef(null);
-  React17.useEffect(() => {
+  const ref = React18.useRef(null);
+  React18.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
   const isEdge = modifiers.range_start || modifiers.range_end;
@@ -3551,10 +3561,10 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React17.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React18.useMemo(() => /* @__PURE__ */ new Date(), []);
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? today;
-  const [viewMonth, setViewMonth] = React17.useState(initialMonth);
-  const yearOptions = React17.useMemo(
+  const [viewMonth, setViewMonth] = React18.useState(initialMonth);
+  const yearOptions = React18.useMemo(
     () => buildYearOptions(today.getFullYear()),
     [today]
   );
@@ -3680,11 +3690,11 @@ function MonthPickerCalendar({
   onSelect,
   className
 }) {
-  const today = React17.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const [viewYear, setViewYear] = React17.useState(
+  const today = React18.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React18.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React17.useMemo(() => {
+  const yearOptions = React18.useMemo(() => {
     const center = today.getFullYear();
     const minYear = minDate ? minDate.getFullYear() : center - 10;
     const maxYear = maxDate ? maxDate.getFullYear() : center + 10;
@@ -3840,20 +3850,20 @@ function DatePicker({
   error,
   readOnly = false
 }) {
-  const [open, setOpen] = React17.useState(false);
-  const touchedRef = React17.useRef(false);
-  const interactedRef = React17.useRef(false);
-  const [committed, setCommitted] = React17.useState(
+  const [open, setOpen] = React18.useState(false);
+  const touchedRef = React18.useRef(false);
+  const interactedRef = React18.useRef(false);
+  const [committed, setCommitted] = React18.useState(
     controlledValue !== void 0 ? controlledValue ?? null : null
   );
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (controlledValue !== void 0) setCommitted(controlledValue ?? null);
   }, [controlledValue]);
-  const [pendingFrom, setPendingFrom] = React17.useState(null);
-  const [draftRange, setDraftRange] = React17.useState(null);
-  const [hoverDate, setHoverDate] = React17.useState(null);
-  const prevOpen = React17.useRef(false);
-  React17.useEffect(() => {
+  const [pendingFrom, setPendingFrom] = React18.useState(null);
+  const [draftRange, setDraftRange] = React18.useState(null);
+  const [hoverDate, setHoverDate] = React18.useState(null);
+  const prevOpen = React18.useRef(false);
+  React18.useEffect(() => {
     if (open && !prevOpen.current) {
       setPendingFrom(null);
       setHoverDate(null);
@@ -3867,13 +3877,13 @@ function DatePicker({
     }
     prevOpen.current = open;
   }, [open, committed, mode]);
-  const calendarDisabled = React17.useMemo(() => {
+  const calendarDisabled = React18.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length > 0 ? m : void 0;
   }, [minDate, maxDate]);
-  const triggerLabel = React17.useMemo(() => {
+  const triggerLabel = React18.useMemo(() => {
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return formatDate(committed);
@@ -3883,7 +3893,7 @@ function DatePicker({
       return formatRange(committed.from, committed.to) ?? null;
     return null;
   }, [committed, mode]);
-  const effectiveDisplayRange = React17.useMemo(() => {
+  const effectiveDisplayRange = React18.useMemo(() => {
     if (mode !== "range") return null;
     const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
     if (pendingFrom) {
@@ -3891,17 +3901,17 @@ function DatePicker({
     }
     return existingRange;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const calendarSelected = React17.useMemo(() => {
+  const calendarSelected = React18.useMemo(() => {
     if (mode === "single") {
       return committed instanceof Date ? committed : void 0;
     }
     return effectiveDisplayRange ?? void 0;
   }, [mode, committed, effectiveDisplayRange]);
-  const fromLabel = React17.useMemo(() => {
+  const fromLabel = React18.useMemo(() => {
     if (!effectiveDisplayRange) return null;
     return formatDate(effectiveDisplayRange.from);
   }, [effectiveDisplayRange]);
-  const toLabel = React17.useMemo(() => {
+  const toLabel = React18.useMemo(() => {
     if (!effectiveDisplayRange?.to) return null;
     return formatDate(effectiveDisplayRange.to);
   }, [effectiveDisplayRange]);
@@ -4057,7 +4067,6 @@ function DatePicker({
           align: "center",
           className: "w-auto max-w-[calc(100vw-1rem)] p-0",
           collisionPadding: { top: 64 },
-          style: { zIndex: 60 },
           children: /* @__PURE__ */ jsxs("div", { className: "overflow-hidden rounded-lg bg-white shadow-md", children: [
             mode === "range" && /* @__PURE__ */ jsxs("div", { className: "flex gap-2 px-3 pt-3", children: [
               /* @__PURE__ */ jsx(DateBox, { label: fromLabel, active: !!fromLabel }),
@@ -4644,7 +4653,7 @@ var thumbVariants = cva(
     }
   }
 );
-var Toggle = React17.forwardRef(
+var Toggle = React18.forwardRef(
   ({
     size = "md",
     label,
@@ -4700,7 +4709,7 @@ var Toggle = React17.forwardRef(
 );
 Toggle.displayName = "Toggle";
 var sidebarContentVariants = cva(
-  "fixed z-50 bg-background border shadow-lg outline-none will-change-transform",
+  "fixed z-[400] bg-background border shadow-lg outline-none will-change-transform",
   {
     variants: {
       side: {
@@ -4779,8 +4788,8 @@ var sidebarPersistentVariants = cva("bg-background border", {
   }
 });
 function useIsDesktop(breakpoint = 768) {
-  const [isDesktop, setIsDesktop] = React17.useState(false);
-  React17.useEffect(() => {
+  const [isDesktop, setIsDesktop] = React18.useState(false);
+  React18.useEffect(() => {
     const query = `(min-width: ${breakpoint}px)`;
     const media = window.matchMedia(query);
     const setFromMedia = () => setIsDesktop(media.matches);
@@ -4834,9 +4843,9 @@ function Sidebar({
 }) {
   const isDesktop = useIsDesktop();
   const isControlled = open !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React17.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React18.useState(defaultOpen);
   const resolvedOpen = isControlled ? open : uncontrolledOpen;
-  const handleOpenChange = React17.useCallback(
+  const handleOpenChange = React18.useCallback(
     (nextOpen) => {
       if (!isControlled) {
         setUncontrolledOpen(nextOpen);
@@ -4845,7 +4854,7 @@ function Sidebar({
     },
     [isControlled, onOpenChange]
   );
-  const customSizeStyle = React17.useMemo(() => {
+  const customSizeStyle = React18.useMemo(() => {
     if (sizePercent == null) return {};
     const pct = Math.min(100, Math.max(1, sizePercent));
     if (side === "top" || side === "bottom") {
@@ -4854,7 +4863,7 @@ function Sidebar({
     if (!isDesktop) return { width: "100vw", maxWidth: "100vw" };
     return { width: `${pct}vw`, maxWidth: "100vw" };
   }, [sizePercent, side, isDesktop]);
-  const animDurationStyle = React17.useMemo(() => {
+  const animDurationStyle = React18.useMemo(() => {
     if (sizePercent != null) {
       const pct = Math.min(100, Math.max(1, sizePercent));
       return {
@@ -4879,7 +4888,7 @@ function Sidebar({
     if (!resolvedOpen) {
       return null;
     }
-    return /* @__PURE__ */ jsxs(
+    return /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsxs(
       "aside",
       {
         className: cn(
@@ -4901,7 +4910,7 @@ function Sidebar({
           children
         ]
       }
-    );
+    ) });
   }
   return /* @__PURE__ */ jsxs(Drawer, { open: resolvedOpen, onOpenChange: handleOpenChange, children: [
     trigger ? /* @__PURE__ */ jsx(DrawerTrigger, { asChild: true, children: trigger }) : null,
@@ -4915,7 +4924,7 @@ function Sidebar({
         }
       }
     ) : null,
-    /* @__PURE__ */ jsxs(
+    /* @__PURE__ */ jsx(
       DrawerContent,
       {
         "aria-label": `${side} sidebar`,
@@ -4933,7 +4942,7 @@ function Sidebar({
           contentClassName
         ),
         style: { ...animDurationStyle, ...customSizeStyle },
-        children: [
+        children: /* @__PURE__ */ jsxs(SidebarZIndexProvider, { children: [
           /* @__PURE__ */ jsx(
             SidebarHeader,
             {
@@ -4944,7 +4953,7 @@ function Sidebar({
             }
           ),
           children
-        ]
+        ] })
       }
     )
   ] });
@@ -5075,33 +5084,33 @@ function AlertDialog2({
   ...options
 }) {
   const isControlled = openProp !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React17.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React18.useState(defaultOpen);
   const open = isControlled ? openProp : uncontrolledOpen;
-  const [inputValue, setInputValue] = React17.useState(defaultValue ?? "");
-  const [inputError, setInputError] = React17.useState(null);
-  const [submitError, setSubmitError] = React17.useState(null);
-  const [loading, setLoading] = React17.useState(false);
-  const setOpen = React17.useCallback(
+  const [inputValue, setInputValue] = React18.useState(defaultValue ?? "");
+  const [inputError, setInputError] = React18.useState(null);
+  const [submitError, setSubmitError] = React18.useState(null);
+  const [loading, setLoading] = React18.useState(false);
+  const setOpen = React18.useCallback(
     (next) => {
       if (!isControlled) setUncontrolledOpen(next);
       onOpenChange?.(next);
     },
     [isControlled, onOpenChange]
   );
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (!open) return;
     setInputValue(defaultValue ?? "");
     setInputError(null);
     setSubmitError(null);
     setLoading(false);
   }, [open]);
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (!open || !autoCloseMs || loading) return;
     const id = window.setTimeout(() => setOpen(false), autoCloseMs);
     return () => window.clearTimeout(id);
   }, [open, autoCloseMs, loading]);
-  const dismiss = React17.useCallback(() => setOpen(false), [setOpen]);
-  const confirm = React17.useCallback(async () => {
+  const dismiss = React18.useCallback(() => setOpen(false), [setOpen]);
+  const confirm = React18.useCallback(async () => {
     const validationError = inputValidator?.(inputValue);
     if (validationError) {
       setInputError(validationError);
@@ -5148,23 +5157,23 @@ function AlertDialog2({
     )
   ] });
 }
-var SweetAlertContext = React17.createContext(null);
+var SweetAlertContext = React18.createContext(null);
 function useSweetAlert() {
-  const ctx = React17.useContext(SweetAlertContext);
+  const ctx = React18.useContext(SweetAlertContext);
   if (!ctx) throw new Error("useSweetAlert must be used inside <SweetAlertProvider>");
   return ctx;
 }
 function SweetAlertProvider({ children }) {
-  const [queue, setQueue] = React17.useState([]);
-  const counter = React17.useRef(0);
-  const fire = React17.useCallback(
+  const [queue, setQueue] = React18.useState([]);
+  const counter = React18.useRef(0);
+  const fire = React18.useCallback(
     (options) => new Promise((resolve) => {
       counter.current += 1;
       setQueue((q) => [...q, { id: counter.current, options, resolve }]);
     }),
     []
   );
-  const ctx = React17.useMemo(() => ({ fire }), [fire]);
+  const ctx = React18.useMemo(() => ({ fire }), [fire]);
   return /* @__PURE__ */ jsxs(SweetAlertContext.Provider, { value: ctx, children: [
     children,
     queue[0] && /* @__PURE__ */ jsx(
@@ -5181,10 +5190,10 @@ function SweetAlertInstance({
   pending,
   onDone
 }) {
-  const [open, setOpen] = React17.useState(true);
-  const resolvedRef = React17.useRef(false);
-  const close = React17.useCallback(() => setOpen(false), []);
-  const handlePreConfirm = React17.useCallback(
+  const [open, setOpen] = React18.useState(true);
+  const resolvedRef = React18.useRef(false);
+  const close = React18.useCallback(() => setOpen(false), []);
+  const handlePreConfirm = React18.useCallback(
     async (value) => {
       await pending.options.preConfirm?.(value);
       resolvedRef.current = true;
@@ -5193,7 +5202,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  const handleOpenChange = React17.useCallback(
+  const handleOpenChange = React18.useCallback(
     (next) => {
       if (!next && !resolvedRef.current) {
         resolvedRef.current = true;
@@ -5203,7 +5212,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (!open) {
       const id = window.setTimeout(onDone, 200);
       return () => window.clearTimeout(id);
@@ -5244,7 +5253,7 @@ function Modal({
   bodyClassName,
   modalClassName
 }) {
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -5278,7 +5287,7 @@ function Modal({
             }
           )
         ] }),
-        /* @__PURE__ */ jsx("div", { className: cn("flex-1 overflow-y-auto p-4 outline-none", bodyClassName), children })
+        /* @__PURE__ */ jsx(ModalZIndexProvider, { children: /* @__PURE__ */ jsx("div", { className: cn("flex-1 overflow-y-auto p-4 outline-none", bodyClassName), children }) })
       ] })
     }
   );
@@ -5542,8 +5551,8 @@ function UengageProvider({ children, className }) {
 // src/assets/uEngage_icon.png
 var uEngage_icon_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPwAAAD7CAYAAABOrvnfAAAEHklEQVR4nO3d0U1jSRCG0WKFSIocCJYcSIoX9mE00uwsxjb4uqv6PyeCEre/rmujGaoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuMTD6gG+8vTy/LF6hku8v761/jnuott5mPjc2w7c7eGeM/HhT9L5PEx69v+sHgDO6Rz7NIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKnvffXt4fVM+xC8IzQNfquc53yuHoAuNS0uDqy4SGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CHI4+oB4BJPL88fq2f4zPvr28PqGa5hw8MPdL2IThE87U2LqjPBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDB34h/0cUEgocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggr8h/+vNMd5f3x5Wz3BK59k+87h6ALjEtLC6suEhiOBvzGs9nQkegggeggj+AF7r6UrwEKRt8H4NA7fXNvjpvNbTkeAhiOAPZMvTjeAPJno6aR28L+7gtloHvwtbni4EfyeipwPBQxDB35Etz2rtg9/tizvRs1L74HckelYR/CKiZ4URwe/2Wv+b6Lm3EcHvTPTck+AbED33IvgmRM89jPpsnBLFrt9ZsJ4N31DKxcb9jdskaTHY9tySDd9c2gXHsUZuj9QIbHt+yoYf5Onl+SP1suM2xm4MB/8XW59r2PDD2fpcY/R2cNC/Zvvzt9EHQvDHc2nsZfzDFD2rTLwMfYaHb5q4bMYHP/GWhVXGB18lerjUFsEDl9kmeFseztsm+CrRwzlbBQ98bbvgbXk4bbvgq0QPp2wZfJXo4TPbBg/839bB2/LwX1sHXyV6+NP2wVeJHn6LCL5K9FAVFHyV6CEq+CrRky0u+CrRkysy+CrRkyk2+CrRkyc6+CrRkyU++Kpf0QufBIL/g+jZneD/Inp2JvhPiJ5dCf4En+vZkeDPED47EfyFRM8OBH8F257pBP8Nwmcqwf+A6JlG8D9k2zOJg3qAiX83nO+Zdtnb8Aew9elK8AcSPt04jHfmdX8v0y70UcPuyAUwm+D5MZfAHILnEC6BfqbFXiV4rpBy6UwMGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDb+hd78es6KyZOZAAAAABJRU5ErkJggg==";
 function Loader(_props) {
-  const [mounted, setMounted] = React17.useState(false);
-  React17.useEffect(() => {
+  const [mounted, setMounted] = React18.useState(false);
+  React18.useEffect(() => {
     setMounted(true);
   }, []);
   if (!mounted) return null;
@@ -5711,7 +5720,7 @@ function AppSidebar({
                   className: "mt-2 flex-1 cursor-pointer overflow-y-auto pb-24 scrollbar-thin",
                   children: modules.map((module, index) => {
                     const isActive = module.page === activeModulePage;
-                    return /* @__PURE__ */ jsxs(React17.Fragment, { children: [
+                    return /* @__PURE__ */ jsxs(React18.Fragment, { children: [
                       /* @__PURE__ */ jsx(
                         "button",
                         {
@@ -5882,13 +5891,13 @@ function Accordion(props) {
 }
 Accordion.displayName = "Accordion";
 function findDatePickerInTree(node) {
-  if (!React17.isValidElement(node)) return null;
+  if (!React18.isValidElement(node)) return null;
   if (node.type.displayName === "DatePicker") {
     return node;
   }
   const children = node.props.children;
   if (!children) return null;
-  for (const child of React17.Children.toArray(children)) {
+  for (const child of React18.Children.toArray(children)) {
     const found = findDatePickerInTree(child);
     if (found) return found;
   }
@@ -5900,31 +5909,31 @@ function InlineDatePickerPanel({ child }) {
   const minDate = p.minDate;
   const maxDate = p.maxDate;
   const onChange = p.onChange;
-  const [committed, setCommitted] = React17.useState(
+  const [committed, setCommitted] = React18.useState(
     p.value ?? null
   );
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (p.value !== void 0) setCommitted(p.value ?? null);
   }, [p.value]);
-  const [pendingFrom, setPendingFrom] = React17.useState(null);
-  const [draftRange, setDraftRange] = React17.useState(null);
-  const [hoverDate, setHoverDate] = React17.useState(null);
+  const [pendingFrom, setPendingFrom] = React18.useState(null);
+  const [draftRange, setDraftRange] = React18.useState(null);
+  const [hoverDate, setHoverDate] = React18.useState(null);
   const isRange = (v) => !!v && typeof v === "object" && "from" in v;
   const orderedRange2 = (a, b) => a <= b ? { from: a, to: b } : { from: b, to: a };
-  const calendarDisabled = React17.useMemo(() => {
+  const calendarDisabled = React18.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length ? m : void 0;
   }, [minDate, maxDate]);
-  const effectiveRange = React17.useMemo(() => {
+  const effectiveRange = React18.useMemo(() => {
     if (mode !== "range") return null;
     const existing = draftRange ?? (isRange(committed) ? committed : null);
     if (pendingFrom)
       return hoverDate ? orderedRange2(pendingFrom, hoverDate) : { from: pendingFrom };
     return existing;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const calendarSelected = React17.useMemo(() => {
+  const calendarSelected = React18.useMemo(() => {
     if (mode === "single") return committed instanceof Date ? committed : void 0;
     return effectiveRange ?? void 0;
   }, [mode, committed, effectiveRange]);
@@ -6010,10 +6019,10 @@ function FilterGroup({
   drawerClassName,
   forceDrawer = false
 }) {
-  const [open, setOpen] = React17.useState(false);
-  const [activeIndex, setActiveIndex] = React17.useState(0);
-  const programmaticClose = React17.useRef(false);
-  const childArray = React17.Children.toArray(children);
+  const [open, setOpen] = React18.useState(false);
+  const [activeIndex, setActiveIndex] = React18.useState(0);
+  const programmaticClose = React18.useRef(false);
+  const childArray = React18.Children.toArray(children);
   const items = childArray.map((child, i) => ({
     label: labels[i] ?? `Filter ${i + 1}`,
     content: child
@@ -6135,7 +6144,7 @@ function FilterGroup({
   ] });
   if (forceDrawer) return drawer;
   return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx("div", { className: cn("hidden sm:flex items-center gap-2 flex-wrap", className), children: items.map((item, i) => /* @__PURE__ */ jsx(React17.Fragment, { children: item.content }, i)) }),
+    /* @__PURE__ */ jsx("div", { className: cn("hidden sm:flex items-center gap-2 flex-wrap", className), children: items.map((item, i) => /* @__PURE__ */ jsx(React18.Fragment, { children: item.content }, i)) }),
     /* @__PURE__ */ jsx("div", { className: "flex sm:hidden", children: drawer })
   ] });
 }
@@ -6154,7 +6163,7 @@ var bannerVariants = cva(
     defaultVariants: { variant: "info" }
   }
 );
-var BannerRoot = React17.forwardRef(
+var BannerRoot = React18.forwardRef(
   ({ className, variant, ...props }, ref) => /* @__PURE__ */ jsx(
     "div",
     {
@@ -6166,7 +6175,7 @@ var BannerRoot = React17.forwardRef(
   )
 );
 BannerRoot.displayName = "Banner";
-var BannerIcon = React17.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsx(
+var BannerIcon = React18.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsx(
   "span",
   {
     ref,
@@ -6177,7 +6186,7 @@ var BannerIcon = React17.forwardRef(({ className, style, ...props }, ref) => /* 
   }
 ));
 BannerIcon.displayName = "BannerIcon";
-var BannerContent = React17.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx("div", { ref, className: cn("flex-1 min-w-0 break-normal", className), ...props }));
+var BannerContent = React18.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx("div", { ref, className: cn("flex-1 min-w-0 break-normal", className), ...props }));
 BannerContent.displayName = "BannerContent";
 var DEFAULT_ICONS = {
   info: /* @__PURE__ */ jsx(Info, {}),
