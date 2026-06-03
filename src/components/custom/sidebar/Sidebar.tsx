@@ -1,5 +1,6 @@
 import * as React from "react";
 import { X } from "lucide-react";
+import { SidebarZIndexProvider } from "@/lib/zIndexContext";
 
 import {
   Drawer,
@@ -148,22 +149,24 @@ export function Sidebar({
     }
 
     return (
-      <aside
-        className={cn(
-          sidebarPersistentVariants({ side, size }),
-          className,
-          contentClassName,
-        )}
-        style={customSizeStyle}
-      >
-        <SidebarHeader
-          heading={heading}
-          closeIcon={closeIcon}
-          divider={divider}
-          onClose={() => handleOpenChange(false)}
-        />
-        {children}
-      </aside>
+      <SidebarZIndexProvider>
+        <aside
+          className={cn(
+            sidebarPersistentVariants({ side, size }),
+            className,
+            contentClassName,
+          )}
+          style={customSizeStyle}
+        >
+          <SidebarHeader
+            heading={heading}
+            closeIcon={closeIcon}
+            divider={divider}
+            onClose={() => handleOpenChange(false)}
+          />
+          {children}
+        </aside>
+      </SidebarZIndexProvider>
     );
   }
 
@@ -200,13 +203,15 @@ export function Sidebar({
         )}
         style={{ ...animDurationStyle, ...customSizeStyle }}
       >
-        <SidebarHeader
-          heading={heading}
-          closeIcon={closeIcon}
-          divider={divider}
-          onClose={() => handleOpenChange(false)}
-        />
-        {children}
+        <SidebarZIndexProvider>
+          <SidebarHeader
+            heading={heading}
+            closeIcon={closeIcon}
+            divider={divider}
+            onClose={() => handleOpenChange(false)}
+          />
+          {children}
+        </SidebarZIndexProvider>
       </DrawerContent>
     </Drawer>
   );

@@ -38,7 +38,7 @@ function DrawerOverlay({
       "data-slot": "drawer-overlay",
       className: cn(
         "uengage-ui",
-        "fixed inset-0 z-50 bg-black/50 transition-opacity opacity-0",
+        "fixed inset-0 z-[400] bg-black/50 transition-opacity opacity-0",
         "data-[state=open]:opacity-100 data-[state=open]:duration-300 data-[state=open]:ease-out",
         "data-[state=closed]:opacity-0 data-[state=closed]:duration-200 data-[state=closed]:ease-in",
         className

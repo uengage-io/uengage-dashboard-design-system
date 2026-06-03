@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Popover as PopoverPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
+import { useZIndex } from "@/lib/zIndexContext";
 
 function Popover({
   ...props
@@ -21,6 +22,7 @@ function PopoverContent({
   style,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+  const { popover } = useZIndex();
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
@@ -32,7 +34,7 @@ function PopoverContent({
           "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
           className,
         )}
-        style={{ zIndex: 9999, ...style }}
+        style={{ zIndex: popover, ...style }}
         {...props}
       />
     </PopoverPrimitive.Portal>

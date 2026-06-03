@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import { X } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { ModalZIndexProvider } from "@/lib/zIndexContext";
 
 const modalSizeVariants = cva("bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-hidden flex flex-col w-full", {
   variants: {
@@ -81,9 +82,11 @@ export function Modal({
             )}
           </div>
         )}
-        <div className={cn("flex-1 overflow-y-auto p-4 outline-none", bodyClassName)}>
-          {children}
-        </div>
+        <ModalZIndexProvider>
+          <div className={cn("flex-1 overflow-y-auto p-4 outline-none", bodyClassName)}>
+            {children}
+          </div>
+        </ModalZIndexProvider>
       </div>
     </div>
   );

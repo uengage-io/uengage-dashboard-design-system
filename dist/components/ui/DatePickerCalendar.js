@@ -1,5 +1,5 @@
 "use client";
-import * as React2 from 'react';
+import * as React3 from 'react';
 import { useMemo } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { ChevronLeft, ChevronRight, Check, X, ChevronDown, CircleAlert } from 'lucide-react';
@@ -32,7 +32,11 @@ function useFuzzySearch(items, query) {
     return fuse.search(q).map((r) => r.item);
   }, [fuse, query, items]);
 }
-var FilterGroupMobileContext = React2.createContext(false);
+var FilterGroupMobileContext = React3.createContext(false);
+var ZIndexContext = React3.createContext({ popover: 100 });
+function useZIndex() {
+  return React3.useContext(ZIndexContext);
+}
 function Popover({
   ...props
 }) {
@@ -50,6 +54,7 @@ function PopoverContent({
   style,
   ...props
 }) {
+  const { popover } = useZIndex();
   return /* @__PURE__ */ jsx(Popover$1.Portal, { children: /* @__PURE__ */ jsx(
     Popover$1.Content,
     {
@@ -61,7 +66,7 @@ function PopoverContent({
         "min-w-[8rem] overflow-hidden rounded-[4px] border border-[#E5E7EB] bg-white p-0 shadow-md outline-none",
         className
       ),
-      style: { zIndex: 9999, ...style },
+      style: { zIndex: popover, ...style },
       ...props
     }
   ) });
@@ -301,10 +306,10 @@ function Select({
   error,
   readOnly = false
 }) {
-  const isMobileDrawer = React2.useContext(FilterGroupMobileContext);
-  const touchedRef = React2.useRef(false);
-  const interactedRef = React2.useRef(false);
-  const resolvedOptions = React2.useMemo(() => {
+  const isMobileDrawer = React3.useContext(FilterGroupMobileContext);
+  const touchedRef = React3.useRef(false);
+  const interactedRef = React3.useRef(false);
+  const resolvedOptions = React3.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -314,13 +319,13 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React2.useState(false);
-  const [search, setSearch] = React2.useState("");
+  const [open, setOpen] = React3.useState(false);
+  const [search, setSearch] = React3.useState("");
   const filteredOptions = useFuzzySearch(resolvedOptions, search);
-  const [selected, setSelected] = React2.useState(
+  const [selected, setSelected] = React3.useState(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
   );
-  React2.useEffect(() => {
+  React3.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -354,12 +359,12 @@ function Select({
     e.stopPropagation();
     commit(mode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React2.useRef(null);
-  const [visibleCount, setVisibleCount] = React2.useState(null);
-  React2.useLayoutEffect(() => {
+  const pillsContainerRef = React3.useRef(null);
+  const [visibleCount, setVisibleCount] = React3.useState(null);
+  React3.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), mode]);
-  React2.useLayoutEffect(() => {
+  React3.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     const container = pillsContainerRef.current;
     if (!container || mode !== "multi" || selectedArr.length === 0) {
@@ -565,7 +570,6 @@ function Select({
           className: "max-w-[calc(100vw-1rem)]",
           collisionPadding: { top: 64 },
           style: {
-            zIndex: 9999,
             width: "var(--radix-popover-trigger-width)"
           },
           children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
@@ -672,8 +676,8 @@ function StyledDayButton({
   className,
   ...props
 }) {
-  const ref = React2.useRef(null);
-  React2.useEffect(() => {
+  const ref = React3.useRef(null);
+  React3.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
   const isEdge = modifiers.range_start || modifiers.range_end;
@@ -721,10 +725,10 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React2.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React3.useMemo(() => /* @__PURE__ */ new Date(), []);
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? today;
-  const [viewMonth, setViewMonth] = React2.useState(initialMonth);
-  const yearOptions = React2.useMemo(
+  const [viewMonth, setViewMonth] = React3.useState(initialMonth);
+  const yearOptions = React3.useMemo(
     () => buildYearOptions(today.getFullYear()),
     [today]
   );
@@ -850,11 +854,11 @@ function MonthPickerCalendar({
   onSelect,
   className
 }) {
-  const today = React2.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const [viewYear, setViewYear] = React2.useState(
+  const today = React3.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React3.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React2.useMemo(() => {
+  const yearOptions = React3.useMemo(() => {
     const center = today.getFullYear();
     const minYear = minDate ? minDate.getFullYear() : center - 10;
     const maxYear = maxDate ? maxDate.getFullYear() : center + 10;
