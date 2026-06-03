@@ -9,7 +9,7 @@ import { jsx } from 'react/jsx-runtime';
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
-var ZIndexContext = React.createContext({ popover: 100 });
+var ZIndexContext = React.createContext({ popover: 20 });
 function useZIndex() {
   return React.useContext(ZIndexContext);
 }

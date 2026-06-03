@@ -31,7 +31,7 @@ var React__namespace = /*#__PURE__*/_interopNamespace(React);
 function cn(...inputs) {
   return tailwindMerge.twMerge(clsx.clsx(inputs));
 }
-var ZIndexContext = React__namespace.createContext({ popover: 100 });
+var ZIndexContext = React__namespace.createContext({ popover: 20 });
 function useZIndex() {
   return React__namespace.useContext(ZIndexContext);
 }

@@ -306,7 +306,7 @@ function DrawerOverlay({
       "data-slot": "drawer-overlay",
       className: cn(
         "uengage-ui",
-        "fixed inset-0 z-[400] bg-black/50 transition-opacity opacity-0",
+        "fixed inset-0 z-40 bg-black/50 transition-opacity opacity-0",
         "data-[state=open]:opacity-100 data-[state=open]:duration-300 data-[state=open]:ease-out",
         "data-[state=closed]:opacity-0 data-[state=closed]:duration-200 data-[state=closed]:ease-in",
         className
@@ -1469,12 +1469,12 @@ function SearchBar({
 }
 SearchBar.displayName = "SearchBar";
 var FilterGroupMobileContext = React18__namespace.createContext(false);
-var ZIndexContext = React18__namespace.createContext({ popover: 100 });
+var ZIndexContext = React18__namespace.createContext({ popover: 20 });
 function useZIndex() {
   return React18__namespace.useContext(ZIndexContext);
 }
 function SidebarZIndexProvider({ children }) {
-  return /* @__PURE__ */ jsxRuntime.jsx(ZIndexContext.Provider, { value: { popover: 500 }, children });
+  return /* @__PURE__ */ jsxRuntime.jsx(ZIndexContext.Provider, { value: { popover: 50 }, children });
 }
 function ModalZIndexProvider({ children }) {
   return /* @__PURE__ */ jsxRuntime.jsx(ZIndexContext.Provider, { value: { popover: 10001 }, children });
@@ -4734,7 +4734,7 @@ var Toggle = React18__namespace.forwardRef(
 );
 Toggle.displayName = "Toggle";
 var sidebarContentVariants = classVarianceAuthority.cva(
-  "fixed z-[400] bg-background border shadow-lg outline-none will-change-transform",
+  "fixed z-40 bg-background border shadow-lg outline-none will-change-transform",
   {
     variants: {
       side: {
