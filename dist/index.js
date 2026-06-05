@@ -2463,7 +2463,7 @@ function SecondaryTabs({
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  React18.useLayoutEffect(() => {
+  const measureIndicator = React18.useCallback(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper || !activeValue) return;
     const btn = wrapper.querySelector(
@@ -2473,33 +2473,25 @@ function SecondaryTabs({
       setIndicator((i) => ({ ...i, ready: false }));
       return;
     }
+    const containerRect = wrapper.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
     setIndicator({
-      left: btn.offsetLeft,
-      width: btn.offsetWidth,
+      left: btnRect.left - containerRect.left + wrapper.scrollLeft,
+      width: btnRect.width,
       ready: true
     });
+  }, [activeValue]);
+  React18.useLayoutEffect(() => {
+    measureIndicator();
   }, [
-    activeValue,
+    measureIndicator,
     visibleTabs.length,
-    visibleTabs.map((t) => t.value).join("|")
+    visibleTabs.map((t) => t.value + t.label).join("|")
   ]);
   React18.useEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return;
-    const handle = () => {
-      const btn = wrapper.querySelector(
-        `[data-tab-value="${escapeTabValue(activeValue)}"]`
-      );
-      if (!btn) return;
-      setIndicator((prev) => ({
-        left: btn.offsetLeft,
-        width: btn.offsetWidth,
-        ready: prev.ready
-      }));
-    };
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, [activeValue]);
+    window.addEventListener("resize", measureIndicator);
+    return () => window.removeEventListener("resize", measureIndicator);
+  }, [measureIndicator]);
   return /* @__PURE__ */ jsx(
     Tabs,
     {
@@ -2584,7 +2576,7 @@ function TertiaryTabs({
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  React18.useLayoutEffect(() => {
+  const measureChip = React18.useCallback(() => {
     const list = listRef.current;
     if (!list || !activeValue) return;
     const btn = list.querySelector(
@@ -2594,33 +2586,25 @@ function TertiaryTabs({
       setChip((c) => ({ ...c, ready: false }));
       return;
     }
+    const containerRect = list.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
     setChip({
-      left: btn.offsetLeft,
-      width: btn.offsetWidth,
+      left: btnRect.left - containerRect.left + list.scrollLeft,
+      width: btnRect.width,
       ready: true
     });
+  }, [activeValue]);
+  React18.useLayoutEffect(() => {
+    measureChip();
   }, [
-    activeValue,
+    measureChip,
     visibleTabs.length,
-    visibleTabs.map((t) => t.value).join("|")
+    visibleTabs.map((t) => t.value + t.label).join("|")
   ]);
   React18.useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const handle = () => {
-      const btn = list.querySelector(
-        `[data-tab-value="${escapeTabValue(activeValue)}"]`
-      );
-      if (!btn) return;
-      setChip((prev) => ({
-        left: btn.offsetLeft,
-        width: btn.offsetWidth,
-        ready: prev.ready
-      }));
-    };
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, [activeValue]);
+    window.addEventListener("resize", measureChip);
+    return () => window.removeEventListener("resize", measureChip);
+  }, [measureChip]);
   return /* @__PURE__ */ jsx(
     Tabs,
     {
