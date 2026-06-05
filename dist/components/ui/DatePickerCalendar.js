@@ -333,7 +333,7 @@ function Select({
   const allSelected = enabledOptions.length > 0 && enabledOptions.every((o) => selectedArr.includes(o.value));
   const isSelected = (val) => mode === "single" ? selected === val : selectedArr.includes(val);
   const commit = (next) => {
-    setSelected(next);
+    if (controlledValue === void 0) setSelected(next);
     onChange?.(next);
   };
   const handleSelect = (val) => {
