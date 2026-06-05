@@ -99,7 +99,10 @@ function Select<TItem = unknown>({
     mode === "single" ? selected === val : selectedArr.includes(val);
 
   const commit = (next: string | string[]) => {
-    setSelected(next);
+    // In uncontrolled mode update internal state immediately.
+    // In controlled mode the parent owns the value — don't touch internal state
+    // so the display stays at the last confirmed value until the parent updates the prop.
+    if (controlledValue === undefined) setSelected(next);
     onChange?.(next);
   };
 
