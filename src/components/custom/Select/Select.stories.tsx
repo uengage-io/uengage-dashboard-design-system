@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Popover + command-menu backed select. Supports `single` and `multi` modes, a built-in search, and either pre-shaped `options` or structured `items` + `getLabel` / `getValue`. In multi mode, selections render as overflow-aware pills. Options are always sorted alphabetically by label regardless of the order they are passed in.",
+          "Popover + command-menu backed select. Supports `single` and `multi` modes, a built-in search, and either pre-shaped `options` or structured `items` + `getLabel` / `getValue`. In multi mode, selections render as overflow-aware pills. Pass `sorting` to enable an A→Z / Z→A toggle icon on the trigger.",
       },
     },
   },
@@ -27,6 +27,9 @@ const meta = {
     readOnly: { control: "boolean" },
     width: { control: "text" },
     placeholder: { control: "text" },
+    sorting: { control: "boolean" },
+    indexing: { control: "boolean" },
+    search: { control: "boolean" },
     onChange: { action: "changed" },
   },
   args: {
@@ -37,33 +40,27 @@ const meta = {
     disabled: false,
     readOnly: false,
     required: false,
+    sorting: false,
+    indexing: false,
+    search: true,
   },
 } satisfies Meta<typeof Select>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Intentionally unsorted — the component sorts alphabetically automatically.
 const CITY_OPTIONS: SelectOption[] = [
-  { value: "bom", label: "Mumbai" },
   { value: "chd", label: "Chandigarh" },
-  { value: "ccu", label: "Kolkata" },
   { value: "del", label: "Delhi" },
+  { value: "bom", label: "Mumbai" },
   { value: "blr", label: "Bengaluru" },
-  { value: "pnq", label: "Pune" },
   { value: "hyd", label: "Hyderabad" },
   { value: "maa", label: "Chennai" },
+  { value: "ccu", label: "Kolkata" },
+  { value: "pnq", label: "Pune" },
 ];
 
 export const Single: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Options are passed in a random order but the dropdown renders them A → Z automatically.",
-      },
-    },
-  },
   args: { mode: "single", options: CITY_OPTIONS, placeholder: "Pick a city" },
 };
 
@@ -156,6 +153,23 @@ export const WithItemsApi: Story = {
     />
   ),
   args: { mode: "multi", placeholder: "Pick zones" },
+};
+
+export const WithSorting: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass `sorting` to render an A→Z / Z→A toggle icon on the trigger. Clicking it re-orders the option list; fuzzy search still ranks by relevance when the user types.",
+      },
+    },
+  },
+  args: { mode: "single", options: CITY_OPTIONS, placeholder: "Pick a city", sorting: true },
+};
+
+export const WithSortingMulti: Story = {
+  name: "Sorting · Multi",
+  args: { mode: "multi", options: CITY_OPTIONS, placeholder: "Pick cities", sorting: true },
 };
 
 export const Controlled: Story = {

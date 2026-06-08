@@ -89,18 +89,16 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
   const resolvedItems = React.useMemo<ResolvedItem[]>(() => {
     if (dropdownItems && getLabel) {
-      return dropdownItems
-        .map((item) => ({
-          label: getLabel(item),
-          value: getValue ? getValue(item) : getLabel(item),
-          raw: item,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+      return dropdownItems.map((item) => ({
+        label: getLabel(item),
+        value: getValue ? getValue(item) : getLabel(item),
+        raw: item,
+      }));
     }
     return [];
   }, [dropdownItems, getLabel, getValue]);
 
-  // Fuse.js fuzzy search — replaces the hand-rolled levenshtein filter
+  // Fuse.js fuzzy search — operates on the resolved list
   const fuseResults = useFuzzySearch(resolvedItems, displayValue);
   // Only surface results when the user has actually typed something
   const filteredItems = displayValue.trim() ? fuseResults : [];

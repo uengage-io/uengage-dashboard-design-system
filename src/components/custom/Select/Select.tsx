@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ChevronDown, Check, X } from "lucide-react";
+import { ArrowDownAZ, ArrowUpAZ, ChevronDown, Check, X } from "lucide-react";
 import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import { cn } from "@/lib/utils";
 import { FilterGroupMobileContext } from "@/lib/filterGroupContext";
@@ -61,26 +61,50 @@ function Select<TItem = unknown>({
   helperText,
   error,
   readOnly = false,
+  sorting = false,
+  indexing = false,
+  search: searchEnabled = true,
 }: SelectProps<TItem>) {
   const isMobileDrawer = React.useContext(FilterGroupMobileContext);
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
   const resolvedOptions = React.useMemo<SelectOption[]>(() => {
     if (items && getLabel && getValue) {
-      return items
-        .map((item) => ({
-          label: getLabel(item),
-          value: getValue(item),
-          disabled: getDisabled ? getDisabled(item) : false,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+      return items.map((item) => ({
+        label: getLabel(item),
+        value: getValue(item),
+        disabled: getDisabled ? getDisabled(item) : false,
+      }));
     }
-    return (options ?? []).slice().sort((a, b) => a.label.localeCompare(b.label));
+    return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
 
   const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = React.useState("");
-  const filteredOptions = useFuzzySearch(resolvedOptions, search);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
+
+  const sortedOptions = React.useMemo<SelectOption[]>(() => {
+    if (!sorting) return resolvedOptions;
+    return [...resolvedOptions].sort((a, b) =>
+      sortOrder === "asc"
+        ? a.label.localeCompare(b.label)
+        : b.label.localeCompare(a.label),
+    );
+  }, [resolvedOptions, sorting, sortOrder]);
+
+  const fuseFilteredOptions = useFuzzySearch(sortedOptions, searchQuery);
+
+  const visibleOptions = React.useMemo<SelectOption[]>(() => {
+    if (!searchEnabled) return sortedOptions;
+    const q = searchQuery.trim();
+    if (indexing && /^\d+$/.test(q)) {
+      const n = parseInt(q, 10);
+      const pos = sorting && sortOrder === "desc" ? sortedOptions.length - n : n - 1;
+      const opt = sortedOptions[pos];
+      return opt ? [opt] : [];
+    }
+    return fuseFilteredOptions;
+  }, [searchEnabled, searchQuery, indexing, sorting, sortOrder, sortedOptions, fuseFilteredOptions]);
   const [selected, setSelected] = React.useState<string | string[]>(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : ""),
   );
@@ -92,7 +116,7 @@ function Select<TItem = unknown>({
   const selectedArr: string[] =
     mode === "multi" ? (Array.isArray(selected) ? selected : []) : [];
 
-  const enabledOptions = resolvedOptions.filter((o) => !o.disabled);
+  const enabledOptions = sortedOptions.filter((o) => !o.disabled);
   const allSelected =
     enabledOptions.length > 0 &&
     enabledOptions.every((o) => selectedArr.includes(o.value));
@@ -222,7 +246,7 @@ function Select<TItem = unknown>({
   const handleOpenChange = (next: boolean) => {
     if (disabled || readOnly) return;
     setOpen(next);
-    if (!next) setSearch(""); // reset search so next open starts fresh
+    if (!next) setSearchQuery(""); // reset search so next open starts fresh
     if (next) {
       interactedRef.current = true;
     } else if (interactedRef.current && !touchedRef.current) {
@@ -390,6 +414,26 @@ function Select<TItem = unknown>({
                   <X size={14} className="hover:text-red-500" strokeWidth={2} />
                 </button>
               )}
+              {sorting && (
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
+                  }}
+                  disabled={disabled}
+                  className="flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label={sortOrder === "asc" ? "Sorted A→Z, click for Z→A" : "Sorted Z→A, click for A→Z"}
+                >
+                  {sortOrder === "asc" ? (
+                    <ArrowUpAZ size={14} strokeWidth={2} />
+                  ) : (
+                    <ArrowDownAZ size={14} strokeWidth={2} />
+                  )}
+                </button>
+              )}
               <ChevronDown
                 size={16}
                 strokeWidth={2}
@@ -411,15 +455,17 @@ function Select<TItem = unknown>({
         >
           {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
           <Command shouldFilter={false}>
-            <CommandInput
-              placeholder="Search..."
-              value={search}
-              onValueChange={setSearch}
-              spellCheck={spellCheck}
-              className={commandInputSizeClass}
-            />
+            {searchEnabled && (
+              <CommandInput
+                placeholder="Search..."
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+                spellCheck={spellCheck}
+                className={commandInputSizeClass}
+              />
+            )}
             <CommandList>
-              {filteredOptions.length === 0 && search.trim() ? (
+              {visibleOptions.length === 0 && searchQuery.trim() ? (
                 <CommandEmpty>No results found.</CommandEmpty>
               ) : null}
 
@@ -437,27 +483,37 @@ function Select<TItem = unknown>({
                 </CommandItem>
               )}
 
-              {filteredOptions.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                  aria-selected={isSelected(option.value)}
-                  onSelect={() => handleSelect(option.value)}
-                  className={cn(
-                    "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                    commandItemSizeClass,
-                  )}
-                >
-                  {mode === "multi" && (
-                    <CheckboxIcon checked={isSelected(option.value)} />
-                  )}
-                  <span className="flex-1 truncate">{option.label}</span>
-                  {mode === "single" && isSelected(option.value) && (
-                    <Check size={14} className="shrink-0 text-[#006F42]" />
-                  )}
-                </CommandItem>
-              ))}
+              {visibleOptions.map((option) => {
+                const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
+                const displayIndex =
+                  sorting && sortOrder === "desc"
+                    ? sortedOptions.length - originalIdx
+                    : originalIdx + 1;
+                return (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    disabled={option.disabled}
+                    aria-selected={isSelected(option.value)}
+                    onSelect={() => handleSelect(option.value)}
+                    className={cn(
+                      "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                      commandItemSizeClass,
+                    )}
+                  >
+                    {mode === "multi" && (
+                      <CheckboxIcon checked={isSelected(option.value)} />
+                    )}
+                    {indexing && (
+                      <span className="shrink-0 text-[#9CA3AF] tabular-nums">{displayIndex}.</span>
+                    )}
+                    <span className="flex-1 truncate">{option.label}</span>
+                    {mode === "single" && isSelected(option.value) && (
+                      <Check size={14} className="shrink-0 text-[#006F42]" />
+                    )}
+                  </CommandItem>
+                );
+              })}
             </CommandList>
           </Command>
         </PopoverContent>
