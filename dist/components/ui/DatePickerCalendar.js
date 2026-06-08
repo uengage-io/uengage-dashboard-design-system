@@ -2,7 +2,7 @@
 import * as React3 from 'react';
 import { useMemo } from 'react';
 import { DayPicker } from 'react-day-picker';
-import { ChevronLeft, ChevronRight, Check, X, ChevronDown, CircleAlert } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, X, ArrowUpAZ, ArrowDownAZ, ChevronDown, CircleAlert } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import Fuse from 'fuse.js';
@@ -304,7 +304,10 @@ function Select({
   required,
   helperText,
   error,
-  readOnly = false
+  readOnly = false,
+  sorting = false,
+  indexing = false,
+  search: searchEnabled = true
 }) {
   const isMobileDrawer = React3.useContext(FilterGroupMobileContext);
   const touchedRef = React3.useRef(false);
@@ -315,13 +318,31 @@ function Select({
         label: getLabel(item),
         value: getValue(item),
         disabled: getDisabled ? getDisabled(item) : false
-      })).sort((a, b) => a.label.localeCompare(b.label));
+      }));
     }
-    return (options ?? []).slice().sort((a, b) => a.label.localeCompare(b.label));
+    return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
   const [open, setOpen] = React3.useState(false);
-  const [search, setSearch] = React3.useState("");
-  const filteredOptions = useFuzzySearch(resolvedOptions, search);
+  const [searchQuery, setSearchQuery] = React3.useState("");
+  const [sortOrder, setSortOrder] = React3.useState("asc");
+  const sortedOptions = React3.useMemo(() => {
+    if (!sorting) return resolvedOptions;
+    return [...resolvedOptions].sort(
+      (a, b) => sortOrder === "asc" ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)
+    );
+  }, [resolvedOptions, sorting, sortOrder]);
+  const fuseFilteredOptions = useFuzzySearch(sortedOptions, searchQuery);
+  const visibleOptions = React3.useMemo(() => {
+    if (!searchEnabled) return sortedOptions;
+    const q = searchQuery.trim();
+    if (indexing && /^\d+$/.test(q)) {
+      const n = parseInt(q, 10);
+      const pos = sorting && sortOrder === "desc" ? sortedOptions.length - n : n - 1;
+      const opt = sortedOptions[pos];
+      return opt ? [opt] : [];
+    }
+    return fuseFilteredOptions;
+  }, [searchEnabled, searchQuery, indexing, sorting, sortOrder, sortedOptions, fuseFilteredOptions]);
   const [selected, setSelected] = React3.useState(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
   );
@@ -329,7 +350,7 @@ function Select({
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
-  const enabledOptions = resolvedOptions.filter((o) => !o.disabled);
+  const enabledOptions = sortedOptions.filter((o) => !o.disabled);
   const allSelected = enabledOptions.length > 0 && enabledOptions.every((o) => selectedArr.includes(o.value));
   const isSelected = (val) => mode === "single" ? selected === val : selectedArr.includes(val);
   const commit = (next) => {
@@ -399,7 +420,7 @@ function Select({
   const handleOpenChange = (next) => {
     if (disabled || readOnly) return;
     setOpen(next);
-    if (!next) setSearch("");
+    if (!next) setSearchQuery("");
     if (next) {
       interactedRef.current = true;
     } else if (interactedRef.current && !touchedRef.current) {
@@ -549,6 +570,22 @@ function Select({
                   children: /* @__PURE__ */ jsx(X, { size: 14, className: "hover:text-red-500", strokeWidth: 2 })
                 }
               ),
+              sorting && /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  tabIndex: -1,
+                  onClick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSortOrder((o) => o === "asc" ? "desc" : "asc");
+                  },
+                  disabled,
+                  className: "flex items-center text-gray-400 hover:text-gray-600 transition-colors",
+                  "aria-label": sortOrder === "asc" ? "Sorted A\u2192Z, click for Z\u2192A" : "Sorted Z\u2192A, click for A\u2192Z",
+                  children: sortOrder === "asc" ? /* @__PURE__ */ jsx(ArrowUpAZ, { size: 14, strokeWidth: 2 }) : /* @__PURE__ */ jsx(ArrowDownAZ, { size: 14, strokeWidth: 2 })
+                }
+              ),
               /* @__PURE__ */ jsx(
                 ChevronDown,
                 {
@@ -573,18 +610,18 @@ function Select({
             width: "var(--radix-popover-trigger-width)"
           },
           children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
-            /* @__PURE__ */ jsx(
+            searchEnabled && /* @__PURE__ */ jsx(
               CommandInput,
               {
                 placeholder: "Search...",
-                value: search,
-                onValueChange: setSearch,
+                value: searchQuery,
+                onValueChange: setSearchQuery,
                 spellCheck,
                 className: commandInputSizeClass
               }
             ),
             /* @__PURE__ */ jsxs(CommandList, { children: [
-              filteredOptions.length === 0 && search.trim() ? /* @__PURE__ */ jsx(CommandEmpty, { children: "No results found." }) : null,
+              visibleOptions.length === 0 && searchQuery.trim() ? /* @__PURE__ */ jsx(CommandEmpty, { children: "No results found." }) : null,
               mode === "multi" && /* @__PURE__ */ jsxs(
                 CommandItem,
                 {
@@ -600,25 +637,33 @@ function Select({
                   ]
                 }
               ),
-              filteredOptions.map((option) => /* @__PURE__ */ jsxs(
-                CommandItem,
-                {
-                  value: option.value,
-                  disabled: option.disabled,
-                  "aria-selected": isSelected(option.value),
-                  onSelect: () => handleSelect(option.value),
-                  className: cn(
-                    "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                    commandItemSizeClass
-                  ),
-                  children: [
-                    mode === "multi" && /* @__PURE__ */ jsx(CheckboxIcon, { checked: isSelected(option.value) }),
-                    /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: option.label }),
-                    mode === "single" && isSelected(option.value) && /* @__PURE__ */ jsx(Check, { size: 14, className: "shrink-0 text-[#006F42]" })
-                  ]
-                },
-                option.value
-              ))
+              visibleOptions.map((option) => {
+                const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
+                const displayIndex = sorting && sortOrder === "desc" ? sortedOptions.length - originalIdx : originalIdx + 1;
+                return /* @__PURE__ */ jsxs(
+                  CommandItem,
+                  {
+                    value: option.value,
+                    disabled: option.disabled,
+                    "aria-selected": isSelected(option.value),
+                    onSelect: () => handleSelect(option.value),
+                    className: cn(
+                      "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                      commandItemSizeClass
+                    ),
+                    children: [
+                      mode === "multi" && /* @__PURE__ */ jsx(CheckboxIcon, { checked: isSelected(option.value) }),
+                      indexing && /* @__PURE__ */ jsxs("span", { className: "shrink-0 text-[#9CA3AF] tabular-nums", children: [
+                        displayIndex,
+                        "."
+                      ] }),
+                      /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: option.label }),
+                      mode === "single" && isSelected(option.value) && /* @__PURE__ */ jsx(Check, { size: 14, className: "shrink-0 text-[#006F42]" })
+                    ]
+                  },
+                  option.value
+                );
+              })
             ] })
           ] })
         }

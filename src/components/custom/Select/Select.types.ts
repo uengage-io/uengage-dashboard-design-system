@@ -55,4 +55,22 @@ export interface SelectProps<TItem = unknown> {
   error?: string;
   /** When true, the trigger shows the current selection but the dropdown cannot be opened. */
   readOnly?: boolean;
+
+  /**
+   * When `true`, renders an ascending/descending sort toggle icon on the trigger.
+   * Clicking it cycles A→Z / Z→A on the option list.
+   */
+  sorting?: boolean;
+
+  /**
+   * Controls visibility of the search input inside the dropdown.
+   * Defaults to `true`. Set to `false` to show only the raw option list.
+   */
+  search?: boolean;
+
+  /**
+   * When `true`, each option in the dropdown is prefixed with its position number (1, 2, 3 …).
+   * The index reflects the current displayed order (after sorting / fuzzy filtering).
+   */
+  indexing?: boolean;
 }
