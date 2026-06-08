@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Input + search/clear actions, with optional fuzzy-matched dropdown. `valueType` restricts the input charset (`string` | `number` | `alphanumeric`). Feed suggestions either as a string list via `dropdownContent` or as structured objects via `dropdownItems` + `getLabel` / `getValue`.",
+          "Input + search/clear actions, with optional fuzzy-matched dropdown. `valueType` restricts the input charset (`string` | `number` | `alphanumeric`). Feed suggestions either as a string list via `dropdownContent` or as structured objects via `dropdownItems` + `getLabel` / `getValue`. Dropdown options are always sorted alphabetically by label regardless of the order they are passed in.",
       },
     },
   },
@@ -82,21 +82,30 @@ export const ReadOnly: Story = {
   args: {},
 };
 
+// Intentionally unsorted — the component sorts alphabetically automatically.
 const CITIES = [
-  "Chandigarh",
-  "Mohali",
-  "Panchkula",
-  "Delhi",
-  "Gurgaon",
-  "Noida",
   "Mumbai",
-  "Bengaluru",
-  "Hyderabad",
-  "Chennai",
+  "Chandigarh",
   "Kolkata",
+  "Delhi",
+  "Bengaluru",
+  "Mohali",
+  "Hyderabad",
+  "Panchkula",
+  "Noida",
+  "Chennai",
+  "Gurgaon",
 ];
 
 export const WithStringDropdown: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Options are passed in a random order but the dropdown renders them A → Z automatically.",
+      },
+    },
+  },
   render: (args) => (
     <SearchBar
       {...args}
