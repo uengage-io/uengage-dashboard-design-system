@@ -1,5 +1,6 @@
 "use client";
-import { Command as Command$1, CommandInput as CommandInput$1, CommandList as CommandList$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
+import * as React from 'react';
+import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { jsx } from 'react/jsx-runtime';
@@ -31,16 +32,16 @@ function CommandInput({ className, ...props }) {
     }
   ) });
 }
-function CommandList({ className, ...props }) {
-  return /* @__PURE__ */ jsx(
-    CommandList$1,
-    {
-      "data-slot": "command-list",
-      className: cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className),
-      ...props
-    }
-  );
-}
+var CommandList = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  CommandList$1,
+  {
+    ref,
+    "data-slot": "command-list",
+    className: cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className),
+    ...props
+  }
+));
+CommandList.displayName = "CommandList";
 function CommandEmpty({ className, ...props }) {
   return /* @__PURE__ */ jsx(
     CommandEmpty$1,

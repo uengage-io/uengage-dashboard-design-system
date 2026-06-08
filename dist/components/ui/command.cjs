@@ -1,10 +1,31 @@
 "use client";
 'use strict';
 
+var React = require('react');
 var cmdk = require('cmdk');
 var clsx = require('clsx');
 var tailwindMerge = require('tailwind-merge');
 var jsxRuntime = require('react/jsx-runtime');
+
+function _interopNamespace(e) {
+  if (e && e.__esModule) return e;
+  var n = Object.create(null);
+  if (e) {
+    Object.keys(e).forEach(function (k) {
+      if (k !== 'default') {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function () { return e[k]; }
+        });
+      }
+    });
+  }
+  n.default = e;
+  return Object.freeze(n);
+}
+
+var React__namespace = /*#__PURE__*/_interopNamespace(React);
 
 // src/components/ui/command.tsx
 function cn(...inputs) {
@@ -33,16 +54,16 @@ function CommandInput({ className, ...props }) {
     }
   ) });
 }
-function CommandList({ className, ...props }) {
-  return /* @__PURE__ */ jsxRuntime.jsx(
-    cmdk.CommandList,
-    {
-      "data-slot": "command-list",
-      className: cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className),
-      ...props
-    }
-  );
-}
+var CommandList = React__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+  cmdk.CommandList,
+  {
+    ref,
+    "data-slot": "command-list",
+    className: cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className),
+    ...props
+  }
+));
+CommandList.displayName = "CommandList";
 function CommandEmpty({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntime.jsx(
     cmdk.CommandEmpty,

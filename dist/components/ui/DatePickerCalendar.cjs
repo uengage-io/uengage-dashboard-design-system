@@ -1,7 +1,7 @@
 "use client";
 'use strict';
 
-var React3 = require('react');
+var React4 = require('react');
 var reactDayPicker = require('react-day-picker');
 var lucideReact = require('lucide-react');
 var clsx = require('clsx');
@@ -32,7 +32,7 @@ function _interopNamespace(e) {
   return Object.freeze(n);
 }
 
-var React3__namespace = /*#__PURE__*/_interopNamespace(React3);
+var React4__namespace = /*#__PURE__*/_interopNamespace(React4);
 var Fuse__default = /*#__PURE__*/_interopDefault(Fuse);
 
 // src/components/ui/DatePickerCalendar.tsx
@@ -40,7 +40,7 @@ function cn(...inputs) {
   return tailwindMerge.twMerge(clsx.clsx(inputs));
 }
 function useFuzzySearch(items, query) {
-  const fuse = React3.useMemo(
+  const fuse = React4.useMemo(
     () => new Fuse__default.default(items, {
       keys: ["label"],
       threshold: 0.35,
@@ -50,16 +50,16 @@ function useFuzzySearch(items, query) {
     }),
     [items]
   );
-  return React3.useMemo(() => {
+  return React4.useMemo(() => {
     const q = query.trim();
     if (!q) return items;
     return fuse.search(q).map((r) => r.item);
   }, [fuse, query, items]);
 }
-var FilterGroupMobileContext = React3__namespace.createContext(false);
-var ZIndexContext = React3__namespace.createContext({ popover: 20 });
+var FilterGroupMobileContext = React4__namespace.createContext(false);
+var ZIndexContext = React4__namespace.createContext({ popover: 20 });
 function useZIndex() {
-  return React3__namespace.useContext(ZIndexContext);
+  return React4__namespace.useContext(ZIndexContext);
 }
 function Popover({
   ...props
@@ -197,16 +197,16 @@ function CommandInput({ className, ...props }) {
     }
   ) });
 }
-function CommandList({ className, ...props }) {
-  return /* @__PURE__ */ jsxRuntime.jsx(
-    cmdk.CommandList,
-    {
-      "data-slot": "command-list",
-      className: cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className),
-      ...props
-    }
-  );
-}
+var CommandList = React4__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+  cmdk.CommandList,
+  {
+    ref,
+    "data-slot": "command-list",
+    className: cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className),
+    ...props
+  }
+));
+CommandList.displayName = "CommandList";
 function CommandEmpty({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntime.jsx(
     cmdk.CommandEmpty,
@@ -333,10 +333,10 @@ function Select({
   indexing = false,
   search: searchEnabled = true
 }) {
-  const isMobileDrawer = React3__namespace.useContext(FilterGroupMobileContext);
-  const touchedRef = React3__namespace.useRef(false);
-  const interactedRef = React3__namespace.useRef(false);
-  const resolvedOptions = React3__namespace.useMemo(() => {
+  const isMobileDrawer = React4__namespace.useContext(FilterGroupMobileContext);
+  const touchedRef = React4__namespace.useRef(false);
+  const interactedRef = React4__namespace.useRef(false);
+  const resolvedOptions = React4__namespace.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -346,31 +346,35 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React3__namespace.useState(false);
-  const [searchQuery, setSearchQuery] = React3__namespace.useState("");
-  const [sortOrder, setSortOrder] = React3__namespace.useState("asc");
-  const sortedOptions = React3__namespace.useMemo(() => {
+  const [open, setOpen] = React4__namespace.useState(false);
+  const [searchQuery, setSearchQuery] = React4__namespace.useState("");
+  const [sortOrder, setSortOrder] = React4__namespace.useState("asc");
+  const listRef = React4__namespace.useRef(null);
+  React4__namespace.useEffect(() => {
+    listRef.current?.scrollTo({ top: 0 });
+  }, [sortOrder]);
+  const sortedOptions = React4__namespace.useMemo(() => {
     if (!sorting) return resolvedOptions;
     return [...resolvedOptions].sort(
       (a, b) => sortOrder === "asc" ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)
     );
   }, [resolvedOptions, sorting, sortOrder]);
   const fuseFilteredOptions = useFuzzySearch(sortedOptions, searchQuery);
-  const visibleOptions = React3__namespace.useMemo(() => {
+  const visibleOptions = React4__namespace.useMemo(() => {
     if (!searchEnabled) return sortedOptions;
     const q = searchQuery.trim();
     if (indexing && /^\d+$/.test(q)) {
       const n = parseInt(q, 10);
-      const pos = sorting && sortOrder === "desc" ? sortedOptions.length - n : n - 1;
+      const pos = n - 1;
       const opt = sortedOptions[pos];
       return opt ? [opt] : [];
     }
     return fuseFilteredOptions;
   }, [searchEnabled, searchQuery, indexing, sorting, sortOrder, sortedOptions, fuseFilteredOptions]);
-  const [selected, setSelected] = React3__namespace.useState(
+  const [selected, setSelected] = React4__namespace.useState(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
   );
-  React3__namespace.useEffect(() => {
+  React4__namespace.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -404,12 +408,12 @@ function Select({
     e.stopPropagation();
     commit(mode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React3__namespace.useRef(null);
-  const [visibleCount, setVisibleCount] = React3__namespace.useState(null);
-  React3__namespace.useLayoutEffect(() => {
+  const pillsContainerRef = React4__namespace.useRef(null);
+  const [visibleCount, setVisibleCount] = React4__namespace.useState(null);
+  React4__namespace.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), mode]);
-  React3__namespace.useLayoutEffect(() => {
+  React4__namespace.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     const container = pillsContainerRef.current;
     if (!container || mode !== "multi" || selectedArr.length === 0) {
@@ -644,7 +648,7 @@ function Select({
                 className: commandInputSizeClass
               }
             ),
-            /* @__PURE__ */ jsxRuntime.jsxs(CommandList, { children: [
+            /* @__PURE__ */ jsxRuntime.jsxs(CommandList, { ref: listRef, children: [
               visibleOptions.length === 0 && searchQuery.trim() ? /* @__PURE__ */ jsxRuntime.jsx(CommandEmpty, { children: "No results found." }) : null,
               mode === "multi" && /* @__PURE__ */ jsxRuntime.jsxs(
                 CommandItem,
@@ -663,7 +667,7 @@ function Select({
               ),
               visibleOptions.map((option) => {
                 const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
-                const displayIndex = sorting && sortOrder === "desc" ? sortedOptions.length - originalIdx : originalIdx + 1;
+                const displayIndex = originalIdx + 1;
                 return /* @__PURE__ */ jsxRuntime.jsxs(
                   CommandItem,
                   {
@@ -745,8 +749,8 @@ function StyledDayButton({
   className,
   ...props
 }) {
-  const ref = React3__namespace.useRef(null);
-  React3__namespace.useEffect(() => {
+  const ref = React4__namespace.useRef(null);
+  React4__namespace.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
   const isEdge = modifiers.range_start || modifiers.range_end;
@@ -794,10 +798,10 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React3__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React4__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? today;
-  const [viewMonth, setViewMonth] = React3__namespace.useState(initialMonth);
-  const yearOptions = React3__namespace.useMemo(
+  const [viewMonth, setViewMonth] = React4__namespace.useState(initialMonth);
+  const yearOptions = React4__namespace.useMemo(
     () => buildYearOptions(today.getFullYear()),
     [today]
   );
@@ -923,11 +927,11 @@ function MonthPickerCalendar({
   onSelect,
   className
 }) {
-  const today = React3__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const [viewYear, setViewYear] = React3__namespace.useState(
+  const today = React4__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React4__namespace.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React3__namespace.useMemo(() => {
+  const yearOptions = React4__namespace.useMemo(() => {
     const center = today.getFullYear();
     const minYear = minDate ? minDate.getFullYear() : center - 10;
     const maxYear = maxDate ? maxDate.getFullYear() : center + 10;
