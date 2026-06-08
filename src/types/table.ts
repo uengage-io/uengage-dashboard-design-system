@@ -40,4 +40,10 @@ export interface CustomTableProps<T> {
    * - "cards"   — each row becomes a labelled card; columns with hideOnMobile are omitted
    */
   mobileLayout?: "scroll" | "cards";
+
+  /**
+   * When `true` (default), rows highlight on hover.
+   * Set to `false` to disable the hover effect entirely.
+   */
+  hover?: boolean;
 }

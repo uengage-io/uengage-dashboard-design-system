@@ -28,6 +28,7 @@ export function Table<T>({
   size = "md",
   mobileLayout = "scroll",
   className,
+  hover = true,
 }: CustomTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDirection>(null);
@@ -114,9 +115,9 @@ export function Table<T>({
                   key={rowKey}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
                   className={cn(
-                    "rounded-lg border border-gray-200 bg-white p-3 sm:p-4",
-                    onRowClick &&
-                      "cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors",
+                    "rounded-lg border border-gray-200 bg-white p-3 sm:p-4 transition-colors",
+                    hover && "hover:bg-gray-50",
+                    onRowClick && "cursor-pointer active:bg-gray-100",
                     rowClassName?.(row),
                   )}
                 >
@@ -248,6 +249,7 @@ export function Table<T>({
                       tableBodyRowVariants({
                         size,
                         clickable: Boolean(onRowClick),
+                        hover,
                       }),
                       rowClassName?.(row),
                     )}

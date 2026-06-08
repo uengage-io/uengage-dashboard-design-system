@@ -27,7 +27,7 @@ export function TableCell({
   return (
     <ShadcnTableCell
       className={cn(
-        tableBodyRowVariants({ size }),
+        tableBodyRowVariants({ size, hover: false }),
         alignClass[align],
         // Allow content to wrap and break long words/URLs that would otherwise
         // force the column wider than its flex-allocated share.
