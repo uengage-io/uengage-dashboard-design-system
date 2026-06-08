@@ -156,9 +156,18 @@ const meta = {
     docs: {
       description: {
         component:
-          "Generic, typed table built on shadcn Table. CVA-driven size/border variants, built-in sort (asc → desc → cleared), sticky header + max-height scroll, loading and empty states, responsive column hiding, and optional row click handling.",
+          "Generic, typed table built on shadcn Table. CVA-driven size/border variants, built-in sort (asc → desc → cleared), sticky header + max-height scroll, loading and empty states, responsive column hiding, optional row click handling, and a `hover` prop (default `true`) to control row highlight on hover.",
       },
     },
+  },
+  argTypes: {
+    hover: { control: "boolean" },
+    bordered: { control: "boolean" },
+    size: { control: "radio", options: ["sm", "md", "lg"] },
+    mobileLayout: { control: "radio", options: ["scroll", "cards"] },
+  },
+  args: {
+    hover: true,
   },
 } satisfies Meta<typeof OrderTable>;
 
@@ -174,6 +183,25 @@ export const Default: Story = {
     keyField: "id",
     bordered: true,
     size: "md",
+  },
+};
+
+export const HoverDisabled: Story = {
+  name: "Hover disabled",
+  parameters: {
+    docs: {
+      description: {
+        story: "Pass `hover={false}` to remove the row highlight on hover.",
+      },
+    },
+  },
+  args: {
+    columns: BASE_COLUMNS,
+    data: ROWS,
+    keyField: "id",
+    bordered: true,
+    size: "md",
+    hover: false,
   },
 };
 

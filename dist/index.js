@@ -4279,13 +4279,18 @@ var tableBodyRowVariants = cva("transition-colors", {
       lg: "py-3 sm:py-4 text-sm sm:text-base"
     },
     clickable: {
-      true: "hover:bg-gray-50 cursor-pointer",
+      true: "cursor-pointer",
       false: ""
+    },
+    hover: {
+      true: "hover:bg-gray-50",
+      false: "hover:bg-transparent"
     }
   },
   defaultVariants: {
     size: "md",
-    clickable: false
+    clickable: false,
+    hover: true
   }
 });
 var statusBadgeVariants = cva(
@@ -4326,7 +4331,7 @@ function TableCell2({
     TableCell,
     {
       className: cn(
-        tableBodyRowVariants({ size }),
+        tableBodyRowVariants({ size, hover: false }),
         alignClass[align],
         // Allow content to wrap and break long words/URLs that would otherwise
         // force the column wider than its flex-allocated share.
@@ -4409,7 +4414,8 @@ function Table2({
   bordered = false,
   size = "md",
   mobileLayout = "scroll",
-  className
+  className,
+  hover = true
 }) {
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState(null);
@@ -4467,8 +4473,9 @@ function Table2({
             {
               onClick: onRowClick ? () => onRowClick(row) : void 0,
               className: cn(
-                "rounded-lg border border-gray-200 bg-white p-3 sm:p-4",
-                onRowClick && "cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors",
+                "rounded-lg border border-gray-200 bg-white p-3 sm:p-4 transition-colors",
+                hover && "hover:bg-gray-50",
+                onRowClick && "cursor-pointer active:bg-gray-100",
                 rowClassName?.(row)
               ),
               children: visibleColumns.map((col) => {
@@ -4571,7 +4578,8 @@ function Table2({
                         className: cn(
                           tableBodyRowVariants({
                             size,
-                            clickable: Boolean(onRowClick)
+                            clickable: Boolean(onRowClick),
+                            hover
                           }),
                           rowClassName?.(row)
                         ),

@@ -659,9 +659,14 @@ interface CustomTableProps<T> {
      * - "cards"   — each row becomes a labelled card; columns with hideOnMobile are omitted
      */
     mobileLayout?: "scroll" | "cards";
+    /**
+     * When `true` (default), rows highlight on hover.
+     * Set to `false` to disable the hover effect entirely.
+     */
+    hover?: boolean;
 }
 
-declare function Table<T>({ columns, data, keyField, loading, emptyMessage, onRowClick, rowClassName, stickyHeader, maxHeight, bordered, size, mobileLayout, className, }: CustomTableProps<T>): react_jsx_runtime.JSX.Element;
+declare function Table<T>({ columns, data, keyField, loading, emptyMessage, onRowClick, rowClassName, stickyHeader, maxHeight, bordered, size, mobileLayout, className, hover, }: CustomTableProps<T>): react_jsx_runtime.JSX.Element;
 
 declare const tableWrapperVariants: (props?: ({
     bordered?: boolean | null | undefined;
@@ -672,6 +677,7 @@ declare const tableHeaderRowVariants: (props?: ({
 declare const tableBodyRowVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
     clickable?: boolean | null | undefined;
+    hover?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const statusBadgeVariants: (props?: ({
     variant?: "error" | "success" | "warning" | null | undefined;
