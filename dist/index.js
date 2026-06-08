@@ -4941,7 +4941,7 @@ function Sidebar({
       }
     ) });
   }
-  return /* @__PURE__ */ jsxs(Drawer, { open: resolvedOpen, onOpenChange: handleOpenChange, children: [
+  return /* @__PURE__ */ jsxs(Drawer, { open: resolvedOpen, onOpenChange: handleOpenChange, modal: false, children: [
     trigger ? /* @__PURE__ */ jsx(DrawerTrigger, { asChild: true, children: trigger }) : null,
     overlay ? /* @__PURE__ */ jsx(
       DrawerOverlay,
