@@ -315,9 +315,9 @@ function Select({
         label: getLabel(item),
         value: getValue(item),
         disabled: getDisabled ? getDisabled(item) : false
-      }));
+      })).sort((a, b) => a.label.localeCompare(b.label));
     }
-    return options ?? [];
+    return (options ?? []).slice().sort((a, b) => a.label.localeCompare(b.label));
   }, [items, getLabel, getValue, getDisabled, options]);
   const [open, setOpen] = React3.useState(false);
   const [search, setSearch] = React3.useState("");

@@ -34,7 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <BannerPreview /> */}
     {/* <FilterGroupPreview/> */}
-   <LayoutDemo/>
+   <SelectPreview/>
     {/* <InputPreview/> */}
     <TabsPreview />
   </React.StrictMode>,

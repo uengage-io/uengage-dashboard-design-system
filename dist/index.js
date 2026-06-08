@@ -1261,7 +1261,7 @@ function SearchBar({
         label: getLabel(item),
         value: getValue ? getValue(item) : getLabel(item),
         raw: item
-      }));
+      })).sort((a, b) => a.label.localeCompare(b.label));
     }
     return [];
   }, [dropdownItems, getLabel, getValue]);
@@ -1712,9 +1712,9 @@ function Select({
         label: getLabel(item),
         value: getValue(item),
         disabled: getDisabled ? getDisabled(item) : false
-      }));
+      })).sort((a, b) => a.label.localeCompare(b.label));
     }
-    return options ?? [];
+    return (options ?? []).slice().sort((a, b) => a.label.localeCompare(b.label));
   }, [items, getLabel, getValue, getDisabled, options]);
   const [open, setOpen] = React18.useState(false);
   const [search, setSearch] = React18.useState("");

@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Popover + command-menu backed select. Supports `single` and `multi` modes, a built-in search, and either pre-shaped `options` or structured `items` + `getLabel` / `getValue`. In multi mode, selections render as overflow-aware pills.",
+          "Popover + command-menu backed select. Supports `single` and `multi` modes, a built-in search, and either pre-shaped `options` or structured `items` + `getLabel` / `getValue`. In multi mode, selections render as overflow-aware pills. Options are always sorted alphabetically by label regardless of the order they are passed in.",
       },
     },
   },
@@ -43,18 +43,27 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// Intentionally unsorted — the component sorts alphabetically automatically.
 const CITY_OPTIONS: SelectOption[] = [
-  { value: "chd", label: "Chandigarh" },
-  { value: "del", label: "Delhi" },
   { value: "bom", label: "Mumbai" },
+  { value: "chd", label: "Chandigarh" },
+  { value: "ccu", label: "Kolkata" },
+  { value: "del", label: "Delhi" },
   { value: "blr", label: "Bengaluru" },
+  { value: "pnq", label: "Pune" },
   { value: "hyd", label: "Hyderabad" },
   { value: "maa", label: "Chennai" },
-  { value: "ccu", label: "Kolkata" },
-  { value: "pnq", label: "Pune" },
 ];
 
 export const Single: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Options are passed in a random order but the dropdown renders them A → Z automatically.",
+      },
+    },
+  },
   args: { mode: "single", options: CITY_OPTIONS, placeholder: "Pick a city" },
 };
 

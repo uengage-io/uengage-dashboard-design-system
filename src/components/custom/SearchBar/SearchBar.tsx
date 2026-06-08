@@ -89,11 +89,13 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
   const resolvedItems = React.useMemo<ResolvedItem[]>(() => {
     if (dropdownItems && getLabel) {
-      return dropdownItems.map((item) => ({
-        label: getLabel(item),
-        value: getValue ? getValue(item) : getLabel(item),
-        raw: item,
-      }));
+      return dropdownItems
+        .map((item) => ({
+          label: getLabel(item),
+          value: getValue ? getValue(item) : getLabel(item),
+          raw: item,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
     }
     return [];
   }, [dropdownItems, getLabel, getValue]);

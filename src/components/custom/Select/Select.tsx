@@ -67,13 +67,15 @@ function Select<TItem = unknown>({
   const interactedRef = React.useRef(false);
   const resolvedOptions = React.useMemo<SelectOption[]>(() => {
     if (items && getLabel && getValue) {
-      return items.map((item) => ({
-        label: getLabel(item),
-        value: getValue(item),
-        disabled: getDisabled ? getDisabled(item) : false,
-      }));
+      return items
+        .map((item) => ({
+          label: getLabel(item),
+          value: getValue(item),
+          disabled: getDisabled ? getDisabled(item) : false,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
     }
-    return options ?? [];
+    return (options ?? []).slice().sort((a, b) => a.label.localeCompare(b.label));
   }, [items, getLabel, getValue, getDisabled, options]);
 
   const [open, setOpen] = React.useState(false);
