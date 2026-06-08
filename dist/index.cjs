@@ -6,7 +6,7 @@ var radixUi = require('radix-ui');
 var clsx = require('clsx');
 var tailwindMerge = require('tailwind-merge');
 var jsxRuntime = require('react/jsx-runtime');
-var React18 = require('react');
+var React19 = require('react');
 var lucideReact = require('lucide-react');
 var Fuse = require('fuse.js');
 var cmdk = require('cmdk');
@@ -33,7 +33,7 @@ function _interopNamespace(e) {
   return Object.freeze(n);
 }
 
-var React18__namespace = /*#__PURE__*/_interopNamespace(React18);
+var React19__namespace = /*#__PURE__*/_interopNamespace(React19);
 var Fuse__default = /*#__PURE__*/_interopDefault(Fuse);
 var ReactDOM__namespace = /*#__PURE__*/_interopNamespace(ReactDOM);
 
@@ -687,9 +687,9 @@ function Button2({
   onBlur,
   ...props
 }) {
-  const [hovered, setHovered] = React18__namespace.useState(false);
-  const [pressed, setPressed] = React18__namespace.useState(false);
-  const [focused, setFocused] = React18__namespace.useState(false);
+  const [hovered, setHovered] = React19__namespace.useState(false);
+  const [pressed, setPressed] = React19__namespace.useState(false);
+  const [focused, setFocused] = React19__namespace.useState(false);
   const interactionBlocked = disabled || loading;
   const state = disabled ? "disabled" : pressed ? "pressed" : hovered ? "hover" : focused ? "focused" : "default";
   const gradientStyle = getButtonStyle(variant, state);
@@ -846,7 +846,7 @@ function TopHeader({
                   className: "flex min-w-0 flex-1 items-center overflow-hidden",
                   style: { gap: toCssSize(titleGap), minWidth: "160px" },
                   children: [
-                    React18__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
+                    React19__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
                     helper != null && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "shrink-0 text-xs leading-none sm:text-sm", children: helper })
                   ]
                 }
@@ -930,8 +930,8 @@ function SubHeader({
                   },
                   children: [
                     hasHeading && /* @__PURE__ */ jsxRuntime.jsxs("div", { "data-slot": "sub-header-heading", children: [
-                      title != null && (React18__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
-                      subtitle != null && (React18__namespace.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
+                      title != null && (React19__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
+                      subtitle != null && (React19__namespace.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
                     ] }),
                     children != null && /* @__PURE__ */ jsxRuntime.jsx("div", { "data-slot": "sub-header-content", children })
                   ]
@@ -1157,7 +1157,7 @@ function Input({ className, type, ...props }) {
   );
 }
 function useFuzzySearch(items, query) {
-  const fuse = React18.useMemo(
+  const fuse = React19.useMemo(
     () => new Fuse__default.default(items, {
       keys: ["label"],
       threshold: 0.35,
@@ -1167,7 +1167,7 @@ function useFuzzySearch(items, query) {
     }),
     [items]
   );
-  return React18.useMemo(() => {
+  return React19.useMemo(() => {
     const q = query.trim();
     if (!q) return items;
     return fuse.search(q).map((r) => r.item);
@@ -1270,17 +1270,17 @@ function SearchBar({
   onSelect,
   fallbackText = "No results found"
 }) {
-  const [internal, setInternal] = React18__namespace.useState(
+  const [internal, setInternal] = React19__namespace.useState(
     String(controlledValue ?? defaultValue ?? "")
   );
-  const [dropdownOpen, setDropdownOpen] = React18__namespace.useState(false);
-  const wrapperRef = React18__namespace.useRef(null);
-  const touchedRef = React18__namespace.useRef(false);
-  React18__namespace.useEffect(() => {
+  const [dropdownOpen, setDropdownOpen] = React19__namespace.useState(false);
+  const wrapperRef = React19__namespace.useRef(null);
+  const touchedRef = React19__namespace.useRef(false);
+  React19__namespace.useEffect(() => {
     if (controlledValue !== void 0) setInternal(String(controlledValue));
   }, [controlledValue]);
   const displayValue = internal;
-  const resolvedItems = React18__namespace.useMemo(() => {
+  const resolvedItems = React19__namespace.useMemo(() => {
     if (dropdownItems && getLabel) {
       return dropdownItems.map((item) => ({
         label: getLabel(item),
@@ -1468,10 +1468,10 @@ function SearchBar({
   );
 }
 SearchBar.displayName = "SearchBar";
-var FilterGroupMobileContext = React18__namespace.createContext(false);
-var ZIndexContext = React18__namespace.createContext({ popover: 20 });
+var FilterGroupMobileContext = React19__namespace.createContext(false);
+var ZIndexContext = React19__namespace.createContext({ popover: 20 });
 function useZIndex() {
-  return React18__namespace.useContext(ZIndexContext);
+  return React19__namespace.useContext(ZIndexContext);
 }
 function SidebarZIndexProvider({ children }) {
   return /* @__PURE__ */ jsxRuntime.jsx(ZIndexContext.Provider, { value: { popover: 50 }, children });
@@ -1574,16 +1574,16 @@ function CommandInput({ className, ...props }) {
     }
   ) });
 }
-function CommandList({ className, ...props }) {
-  return /* @__PURE__ */ jsxRuntime.jsx(
-    cmdk.CommandList,
-    {
-      "data-slot": "command-list",
-      className: cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className),
-      ...props
-    }
-  );
-}
+var CommandList = React19__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+  cmdk.CommandList,
+  {
+    ref,
+    "data-slot": "command-list",
+    className: cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className),
+    ...props
+  }
+));
+CommandList.displayName = "CommandList";
 function CommandEmpty({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntime.jsx(
     cmdk.CommandEmpty,
@@ -1731,10 +1731,10 @@ function Select({
   indexing = false,
   search: searchEnabled = true
 }) {
-  const isMobileDrawer = React18__namespace.useContext(FilterGroupMobileContext);
-  const touchedRef = React18__namespace.useRef(false);
-  const interactedRef = React18__namespace.useRef(false);
-  const resolvedOptions = React18__namespace.useMemo(() => {
+  const isMobileDrawer = React19__namespace.useContext(FilterGroupMobileContext);
+  const touchedRef = React19__namespace.useRef(false);
+  const interactedRef = React19__namespace.useRef(false);
+  const resolvedOptions = React19__namespace.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -1744,31 +1744,35 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React18__namespace.useState(false);
-  const [searchQuery, setSearchQuery] = React18__namespace.useState("");
-  const [sortOrder, setSortOrder] = React18__namespace.useState("asc");
-  const sortedOptions = React18__namespace.useMemo(() => {
+  const [open, setOpen] = React19__namespace.useState(false);
+  const [searchQuery, setSearchQuery] = React19__namespace.useState("");
+  const [sortOrder, setSortOrder] = React19__namespace.useState("asc");
+  const listRef = React19__namespace.useRef(null);
+  React19__namespace.useEffect(() => {
+    listRef.current?.scrollTo({ top: 0 });
+  }, [sortOrder]);
+  const sortedOptions = React19__namespace.useMemo(() => {
     if (!sorting) return resolvedOptions;
     return [...resolvedOptions].sort(
       (a, b) => sortOrder === "asc" ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)
     );
   }, [resolvedOptions, sorting, sortOrder]);
   const fuseFilteredOptions = useFuzzySearch(sortedOptions, searchQuery);
-  const visibleOptions = React18__namespace.useMemo(() => {
+  const visibleOptions = React19__namespace.useMemo(() => {
     if (!searchEnabled) return sortedOptions;
     const q = searchQuery.trim();
     if (indexing && /^\d+$/.test(q)) {
       const n = parseInt(q, 10);
-      const pos = sorting && sortOrder === "desc" ? sortedOptions.length - n : n - 1;
+      const pos = n - 1;
       const opt = sortedOptions[pos];
       return opt ? [opt] : [];
     }
     return fuseFilteredOptions;
   }, [searchEnabled, searchQuery, indexing, sorting, sortOrder, sortedOptions, fuseFilteredOptions]);
-  const [selected, setSelected] = React18__namespace.useState(
+  const [selected, setSelected] = React19__namespace.useState(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
   );
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -1802,12 +1806,12 @@ function Select({
     e.stopPropagation();
     commit(mode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React18__namespace.useRef(null);
-  const [visibleCount, setVisibleCount] = React18__namespace.useState(null);
-  React18__namespace.useLayoutEffect(() => {
+  const pillsContainerRef = React19__namespace.useRef(null);
+  const [visibleCount, setVisibleCount] = React19__namespace.useState(null);
+  React19__namespace.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), mode]);
-  React18__namespace.useLayoutEffect(() => {
+  React19__namespace.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     const container = pillsContainerRef.current;
     if (!container || mode !== "multi" || selectedArr.length === 0) {
@@ -2042,7 +2046,7 @@ function Select({
                 className: commandInputSizeClass
               }
             ),
-            /* @__PURE__ */ jsxRuntime.jsxs(CommandList, { children: [
+            /* @__PURE__ */ jsxRuntime.jsxs(CommandList, { ref: listRef, children: [
               visibleOptions.length === 0 && searchQuery.trim() ? /* @__PURE__ */ jsxRuntime.jsx(CommandEmpty, { children: "No results found." }) : null,
               mode === "multi" && /* @__PURE__ */ jsxRuntime.jsxs(
                 CommandItem,
@@ -2061,7 +2065,7 @@ function Select({
               ),
               visibleOptions.map((option) => {
                 const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
-                const displayIndex = sorting && sortOrder === "desc" ? sortedOptions.length - originalIdx : originalIdx + 1;
+                const displayIndex = originalIdx + 1;
                 return /* @__PURE__ */ jsxRuntime.jsxs(
                   CommandItem,
                   {
@@ -2283,16 +2287,16 @@ function escapeTabValue(value) {
   return value.replace(/["\\]/g, "\\$&");
 }
 function useTabValue(tabs, value, defaultValue, onChange) {
-  const [uncontrolledValue, setUncontrolledValue] = React18__namespace.useState(
+  const [uncontrolledValue, setUncontrolledValue] = React19__namespace.useState(
     () => getInitialValue(tabs, value, defaultValue)
   );
   const activeValue = value ?? uncontrolledValue;
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     if (value !== void 0) return;
     if (tabs.some((tab) => tab.value === uncontrolledValue)) return;
     setUncontrolledValue(getInitialValue(tabs, value, defaultValue));
   }, [defaultValue, tabs, uncontrolledValue, value]);
-  const handleChange = React18__namespace.useCallback(
+  const handleChange = React19__namespace.useCallback(
     (nextValue) => {
       if (!tabs.some((tab) => tab.value === nextValue && !tab.disabled)) return;
       if (value === void 0) setUncontrolledValue(nextValue);
@@ -2354,7 +2358,7 @@ function OverflowTabsSelect({
   onChange,
   className
 }) {
-  const [open, setOpen] = React18__namespace.useState(false);
+  const [open, setOpen] = React19__namespace.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
@@ -2433,7 +2437,7 @@ function LineTabsOverflow({
   activeValue,
   onChange
 }) {
-  const [open, setOpen] = React18__namespace.useState(false);
+  const [open, setOpen] = React19__namespace.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
@@ -2521,19 +2525,19 @@ function SecondaryTabs({
   showBottomBorder = true,
   className
 }) {
-  const wrapperRef = React18__namespace.useRef(null);
+  const wrapperRef = React19__namespace.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [indicator, setIndicator] = React18__namespace.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React18__namespace.useMemo(
+  const [indicator, setIndicator] = React19__namespace.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React19__namespace.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  const measureIndicator = React18__namespace.useCallback(() => {
+  const measureIndicator = React19__namespace.useCallback(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper || !activeValue) return;
     const btn = wrapper.querySelector(
@@ -2551,14 +2555,14 @@ function SecondaryTabs({
       ready: true
     });
   }, [activeValue]);
-  React18__namespace.useLayoutEffect(() => {
+  React19__namespace.useLayoutEffect(() => {
     measureIndicator();
   }, [
     measureIndicator,
     visibleTabs.length,
     visibleTabs.map((t) => t.value + t.label).join("|")
   ]);
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     window.addEventListener("resize", measureIndicator);
     return () => window.removeEventListener("resize", measureIndicator);
   }, [measureIndicator]);
@@ -2634,19 +2638,19 @@ function TertiaryTabs({
   overflowLabel = "More Options",
   className
 }) {
-  const listRef = React18__namespace.useRef(null);
+  const listRef = React19__namespace.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [chip, setChip] = React18__namespace.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React18__namespace.useMemo(
+  const [chip, setChip] = React19__namespace.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React19__namespace.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  const measureChip = React18__namespace.useCallback(() => {
+  const measureChip = React19__namespace.useCallback(() => {
     const list = listRef.current;
     if (!list || !activeValue) return;
     const btn = list.querySelector(
@@ -2664,14 +2668,14 @@ function TertiaryTabs({
       ready: true
     });
   }, [activeValue]);
-  React18__namespace.useLayoutEffect(() => {
+  React19__namespace.useLayoutEffect(() => {
     measureChip();
   }, [
     measureChip,
     visibleTabs.length,
     visibleTabs.map((t) => t.value + t.label).join("|")
   ]);
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     window.addEventListener("resize", measureChip);
     return () => window.removeEventListener("resize", measureChip);
   }, [measureChip]);
@@ -2861,21 +2865,21 @@ function Input2({
   onClear,
   ...rest
 }) {
-  const reactId = React18__namespace.useId();
+  const reactId = React19__namespace.useId();
   const inputId = id ?? reactId;
-  const [focused, setFocused] = React18__namespace.useState(false);
-  const [showPassword, setShowPassword] = React18__namespace.useState(false);
-  const [internalError, setInternalError] = React18__namespace.useState(void 0);
-  const touchedRef = React18__namespace.useRef(false);
+  const [focused, setFocused] = React19__namespace.useState(false);
+  const [showPassword, setShowPassword] = React19__namespace.useState(false);
+  const [internalError, setInternalError] = React19__namespace.useState(void 0);
+  const touchedRef = React19__namespace.useRef(false);
   const isControlled = rest.value !== void 0;
-  const [uncontrolledQuery, setUncontrolledQuery] = React18__namespace.useState(
+  const [uncontrolledQuery, setUncontrolledQuery] = React19__namespace.useState(
     String(rest.defaultValue ?? "")
   );
   const suggestionQuery = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
   const fuseResults = useFuzzySearch(suggestions ?? [], suggestionQuery);
   const showSuggestions = !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
-  const wrapperRef = React18__namespace.useRef(null);
-  const inputRef = React18__namespace.useRef(null);
+  const wrapperRef = React19__namespace.useRef(null);
+  const inputRef = React19__namespace.useRef(null);
   const runValidation = (el) => {
     if (!el.validity.valid) {
       return validationMessage ?? el.validationMessage ?? "Invalid value";
@@ -2891,7 +2895,7 @@ function Input2({
   const effectiveError = error ?? internalError;
   const isPassword = inputType === "password";
   const effectiveType = isPassword && showPassword ? "text" : inputType;
-  const resolvedRightIcon = React18__namespace.useMemo(() => {
+  const resolvedRightIcon = React19__namespace.useMemo(() => {
     if (rightIcon !== void 0) return rightIcon;
     if (!isPassword) return null;
     return /* @__PURE__ */ jsxRuntime.jsx(
@@ -3130,9 +3134,9 @@ function Radio({
   bgColor,
   ...rest
 }) {
-  const reactId = React18__namespace.useId();
+  const reactId = React19__namespace.useId();
   const itemId = id ?? reactId;
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     validateLabelWordLimit(label, "Radio");
   }, [label]);
   const state = disabled ? "disabled" : error ? "error" : "default";
@@ -3219,7 +3223,7 @@ function RadioGroup({
   bgColor,
   readOnly
 }) {
-  const reactId = React18__namespace.useId();
+  const reactId = React19__namespace.useId();
   const groupId = `radio-group-${reactId}`;
   const describedById = error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0;
   const gridColsMap = {
@@ -3347,13 +3351,13 @@ function Checkbox({
   bgColor,
   ...rest
 }) {
-  const reactId = React18__namespace.useId();
+  const reactId = React19__namespace.useId();
   const itemId = rest.id ?? reactId;
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     validateLabelWordLimit(label, "CustomCheckbox");
   }, [label]);
   const isControlled = checked !== void 0;
-  const [internalChecked, setInternalChecked] = React18__namespace.useState(
+  const [internalChecked, setInternalChecked] = React19__namespace.useState(
     defaultChecked ?? false
   );
   const visualChecked = isControlled ? Boolean(checked) : internalChecked;
@@ -3445,10 +3449,10 @@ function CheckboxGroup({
   bgColor,
   readOnly
 }) {
-  const reactId = React18__namespace.useId();
+  const reactId = React19__namespace.useId();
   const groupId = `checkbox-group-${reactId}`;
   const isControlled = value !== void 0;
-  const [internalValue, setInternalValue] = React18__namespace.useState([]);
+  const [internalValue, setInternalValue] = React19__namespace.useState([]);
   const currentValue = isControlled ? value : internalValue;
   const setValue = (next) => {
     if (!isControlled) setInternalValue(next);
@@ -3566,8 +3570,8 @@ function StyledDayButton({
   className,
   ...props
 }) {
-  const ref = React18__namespace.useRef(null);
-  React18__namespace.useEffect(() => {
+  const ref = React19__namespace.useRef(null);
+  React19__namespace.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
   const isEdge = modifiers.range_start || modifiers.range_end;
@@ -3615,10 +3619,10 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React18__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React19__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? today;
-  const [viewMonth, setViewMonth] = React18__namespace.useState(initialMonth);
-  const yearOptions = React18__namespace.useMemo(
+  const [viewMonth, setViewMonth] = React19__namespace.useState(initialMonth);
+  const yearOptions = React19__namespace.useMemo(
     () => buildYearOptions(today.getFullYear()),
     [today]
   );
@@ -3744,11 +3748,11 @@ function MonthPickerCalendar({
   onSelect,
   className
 }) {
-  const today = React18__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const [viewYear, setViewYear] = React18__namespace.useState(
+  const today = React19__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React19__namespace.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React18__namespace.useMemo(() => {
+  const yearOptions = React19__namespace.useMemo(() => {
     const center = today.getFullYear();
     const minYear = minDate ? minDate.getFullYear() : center - 10;
     const maxYear = maxDate ? maxDate.getFullYear() : center + 10;
@@ -3904,20 +3908,20 @@ function DatePicker({
   error,
   readOnly = false
 }) {
-  const [open, setOpen] = React18__namespace.useState(false);
-  const touchedRef = React18__namespace.useRef(false);
-  const interactedRef = React18__namespace.useRef(false);
-  const [committed, setCommitted] = React18__namespace.useState(
+  const [open, setOpen] = React19__namespace.useState(false);
+  const touchedRef = React19__namespace.useRef(false);
+  const interactedRef = React19__namespace.useRef(false);
+  const [committed, setCommitted] = React19__namespace.useState(
     controlledValue !== void 0 ? controlledValue ?? null : null
   );
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     if (controlledValue !== void 0) setCommitted(controlledValue ?? null);
   }, [controlledValue]);
-  const [pendingFrom, setPendingFrom] = React18__namespace.useState(null);
-  const [draftRange, setDraftRange] = React18__namespace.useState(null);
-  const [hoverDate, setHoverDate] = React18__namespace.useState(null);
-  const prevOpen = React18__namespace.useRef(false);
-  React18__namespace.useEffect(() => {
+  const [pendingFrom, setPendingFrom] = React19__namespace.useState(null);
+  const [draftRange, setDraftRange] = React19__namespace.useState(null);
+  const [hoverDate, setHoverDate] = React19__namespace.useState(null);
+  const prevOpen = React19__namespace.useRef(false);
+  React19__namespace.useEffect(() => {
     if (open && !prevOpen.current) {
       setPendingFrom(null);
       setHoverDate(null);
@@ -3931,13 +3935,13 @@ function DatePicker({
     }
     prevOpen.current = open;
   }, [open, committed, mode]);
-  const calendarDisabled = React18__namespace.useMemo(() => {
+  const calendarDisabled = React19__namespace.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length > 0 ? m : void 0;
   }, [minDate, maxDate]);
-  const triggerLabel = React18__namespace.useMemo(() => {
+  const triggerLabel = React19__namespace.useMemo(() => {
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return formatDate(committed);
@@ -3947,7 +3951,7 @@ function DatePicker({
       return formatRange(committed.from, committed.to) ?? null;
     return null;
   }, [committed, mode]);
-  const effectiveDisplayRange = React18__namespace.useMemo(() => {
+  const effectiveDisplayRange = React19__namespace.useMemo(() => {
     if (mode !== "range") return null;
     const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
     if (pendingFrom) {
@@ -3955,17 +3959,17 @@ function DatePicker({
     }
     return existingRange;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const calendarSelected = React18__namespace.useMemo(() => {
+  const calendarSelected = React19__namespace.useMemo(() => {
     if (mode === "single") {
       return committed instanceof Date ? committed : void 0;
     }
     return effectiveDisplayRange ?? void 0;
   }, [mode, committed, effectiveDisplayRange]);
-  const fromLabel = React18__namespace.useMemo(() => {
+  const fromLabel = React19__namespace.useMemo(() => {
     if (!effectiveDisplayRange) return null;
     return formatDate(effectiveDisplayRange.from);
   }, [effectiveDisplayRange]);
-  const toLabel = React18__namespace.useMemo(() => {
+  const toLabel = React19__namespace.useMemo(() => {
     if (!effectiveDisplayRange?.to) return null;
     return formatDate(effectiveDisplayRange.to);
   }, [effectiveDisplayRange]);
@@ -4442,9 +4446,9 @@ function Table2({
   className,
   hover = true
 }) {
-  const [sortKey, setSortKey] = React18.useState(null);
-  const [sortDir, setSortDir] = React18.useState(null);
-  const sortedData = React18.useMemo(() => {
+  const [sortKey, setSortKey] = React19.useState(null);
+  const [sortDir, setSortDir] = React19.useState(null);
+  const sortedData = React19.useMemo(() => {
     if (!sortKey || !sortDir) return data;
     return [...data].sort((a, b) => {
       const av = a[sortKey];
@@ -4715,7 +4719,7 @@ var thumbVariants = classVarianceAuthority.cva(
     }
   }
 );
-var Toggle = React18__namespace.forwardRef(
+var Toggle = React19__namespace.forwardRef(
   ({
     size = "md",
     label,
@@ -4850,8 +4854,8 @@ var sidebarPersistentVariants = classVarianceAuthority.cva("bg-background border
   }
 });
 function useIsDesktop(breakpoint = 768) {
-  const [isDesktop, setIsDesktop] = React18__namespace.useState(false);
-  React18__namespace.useEffect(() => {
+  const [isDesktop, setIsDesktop] = React19__namespace.useState(false);
+  React19__namespace.useEffect(() => {
     const query = `(min-width: ${breakpoint}px)`;
     const media = window.matchMedia(query);
     const setFromMedia = () => setIsDesktop(media.matches);
@@ -4905,9 +4909,9 @@ function Sidebar({
 }) {
   const isDesktop = useIsDesktop();
   const isControlled = open !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React18__namespace.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React19__namespace.useState(defaultOpen);
   const resolvedOpen = isControlled ? open : uncontrolledOpen;
-  const handleOpenChange = React18__namespace.useCallback(
+  const handleOpenChange = React19__namespace.useCallback(
     (nextOpen) => {
       if (!isControlled) {
         setUncontrolledOpen(nextOpen);
@@ -4916,7 +4920,7 @@ function Sidebar({
     },
     [isControlled, onOpenChange]
   );
-  const customSizeStyle = React18__namespace.useMemo(() => {
+  const customSizeStyle = React19__namespace.useMemo(() => {
     if (sizePercent == null) return {};
     const pct = Math.min(100, Math.max(1, sizePercent));
     if (side === "top" || side === "bottom") {
@@ -4925,7 +4929,7 @@ function Sidebar({
     if (!isDesktop) return { width: "100vw", maxWidth: "100vw" };
     return { width: `${pct}vw`, maxWidth: "100vw" };
   }, [sizePercent, side, isDesktop]);
-  const animDurationStyle = React18__namespace.useMemo(() => {
+  const animDurationStyle = React19__namespace.useMemo(() => {
     if (sizePercent != null) {
       const pct = Math.min(100, Math.max(1, sizePercent));
       return {
@@ -5146,33 +5150,33 @@ function AlertDialog2({
   ...options
 }) {
   const isControlled = openProp !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React18__namespace.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React19__namespace.useState(defaultOpen);
   const open = isControlled ? openProp : uncontrolledOpen;
-  const [inputValue, setInputValue] = React18__namespace.useState(defaultValue ?? "");
-  const [inputError, setInputError] = React18__namespace.useState(null);
-  const [submitError, setSubmitError] = React18__namespace.useState(null);
-  const [loading, setLoading] = React18__namespace.useState(false);
-  const setOpen = React18__namespace.useCallback(
+  const [inputValue, setInputValue] = React19__namespace.useState(defaultValue ?? "");
+  const [inputError, setInputError] = React19__namespace.useState(null);
+  const [submitError, setSubmitError] = React19__namespace.useState(null);
+  const [loading, setLoading] = React19__namespace.useState(false);
+  const setOpen = React19__namespace.useCallback(
     (next) => {
       if (!isControlled) setUncontrolledOpen(next);
       onOpenChange?.(next);
     },
     [isControlled, onOpenChange]
   );
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     if (!open) return;
     setInputValue(defaultValue ?? "");
     setInputError(null);
     setSubmitError(null);
     setLoading(false);
   }, [open]);
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     if (!open || !autoCloseMs || loading) return;
     const id = window.setTimeout(() => setOpen(false), autoCloseMs);
     return () => window.clearTimeout(id);
   }, [open, autoCloseMs, loading]);
-  const dismiss = React18__namespace.useCallback(() => setOpen(false), [setOpen]);
-  const confirm = React18__namespace.useCallback(async () => {
+  const dismiss = React19__namespace.useCallback(() => setOpen(false), [setOpen]);
+  const confirm = React19__namespace.useCallback(async () => {
     const validationError = inputValidator?.(inputValue);
     if (validationError) {
       setInputError(validationError);
@@ -5219,23 +5223,23 @@ function AlertDialog2({
     )
   ] });
 }
-var SweetAlertContext = React18__namespace.createContext(null);
+var SweetAlertContext = React19__namespace.createContext(null);
 function useSweetAlert() {
-  const ctx = React18__namespace.useContext(SweetAlertContext);
+  const ctx = React19__namespace.useContext(SweetAlertContext);
   if (!ctx) throw new Error("useSweetAlert must be used inside <SweetAlertProvider>");
   return ctx;
 }
 function SweetAlertProvider({ children }) {
-  const [queue, setQueue] = React18__namespace.useState([]);
-  const counter = React18__namespace.useRef(0);
-  const fire = React18__namespace.useCallback(
+  const [queue, setQueue] = React19__namespace.useState([]);
+  const counter = React19__namespace.useRef(0);
+  const fire = React19__namespace.useCallback(
     (options) => new Promise((resolve) => {
       counter.current += 1;
       setQueue((q) => [...q, { id: counter.current, options, resolve }]);
     }),
     []
   );
-  const ctx = React18__namespace.useMemo(() => ({ fire }), [fire]);
+  const ctx = React19__namespace.useMemo(() => ({ fire }), [fire]);
   return /* @__PURE__ */ jsxRuntime.jsxs(SweetAlertContext.Provider, { value: ctx, children: [
     children,
     queue[0] && /* @__PURE__ */ jsxRuntime.jsx(
@@ -5252,10 +5256,10 @@ function SweetAlertInstance({
   pending,
   onDone
 }) {
-  const [open, setOpen] = React18__namespace.useState(true);
-  const resolvedRef = React18__namespace.useRef(false);
-  const close = React18__namespace.useCallback(() => setOpen(false), []);
-  const handlePreConfirm = React18__namespace.useCallback(
+  const [open, setOpen] = React19__namespace.useState(true);
+  const resolvedRef = React19__namespace.useRef(false);
+  const close = React19__namespace.useCallback(() => setOpen(false), []);
+  const handlePreConfirm = React19__namespace.useCallback(
     async (value) => {
       await pending.options.preConfirm?.(value);
       resolvedRef.current = true;
@@ -5264,7 +5268,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  const handleOpenChange = React18__namespace.useCallback(
+  const handleOpenChange = React19__namespace.useCallback(
     (next) => {
       if (!next && !resolvedRef.current) {
         resolvedRef.current = true;
@@ -5274,7 +5278,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     if (!open) {
       const id = window.setTimeout(onDone, 200);
       return () => window.clearTimeout(id);
@@ -5315,7 +5319,7 @@ function Modal({
   bodyClassName,
   modalClassName
 }) {
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -5463,11 +5467,11 @@ function Pagination2({
   const pages = usePagination({ currentPage, totalPages, siblingCount });
   const isPrevDisabled = disabled || currentPage === 1;
   const isNextDisabled = disabled || currentPage === totalPages;
-  const containerRef = React18.useRef(null);
-  const buttonRefs = React18.useRef(/* @__PURE__ */ new Map());
-  const [pill, setPill] = React18.useState(null);
-  const firstRender = React18.useRef(true);
-  React18.useLayoutEffect(() => {
+  const containerRef = React19.useRef(null);
+  const buttonRefs = React19.useRef(/* @__PURE__ */ new Map());
+  const [pill, setPill] = React19.useState(null);
+  const firstRender = React19.useRef(true);
+  React19.useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     const measurePill = (animated) => {
@@ -5613,8 +5617,8 @@ function UengageProvider({ children, className }) {
 // src/assets/uEngage_icon.png
 var uEngage_icon_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPwAAAD7CAYAAABOrvnfAAAEHklEQVR4nO3d0U1jSRCG0WKFSIocCJYcSIoX9mE00uwsxjb4uqv6PyeCEre/rmujGaoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuMTD6gG+8vTy/LF6hku8v761/jnuott5mPjc2w7c7eGeM/HhT9L5PEx69v+sHgDO6Rz7NIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKnvffXt4fVM+xC8IzQNfquc53yuHoAuNS0uDqy4SGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CHI4+oB4BJPL88fq2f4zPvr28PqGa5hw8MPdL2IThE87U2LqjPBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDB34h/0cUEgocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggr8h/+vNMd5f3x5Wz3BK59k+87h6ALjEtLC6suEhiOBvzGs9nQkegggeggj+AF7r6UrwEKRt8H4NA7fXNvjpvNbTkeAhiOAPZMvTjeAPJno6aR28L+7gtloHvwtbni4EfyeipwPBQxDB35Etz2rtg9/tizvRs1L74HckelYR/CKiZ4URwe/2Wv+b6Lm3EcHvTPTck+AbED33IvgmRM89jPpsnBLFrt9ZsJ4N31DKxcb9jdskaTHY9tySDd9c2gXHsUZuj9QIbHt+yoYf5Onl+SP1suM2xm4MB/8XW59r2PDD2fpcY/R2cNC/Zvvzt9EHQvDHc2nsZfzDFD2rTLwMfYaHb5q4bMYHP/GWhVXGB18lerjUFsEDl9kmeFseztsm+CrRwzlbBQ98bbvgbXk4bbvgq0QPp2wZfJXo4TPbBg/839bB2/LwX1sHXyV6+NP2wVeJHn6LCL5K9FAVFHyV6CEq+CrRky0u+CrRkysy+CrRkyk2+CrRkyc6+CrRkyU++Kpf0QufBIL/g+jZneD/Inp2JvhPiJ5dCf4En+vZkeDPED47EfyFRM8OBH8F257pBP8Nwmcqwf+A6JlG8D9k2zOJg3qAiX83nO+Zdtnb8Aew9elK8AcSPt04jHfmdX8v0y70UcPuyAUwm+D5MZfAHILnEC6BfqbFXiV4rpBy6UwMGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDb+hd78es6KyZOZAAAAABJRU5ErkJggg==";
 function Loader(_props) {
-  const [mounted, setMounted] = React18__namespace.useState(false);
-  React18__namespace.useEffect(() => {
+  const [mounted, setMounted] = React19__namespace.useState(false);
+  React19__namespace.useEffect(() => {
     setMounted(true);
   }, []);
   if (!mounted) return null;
@@ -5782,7 +5786,7 @@ function AppSidebar({
                   className: "mt-2 flex-1 cursor-pointer overflow-y-auto pb-24 scrollbar-thin",
                   children: modules.map((module, index) => {
                     const isActive = module.page === activeModulePage;
-                    return /* @__PURE__ */ jsxRuntime.jsxs(React18__namespace.Fragment, { children: [
+                    return /* @__PURE__ */ jsxRuntime.jsxs(React19__namespace.Fragment, { children: [
                       /* @__PURE__ */ jsxRuntime.jsx(
                         "button",
                         {
@@ -5953,13 +5957,13 @@ function Accordion(props) {
 }
 Accordion.displayName = "Accordion";
 function findDatePickerInTree(node) {
-  if (!React18__namespace.isValidElement(node)) return null;
+  if (!React19__namespace.isValidElement(node)) return null;
   if (node.type.displayName === "DatePicker") {
     return node;
   }
   const children = node.props.children;
   if (!children) return null;
-  for (const child of React18__namespace.Children.toArray(children)) {
+  for (const child of React19__namespace.Children.toArray(children)) {
     const found = findDatePickerInTree(child);
     if (found) return found;
   }
@@ -5971,31 +5975,31 @@ function InlineDatePickerPanel({ child }) {
   const minDate = p.minDate;
   const maxDate = p.maxDate;
   const onChange = p.onChange;
-  const [committed, setCommitted] = React18__namespace.useState(
+  const [committed, setCommitted] = React19__namespace.useState(
     p.value ?? null
   );
-  React18__namespace.useEffect(() => {
+  React19__namespace.useEffect(() => {
     if (p.value !== void 0) setCommitted(p.value ?? null);
   }, [p.value]);
-  const [pendingFrom, setPendingFrom] = React18__namespace.useState(null);
-  const [draftRange, setDraftRange] = React18__namespace.useState(null);
-  const [hoverDate, setHoverDate] = React18__namespace.useState(null);
+  const [pendingFrom, setPendingFrom] = React19__namespace.useState(null);
+  const [draftRange, setDraftRange] = React19__namespace.useState(null);
+  const [hoverDate, setHoverDate] = React19__namespace.useState(null);
   const isRange = (v) => !!v && typeof v === "object" && "from" in v;
   const orderedRange2 = (a, b) => a <= b ? { from: a, to: b } : { from: b, to: a };
-  const calendarDisabled = React18__namespace.useMemo(() => {
+  const calendarDisabled = React19__namespace.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length ? m : void 0;
   }, [minDate, maxDate]);
-  const effectiveRange = React18__namespace.useMemo(() => {
+  const effectiveRange = React19__namespace.useMemo(() => {
     if (mode !== "range") return null;
     const existing = draftRange ?? (isRange(committed) ? committed : null);
     if (pendingFrom)
       return hoverDate ? orderedRange2(pendingFrom, hoverDate) : { from: pendingFrom };
     return existing;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const calendarSelected = React18__namespace.useMemo(() => {
+  const calendarSelected = React19__namespace.useMemo(() => {
     if (mode === "single") return committed instanceof Date ? committed : void 0;
     return effectiveRange ?? void 0;
   }, [mode, committed, effectiveRange]);
@@ -6081,10 +6085,10 @@ function FilterGroup({
   drawerClassName,
   forceDrawer = false
 }) {
-  const [open, setOpen] = React18__namespace.useState(false);
-  const [activeIndex, setActiveIndex] = React18__namespace.useState(0);
-  const programmaticClose = React18__namespace.useRef(false);
-  const childArray = React18__namespace.Children.toArray(children);
+  const [open, setOpen] = React19__namespace.useState(false);
+  const [activeIndex, setActiveIndex] = React19__namespace.useState(0);
+  const programmaticClose = React19__namespace.useRef(false);
+  const childArray = React19__namespace.Children.toArray(children);
   const items = childArray.map((child, i) => ({
     label: labels[i] ?? `Filter ${i + 1}`,
     content: child
@@ -6206,7 +6210,7 @@ function FilterGroup({
   ] });
   if (forceDrawer) return drawer;
   return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("hidden sm:flex items-center gap-2 flex-wrap", className), children: items.map((item, i) => /* @__PURE__ */ jsxRuntime.jsx(React18__namespace.Fragment, { children: item.content }, i)) }),
+    /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("hidden sm:flex items-center gap-2 flex-wrap", className), children: items.map((item, i) => /* @__PURE__ */ jsxRuntime.jsx(React19__namespace.Fragment, { children: item.content }, i)) }),
     /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex sm:hidden", children: drawer })
   ] });
 }
@@ -6225,7 +6229,7 @@ var bannerVariants = classVarianceAuthority.cva(
     defaultVariants: { variant: "info" }
   }
 );
-var BannerRoot = React18__namespace.forwardRef(
+var BannerRoot = React19__namespace.forwardRef(
   ({ className, variant, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
     "div",
     {
@@ -6237,7 +6241,7 @@ var BannerRoot = React18__namespace.forwardRef(
   )
 );
 BannerRoot.displayName = "Banner";
-var BannerIcon = React18__namespace.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+var BannerIcon = React19__namespace.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
   "span",
   {
     ref,
@@ -6248,7 +6252,7 @@ var BannerIcon = React18__namespace.forwardRef(({ className, style, ...props }, 
   }
 ));
 BannerIcon.displayName = "BannerIcon";
-var BannerContent = React18__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx("div", { ref, className: cn("flex-1 min-w-0 break-normal", className), ...props }));
+var BannerContent = React19__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx("div", { ref, className: cn("flex-1 min-w-0 break-normal", className), ...props }));
 BannerContent.displayName = "BannerContent";
 var DEFAULT_ICONS = {
   info: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Info, {}),

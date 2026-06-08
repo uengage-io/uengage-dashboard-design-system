@@ -82,6 +82,11 @@ function Select<TItem = unknown>({
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
+  const listRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    listRef.current?.scrollTo({ top: 0 });
+  }, [sortOrder]);
 
   const sortedOptions = React.useMemo<SelectOption[]>(() => {
     if (!sorting) return resolvedOptions;
@@ -99,7 +104,7 @@ function Select<TItem = unknown>({
     const q = searchQuery.trim();
     if (indexing && /^\d+$/.test(q)) {
       const n = parseInt(q, 10);
-      const pos = sorting && sortOrder === "desc" ? sortedOptions.length - n : n - 1;
+      const pos = n - 1;
       const opt = sortedOptions[pos];
       return opt ? [opt] : [];
     }
@@ -464,7 +469,7 @@ function Select<TItem = unknown>({
                 className={commandInputSizeClass}
               />
             )}
-            <CommandList>
+            <CommandList ref={listRef}>
               {visibleOptions.length === 0 && searchQuery.trim() ? (
                 <CommandEmpty>No results found.</CommandEmpty>
               ) : null}
@@ -485,10 +490,7 @@ function Select<TItem = unknown>({
 
               {visibleOptions.map((option) => {
                 const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
-                const displayIndex =
-                  sorting && sortOrder === "desc"
-                    ? sortedOptions.length - originalIdx
-                    : originalIdx + 1;
+                const displayIndex = originalIdx + 1;
                 return (
                   <CommandItem
                     key={option.value}
