@@ -306,3 +306,15 @@ export {
   type BannerProps,
   type BannerVariant,
 } from "./components/custom/Banner";
+
+// FileUpload
+export {
+  FileUpload,
+  type FileUploadProps,
+  type FileUploadVariant,
+  type FileUploadSize,
+  type FileUploadLocalFile,
+  dropzoneVariants,
+  iconWrapperVariants,
+  avatarContainerVariants,
+} from "./components/custom/FileUpload";

@@ -6306,6 +6306,695 @@ function Banner({
   );
 }
 Banner.displayName = "Banner";
+var dropzoneVariants = classVarianceAuthority.cva(
+  [
+    "relative w-full flex flex-col items-center justify-center",
+    "rounded-xl border-2 border-dashed transition-all duration-150",
+    "cursor-pointer select-none outline-none",
+    "focus-visible:ring-2 focus-visible:ring-[#007a4d] focus-visible:ring-offset-2"
+  ],
+  {
+    variants: {
+      size: {
+        sm: "min-h-24 gap-1.5 px-3 py-3",
+        md: "min-h-32 gap-2 px-4 py-5",
+        lg: "min-h-44 gap-3 px-6 py-8"
+      },
+      state: {
+        idle: "border-gray-300 bg-gray-50 hover:border-[#007a4d] hover:bg-green-50/60",
+        dragover: "border-[#007a4d] bg-green-50 ring-2 ring-[#007a4d]/20 ring-offset-0",
+        error: "border-red-400 bg-red-50/60",
+        disabled: "cursor-not-allowed border-gray-200 bg-gray-50/80 opacity-50 pointer-events-none"
+      }
+    },
+    defaultVariants: {
+      size: "md",
+      state: "idle"
+    }
+  }
+);
+var iconWrapperVariants = classVarianceAuthority.cva(
+  "flex items-center justify-center rounded-xl bg-gray-100 flex-shrink-0",
+  {
+    variants: {
+      size: {
+        sm: "w-8 h-8",
+        md: "w-10 h-10",
+        lg: "w-12 h-12"
+      }
+    },
+    defaultVariants: { size: "md" }
+  }
+);
+var avatarContainerVariants = classVarianceAuthority.cva(
+  [
+    "relative rounded-full overflow-hidden flex-shrink-0 transition-all duration-150",
+    "focus-visible:ring-2 focus-visible:ring-[#007a4d] focus-visible:ring-offset-2"
+  ],
+  {
+    variants: {
+      size: {
+        sm: "w-16 h-16",
+        md: "w-20 h-20",
+        lg: "w-28 h-28"
+      },
+      state: {
+        empty: "border-2 border-dashed border-gray-300 bg-gray-50 cursor-pointer hover:border-[#007a4d] hover:bg-green-50/60",
+        filled: "border border-gray-200 cursor-pointer",
+        disabled: "border-2 border-dashed border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed pointer-events-none"
+      }
+    },
+    defaultVariants: { size: "md", state: "empty" }
+  }
+);
+var ICON_SIZES2 = { sm: 14, md: 18, lg: 22 };
+var AVATAR_ICON_SIZES = { sm: 16, md: 20, lg: 26 };
+var PLACEHOLDER_TEXT = {
+  image: "Click or drag to upload image",
+  file: "Click or drag to upload file",
+  avatar: "Upload photo"
+};
+function formatBytes(bytes, decimals = 1) {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${units[i]}`;
+}
+function getDefaultAccept(variant) {
+  if (variant === "image" || variant === "avatar") return "image/*";
+  return void 0;
+}
+function makeId() {
+  return Math.random().toString(36).slice(2, 9);
+}
+function FileUpload({
+  variant = "file",
+  size = "md",
+  accept,
+  multiple = false,
+  disabled = false,
+  readOnly = false,
+  name,
+  id,
+  maxSize,
+  maxFiles,
+  value,
+  onChange,
+  onFilesChange,
+  onRemove,
+  onRemoveFile,
+  onValidationError,
+  label,
+  required = false,
+  error,
+  helperText,
+  placeholder,
+  description,
+  dragAndDrop = true,
+  showLocalPreview = true,
+  clearable = true,
+  className,
+  dropzoneClassName,
+  inputRef: externalInputRef
+}) {
+  const reactId = React19__namespace.useId();
+  const inputId = id ?? reactId;
+  const internalInputRef = React19__namespace.useRef(null);
+  const attachInputRef = React19__namespace.useCallback(
+    (node) => {
+      internalInputRef.current = node;
+      if (!externalInputRef) return;
+      if (typeof externalInputRef === "function") {
+        externalInputRef(node);
+      } else {
+        externalInputRef.current = node;
+      }
+    },
+    [externalInputRef]
+  );
+  const [isDragOver, setIsDragOver] = React19__namespace.useState(false);
+  const [localFiles, setLocalFiles] = React19__namespace.useState([]);
+  const [validationErrors, setValidationErrors] = React19__namespace.useState([]);
+  const isImageVariant = variant === "image" || variant === "avatar";
+  const effectiveAccept = accept ?? getDefaultAccept(variant);
+  const controlledUrls = React19__namespace.useMemo(() => {
+    if (!value) return [];
+    return Array.isArray(value) ? value.filter(Boolean) : [value].filter(Boolean);
+  }, [value]);
+  const hasControlledValue = controlledUrls.length > 0;
+  const displayItems = React19__namespace.useMemo(() => {
+    const items = [];
+    controlledUrls.forEach((url, i) => items.push({ kind: "url", url, index: i }));
+    if (showLocalPreview) {
+      localFiles.forEach(
+        (lf, i) => items.push({ kind: "file", localFile: lf, index: controlledUrls.length + i })
+      );
+    }
+    return items;
+  }, [controlledUrls, localFiles, showLocalPreview]);
+  const hasContent = displayItems.length > 0;
+  React19__namespace.useEffect(() => {
+    if (hasControlledValue && localFiles.length > 0) {
+      localFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
+      setLocalFiles([]);
+    }
+  }, [hasControlledValue]);
+  React19__namespace.useEffect(() => {
+    return () => {
+      localFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
+    };
+  }, []);
+  const validateAndFilter = (incoming) => {
+    const errors = [];
+    let valid = incoming;
+    if (maxSize) {
+      const oversized = incoming.filter((f) => f.size > maxSize);
+      if (oversized.length > 0) {
+        errors.push(
+          `${oversized.map((f) => f.name).join(", ")} exceed${oversized.length === 1 ? "s" : ""} the ${formatBytes(maxSize)} size limit`
+        );
+        valid = valid.filter((f) => f.size <= maxSize);
+      }
+    }
+    if (multiple && maxFiles !== void 0) {
+      const current = displayItems.length;
+      const remaining = maxFiles - current;
+      if (valid.length > remaining) {
+        const skipped = valid.length - Math.max(0, remaining);
+        if (skipped > 0) {
+          errors.push(`${skipped} file(s) skipped \u2014 max ${maxFiles} allowed`);
+        }
+        valid = valid.slice(0, Math.max(0, remaining));
+      }
+    }
+    return { valid, errors };
+  };
+  const processFiles = React19__namespace.useCallback(
+    (incoming) => {
+      const fileArray = Array.from(incoming);
+      const { valid, errors } = validateAndFilter(fileArray);
+      if (errors.length > 0) {
+        setValidationErrors(errors);
+        onValidationError?.(errors);
+      } else {
+        setValidationErrors([]);
+      }
+      if (valid.length === 0) return;
+      if (showLocalPreview && isImageVariant) {
+        const newLocal = valid.map((file) => ({
+          file,
+          previewUrl: URL.createObjectURL(file),
+          id: makeId()
+        }));
+        if (multiple) {
+          setLocalFiles((prev) => {
+            const updated = [...prev, ...newLocal];
+            onFilesChange?.(updated);
+            return updated;
+          });
+        } else {
+          setLocalFiles((prev) => {
+            prev.forEach((f) => URL.revokeObjectURL(f.previewUrl));
+            const updated = newLocal.slice(0, 1);
+            onFilesChange?.(updated);
+            return updated;
+          });
+        }
+      } else if (!isImageVariant && multiple) {
+        const newLocal = valid.map((file) => ({
+          file,
+          previewUrl: "",
+          id: makeId()
+        }));
+        setLocalFiles((prev) => {
+          const updated = [...prev, ...newLocal];
+          onFilesChange?.(updated);
+          return updated;
+        });
+      } else if (!isImageVariant) {
+        const newLocal = valid.slice(0, 1).map((file) => ({
+          file,
+          previewUrl: "",
+          id: makeId()
+        }));
+        setLocalFiles(() => {
+          onFilesChange?.(newLocal);
+          return newLocal;
+        });
+      }
+      onChange?.(valid);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [multiple, maxFiles, maxSize, displayItems.length, isImageVariant, showLocalPreview, onChange, onFilesChange, onValidationError]
+  );
+  const openFilePicker = React19__namespace.useCallback(() => {
+    if (disabled || readOnly) return;
+    internalInputRef.current?.click();
+  }, [disabled, readOnly]);
+  const handleInputChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processFiles(e.target.files);
+    }
+    e.target.value = "";
+  };
+  const handleDragOver = (e) => {
+    if (disabled || readOnly || !dragAndDrop) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+  const handleDrop = (e) => {
+    if (disabled || readOnly || !dragAndDrop) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    if (e.dataTransfer.files.length > 0) {
+      processFiles(e.dataTransfer.files);
+    }
+  };
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openFilePicker();
+    }
+  };
+  const handleRemoveItem = (e, item) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (item.kind === "url") {
+      if (!multiple && controlledUrls.length === 1) {
+        onRemove?.();
+      } else {
+        onRemoveFile?.(item.index);
+      }
+    } else {
+      URL.revokeObjectURL(item.localFile.previewUrl);
+      setLocalFiles((prev) => {
+        const updated = prev.filter((f) => f.id !== item.localFile.id);
+        onFilesChange?.(updated);
+        return updated;
+      });
+      onRemoveFile?.(item.index);
+    }
+  };
+  const handleClearAll = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    localFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
+    setLocalFiles([]);
+    setValidationErrors([]);
+    onFilesChange?.([]);
+    onRemove?.();
+  };
+  const dzState = disabled ? "disabled" : isDragOver ? "dragover" : error || validationErrors.length > 0 ? "error" : "idle";
+  const combinedError = error ?? validationErrors[0];
+  const iconSize = ICON_SIZES2[size] ?? 18;
+  const avatarIconSize = AVATAR_ICON_SIZES[size] ?? 20;
+  const canAddMore = !disabled && !readOnly && (!maxFiles || displayItems.length < maxFiles);
+  const dropzoneInteractionProps = {
+    role: "button",
+    tabIndex: disabled ? -1 : 0,
+    onClick: openFilePicker,
+    onDragOver: handleDragOver,
+    onDragLeave: handleDragLeave,
+    onDrop: handleDrop,
+    onKeyDown: handleKeyDown,
+    "aria-label": placeholder ?? PLACEHOLDER_TEXT[variant]
+  };
+  const renderImageVariant = () => {
+    if (!multiple) {
+      const item = displayItems[0];
+      const previewUrl = item ? item.kind === "url" ? item.url : item.localFile.previewUrl : null;
+      if (previewUrl) {
+        return /* @__PURE__ */ jsxRuntime.jsxs(
+          "div",
+          {
+            className: cn(
+              "relative w-full overflow-hidden rounded-xl border border-gray-200 group",
+              size === "sm" && "h-24",
+              size === "md" && "h-32",
+              size === "lg" && "h-44"
+            ),
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "img",
+                {
+                  src: previewUrl,
+                  alt: "Preview",
+                  className: "absolute inset-0 w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                }
+              ),
+              !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute bottom-0 left-0 right-0 flex items-center justify-between gap-2 p-2.5 translate-y-1 group-hover:translate-y-0 transition-transform duration-200", children: [
+                /* @__PURE__ */ jsxRuntime.jsxs(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: openFilePicker,
+                    onKeyDown: handleKeyDown,
+                    className: "flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+                    "aria-label": "Change image",
+                    children: [
+                      /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ImageIcon, { size: 12 }),
+                      "Change"
+                    ]
+                  }
+                ),
+                clearable && /* @__PURE__ */ jsxRuntime.jsxs(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: (e) => item && handleRemoveItem(e, item),
+                    className: "flex items-center gap-1.5 bg-red-500/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400",
+                    "aria-label": "Remove image",
+                    children: [
+                      /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 12 }),
+                      "Remove"
+                    ]
+                  }
+                )
+              ] }) })
+            ]
+          }
+        );
+      }
+      return /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          ...dropzoneInteractionProps,
+          className: cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName),
+          children: [
+            /* @__PURE__ */ jsxRuntime.jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ImageIcon, { size: iconSize, className: "text-gray-400" }) }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col items-center gap-0.5 text-center", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "span",
+                {
+                  className: cn(
+                    "font-medium text-gray-600",
+                    size === "sm" && "text-xs",
+                    size === "md" && "text-sm",
+                    size === "lg" && "text-base"
+                  ),
+                  children: placeholder ?? PLACEHOLDER_TEXT.image
+                }
+              ),
+              description && /* @__PURE__ */ jsxRuntime.jsx(
+                "span",
+                {
+                  className: cn(
+                    "text-gray-400",
+                    size === "sm" && "text-[10px]",
+                    size === "md" && "text-xs",
+                    size === "lg" && "text-sm"
+                  ),
+                  children: description
+                }
+              )
+            ] }),
+            dragAndDrop && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] text-gray-300", children: "Drag & drop supported" })
+          ]
+        }
+      );
+    }
+    return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-wrap gap-2", children: [
+      displayItems.map((item) => {
+        const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
+        return /* @__PURE__ */ jsxRuntime.jsxs(
+          "div",
+          {
+            className: "relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0",
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "img",
+                {
+                  src: url,
+                  alt: `Image ${item.index + 1}`,
+                  className: "w-full h-full object-cover"
+                }
+              ),
+              !disabled && !readOnly && clearable && /* @__PURE__ */ jsxRuntime.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: (e) => handleRemoveItem(e, item),
+                  className: "absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
+                  "aria-label": "Remove",
+                  children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 10, className: "text-white" })
+                }
+              )
+            ]
+          },
+          item.kind === "url" ? `url-${item.index}` : item.localFile.id
+        );
+      }),
+      canAddMore && /* @__PURE__ */ jsxRuntime.jsxs(
+        "button",
+        {
+          type: "button",
+          onClick: openFilePicker,
+          className: cn(
+            "rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
+            "w-20 h-20"
+          ),
+          "aria-label": "Add image",
+          children: [
+            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Plus, { size: 18 }),
+            /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] font-medium", children: "Add" })
+          ]
+        }
+      ),
+      displayItems.length === 0 && /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          ...dropzoneInteractionProps,
+          className: cn(
+            dropzoneVariants({ size, state: dzState }),
+            "w-full",
+            dropzoneClassName
+          ),
+          children: [
+            /* @__PURE__ */ jsxRuntime.jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ImageIcon, { size: iconSize, className: "text-gray-400" }) }),
+            /* @__PURE__ */ jsxRuntime.jsx(
+              "span",
+              {
+                className: cn(
+                  "font-medium text-gray-600",
+                  size === "sm" && "text-xs",
+                  size === "md" && "text-sm",
+                  size === "lg" && "text-base"
+                ),
+                children: placeholder ?? PLACEHOLDER_TEXT.image
+              }
+            ),
+            description && /* @__PURE__ */ jsxRuntime.jsx(
+              "span",
+              {
+                className: cn(
+                  "text-gray-400",
+                  size === "sm" && "text-[10px]",
+                  size === "md" && "text-xs",
+                  size === "lg" && "text-sm"
+                ),
+                children: description
+              }
+            )
+          ]
+        }
+      )
+    ] });
+  };
+  const renderAvatarVariant = () => {
+    const item = displayItems[0];
+    const previewUrl = item ? item.kind === "url" ? item.url : item.localFile.previewUrl : null;
+    const avatarState = disabled ? "disabled" : previewUrl ? "filled" : "empty";
+    return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-4", children: [
+      /* @__PURE__ */ jsxRuntime.jsx(
+        "div",
+        {
+          ...!previewUrl ? dropzoneInteractionProps : {},
+          className: avatarContainerVariants({ size, state: avatarState }),
+          children: previewUrl ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntime.jsx(
+              "img",
+              {
+                src: previewUrl,
+                alt: "Avatar",
+                className: "w-full h-full object-cover"
+              }
+            ),
+            !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
+              "div",
+              {
+                className: "absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full",
+                onClick: openFilePicker,
+                role: "button",
+                tabIndex: 0,
+                onKeyDown: handleKeyDown,
+                "aria-label": "Change photo",
+                children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ImageIcon, { size: avatarIconSize, className: "text-white" })
+              }
+            )
+          ] }) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Upload, { size: avatarIconSize, className: "text-gray-400" }) })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1", children: [
+        !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
+          "button",
+          {
+            type: "button",
+            onClick: openFilePicker,
+            className: "text-sm font-medium text-[#007a4d] hover:underline text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d] rounded",
+            children: previewUrl ? "Change photo" : placeholder ?? "Upload photo"
+          }
+        ),
+        description && /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-xs text-gray-400", children: description }),
+        clearable && previewUrl && !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
+          "button",
+          {
+            type: "button",
+            onClick: handleClearAll,
+            className: "text-xs text-red-400 hover:text-red-600 text-left",
+            children: "Remove"
+          }
+        )
+      ] })
+    ] });
+  };
+  const renderFileVariant = () => {
+    if (hasContent) {
+      return /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          className: cn(
+            "w-full rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100",
+            disabled && "opacity-50"
+          ),
+          children: [
+            displayItems.map((item) => {
+              const name2 = item.kind === "file" ? item.localFile.file.name : item.url.split("/").pop() ?? item.url;
+              const size_ = item.kind === "file" ? formatBytes(item.localFile.file.size) : null;
+              return /* @__PURE__ */ jsxRuntime.jsxs(
+                "div",
+                {
+                  className: "flex items-center gap-3 px-3 py-2.5 bg-white",
+                  children: [
+                    /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.File, { size: 15, className: "text-gray-400" }) }),
+                    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex-1 min-w-0", children: [
+                      /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-sm font-medium text-gray-800 truncate", children: name2 }),
+                      size_ && /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-xs text-gray-400", children: size_ })
+                    ] }),
+                    clearable && !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: (e) => handleRemoveItem(e, item),
+                        className: "w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors rounded flex-shrink-0",
+                        "aria-label": `Remove ${name2}`,
+                        children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 14 })
+                      }
+                    )
+                  ]
+                },
+                item.kind === "url" ? `url-${item.index}` : item.localFile.id
+              );
+            }),
+            multiple && canAddMore && /* @__PURE__ */ jsxRuntime.jsxs(
+              "button",
+              {
+                type: "button",
+                onClick: openFilePicker,
+                className: "w-full flex items-center gap-2 px-3 py-2.5 bg-gray-50 text-sm text-gray-500 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#007a4d]",
+                children: [
+                  /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Plus, { size: 14 }),
+                  "Add more files"
+                ]
+              }
+            )
+          ]
+        }
+      );
+    }
+    return /* @__PURE__ */ jsxRuntime.jsxs(
+      "div",
+      {
+        ...dropzoneInteractionProps,
+        className: cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName),
+        children: [
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Upload, { size: iconSize, className: "text-gray-400" }) }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col items-center gap-0.5 text-center", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(
+              "span",
+              {
+                className: cn(
+                  "font-medium text-gray-600",
+                  size === "sm" && "text-xs",
+                  size === "md" && "text-sm",
+                  size === "lg" && "text-base"
+                ),
+                children: placeholder ?? PLACEHOLDER_TEXT.file
+              }
+            ),
+            description && /* @__PURE__ */ jsxRuntime.jsx(
+              "span",
+              {
+                className: cn(
+                  "text-gray-400",
+                  size === "sm" && "text-[10px]",
+                  size === "md" && "text-xs",
+                  size === "lg" && "text-sm"
+                ),
+                children: description
+              }
+            )
+          ] }),
+          dragAndDrop && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] text-gray-300", children: "Drag & drop supported" })
+        ]
+      }
+    );
+  };
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex flex-col gap-1.5 w-full", className), children: [
+    label && /* @__PURE__ */ jsxRuntime.jsx(
+      InputLabel,
+      {
+        htmlFor: inputId,
+        required,
+        size: size === "lg" ? "lg" : size === "sm" ? "sm" : "md",
+        children: label
+      }
+    ),
+    variant === "avatar" ? renderAvatarVariant() : variant === "image" ? renderImageVariant() : renderFileVariant(),
+    /* @__PURE__ */ jsxRuntime.jsx(
+      "input",
+      {
+        ref: attachInputRef,
+        type: "file",
+        id: inputId,
+        accept: effectiveAccept,
+        multiple,
+        disabled,
+        name,
+        className: "sr-only",
+        "aria-hidden": "true",
+        tabIndex: -1,
+        onChange: handleInputChange
+      }
+    ),
+    /* @__PURE__ */ jsxRuntime.jsx(
+      InputHelper,
+      {
+        size: size === "lg" ? "lg" : size === "sm" ? "sm" : "md",
+        error: combinedError,
+        helperText: combinedError ? void 0 : helperText
+      }
+    )
+  ] });
+}
+FileUpload.displayName = "FileUpload";
 
 exports.Accordion = Accordion;
 exports.AlertDialog = AlertDialog2;
@@ -6354,6 +7043,7 @@ exports.DrawerOverlay = DrawerOverlay;
 exports.DrawerPortal = DrawerPortal;
 exports.DrawerTitle = DrawerTitle;
 exports.DrawerTrigger = DrawerTrigger;
+exports.FileUpload = FileUpload;
 exports.FilterGroup = FilterGroup;
 exports.FilterGroupMobileContext = FilterGroupMobileContext;
 exports.Grid = Grid;
@@ -6390,6 +7080,7 @@ exports.accordionItemVariants = accordionItemVariants;
 exports.accordionRootVariants = accordionRootVariants;
 exports.accordionTriggerVariants = accordionTriggerVariants;
 exports.alertDialogIconBadgeVariants = iconBadgeVariants;
+exports.avatarContainerVariants = avatarContainerVariants;
 exports.brand = brand;
 exports.buttonVariants = buttonVariants;
 exports.checkboxBoxVariants = checkboxBoxVariants;
@@ -6399,9 +7090,11 @@ exports.cn = cn;
 exports.customButtonVariants = buttonVariants2;
 exports.datePickerTriggerVariants = triggerVariants2;
 exports.dayCellVariants = dayCellVariants;
+exports.dropzoneVariants = dropzoneVariants;
 exports.formatDate = formatDate;
 exports.formatMonthYear = formatMonthYear;
 exports.formatRange = formatRange;
+exports.iconWrapperVariants = iconWrapperVariants;
 exports.input = Input;
 exports.inputFieldVariants = inputFieldVariants;
 exports.inputIconSlotVariants = inputIconSlotVariants;

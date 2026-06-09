@@ -30,12 +30,15 @@ import FilterGroupPreview from "./components/FilterGroup"
 import BannerPreview from "./components/Banner"
 import DemoPage from "./components/DemoPage"
 import LayoutDemo from "./components/LayoutDemo";
+import FileUploadPreview from "./components/FileUpload";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <BannerPreview /> */}
     {/* <FilterGroupPreview/> */}
-   <SelectPreview/>
+    {/* <SelectPreview/> */}
     {/* <InputPreview/> */}
-    <TabsPreview />
+    {/* <TabsPreview /> */}
+    <Demo/>
+    <FileUploadPreview />
   </React.StrictMode>,
 );
