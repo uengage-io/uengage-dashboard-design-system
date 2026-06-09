@@ -1247,4 +1247,96 @@ declare namespace Banner {
     var displayName: string;
 }
 
-export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerProps, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, formatDate, formatMonthYear, formatRange, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
+type FileUploadVariant = "image" | "file" | "avatar";
+type FileUploadSize = "sm" | "md" | "lg";
+/** Internal representation of a locally-selected file with a preview URL. */
+interface FileUploadLocalFile {
+    file: File;
+    /** Object URL for image preview — created via URL.createObjectURL(). */
+    previewUrl: string;
+    /** Stable random ID for React key. */
+    id: string;
+}
+interface FileUploadProps {
+    /** Controls layout and default accept type. Defaults to "file". */
+    variant?: FileUploadVariant;
+    /** Controls spacing and icon sizes. Defaults to "md". */
+    size?: FileUploadSize;
+    /** Forwarded to the hidden <input type="file" accept="...">. Overrides variant default. */
+    accept?: string;
+    /** Allow selecting multiple files at once. */
+    multiple?: boolean;
+    disabled?: boolean;
+    readOnly?: boolean;
+    /** Native input name — useful in form submissions. */
+    name?: string;
+    /** Explicit id for the hidden input (also used for label htmlFor). */
+    id?: string;
+    /** Per-file size limit in bytes. Files exceeding this are rejected. */
+    maxSize?: number;
+    /** Maximum number of files allowed (only meaningful when multiple=true). */
+    maxFiles?: number;
+    /**
+     * Controlled URL(s) for showing already-uploaded content.
+     * - image / avatar: renders as <img> preview
+     * - file: renders as filename chip(s)
+     * Pass a string for single, string[] for multiple.
+     */
+    value?: string | string[];
+    /** Fired whenever the user selects valid files. Receives the raw File list. */
+    onChange?: (files: File[]) => void;
+    /**
+     * Fired with the internal FileUploadLocalFile list on every change.
+     * Useful when you need the auto-generated preview URLs.
+     */
+    onFilesChange?: (files: FileUploadLocalFile[]) => void;
+    /** Fired when the remove button is clicked on a single-value field. */
+    onRemove?: () => void;
+    /** Fired when a specific item is removed from a multi-value field (index into the combined display list). */
+    onRemoveFile?: (index: number) => void;
+    /** Fired when any files are rejected due to size/count validation. */
+    onValidationError?: (errors: string[]) => void;
+    label?: string;
+    required?: boolean;
+    /** Shown below the field in red. Also shown for internal validation errors. */
+    error?: string;
+    helperText?: string;
+    /** Main line in the empty-state dropzone. Falls back to variant default. */
+    placeholder?: string;
+    /** Sub-line in the empty-state dropzone (e.g. "PNG, JPG up to 5 MB"). */
+    description?: string;
+    /** Enable drag-and-drop. Defaults to true. */
+    dragAndDrop?: boolean;
+    /**
+     * Auto-generate local object-URL previews from selected File objects
+     * (shown immediately before upload completes). Defaults to true.
+     * Previews are revoked automatically on unmount or when `value` prop changes.
+     */
+    showLocalPreview?: boolean;
+    /** Show the × clear button. Defaults to true. */
+    clearable?: boolean;
+    /** Applied to the outermost wrapper div. */
+    className?: string;
+    /** Applied to the dropzone area (not used in avatar variant). */
+    dropzoneClassName?: string;
+    /** Ref forwarded to the hidden <input type="file"> element. */
+    inputRef?: React.Ref<HTMLInputElement>;
+}
+declare function FileUpload({ variant, size, accept, multiple, disabled, readOnly, name, id, maxSize, maxFiles, value, onChange, onFilesChange, onRemove, onRemoveFile, onValidationError, label, required, error, helperText, placeholder, description, dragAndDrop, showLocalPreview, clearable, className, dropzoneClassName, inputRef: externalInputRef, }: FileUploadProps): react_jsx_runtime.JSX.Element;
+declare namespace FileUpload {
+    var displayName: string;
+}
+
+declare const dropzoneVariants: (props?: ({
+    size?: "sm" | "lg" | "md" | null | undefined;
+    state?: "disabled" | "error" | "dragover" | "idle" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+declare const iconWrapperVariants: (props?: ({
+    size?: "sm" | "lg" | "md" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+declare const avatarContainerVariants: (props?: ({
+    size?: "sm" | "lg" | "md" | null | undefined;
+    state?: "disabled" | "filled" | "empty" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+
+export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerProps, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
