@@ -171,7 +171,7 @@ export function Sidebar({
   }
 
   return (
-    <Drawer open={resolvedOpen} onOpenChange={handleOpenChange} modal={false}>
+    <Drawer open={resolvedOpen} onOpenChange={handleOpenChange}>
       {trigger ? <DrawerTrigger asChild>{trigger}</DrawerTrigger> : null}
       {overlay ? (
         <DrawerOverlay

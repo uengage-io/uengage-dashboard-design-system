@@ -31,6 +31,7 @@ import BannerPreview from "./components/Banner"
 import DemoPage from "./components/DemoPage"
 import LayoutDemo from "./components/LayoutDemo";
 import FileUploadPreview from "./components/FileUpload";
+import SectionPreview from "./components/Section";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <BannerPreview /> */}
@@ -38,7 +39,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <SelectPreview/> */}
     {/* <InputPreview/> */}
     {/* <TabsPreview /> */}
-    <Demo/>
-    <FileUploadPreview />
+    {/* <Demo/> */}
+    {/* <FileUploadPreview /> */}
+    <SectionPreview />
   </React.StrictMode>,
 );
