@@ -4978,7 +4978,7 @@ function Sidebar({
       }
     ) });
   }
-  return /* @__PURE__ */ jsxRuntime.jsxs(Drawer, { open: resolvedOpen, onOpenChange: handleOpenChange, modal: false, children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs(Drawer, { open: resolvedOpen, onOpenChange: handleOpenChange, children: [
     trigger ? /* @__PURE__ */ jsxRuntime.jsx(DrawerTrigger, { asChild: true, children: trigger }) : null,
     overlay ? /* @__PURE__ */ jsxRuntime.jsx(
       DrawerOverlay,
@@ -6306,6 +6306,345 @@ function Banner({
   );
 }
 Banner.displayName = "Banner";
+var SectionContext = React19__namespace.createContext({
+  collapsible: false
+});
+function SectionHeader({
+  icon,
+  title,
+  description,
+  action,
+  className,
+  ...props
+}) {
+  const { collapsible } = React19__namespace.useContext(SectionContext);
+  const inner = /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2 min-w-0 pointer-events-none", children: [
+      icon && /* @__PURE__ */ jsxRuntime.jsx(
+        "span",
+        {
+          "data-slot": "section-header-icon",
+          className: "flex-shrink-0 text-[#2b7a3b] w-6 h-6 flex items-center justify-center",
+          children: icon
+        }
+      ),
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsxRuntime.jsx(
+          "div",
+          {
+            "data-slot": "section-header-title",
+            className: "text-base font-semibold text-[#202020] leading-snug",
+            children: title
+          }
+        ),
+        description && /* @__PURE__ */ jsxRuntime.jsx(
+          "div",
+          {
+            "data-slot": "section-header-description",
+            className: "text-xs text-[#6B7280] mt-0.5",
+            children: description
+          }
+        )
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex-shrink-0 flex items-center gap-2", children: [
+      action && // stop click from bubbling to the Collapsible.Trigger
+      /* @__PURE__ */ jsxRuntime.jsx(
+        "div",
+        {
+          "data-slot": "section-header-action",
+          className: "pointer-events-auto",
+          onClick: (e) => e.stopPropagation(),
+          onKeyDown: (e) => e.stopPropagation(),
+          children: action
+        }
+      ),
+      collapsible && /* @__PURE__ */ jsxRuntime.jsx(
+        "span",
+        {
+          "data-slot": "section-collapse-indicator",
+          className: "flex h-7 w-7 items-center justify-center rounded-md text-[#6B7280]",
+          "aria-hidden": true,
+          children: /* @__PURE__ */ jsxRuntime.jsx(
+            lucideReact.ChevronDown,
+            {
+              size: 16,
+              className: "transition-transform duration-200 group-data-[state=open]:rotate-180"
+            }
+          )
+        }
+      )
+    ] })
+  ] });
+  if (collapsible) {
+    return /* @__PURE__ */ jsxRuntime.jsx(
+      radixUi.Collapsible.Trigger,
+      {
+        "data-slot": "section-header",
+        className: cn(
+          "w-full flex items-start justify-between gap-3 pb-4 text-left",
+          "cursor-pointer select-none rounded-lg",
+          "hover:bg-[#F9FAFB] -mx-2 px-2",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b7a3b] focus-visible:ring-offset-1",
+          "group transition-colors",
+          className
+        ),
+        ...props,
+        children: inner
+      }
+    );
+  }
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "section-header",
+      className: cn("flex items-start justify-between gap-3 pb-4", className),
+      ...props,
+      children: inner
+    }
+  );
+}
+function SectionDivider({
+  label,
+  orientation = "horizontal",
+  height,
+  className,
+  ...props
+}) {
+  if (orientation === "vertical") {
+    return /* @__PURE__ */ jsxRuntime.jsx(
+      "div",
+      {
+        "data-slot": "section-divider",
+        "data-orientation": "vertical",
+        role: "separator",
+        "aria-orientation": "vertical",
+        className: cn(
+          "flex-shrink-0 w-px bg-[#E5E7EB] self-stretch",
+          className
+        ),
+        style: height ? { height } : void 0,
+        ...props
+      }
+    );
+  }
+  if (label) {
+    return /* @__PURE__ */ jsxRuntime.jsxs(
+      "div",
+      {
+        "data-slot": "section-divider",
+        "data-orientation": "horizontal",
+        className: cn("flex items-center gap-3 mt-6 mb-4", className),
+        ...props,
+        children: [
+          /* @__PURE__ */ jsxRuntime.jsx(Separator, { className: "flex-1 bg-[#E5E7EB]" }),
+          /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-xs font-medium text-[#6B7280] whitespace-nowrap", children: label }),
+          /* @__PURE__ */ jsxRuntime.jsx(Separator, { className: "flex-1 bg-[#E5E7EB]" })
+        ]
+      }
+    );
+  }
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    Separator,
+    {
+      "data-slot": "section-divider",
+      "data-orientation": "horizontal",
+      className: cn("mt-6 mb-4 bg-[#E5E7EB]", className),
+      ...props
+    }
+  );
+}
+function SectionContent({ className, children, ...props }) {
+  const { collapsible } = React19__namespace.useContext(SectionContext);
+  const inner = /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "section-content",
+      className: cn("flex flex-col gap-0", className),
+      ...props,
+      children
+    }
+  );
+  if (collapsible) {
+    return /* @__PURE__ */ jsxRuntime.jsx(radixUi.Collapsible.Content, { className: "overflow-hidden will-change-[height] data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up", children: inner });
+  }
+  return inner;
+}
+function SectionSubsection({
+  title,
+  description,
+  separator = true,
+  separatorLabel,
+  className,
+  children,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+    separator && /* @__PURE__ */ jsxRuntime.jsx(SectionDivider, { label: separatorLabel }),
+    /* @__PURE__ */ jsxRuntime.jsxs(
+      "div",
+      {
+        "data-slot": "section-subsection",
+        className: cn("flex flex-col gap-3", className),
+        ...props,
+        children: [
+          (title || description) && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-0.5", children: [
+            title && /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-sm font-medium text-[#374151]", children: title }),
+            description && /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-xs text-[#6B7280]", children: description })
+          ] }),
+          children
+        ]
+      }
+    )
+  ] });
+}
+var COLUMN_CLASSES = {
+  "1": "grid-cols-1",
+  "2": "grid-cols-1 sm:grid-cols-2",
+  "3": "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+  "4": "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+};
+function SectionRow({
+  columns = 3,
+  dividers = false,
+  className,
+  style,
+  children,
+  ...props
+}) {
+  if (dividers) {
+    const items = React19__namespace.Children.toArray(children).filter(Boolean);
+    return /* @__PURE__ */ jsxRuntime.jsx(
+      "div",
+      {
+        "data-slot": "section-row",
+        "data-dividers": "true",
+        className: cn("flex items-stretch gap-0", className),
+        style,
+        ...props,
+        children: items.map((child, i) => /* @__PURE__ */ jsxRuntime.jsxs(React19__namespace.Fragment, { children: [
+          i > 0 && /* @__PURE__ */ jsxRuntime.jsx(SectionDivider, { orientation: "vertical", className: "mx-5" }),
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 min-w-0", children: child })
+        ] }, i))
+      }
+    );
+  }
+  const key = String(columns);
+  const isPreset = key in COLUMN_CLASSES;
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "section-row",
+      className: cn(
+        "grid gap-x-5 gap-y-4",
+        isPreset && COLUMN_CLASSES[key],
+        className
+      ),
+      style: isPreset ? style : { gridTemplateColumns: columns, ...style },
+      ...props,
+      children
+    }
+  );
+}
+var SPAN_CLASSES = {
+  1: "col-span-1",
+  2: "col-span-2",
+  3: "col-span-3",
+  4: "col-span-4"
+};
+function SectionField({ span, className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "section-field",
+      className: cn(
+        "flex flex-col gap-1.5",
+        span && SPAN_CLASSES[span],
+        className
+      ),
+      ...props
+    }
+  );
+}
+function SectionTableContent({
+  divider = true,
+  className,
+  children,
+  ...props
+}) {
+  const { collapsible } = React19__namespace.useContext(SectionContext);
+  const inner = /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "section-table-content",
+      className: cn(
+        "-mx-4 sm:-mx-5 md:-mx-6",
+        "-mb-4 sm:-mb-5 md:-mb-6",
+        "overflow-hidden rounded-b-2xl",
+        divider && "border-t border-[#E5E7EB]",
+        className
+      ),
+      ...props,
+      children
+    }
+  );
+  if (collapsible) {
+    return /* @__PURE__ */ jsxRuntime.jsx(radixUi.Collapsible.Content, { className: "overflow-hidden will-change-[height] data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up", children: inner });
+  }
+  return inner;
+}
+function Section({
+  bare = false,
+  collapsible = false,
+  defaultOpen = true,
+  open,
+  onOpenChange,
+  className,
+  children,
+  ...props
+}) {
+  const cardClass = cn(
+    "uengage-ui",
+    "flex flex-col gap-0 rounded-2xl border border-[#E5E7EB] bg-white",
+    "p-4 sm:p-5 md:p-6",
+    "shadow-none text-sm text-[#202020]",
+    className
+  );
+  const ctx = { collapsible };
+  if (bare) {
+    return /* @__PURE__ */ jsxRuntime.jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsxRuntime.jsx(
+      "div",
+      {
+        "data-slot": "section",
+        className: cn("flex flex-col gap-0 text-sm text-[#202020]", className),
+        ...props,
+        children
+      }
+    ) });
+  }
+  if (collapsible) {
+    const collapsibleProps = open !== void 0 ? { open, onOpenChange } : { defaultOpen };
+    return /* @__PURE__ */ jsxRuntime.jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Collapsible.Root, { ...collapsibleProps, asChild: true, children: /* @__PURE__ */ jsxRuntime.jsx(
+      Card,
+      {
+        "data-slot": "section",
+        className: cardClass,
+        ...props,
+        children
+      }
+    ) }) });
+  }
+  return /* @__PURE__ */ jsxRuntime.jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsxRuntime.jsx(
+    Card,
+    {
+      "data-slot": "section",
+      className: cardClass,
+      ...props,
+      children
+    }
+  ) });
+}
+Section.displayName = "Section";
 var dropzoneVariants = classVarianceAuthority.cva(
   [
     "relative w-full flex flex-col items-center justify-center",
@@ -7064,6 +7403,14 @@ exports.PopoverTrigger = PopoverTrigger;
 exports.Radio = Radio;
 exports.RadioGroup = RadioGroup;
 exports.SearchBar = SearchBar;
+exports.Section = Section;
+exports.SectionContent = SectionContent;
+exports.SectionDivider = SectionDivider;
+exports.SectionField = SectionField;
+exports.SectionHeader = SectionHeader;
+exports.SectionRow = SectionRow;
+exports.SectionSubsection = SectionSubsection;
+exports.SectionTableContent = SectionTableContent;
 exports.Select = Select;
 exports.Separator = Separator;
 exports.Sidebar = Sidebar;

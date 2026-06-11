@@ -1247,6 +1247,99 @@ declare namespace Banner {
     var displayName: string;
 }
 
+interface SectionHeaderProps extends React.ComponentProps<"div"> {
+    /** Icon element shown to the left of the title. */
+    icon?: React.ReactNode;
+    /** Main heading text. */
+    title: string;
+    /** Optional subtitle/description rendered below the title. */
+    description?: React.ReactNode;
+    /** Slot for action buttons, rendered at the trailing end of the header. */
+    action?: React.ReactNode;
+}
+declare function SectionHeader({ icon, title, description, action, className, ...props }: SectionHeaderProps): react_jsx_runtime.JSX.Element;
+interface SectionDividerProps extends Omit<React.ComponentProps<"div">, "children"> {
+    /** Label shown inline with a horizontal divider. Ignored when orientation="vertical". */
+    label?: string;
+    /**
+     * "horizontal" (default) — a full-width rule, optionally with an inline label.
+     * "vertical" — a thin column separator for use inside flex/grid rows.
+     */
+    orientation?: "horizontal" | "vertical";
+    /**
+     * Height of a vertical divider. Defaults to "100%" so it fills its grid cell.
+     * Accepts any valid CSS length (e.g. "24px", "2rem").
+     */
+    height?: string;
+}
+declare function SectionDivider({ label, orientation, height, className, ...props }: SectionDividerProps): react_jsx_runtime.JSX.Element;
+interface SectionContentProps extends React.ComponentProps<"div"> {
+}
+declare function SectionContent({ className, children, ...props }: SectionContentProps): react_jsx_runtime.JSX.Element;
+interface SectionSubsectionProps extends React.ComponentProps<"div"> {
+    /** Title shown above this subsection. */
+    title?: string;
+    /** Optional description under the subsection title. */
+    description?: string;
+    /** Show a separator line above this subsection (default: true). */
+    separator?: boolean;
+    /** Label to display on the separator line when separator=true. */
+    separatorLabel?: string;
+}
+declare function SectionSubsection({ title, description, separator, separatorLabel, className, children, ...props }: SectionSubsectionProps): react_jsx_runtime.JSX.Element;
+interface SectionRowProps extends React.ComponentProps<"div"> {
+    /**
+     * Number of equal columns. Defaults to 3 (matching the Business Details
+     * design). Accepts 1–4 or a raw CSS grid-template-columns string.
+     */
+    columns?: 1 | 2 | 3 | 4 | string;
+    /**
+     * When true, injects a vertical `SectionDivider` between every direct child.
+     * Switches the row to a flex layout so the separators size naturally.
+     * Each child gets `flex: 1` and `min-w-0` automatically.
+     */
+    dividers?: boolean;
+}
+declare function SectionRow({ columns, dividers, className, style, children, ...props }: SectionRowProps): react_jsx_runtime.JSX.Element;
+interface SectionFieldProps extends React.ComponentProps<"div"> {
+    /** Column span inside a SectionRow grid (1–4). */
+    span?: 1 | 2 | 3 | 4;
+}
+declare function SectionField({ span, className, ...props }: SectionFieldProps): react_jsx_runtime.JSX.Element;
+interface SectionTableContentProps extends React.ComponentProps<"div"> {
+    /**
+     * Show a thin separator line between the section header and the table.
+     * Defaults to true.
+     */
+    divider?: boolean;
+}
+declare function SectionTableContent({ divider, className, children, ...props }: SectionTableContentProps): react_jsx_runtime.JSX.Element;
+interface SectionProps extends React.ComponentProps<"div"> {
+    /** When true, removes the card border/background and renders a bare container. */
+    bare?: boolean;
+    /** Enables the collapse/expand toggle. A chevron button appears in the header. */
+    collapsible?: boolean;
+    /**
+     * Initial open state when uncontrolled (default: true).
+     * Only used when `collapsible` is true and `open` is not provided.
+     */
+    defaultOpen?: boolean;
+    /**
+     * Controlled open state. When provided, you must also pass `onOpenChange`.
+     * Only used when `collapsible` is true.
+     */
+    open?: boolean;
+    /**
+     * Called when the open state changes.
+     * Only used when `collapsible` is true.
+     */
+    onOpenChange?: (open: boolean) => void;
+}
+declare function Section({ bare, collapsible, defaultOpen, open, onOpenChange, className, children, ...props }: SectionProps): react_jsx_runtime.JSX.Element;
+declare namespace Section {
+    var displayName: string;
+}
+
 type FileUploadVariant = "image" | "file" | "avatar";
 type FileUploadSize = "sm" | "md" | "lg";
 /** Internal representation of a locally-selected file with a preview URL. */
@@ -1339,4 +1432,4 @@ declare const avatarContainerVariants: (props?: ({
     state?: "disabled" | "filled" | "empty" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 
-export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerProps, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
+export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerProps, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, usePagination, useSweetAlert };
