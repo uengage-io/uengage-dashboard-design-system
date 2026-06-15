@@ -174,11 +174,11 @@ export function Table<T>({
       {/* ── Table view (always on "scroll"; md+ only on "cards") ──────── */}
       <div
         className={cn(
-          "overflow-x-auto",
+          "overflow-x-auto scroll-smooth",
           // Clip table cells to the rounded corners — overflow:auto on this
           // element also clips to border-radius, so no parent overflow-hidden needed.
           bordered && "rounded-lg",
-          stickyHeader && "overflow-y-auto",
+          stickyHeader && "overflow-y-auto scroll-smooth",
           mobileLayout === "cards" && "hidden md:block",
         )}
         style={scrollStyle}
