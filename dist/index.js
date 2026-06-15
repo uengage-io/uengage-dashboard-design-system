@@ -6730,6 +6730,7 @@ function FileUpload({
   dragAndDrop = true,
   showLocalPreview = true,
   clearable = true,
+  changeable = true,
   icon,
   className,
   dropzoneClassName,
@@ -6978,8 +6979,8 @@ function FileUpload({
                   children: icon
                 }
               ),
-              !disabled && !readOnly && /* @__PURE__ */ jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200", children: /* @__PURE__ */ jsxs("div", { className: "absolute bottom-0 left-0 right-0 flex items-center justify-between gap-2 p-2.5 translate-y-1 group-hover:translate-y-0 transition-transform duration-200", children: [
-                /* @__PURE__ */ jsxs(
+              !disabled && !readOnly && (changeable || clearable) && /* @__PURE__ */ jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200", children: /* @__PURE__ */ jsxs("div", { className: "absolute bottom-0 left-0 right-0 flex items-center justify-between gap-2 p-2.5 translate-y-1 group-hover:translate-y-0 transition-transform duration-200", children: [
+                changeable && /* @__PURE__ */ jsxs(
                   "button",
                   {
                     type: "button",
