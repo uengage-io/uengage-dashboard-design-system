@@ -31,7 +31,7 @@ export function TableCell({
         alignClass[align],
         // Allow content to wrap and break long words/URLs that would otherwise
         // force the column wider than its flex-allocated share.
-        "whitespace-normal break-words align-top",
+        "whitespace-normal break-words [hyphens:none] align-top",
         className,
       )}
       {...props}
