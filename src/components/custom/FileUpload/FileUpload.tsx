@@ -99,6 +99,12 @@ export interface FileUploadProps {
   showLocalPreview?: boolean;
   /** Show the × clear button. Defaults to true. */
   clearable?: boolean;
+  /**
+   * Show the "Change" button in the image hover overlay. Defaults to true.
+   * Set to false to make the preview display-only while still allowing removal via clearable.
+   * When both changeable and clearable are false the overlay is hidden entirely.
+   */
+  changeable?: boolean;
 
   // ── Icon badge ──────────────────────────────────────────────────────────────
   /**
@@ -166,6 +172,7 @@ function FileUpload({
   dragAndDrop = true,
   showLocalPreview = true,
   clearable = true,
+  changeable = true,
   icon,
   className,
   dropzoneClassName,
@@ -488,19 +495,21 @@ function FileUpload({
                 {icon}
               </button>
             )}
-            {!disabled && !readOnly && (
+            {!disabled && !readOnly && (changeable || clearable) && (
               <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-2 p-2.5 translate-y-1 group-hover:translate-y-0 transition-transform duration-200">
-                  <button
-                    type="button"
-                    onClick={openFilePicker}
-                    onKeyDown={handleKeyDown}
-                    className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                    aria-label="Change image"
-                  >
-                    <ImageIcon size={12} />
-                    Change
-                  </button>
+                  {changeable && (
+                    <button
+                      type="button"
+                      onClick={openFilePicker}
+                      onKeyDown={handleKeyDown}
+                      className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                      aria-label="Change image"
+                    >
+                      <ImageIcon size={12} />
+                      Change
+                    </button>
+                  )}
                   {clearable && (
                     <button
                       type="button"

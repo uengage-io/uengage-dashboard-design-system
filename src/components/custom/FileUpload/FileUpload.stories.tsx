@@ -88,6 +88,11 @@ const meta = {
       control: "boolean",
       description: "Show the × remove button on filled states.",
     },
+    changeable: {
+      control: "boolean",
+      description:
+        'Show the "Change" button in the image hover overlay. Defaults to true. Set to false to make the preview display-only. When both changeable and clearable are false the overlay is hidden entirely.',
+    },
     icon: {
       control: false,
       description:
@@ -109,6 +114,7 @@ const meta = {
     dragAndDrop:      true,
     showLocalPreview: true,
     clearable:        true,
+    changeable:       true,
   },
 } satisfies Meta<typeof FileUpload>;
 
@@ -482,6 +488,37 @@ export const NoClearButton: Story = {
   render: (args) => (
     <div className="w-96">
       <FileUpload {...args} />
+    </div>
+  ),
+};
+
+export const NoChangeButton: Story = {
+  name: "Changeable · false",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Set `changeable={false}` to hide the Change button from the hover overlay. The Remove button (controlled by `clearable`) is unaffected. When both are false the overlay disappears entirely.",
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-col gap-4 w-96">
+      <FileUpload
+        variant="image"
+        label="changeable={false} — remove only"
+        value={BANNER_URL}
+        changeable={false}
+        helperText="Hover to see only the Remove button."
+      />
+      <FileUpload
+        variant="image"
+        label="changeable={false} clearable={false} — no overlay"
+        value={BANNER_URL}
+        changeable={false}
+        clearable={false}
+        helperText="Overlay is fully hidden — display-only preview."
+      />
     </div>
   ),
 };
