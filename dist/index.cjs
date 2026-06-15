@@ -5903,20 +5903,30 @@ function AccordionItems({
           {
             className: cn(
               accordionTriggerVariants({ variant, size }),
-              "data-[state=open]:text-[#006F42] w-full justify-between"
+              "data-[state=open]:text-[#006F42] w-full"
             ),
             children: [
               /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "flex items-center gap-2.5 min-w-0", children: [
                 item.icon && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "shrink-0 [&_svg]:size-4", children: item.icon }),
                 /* @__PURE__ */ jsxRuntime.jsx("span", { className: "truncate text-left", children: item.title })
               ] }),
-              /* @__PURE__ */ jsxRuntime.jsx(
-                lucideReact.ChevronDown,
-                {
-                  className: "ml-3 size-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 group-data-[state=open]:rotate-180",
-                  "aria-hidden": true
-                }
-              )
+              /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "ml-auto flex items-center gap-2", children: [
+                item.action && /* @__PURE__ */ jsxRuntime.jsx(
+                  "span",
+                  {
+                    className: "shrink-0",
+                    onClick: (e) => e.stopPropagation(),
+                    children: item.action
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntime.jsx(
+                  lucideReact.ChevronDown,
+                  {
+                    className: "size-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 group-data-[state=open]:rotate-180",
+                    "aria-hidden": true
+                  }
+                )
+              ] })
             ]
           }
         ) }),

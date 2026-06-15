@@ -8,6 +8,9 @@ import {
   ShieldCheck,
   HelpCircle,
   Info,
+  Pencil,
+  Trash2,
+  ExternalLink,
 } from "lucide-react";
 
 const FAQ_ITEMS: AccordionItem[] = [
@@ -82,6 +85,180 @@ const SETTINGS_ITEMS: AccordionItem[] = [
   },
 ];
 
+const ACTION_BADGE_ITEMS: AccordionItem[] = [
+  {
+    value: "loyalty",
+    title: "Loyalty Program",
+    action: (
+      <span className="rounded-full bg-[#DCFCE7] px-2 py-0.5 text-xs font-medium text-[#166534]">
+        Active
+      </span>
+    ),
+    content:
+      "Configure points rules, tiers, and redemption thresholds for your loyalty program.",
+  },
+  {
+    value: "push",
+    title: "Push Notifications",
+    action: (
+      <span className="rounded-full bg-[#FEF9C3] px-2 py-0.5 text-xs font-medium text-[#854D0E]">
+        Draft
+      </span>
+    ),
+    content:
+      "Set up automated push campaigns triggered by user actions or scheduled times.",
+  },
+  {
+    value: "analytics",
+    title: "Analytics",
+    action: (
+      <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-xs font-medium text-[#64748B]">
+        Beta
+      </span>
+    ),
+    content:
+      "View real-time engagement metrics, funnel reports, and cohort analysis.",
+  },
+];
+
+const ACTION_ICON_ITEMS: AccordionItem[] = [
+  {
+    value: "account",
+    title: "Account Settings",
+    icon: <Settings />,
+    action: (
+      <button
+        className="rounded-md p-1 text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
+        onClick={() => alert("Edit account")}
+        title="Edit"
+      >
+        <Pencil className="size-3.5" />
+      </button>
+    ),
+    content:
+      "Manage your profile details, change your password, and configure two-factor authentication.",
+  },
+  {
+    value: "notifications",
+    title: "Notification Preferences",
+    icon: <Bell />,
+    action: (
+      <button
+        className="rounded-md p-1 text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
+        onClick={() => alert("Edit notifications")}
+        title="Edit"
+      >
+        <Pencil className="size-3.5" />
+      </button>
+    ),
+    content:
+      "Choose which events trigger email, SMS, or push notifications and set quiet hours.",
+  },
+  {
+    value: "billing",
+    title: "Billing & Payments",
+    icon: <CreditCard />,
+    action: (
+      <a
+        href="#"
+        className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[#006F42] hover:bg-[#F0FDF4]"
+        onClick={(e) => e.preventDefault()}
+      >
+        <ExternalLink className="size-3" />
+        Manage
+      </a>
+    ),
+    content:
+      "View your current plan, update payment methods, and download past invoices.",
+  },
+  {
+    value: "security",
+    title: "Security",
+    icon: <ShieldCheck />,
+    action: (
+      <span className="rounded-full bg-[#DCFCE7] px-2 py-0.5 text-xs font-medium text-[#166534]">
+        Active
+      </span>
+    ),
+    content:
+      "Review active sessions, revoke access tokens, and audit recent login activity.",
+  },
+];
+
+const ACTION_CRUD_ITEMS: AccordionItem[] = [
+  {
+    value: "segment-vip",
+    title: "VIP Customers",
+    action: (
+      <div className="flex items-center gap-1">
+        <button
+          className="rounded-md p-1 text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
+          onClick={() => alert("Edit VIP segment")}
+          title="Edit"
+        >
+          <Pencil className="size-3.5" />
+        </button>
+        <button
+          className="rounded-md p-1 text-[#6B7280] hover:bg-[#FEF2F2] hover:text-[#DC2626]"
+          onClick={() => alert("Delete VIP segment")}
+          title="Delete"
+        >
+          <Trash2 className="size-3.5" />
+        </button>
+      </div>
+    ),
+    content: "Customers who have spent over ₹10,000 in the last 90 days.",
+  },
+  {
+    value: "segment-churned",
+    title: "Churned Users",
+    action: (
+      <div className="flex items-center gap-1">
+        <button
+          className="rounded-md p-1 text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
+          onClick={() => alert("Edit churned segment")}
+          title="Edit"
+        >
+          <Pencil className="size-3.5" />
+        </button>
+        <button
+          className="rounded-md p-1 text-[#6B7280] hover:bg-[#FEF2F2] hover:text-[#DC2626]"
+          onClick={() => alert("Delete churned segment")}
+          title="Delete"
+        >
+          <Trash2 className="size-3.5" />
+        </button>
+      </div>
+    ),
+    content:
+      "Users with no activity in the last 60 days targeted for re-engagement campaigns.",
+  },
+  {
+    value: "segment-new",
+    title: "New Signups",
+    action: (
+      <div className="flex items-center gap-1">
+        <button
+          className="rounded-md p-1 text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
+          onClick={() => alert("Edit new signups segment")}
+          title="Edit"
+        >
+          <Pencil className="size-3.5" />
+        </button>
+        <button
+          className="rounded-md p-1 text-[#6B7280] hover:bg-[#FEF2F2] hover:text-[#DC2626]"
+          onClick={() => alert("Delete new signups segment")}
+          title="Delete"
+        >
+          <Trash2 className="size-3.5" />
+        </button>
+      </div>
+    ),
+    content:
+      "Users who registered within the last 7 days and haven't completed onboarding.",
+  },
+];
+
 export default function AccordionPreview() {
   const [controlledValue, setControlledValue] = useState("what-is-uengage");
   const [multipleValues, setMultipleValues] = useState<string[]>([
@@ -102,7 +279,7 @@ export default function AccordionPreview() {
           </h1>
           <p className="mt-1 text-sm text-[#6B7280]">
             Three variants, three sizes, single and multiple modes, icon
-            support, and disabled items.
+            support, action slot, and disabled items.
           </p>
         </div>
 
@@ -150,6 +327,59 @@ export default function AccordionPreview() {
             items={SETTINGS_ITEMS}
             variant="bordered"
             defaultValue="account"
+          />
+        </section>
+
+        {/* Action — status badges */}
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-[#111827]">
+              Action — status badges
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              Pass any node via <code className="rounded bg-[#E5E7EB] px-1 text-xs">action</code> to
+              render it on the right of the header. Clicking it does not toggle the accordion.
+            </p>
+          </div>
+          <Accordion
+            items={ACTION_BADGE_ITEMS}
+            variant="default"
+            defaultValue="loyalty"
+          />
+        </section>
+
+        {/* Action — icon buttons + link */}
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-[#111827]">
+              Action — icon buttons &amp; link
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              Edit buttons and external links as actions alongside leading icons.
+            </p>
+          </div>
+          <Accordion
+            items={ACTION_ICON_ITEMS}
+            variant="bordered"
+            defaultValue="account"
+          />
+        </section>
+
+        {/* Action — CRUD buttons */}
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-[#111827]">
+              Action — Edit &amp; Delete
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              Composite action with Edit and Delete icon buttons — clicks are
+              isolated from the toggle via <code className="rounded bg-[#E5E7EB] px-1 text-xs">stopPropagation</code>.
+            </p>
+          </div>
+          <Accordion
+            items={ACTION_CRUD_ITEMS}
+            variant="bordered"
+            defaultValue="segment-vip"
           />
         </section>
 
@@ -230,8 +460,12 @@ export default function AccordionPreview() {
         <div className="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-4 py-3 text-sm text-[#4B5563]">
           <Info className="size-4 shrink-0 text-[#006F42]" />
           <span>
-            Items with <code className="rounded bg-[#E5E7EB] px-1 text-xs">disabled: true</code> are
-            visible but non-interactive — see the last item in Default and Controlled sections.
+            Items with{" "}
+            <code className="rounded bg-[#E5E7EB] px-1 text-xs">disabled: true</code>{" "}
+            are visible but non-interactive — see the last item in Default and
+            Controlled sections. The{" "}
+            <code className="rounded bg-[#E5E7EB] px-1 text-xs">action</code>{" "}
+            prop accepts any React node and renders it to the right of the header title.
           </span>
         </div>
       </div>

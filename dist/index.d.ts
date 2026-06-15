@@ -1127,6 +1127,7 @@ interface AccordionItem {
     content: React.ReactNode;
     disabled?: boolean;
     icon?: React.ReactNode;
+    action?: React.ReactNode;
 }
 type AccordionVariant = "default" | "ghost" | "bordered";
 type AccordionSize = "sm" | "md" | "lg";

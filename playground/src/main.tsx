@@ -39,6 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <SelectPreview/> */}
     {/* <InputPreview/> */}
     {/* <TabsPreview /> */}
+    <AccordionPreview/>
     <Demo/>
     <FileUploadPreview />
     <SectionPreview />

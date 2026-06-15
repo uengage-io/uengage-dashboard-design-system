@@ -145,6 +145,7 @@ export default function DatePickerPreview() {
               size="md"
               width="w-[280px]"
               clearable
+              maxDate={new Date("2026-06-15T09:57:26.601Z")}
             />
             <code style={{ fontSize: 11, color: "#6b7280" }}>
               {rangeDate
