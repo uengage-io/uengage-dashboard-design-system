@@ -20,7 +20,7 @@ export type AllowPattern =
 export interface CustomInputProps
   extends Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
-    "size" | "width" | "height"
+    "size" | "width" | "height" | "onChange"
   > {
   size?: "sm" | "md" | "lg";
   inputType?: InputType;
@@ -53,4 +53,11 @@ export interface CustomInputProps
   clearable?: boolean;
   /** Fires when the clear button is clicked. */
   onClear?: () => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
+  /** Renders a <textarea> instead of <input>. Incompatible with inputType="password" and suggestions. */
+  multiline?: boolean;
+  /** Number of visible text rows. Only used when multiline=true. */
+  rows?: number;
+  /** Controls CSS resize handle. Only used when multiline=true. Defaults to "vertical". */
+  resize?: "none" | "vertical" | "horizontal" | "both";
 }

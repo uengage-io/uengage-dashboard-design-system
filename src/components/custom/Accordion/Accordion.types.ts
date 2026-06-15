@@ -6,6 +6,7 @@ export interface AccordionItem {
   content: React.ReactNode;
   disabled?: boolean;
   icon?: React.ReactNode;
+  action?: React.ReactNode;
 }
 
 export type AccordionVariant = "default" | "ghost" | "bordered";

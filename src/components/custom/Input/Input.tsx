@@ -7,6 +7,7 @@ import {
   inputFieldVariants,
   inputIconSlotVariants,
   PATTERN_REGEX,
+  RESIZE_CLASS,
 } from "./inputVariants";
 import type { CustomInputProps } from "@/types/input";
 import { InputLabel } from "./InputLabel";
@@ -43,6 +44,9 @@ function Input({
   onSuggestionSelect,
   clearable,
   onClear,
+  multiline = false,
+  rows = 3,
+  resize = "vertical",
   ...rest
 }: CustomInputComposedProps) {
   const reactId = React.useId();
@@ -53,8 +57,6 @@ function Input({
   const [internalError, setInternalError] = React.useState<string | undefined>(undefined);
   const touchedRef = React.useRef(false);
 
-  // Track typed value separately so Fuse.js always has the latest query.
-  // Supports both controlled (rest.value) and uncontrolled (rest.defaultValue) inputs.
   const isControlled = rest.value !== undefined;
   const [uncontrolledQuery, setUncontrolledQuery] = React.useState(
     String(rest.defaultValue ?? ""),
@@ -62,12 +64,17 @@ function Input({
   const suggestionQuery = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
   const fuseResults = useFuzzySearch(suggestions ?? [], suggestionQuery);
   const showSuggestions =
-    !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
+    !multiline &&
+    !!suggestions?.length &&
+    focused &&
+    fuseResults.length > 0 &&
+    suggestionQuery.trim().length > 0;
 
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
-  const runValidation = (el: HTMLInputElement): string | undefined => {
+  const runValidation = (el: HTMLInputElement | HTMLTextAreaElement): string | undefined => {
     if (!el.validity.valid) {
       return validationMessage ?? el.validationMessage ?? "Invalid value";
     }
@@ -85,7 +92,7 @@ function Input({
 
   const effectiveError = error ?? internalError;
 
-  const isPassword = inputType === "password";
+  const isPassword = !multiline && inputType === "password";
   const effectiveType = isPassword && showPassword ? "text" : inputType;
 
   const resolvedRightIcon = React.useMemo(() => {
@@ -128,7 +135,8 @@ function Input({
   const handleClear = () => {
     if (!isControlled) {
       setUncontrolledQuery("");
-      if (inputRef.current) inputRef.current.value = "";
+      const ref = multiline ? textareaRef.current : inputRef.current;
+      if (ref) ref.value = "";
     }
     onChange?.({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
     onClear?.();
@@ -143,7 +151,9 @@ function Input({
     ? ({ sm: "pr-14", md: "pr-16", lg: "pr-20" } as Record<string, string>)[size]
     : undefined;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
     if (allowPattern && allowPattern !== "none") {
       const raw = e.target.value;
       const regex = new RegExp(PATTERN_REGEX[allowPattern], "g");
@@ -151,13 +161,12 @@ function Input({
       if (allowPattern === "phone" && stripped.length > 10) stripped = stripped.slice(0, 10);
       if (stripped !== raw) e.target.value = stripped;
     }
-    if (internalError) setInternalError(runValidation(e.target));
+    if (internalError) setInternalError(runValidation(e.target as HTMLInputElement));
     if (!isControlled) setUncontrolledQuery(e.target.value);
     onChange?.(e);
   };
 
   const handleSuggestionSelect = (item: { label: string; value: string }) => {
-    // Sync uncontrolled query; controlled inputs are updated by the consumer via onChange.
     if (!isControlled) setUncontrolledQuery(item.label);
     onSuggestionSelect?.(item.value);
   };
@@ -168,6 +177,11 @@ function Input({
       ? `${inputId}-helper`
       : undefined;
 
+  const fieldClass = cn(
+    inputFieldVariants({ size, multiline, hasLeftIcon, hasRightIcon }),
+    doubleRightPadding,
+  );
+
   return (
     <div className={cn("flex flex-col gap-1.5 min-w-0", width, className)}>
       {label && (
@@ -176,13 +190,12 @@ function Input({
         </InputLabel>
       )}
 
-      {/* relative wrapper scopes the suggestions dropdown */}
       <div ref={wrapperRef} className="relative">
-        <div className={cn(inputWrapperVariants({ size, state }))}>
+        <div className={cn(inputWrapperVariants({ size, multiline, state }))}>
           {hasLeftIcon && (
             <span
               className={cn(
-                inputIconSlotVariants({ size, side: "left" }),
+                inputIconSlotVariants({ size, side: "left", multiline }),
                 "pointer-events-none",
               )}
             >
@@ -190,44 +203,76 @@ function Input({
             </span>
           )}
 
-          <I
-            {...rest}
-            ref={inputRef}
-            id={inputId}
-            type={effectiveType}
-            disabled={disabled}
-            readOnly={readOnly}
-            spellCheck={spellCheck}
-            aria-autocomplete={suggestions ? "list" : undefined}
-            aria-invalid={Boolean(effectiveError) || undefined}
-            aria-describedby={describedById}
-            onChange={handleChange}
-            onWheel={(e) => {
-              if (e.currentTarget.type === "number") e.currentTarget.blur();
-            }}
-            onFocus={(e) => {
-              setFocused(true);
-              onFocus?.(e);
-            }}
-            onBlur={(e) => {
-              // Small delay so click on a suggestion fires before we lose focus
-              setTimeout(() => {
-                if (!wrapperRef.current?.contains(document.activeElement)) {
-                  setFocused(false);
+          {multiline ? (
+            <textarea
+              {...(rest as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+              ref={textareaRef}
+              id={inputId}
+              rows={rows}
+              disabled={disabled}
+              readOnly={readOnly}
+              spellCheck={spellCheck}
+              aria-invalid={Boolean(effectiveError) || undefined}
+              aria-describedby={describedById}
+              onChange={handleChange}
+              onFocus={(e) => {
+                setFocused(true);
+                onFocus?.(e as unknown as React.FocusEvent<HTMLInputElement>);
+              }}
+              onBlur={(e) => {
+                setTimeout(() => {
+                  if (!wrapperRef.current?.contains(document.activeElement)) {
+                    setFocused(false);
+                  }
+                }, 100);
+                setInternalError(runValidation(e.target));
+                if (!touchedRef.current) {
+                  touchedRef.current = true;
+                  onTouch?.();
                 }
-              }, 100);
-              setInternalError(runValidation(e.target));
-              if (!touchedRef.current) {
-                touchedRef.current = true;
-                onTouch?.();
-              }
-              onBlur?.(e);
-            }}
-            className={cn(inputFieldVariants({ size, hasLeftIcon, hasRightIcon }), doubleRightPadding)}
-          />
+                onBlur?.(e as unknown as React.FocusEvent<HTMLInputElement>);
+              }}
+              className={cn(fieldClass, RESIZE_CLASS[resize], "min-h-[80px]")}
+            />
+          ) : (
+            <I
+              {...rest}
+              ref={inputRef}
+              id={inputId}
+              type={effectiveType}
+              disabled={disabled}
+              readOnly={readOnly}
+              spellCheck={spellCheck}
+              aria-autocomplete={suggestions ? "list" : undefined}
+              aria-invalid={Boolean(effectiveError) || undefined}
+              aria-describedby={describedById}
+              onChange={handleChange as React.ChangeEventHandler<HTMLInputElement>}
+              onWheel={(e) => {
+                if (e.currentTarget.type === "number") e.currentTarget.blur();
+              }}
+              onFocus={(e) => {
+                setFocused(true);
+                onFocus?.(e);
+              }}
+              onBlur={(e) => {
+                setTimeout(() => {
+                  if (!wrapperRef.current?.contains(document.activeElement)) {
+                    setFocused(false);
+                  }
+                }, 100);
+                setInternalError(runValidation(e.target));
+                if (!touchedRef.current) {
+                  touchedRef.current = true;
+                  onTouch?.();
+                }
+                onBlur?.(e);
+              }}
+              className={fieldClass}
+            />
+          )}
 
           {hasRightIcon && (
-            <span className={cn(inputIconSlotVariants({ size, side: "right" }))}>
+            <span className={cn(inputIconSlotVariants({ size, side: "right", multiline }))}>
               <span className="flex items-center gap-1">
                 {showClear && (
                   <button
@@ -255,7 +300,6 @@ function Input({
               <li key={item.value} role="option" aria-selected={false}>
                 <button
                   type="button"
-                  // onMouseDown keeps focus on the input so onBlur doesn't fire before onClick
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => handleSuggestionSelect(item)}
                   className="w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors"

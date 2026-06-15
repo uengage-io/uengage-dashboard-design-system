@@ -332,7 +332,7 @@ type TabTriggerVariants = VariantProps<typeof tabTriggerVariants>;
 
 type InputType = "text" | "email" | "password" | "number" | "tel" | "url" | "search";
 type AllowPattern = "alphanumeric" | "alpha" | "numeric" | "decimal" | "phone" | "none";
-interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "width" | "height"> {
+interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "width" | "height" | "onChange"> {
     size?: "sm" | "md" | "lg";
     inputType?: InputType;
     allowPattern?: AllowPattern;
@@ -367,12 +367,19 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
     clearable?: boolean;
     /** Fires when the clear button is clicked. */
     onClear?: () => void;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
+    /** Renders a <textarea> instead of <input>. Incompatible with inputType="password" and suggestions. */
+    multiline?: boolean;
+    /** Number of visible text rows. Only used when multiline=true. */
+    rows?: number;
+    /** Controls CSS resize handle. Only used when multiline=true. Defaults to "vertical". */
+    resize?: "none" | "vertical" | "horizontal" | "both";
 }
 
 interface CustomInputComposedProps extends CustomInputProps {
     required?: boolean;
 }
-declare function Input({ size, inputType, allowPattern, label, helperText, error, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
+declare function Input({ size, inputType, allowPattern, label, helperText, error, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, multiline, rows, resize, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
 declare namespace Input {
     var displayName: string;
 }
@@ -400,16 +407,19 @@ declare namespace InputHelper {
 
 declare const inputWrapperVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
+    multiline?: boolean | null | undefined;
     state?: "default" | "disabled" | "focused" | "error" | "readonly" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const inputFieldVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
+    multiline?: boolean | null | undefined;
     hasLeftIcon?: boolean | null | undefined;
     hasRightIcon?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const inputIconSlotVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
     side?: "left" | "right" | null | undefined;
+    multiline?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type InputWrapperVariants = VariantProps<typeof inputWrapperVariants>;
 type InputFieldVariants = VariantProps<typeof inputFieldVariants>;
@@ -1127,6 +1137,7 @@ interface AccordionItem {
     content: React.ReactNode;
     disabled?: boolean;
     icon?: React.ReactNode;
+    action?: React.ReactNode;
 }
 type AccordionVariant = "default" | "ghost" | "bordered";
 type AccordionSize = "sm" | "md" | "lg";

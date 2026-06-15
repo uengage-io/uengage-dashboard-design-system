@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Search, Calendar, Mail } from "lucide-react";
+import { Search, Calendar, Mail, AlignLeft } from "lucide-react";
 import { Input } from "./Input";
 
 const meta = {
@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Shadcn-backed input wrapper with sized CVA variants, optional label / helper / error, absolute-positioned left & right icon slots, an auto eye-toggle for `inputType='password'`, and an `allowPattern` that strips disallowed characters inside `onChange` before the event reaches the caller.",
+          "Shadcn-backed input wrapper with sized CVA variants, optional label / helper / error, absolute-positioned left & right icon slots, an auto eye-toggle for `inputType='password'`, an `allowPattern` that strips disallowed characters inside `onChange` before the event reaches the caller, and a `multiline` prop that swaps the `<input>` for a `<textarea>` with configurable `rows` and `resize` behaviour.",
       },
     },
   },
@@ -21,10 +21,24 @@ const meta = {
     inputType: {
       control: "select",
       options: ["text", "email", "password", "number", "tel", "url", "search"],
+      description: "HTML input type. Ignored when `multiline` is true.",
     },
     allowPattern: {
       control: "select",
       options: ["none", "alphanumeric", "alpha", "numeric", "decimal", "phone"],
+    },
+    multiline: {
+      control: "boolean",
+      description: "Renders a `<textarea>` instead of `<input>`. Incompatible with `inputType='password'` and `suggestions`.",
+    },
+    rows: {
+      control: "number",
+      description: "Visible row count for the textarea. Only used when `multiline` is true.",
+    },
+    resize: {
+      control: "select",
+      options: ["none", "vertical", "horizontal", "both"],
+      description: "CSS resize handle direction. Only used when `multiline` is true. Defaults to `'vertical'`.",
     },
     label: { control: "text" },
     placeholder: { control: "text" },
@@ -56,6 +70,9 @@ const meta = {
     required: false,
     readOnly: false,
     clearable: false,
+    multiline: false,
+    rows: 3,
+    resize: "vertical",
   },
 } satisfies Meta<typeof Input>;
 
@@ -154,6 +171,143 @@ export const Url: Story = {
       <Input {...args} />
     </div>
   ),
+};
+
+/* ── Multiline (textarea) ───────────────────────────────────── */
+
+export const Multiline: Story = {
+  args: {
+    multiline: true,
+    label: "Description",
+    placeholder: "Enter a detailed description…",
+    helperText: "Renders a <textarea>. Resize by dragging the bottom-right corner.",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Set `multiline={true}` to swap the `<input>` for a `<textarea>`. All visual props (label, helper, error, icons, sizes, states) work identically.",
+      },
+    },
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const MultilineRows: Story = {
+  args: {
+    multiline: true,
+    rows: 6,
+    label: "Notes",
+    placeholder: "Enter notes…",
+    helperText: "rows={6} gives a taller initial height.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const MultilineResizeNone: Story = {
+  args: {
+    multiline: true,
+    resize: "none",
+    label: "Fixed textarea",
+    placeholder: "Cannot be resized…",
+    helperText: "resize=\"none\" — the user cannot drag to resize.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const MultilineResizeBoth: Story = {
+  args: {
+    multiline: true,
+    resize: "both",
+    label: "Freely resizable",
+    placeholder: "Drag any corner…",
+    helperText: "resize=\"both\" — drag horizontally and vertically.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const MultilineWithError: Story = {
+  args: {
+    multiline: true,
+    label: "Bio",
+    required: true,
+    placeholder: "Tell us about yourself…",
+    error: "Bio is required.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const MultilineDisabled: Story = {
+  args: {
+    multiline: true,
+    label: "Notes (locked)",
+    disabled: true,
+    defaultValue: "This textarea is disabled and cannot be edited.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const MultilineWithIcons: Story = {
+  args: {
+    multiline: true,
+    label: "Message",
+    placeholder: "Compose your message…",
+    leftIcon: <AlignLeft />,
+    helperText: "Icons align to the top of the textarea.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const MultilineControlled: Story = {
+  args: {
+    multiline: true,
+    label: "Feedback",
+    placeholder: "Write your feedback…",
+    maxLength: 200,
+    helperText: "Character count shown below.",
+  },
+  render: function MultilineControlledStory(args) {
+    const [value, setValue] = React.useState("");
+    return (
+      <div className="flex w-90 flex-col gap-2">
+        <Input
+          {...args}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <code className="text-xs text-[#6B7280]">
+          {value.length} / 200 characters
+        </code>
+      </div>
+    );
+  },
 };
 
 /* ── Allow patterns ─────────────────────────────────────────── */

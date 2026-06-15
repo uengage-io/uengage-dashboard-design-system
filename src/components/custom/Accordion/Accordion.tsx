@@ -28,7 +28,7 @@ function AccordionItems({
             <AccordionNS.Trigger
               className={cn(
                 accordionTriggerVariants({ variant, size }),
-                "data-[state=open]:text-[#006F42] w-full justify-between",
+                "data-[state=open]:text-[#006F42] w-full",
               )}
             >
               <span className="flex items-center gap-2.5 min-w-0">
@@ -37,10 +37,20 @@ function AccordionItems({
                 )}
                 <span className="truncate text-left">{item.title}</span>
               </span>
-              <ChevronDown
-                className="ml-3 size-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 group-data-[state=open]:rotate-180"
-                aria-hidden
-              />
+              <span className="ml-auto flex items-center gap-2">
+                {item.action && (
+                  <span
+                    className="shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {item.action}
+                  </span>
+                )}
+                <ChevronDown
+                  className="size-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 group-data-[state=open]:rotate-180"
+                  aria-hidden
+                />
+              </span>
             </AccordionNS.Trigger>
           </AccordionNS.Header>
           <AccordionNS.Content className="overflow-hidden will-change-[height] data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
