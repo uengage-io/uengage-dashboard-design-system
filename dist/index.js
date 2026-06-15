@@ -1452,7 +1452,7 @@ function SidebarZIndexProvider({ children }) {
   return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 50 }, children });
 }
 function ModalZIndexProvider({ children }) {
-  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 10001 }, children });
+  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 10003 }, children });
 }
 function Popover({
   ...props
@@ -2729,13 +2729,17 @@ function TertiaryTabs({
 }
 Tabs2.displayName = "Tabs";
 var inputWrapperVariants = cva(
-  "relative flex w-full items-center rounded-[4px] border bg-white transition-colors",
+  "relative flex w-full rounded-[4px] border bg-white transition-colors",
   {
     variants: {
       size: {
-        sm: `${COMPONENT_HEIGHT.sm} ${TEXT_SIZE.sm}`,
-        md: `${COMPONENT_HEIGHT.md} ${TEXT_SIZE.md}`,
-        lg: `${COMPONENT_HEIGHT.lg} ${TEXT_SIZE.lg}`
+        sm: TEXT_SIZE.sm,
+        md: TEXT_SIZE.md,
+        lg: TEXT_SIZE.lg
+      },
+      multiline: {
+        false: "items-center",
+        true: "items-start h-auto"
       },
       state: {
         default: "border-gray-400 hover:border-gray-500 hover:shadow-sm",
@@ -2745,8 +2749,14 @@ var inputWrapperVariants = cva(
         readonly: "bg-gray-50 border-gray-300 text-gray-700 cursor-default"
       }
     },
+    compoundVariants: [
+      { multiline: false, size: "sm", className: COMPONENT_HEIGHT.sm },
+      { multiline: false, size: "md", className: COMPONENT_HEIGHT.md },
+      { multiline: false, size: "lg", className: COMPONENT_HEIGHT.lg }
+    ],
     defaultVariants: {
       size: "md",
+      multiline: false,
       state: "default"
     }
   }
@@ -2756,9 +2766,13 @@ var inputFieldVariants = cva(
   {
     variants: {
       size: {
-        sm: `px-2.5 py-0 ${PLACEHOLDER_SIZE.sm}`,
-        md: `px-3 py-0 ${PLACEHOLDER_SIZE.md}`,
-        lg: `px-3.5 py-0 ${PLACEHOLDER_SIZE.lg}`
+        sm: `px-2.5 ${PLACEHOLDER_SIZE.sm}`,
+        md: `px-3 ${PLACEHOLDER_SIZE.md}`,
+        lg: `px-3.5 ${PLACEHOLDER_SIZE.lg}`
+      },
+      multiline: {
+        false: "py-0",
+        true: "py-2"
       },
       hasLeftIcon: {
         true: "",
@@ -2779,13 +2793,20 @@ var inputFieldVariants = cva(
     ],
     defaultVariants: {
       size: "md",
+      multiline: false,
       hasLeftIcon: false,
       hasRightIcon: false
     }
   }
 );
+var RESIZE_CLASS = {
+  none: "resize-none",
+  vertical: "resize-y",
+  horizontal: "resize-x",
+  both: "resize"
+};
 var inputIconSlotVariants = cva(
-  "absolute inset-y-0 flex items-center text-gray-400",
+  "absolute inset-y-0 flex text-gray-400",
   {
     variants: {
       size: {
@@ -2796,11 +2817,16 @@ var inputIconSlotVariants = cva(
       side: {
         left: "left-0",
         right: "right-0"
+      },
+      multiline: {
+        false: "items-center",
+        true: "items-start pt-2"
       }
     },
     defaultVariants: {
       size: "md",
-      side: "left"
+      side: "left",
+      multiline: false
     }
   }
 );
@@ -2838,6 +2864,9 @@ function Input2({
   onSuggestionSelect,
   clearable,
   onClear,
+  multiline = false,
+  rows = 3,
+  resize = "vertical",
   ...rest
 }) {
   const reactId = React19.useId();
@@ -2852,9 +2881,10 @@ function Input2({
   );
   const suggestionQuery = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
   const fuseResults = useFuzzySearch(suggestions ?? [], suggestionQuery);
-  const showSuggestions = !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
+  const showSuggestions = !multiline && !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
   const wrapperRef = React19.useRef(null);
   const inputRef = React19.useRef(null);
+  const textareaRef = React19.useRef(null);
   const runValidation = (el) => {
     if (!el.validity.valid) {
       return validationMessage ?? el.validationMessage ?? "Invalid value";
@@ -2868,7 +2898,7 @@ function Input2({
     return void 0;
   };
   const effectiveError = error ?? internalError;
-  const isPassword = inputType === "password";
+  const isPassword = !multiline && inputType === "password";
   const effectiveType = isPassword && showPassword ? "text" : inputType;
   const resolvedRightIcon = React19.useMemo(() => {
     if (rightIcon !== void 0) return rightIcon;
@@ -2890,7 +2920,8 @@ function Input2({
   const handleClear = () => {
     if (!isControlled) {
       setUncontrolledQuery("");
-      if (inputRef.current) inputRef.current.value = "";
+      const ref = multiline ? textareaRef.current : inputRef.current;
+      if (ref) ref.value = "";
     }
     onChange?.({ target: { value: "" } });
     onClear?.();
@@ -2917,21 +2948,57 @@ function Input2({
     onSuggestionSelect?.(item.value);
   };
   const describedById = effectiveError ? `${inputId}-error` : helperText ? `${inputId}-helper` : void 0;
+  const fieldClass = cn(
+    inputFieldVariants({ size, multiline, hasLeftIcon, hasRightIcon }),
+    doubleRightPadding
+  );
   return /* @__PURE__ */ jsxs("div", { className: cn("flex flex-col gap-1.5 min-w-0", width, className), children: [
     label && /* @__PURE__ */ jsx(InputLabel, { htmlFor: inputId, size, required, children: label }),
     /* @__PURE__ */ jsxs("div", { ref: wrapperRef, className: "relative", children: [
-      /* @__PURE__ */ jsxs("div", { className: cn(inputWrapperVariants({ size, state })), children: [
+      /* @__PURE__ */ jsxs("div", { className: cn(inputWrapperVariants({ size, multiline, state })), children: [
         hasLeftIcon && /* @__PURE__ */ jsx(
           "span",
           {
             className: cn(
-              inputIconSlotVariants({ size, side: "left" }),
+              inputIconSlotVariants({ size, side: "left", multiline }),
               "pointer-events-none"
             ),
             children: leftIcon
           }
         ),
-        /* @__PURE__ */ jsx(
+        multiline ? /* @__PURE__ */ jsx(
+          "textarea",
+          {
+            ...rest,
+            ref: textareaRef,
+            id: inputId,
+            rows,
+            disabled,
+            readOnly,
+            spellCheck,
+            "aria-invalid": Boolean(effectiveError) || void 0,
+            "aria-describedby": describedById,
+            onChange: handleChange,
+            onFocus: (e) => {
+              setFocused(true);
+              onFocus?.(e);
+            },
+            onBlur: (e) => {
+              setTimeout(() => {
+                if (!wrapperRef.current?.contains(document.activeElement)) {
+                  setFocused(false);
+                }
+              }, 100);
+              setInternalError(runValidation(e.target));
+              if (!touchedRef.current) {
+                touchedRef.current = true;
+                onTouch?.();
+              }
+              onBlur?.(e);
+            },
+            className: cn(fieldClass, RESIZE_CLASS[resize], "min-h-[80px]")
+          }
+        ) : /* @__PURE__ */ jsx(
           Input,
           {
             ...rest,
@@ -2965,10 +3032,10 @@ function Input2({
               }
               onBlur?.(e);
             },
-            className: cn(inputFieldVariants({ size, hasLeftIcon, hasRightIcon }), doubleRightPadding)
+            className: fieldClass
           }
         ),
-        hasRightIcon && /* @__PURE__ */ jsx("span", { className: cn(inputIconSlotVariants({ size, side: "right" })), children: /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-1", children: [
+        hasRightIcon && /* @__PURE__ */ jsx("span", { className: cn(inputIconSlotVariants({ size, side: "right", multiline })), children: /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-1", children: [
           showClear && /* @__PURE__ */ jsx(
             "button",
             {
@@ -5312,7 +5379,7 @@ function Modal({
     "div",
     {
       className: "fixed inset-0 bg-[#00000066] flex items-center justify-center px-4 outline-none",
-      style: { zIndex: 9999 },
+      style: { zIndex: 10002 },
       onClick: handleBackdropClick,
       children: /* @__PURE__ */ jsxs("div", { className: cn(modalSizeVariants({ size }), modalClassName), children: [
         (title || showCloseButton) && /* @__PURE__ */ jsxs("div", { className: cn("flex justify-between items-center border-b border-gray-300 p-2", headerClassName), children: [

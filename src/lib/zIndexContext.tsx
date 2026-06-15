@@ -20,7 +20,7 @@ export function SidebarZIndexProvider({ children }: { children: React.ReactNode 
 
 export function ModalZIndexProvider({ children }: { children: React.ReactNode }) {
   return (
-    <ZIndexContext.Provider value={{ popover: 10001 }}>
+    <ZIndexContext.Provider value={{ popover: 10003 }}>
       {children}
     </ZIndexContext.Provider>
   );
