@@ -10,9 +10,9 @@ export const dropzoneVariants = cva(
   {
     variants: {
       size: {
-        sm: "min-h-24 gap-1.5 px-3 py-3",
-        md: "min-h-32 gap-2 px-4 py-5",
-        lg: "min-h-44 gap-3 px-6 py-8",
+        sm: "h-24 gap-1.5 px-3 py-3",
+        md: "h-32 gap-2 px-4 py-5",
+        lg: "h-44 gap-3 px-6 py-8",
       },
       state: {
         idle:     "border-gray-300 bg-gray-50 hover:border-[#007a4d] hover:bg-green-50/60",

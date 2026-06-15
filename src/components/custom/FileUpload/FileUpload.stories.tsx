@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { Camera, Pencil, Store } from "lucide-react";
 import { FileUpload } from "./FileUpload";
 
 // ─── Stable placeholder assets ────────────────────────────────────────────────
@@ -86,6 +87,11 @@ const meta = {
     clearable: {
       control: "boolean",
       description: "Show the × remove button on filled states.",
+    },
+    icon: {
+      control: false,
+      description:
+        "Icon element rendered as a small badge in the bottom-right corner of the image or avatar preview. Accepts any ReactNode (e.g. a Lucide icon). Not shown on empty-state dropzones or the file variant.",
     },
     onChange:          { action: "onChange" },
     onFilesChange:     { action: "onFilesChange" },
@@ -675,6 +681,45 @@ export const AllVariantsOverview: Story = {
         label="Avatar — with photo"
         value={AVATAR_URL}
         size="md"
+      />
+    </div>
+  ),
+};
+
+/* ── Icon badge ────────────────────────────────────────────────────────────── */
+
+export const IconBadge: Story = {
+  name: "Icon badge",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass any ReactNode via `icon` to render a small badge in the bottom-right corner of the image or avatar preview. Works on both the `image` and `avatar` variants. Not shown on empty-state dropzones or the `file` variant.",
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-col gap-6 w-96">
+      <FileUpload
+        variant="avatar"
+        size="lg"
+        label="Avatar — camera badge"
+        value={AVATAR_URL}
+        icon={<Camera size={13} />}
+        description="Bottom-right corner"
+      />
+      <FileUpload
+        variant="image"
+        label="Image — pencil badge"
+        value={BANNER_URL}
+        icon={<Pencil size={12} />}
+        description="Hover to see Change / Remove overlay"
+      />
+      <FileUpload
+        variant="image"
+        label="Image — brand badge"
+        value={BANNER_URL}
+        icon={<Store size={12} />}
       />
     </div>
   ),

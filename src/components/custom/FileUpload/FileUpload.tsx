@@ -100,6 +100,14 @@ export interface FileUploadProps {
   /** Show the × clear button. Defaults to true. */
   clearable?: boolean;
 
+  // ── Icon badge ──────────────────────────────────────────────────────────────
+  /**
+   * Icon element rendered as a small badge in the bottom-right corner of the
+   * image or avatar preview. Useful for camera, edit, or brand indicators.
+   * Not rendered in the file variant or on empty-state dropzones.
+   */
+  icon?: React.ReactNode;
+
   // ── Styling ─────────────────────────────────────────────────────────────────
   /** Applied to the outermost wrapper div. */
   className?: string;
@@ -158,6 +166,7 @@ function FileUpload({
   dragAndDrop = true,
   showLocalPreview = true,
   clearable = true,
+  icon,
   className,
   dropzoneClassName,
   inputRef: externalInputRef,
@@ -468,6 +477,11 @@ function FileUpload({
               alt="Preview"
               className="absolute inset-0 w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
+            {icon && (
+              <div className="absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 pointer-events-none">
+                {icon}
+              </div>
+            )}
             {!disabled && !readOnly && (
               <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-2 p-2.5 translate-y-1 group-hover:translate-y-0 transition-transform duration-200">
@@ -642,34 +656,43 @@ function FileUpload({
 
     return (
       <div className="flex items-center gap-4">
-        {/* Circular image / dropzone */}
-        <div
-          {...(!previewUrl ? dropzoneInteractionProps : {})}
-          className={avatarContainerVariants({ size, state: avatarState })}
-        >
-          {previewUrl ? (
-            <>
-              <img
-                src={previewUrl}
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
-              {!disabled && !readOnly && (
-                <div
-                  className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full"
-                  onClick={openFilePicker}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={handleKeyDown}
-                  aria-label="Change photo"
-                >
-                  <ImageIcon size={avatarIconSize} className="text-white" />
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Upload size={avatarIconSize} className="text-gray-400" />
+        {/* Avatar circle + optional icon badge */}
+        <div className="relative flex-shrink-0">
+          <div
+            {...(!previewUrl ? dropzoneInteractionProps : {})}
+            className={avatarContainerVariants({ size, state: avatarState })}
+          >
+            {previewUrl ? (
+              <>
+                <img
+                  src={previewUrl}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+                {!disabled && !readOnly && (
+                  <div
+                    className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full"
+                    onClick={openFilePicker}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={handleKeyDown}
+                    aria-label="Change photo"
+                  >
+                    <ImageIcon size={avatarIconSize} className="text-white" />
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Upload size={avatarIconSize} className="text-gray-400" />
+              </div>
+            )}
+          </div>
+
+          {/* Icon badge — bottom-right corner, outside overflow-hidden */}
+          {icon && (
+            <div className="absolute bottom-0 right-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow border border-gray-100 text-gray-600 pointer-events-none">
+              {icon}
             </div>
           )}
         </div>

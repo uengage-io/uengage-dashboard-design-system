@@ -6657,9 +6657,9 @@ var dropzoneVariants = classVarianceAuthority.cva(
   {
     variants: {
       size: {
-        sm: "min-h-24 gap-1.5 px-3 py-3",
-        md: "min-h-32 gap-2 px-4 py-5",
-        lg: "min-h-44 gap-3 px-6 py-8"
+        sm: "h-24 gap-1.5 px-3 py-3",
+        md: "h-32 gap-2 px-4 py-5",
+        lg: "h-44 gap-3 px-6 py-8"
       },
       state: {
         idle: "border-gray-300 bg-gray-50 hover:border-[#007a4d] hover:bg-green-50/60",
@@ -6755,6 +6755,7 @@ function FileUpload({
   dragAndDrop = true,
   showLocalPreview = true,
   clearable = true,
+  icon,
   className,
   dropzoneClassName,
   inputRef: externalInputRef
@@ -6991,6 +6992,7 @@ function FileUpload({
                   className: "absolute inset-0 w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 }
               ),
+              icon && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 pointer-events-none", children: icon }),
               !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute bottom-0 left-0 right-0 flex items-center justify-between gap-2 p-2.5 translate-y-1 group-hover:translate-y-0 transition-transform duration-200", children: [
                 /* @__PURE__ */ jsxRuntime.jsxs(
                   "button",
@@ -7154,35 +7156,38 @@ function FileUpload({
     const previewUrl = item ? item.kind === "url" ? item.url : item.localFile.previewUrl : null;
     const avatarState = disabled ? "disabled" : previewUrl ? "filled" : "empty";
     return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-4", children: [
-      /* @__PURE__ */ jsxRuntime.jsx(
-        "div",
-        {
-          ...!previewUrl ? dropzoneInteractionProps : {},
-          className: avatarContainerVariants({ size, state: avatarState }),
-          children: previewUrl ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntime.jsx(
-              "img",
-              {
-                src: previewUrl,
-                alt: "Avatar",
-                className: "w-full h-full object-cover"
-              }
-            ),
-            !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
-              "div",
-              {
-                className: "absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full",
-                onClick: openFilePicker,
-                role: "button",
-                tabIndex: 0,
-                onKeyDown: handleKeyDown,
-                "aria-label": "Change photo",
-                children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ImageIcon, { size: avatarIconSize, className: "text-white" })
-              }
-            )
-          ] }) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Upload, { size: avatarIconSize, className: "text-gray-400" }) })
-        }
-      ),
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative flex-shrink-0", children: [
+        /* @__PURE__ */ jsxRuntime.jsx(
+          "div",
+          {
+            ...!previewUrl ? dropzoneInteractionProps : {},
+            className: avatarContainerVariants({ size, state: avatarState }),
+            children: previewUrl ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "img",
+                {
+                  src: previewUrl,
+                  alt: "Avatar",
+                  className: "w-full h-full object-cover"
+                }
+              ),
+              !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
+                "div",
+                {
+                  className: "absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full",
+                  onClick: openFilePicker,
+                  role: "button",
+                  tabIndex: 0,
+                  onKeyDown: handleKeyDown,
+                  "aria-label": "Change photo",
+                  children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ImageIcon, { size: avatarIconSize, className: "text-white" })
+                }
+              )
+            ] }) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Upload, { size: avatarIconSize, className: "text-gray-400" }) })
+          }
+        ),
+        icon && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute bottom-0 right-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow border border-gray-100 text-gray-600 pointer-events-none", children: icon })
+      ] }),
       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1", children: [
         !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
           "button",

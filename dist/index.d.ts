@@ -1408,6 +1408,12 @@ interface FileUploadProps {
     showLocalPreview?: boolean;
     /** Show the × clear button. Defaults to true. */
     clearable?: boolean;
+    /**
+     * Icon element rendered as a small badge in the bottom-right corner of the
+     * image or avatar preview. Useful for camera, edit, or brand indicators.
+     * Not rendered in the file variant or on empty-state dropzones.
+     */
+    icon?: React.ReactNode;
     /** Applied to the outermost wrapper div. */
     className?: string;
     /** Applied to the dropzone area (not used in avatar variant). */
@@ -1415,7 +1421,7 @@ interface FileUploadProps {
     /** Ref forwarded to the hidden <input type="file"> element. */
     inputRef?: React.Ref<HTMLInputElement>;
 }
-declare function FileUpload({ variant, size, accept, multiple, disabled, readOnly, name, id, maxSize, maxFiles, value, onChange, onFilesChange, onRemove, onRemoveFile, onValidationError, label, required, error, helperText, placeholder, description, dragAndDrop, showLocalPreview, clearable, className, dropzoneClassName, inputRef: externalInputRef, }: FileUploadProps): react_jsx_runtime.JSX.Element;
+declare function FileUpload({ variant, size, accept, multiple, disabled, readOnly, name, id, maxSize, maxFiles, value, onChange, onFilesChange, onRemove, onRemoveFile, onValidationError, label, required, error, helperText, placeholder, description, dragAndDrop, showLocalPreview, clearable, icon, className, dropzoneClassName, inputRef: externalInputRef, }: FileUploadProps): react_jsx_runtime.JSX.Element;
 declare namespace FileUpload {
     var displayName: string;
 }
