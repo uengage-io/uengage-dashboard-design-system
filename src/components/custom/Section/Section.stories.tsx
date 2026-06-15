@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import {
   Section,
+  SectionGroup,
   SectionHeader,
   SectionContent,
   SectionSubsection,
@@ -627,6 +628,96 @@ export const CollapsibleSection: Story = {
       </div>
     );
   },
+};
+
+// ─── SectionGroup (accordion) ────────────────────────────────────────────────
+
+export const AccordionGroup: Story = {
+  name: "SectionGroup — Accordion (one open at a time)",
+  parameters: {
+    docs: {
+      description: {
+        story: [
+          "Wrap multiple `<Section>` components in `<SectionGroup>` to get accordion behaviour — only one section is open at a time.",
+          "",
+          "- `SectionGroup` injects `collapsible`, `open`, and `onOpenChange` into each direct `<Section>` child automatically.",
+          "- `defaultOpen` (default `0`) sets which section starts open. Pass `null` to start with all sections collapsed.",
+          "- You don't need to add `collapsible` to each `<Section>` — the group handles it.",
+        ].join("\n"),
+      },
+    },
+  },
+  render: (args) => (
+    <SectionGroup className="max-w-4xl">
+      <Section {...args}>
+        <SectionHeader
+          icon={<Building2 size={18} />}
+          title="Business Details"
+          description="Name, registration, and tax info"
+        />
+        <SectionContent>
+          <SectionRow columns={3}>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Business Name</span>
+              <Input value="Tim Hortons" readOnly />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Legal Entity</span>
+              <Input value="Tim Hortons India Pvt. Ltd." readOnly />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">GSTIN</span>
+              <Input value="Unregistered" readOnly />
+            </SectionField>
+          </SectionRow>
+        </SectionContent>
+      </Section>
+
+      <Section {...args}>
+        <SectionHeader
+          icon={<MapPin size={18} />}
+          title="Location & Contact"
+          description="Address and point-of-contact details"
+        />
+        <SectionContent>
+          <SectionRow columns={3}>
+            <SectionField span={2}>
+              <span className="text-xs text-[#6B7280]">Street</span>
+              <Input value="Linking Road, Bandra West" readOnly />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Pin Code</span>
+              <Input value="400050" readOnly />
+            </SectionField>
+          </SectionRow>
+        </SectionContent>
+      </Section>
+
+      <Section {...args}>
+        <SectionHeader
+          icon={<Settings size={18} />}
+          title="Advanced Settings"
+          description="Ordering window and delivery config"
+        />
+        <SectionContent>
+          <SectionRow columns={3}>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Min Order (₹)</span>
+              <Input placeholder="100" />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Max Order (₹)</span>
+              <Input placeholder="5000" />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Delivery Radius (km)</span>
+              <Input placeholder="5" />
+            </SectionField>
+          </SectionRow>
+        </SectionContent>
+      </Section>
+    </SectionGroup>
+  ),
 };
 
 // ─── Bare ─────────────────────────────────────────────────────────────────────

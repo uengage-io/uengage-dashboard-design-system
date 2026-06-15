@@ -1,5 +1,6 @@
 export {
   Section,
+  SectionGroup,
   SectionHeader,
   SectionContent,
   SectionSubsection,
@@ -8,6 +9,7 @@ export {
   SectionDivider,
   SectionTableContent,
   type SectionProps,
+  type SectionGroupProps,
   type SectionHeaderProps,
   type SectionContentProps,
   type SectionSubsectionProps,

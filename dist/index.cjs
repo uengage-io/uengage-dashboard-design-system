@@ -6382,9 +6382,10 @@ function SectionHeader({
       {
         "data-slot": "section-header",
         className: cn(
-          "w-full flex items-start justify-between gap-3 pb-4 text-left",
-          "cursor-pointer select-none rounded-lg",
-          "hover:bg-[#F9FAFB] -mx-2 px-2",
+          "w-full flex items-start justify-between gap-3 text-left",
+          "data-[state=open]:pb-4",
+          "data-[state=open]:-mx-4 data-[state=open]:px-4 sm:data-[state=open]:-mx-5 sm:data-[state=open]:px-5 md:data-[state=open]:-mx-6 md:data-[state=open]:px-6",
+          "cursor-pointer select-none",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b7a3b] focus-visible:ring-offset-1",
           "group transition-colors",
           className
@@ -6608,6 +6609,7 @@ function Section({
     "flex flex-col gap-0 rounded-2xl border border-[#E5E7EB] bg-white",
     "p-4 sm:p-5 md:p-6",
     "shadow-none text-sm text-[#202020]",
+    collapsible && "[transition:padding_200ms_cubic-bezier(0.4,0,0.2,1),background-color_150ms_ease] data-[state=open]:[transition:padding_280ms_cubic-bezier(0.22,1,0.36,1),background-color_150ms_ease] data-[state=closed]:hover:bg-[#F9FAFB] data-[state=closed]:cursor-pointer data-[state=closed]:py-3 sm:data-[state=closed]:py-3 md:data-[state=closed]:py-3",
     className
   );
   const ctx = { collapsible };
