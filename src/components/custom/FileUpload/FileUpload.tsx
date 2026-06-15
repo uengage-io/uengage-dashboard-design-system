@@ -477,10 +477,16 @@ function FileUpload({
               alt="Preview"
               className="absolute inset-0 w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
-            {icon && (
-              <div className="absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 pointer-events-none">
+            {icon && !disabled && !readOnly && (
+              <button
+                type="button"
+                onClick={openFilePicker}
+                onKeyDown={handleKeyDown}
+                className="absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#007a4d] hover:border-[#007a4d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]"
+                aria-label="Change image"
+              >
                 {icon}
-              </div>
+              </button>
             )}
             {!disabled && !readOnly && (
               <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -690,10 +696,16 @@ function FileUpload({
           </div>
 
           {/* Icon badge — bottom-right corner, outside overflow-hidden */}
-          {icon && (
-            <div className="absolute bottom-0 right-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow border border-gray-100 text-gray-600 pointer-events-none">
+          {icon && !disabled && !readOnly && (
+            <button
+              type="button"
+              onClick={openFilePicker}
+              onKeyDown={handleKeyDown}
+              className="absolute bottom-0 right-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow border border-gray-100 text-gray-600 hover:text-[#007a4d] hover:border-[#007a4d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]"
+              aria-label="Change photo"
+            >
               {icon}
-            </div>
+            </button>
           )}
         </div>
 

@@ -6992,7 +6992,17 @@ function FileUpload({
                   className: "absolute inset-0 w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 }
               ),
-              icon && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 pointer-events-none", children: icon }),
+              icon && !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: openFilePicker,
+                  onKeyDown: handleKeyDown,
+                  className: "absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#007a4d] hover:border-[#007a4d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
+                  "aria-label": "Change image",
+                  children: icon
+                }
+              ),
               !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute bottom-0 left-0 right-0 flex items-center justify-between gap-2 p-2.5 translate-y-1 group-hover:translate-y-0 transition-transform duration-200", children: [
                 /* @__PURE__ */ jsxRuntime.jsxs(
                   "button",
@@ -7186,7 +7196,17 @@ function FileUpload({
             ] }) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Upload, { size: avatarIconSize, className: "text-gray-400" }) })
           }
         ),
-        icon && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute bottom-0 right-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow border border-gray-100 text-gray-600 pointer-events-none", children: icon })
+        icon && !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
+          "button",
+          {
+            type: "button",
+            onClick: openFilePicker,
+            onKeyDown: handleKeyDown,
+            className: "absolute bottom-0 right-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow border border-gray-100 text-gray-600 hover:text-[#007a4d] hover:border-[#007a4d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
+            "aria-label": "Change photo",
+            children: icon
+          }
+        )
       ] }),
       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1", children: [
         !disabled && !readOnly && /* @__PURE__ */ jsxRuntime.jsx(
