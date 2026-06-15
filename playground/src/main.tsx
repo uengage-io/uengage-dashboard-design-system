@@ -39,7 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <SelectPreview/> */}
     {/* <InputPreview/> */}
     {/* <TabsPreview /> */}
-    {/* <Demo/> */}
+    <Demo/>
     {/* <FileUploadPreview /> */}
     <SectionPreview />
   </React.StrictMode>,
