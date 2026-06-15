@@ -665,8 +665,9 @@ interface CustomTableProps<T> {
     className?: string;
     /**
      * How the table renders on small screens (< md / 768px).
-     * - "scroll"  — horizontal scroll (default, existing behaviour)
-     * - "cards"   — each row becomes a labelled card; columns with hideOnMobile are omitted
+     * - "scroll" — (default) horizontal scroll; preserves side-by-side column comparison.
+     * - "cards"  — each row becomes a labelled card; 1-col on xs, 2-col grid at sm.
+     *              Columns with hideOnMobile are omitted. Recommended for mobile-first UIs.
      */
     mobileLayout?: "scroll" | "cards";
     /**

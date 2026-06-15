@@ -11,13 +11,13 @@ export default function InputPreview() {
   const [tab, setTab] = useState("tickets");
 
   return (
-<div className="w-[200px]">
+<div >
   <Input
   label="Enter Name you want to enter in the given box "
   placeholder="Enter Your Name"
   allowPattern="phone"
   required
-
+multiline={true}
   />
 </div>
   );
