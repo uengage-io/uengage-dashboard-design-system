@@ -34,14 +34,11 @@ import FileUploadPreview from "./components/FileUpload";
 import SectionPreview from "./components/Section";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* <BannerPreview /> */}
-    {/* <FilterGroupPreview/> */}
-    {/* <SelectPreview/> */}
-    {/* <InputPreview/> */}
-    {/* <TabsPreview /> */}
-    <AccordionPreview/>
-    <Demo/>
-    <FileUploadPreview />
-    <SectionPreview />
+    <TabsPreview />
+    <TablePreview/>
+    {/* <AccordionPreview/> */}
+    {/* <Demo/> */}
+    {/* <FileUploadPreview /> */}
+    {/* <SectionPreview /> */}
   </React.StrictMode>,
 );

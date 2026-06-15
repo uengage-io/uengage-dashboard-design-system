@@ -91,68 +91,82 @@ export function Table<T>({
     >
       {/* ── Mobile card view ─────────────────────────────────────────── */}
       {mobileLayout === "cards" && (
-        <div className="flex flex-col gap-2 sm:gap-3 md:hidden">
+        <div className="md:hidden">
           {loading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-lg border bg-white p-3 sm:p-4 space-y-2 sm:space-y-3">
-                {visibleColumns.map((_, j) => (
-                  <Skeleton key={j} className="h-4 w-full" />
-                ))}
-              </div>
-            ))
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-gray-100 bg-white p-3 sm:p-4 shadow-sm space-y-2.5"
+                >
+                  <Skeleton className="h-3 w-1/3" />
+                  {visibleColumns.map((_, j) => (
+                    <div key={j} className="flex justify-between gap-3">
+                      <Skeleton className="h-3.5 w-1/4" />
+                      <Skeleton className="h-3.5 w-2/5" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           ) : sortedData.length === 0 ? (
-            <p className="py-8 text-center text-sm text-gray-500">
+            <p className="py-10 text-center text-sm text-gray-500">
               {emptyMessage}
             </p>
           ) : (
-            sortedData.map((row, rowIndex) => {
-              const rowKey = String(
-                (row as Record<string, unknown>)[keyField as string] ??
-                  rowIndex,
-              );
-              return (
-                <div
-                  key={rowKey}
-                  onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  className={cn(
-                    "rounded-lg border border-gray-200 bg-white p-3 sm:p-4 transition-colors",
-                    hover && "hover:bg-gray-50",
-                    onRowClick && "cursor-pointer active:bg-gray-100",
-                    rowClassName?.(row),
-                  )}
-                >
-                  {visibleColumns.map((col) => {
-                    const colKey = String(col.key);
-                    const rawValue = (row as Record<string, unknown>)[colKey];
-                    const content = col.render
-                      ? col.render(rawValue, row, rowIndex)
-                      : (rawValue as React.ReactNode);
-                    return (
-                      <div
-                        key={colKey}
-                        className="flex items-start justify-between gap-3 sm:gap-4 border-b border-gray-100 py-1.5 sm:py-2 first:pt-0 last:border-0 last:pb-0"
-                      >
-                        <span className="shrink-0 text-xs font-medium text-gray-500">
-                          {col.header}
-                        </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              {sortedData.map((row, rowIndex) => {
+                const rowKey = String(
+                  (row as Record<string, unknown>)[keyField as string] ??
+                    rowIndex,
+                );
+                return (
+                  <div
+                    key={rowKey}
+                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                    className={cn(
+                      "rounded-xl border border-gray-100 bg-white shadow-sm",
+                      "transition-colors overflow-hidden",
+                      hover && onRowClick && "hover:bg-gray-50 active:bg-gray-100",
+                      onRowClick && "cursor-pointer",
+                      rowClassName?.(row),
+                    )}
+                  >
+                    {visibleColumns.map((col, colIndex) => {
+                      const colKey = String(col.key);
+                      const rawValue = (row as Record<string, unknown>)[colKey];
+                      const content = col.render
+                        ? col.render(rawValue, row, rowIndex)
+                        : (rawValue as React.ReactNode);
+                      const isLast = colIndex === visibleColumns.length - 1;
+                      return (
                         <div
+                          key={colKey}
                           className={cn(
-                            "text-sm flex-1 min-w-0",
-                            col.align === "center"
-                              ? "text-center"
-                              : col.align === "right"
-                                ? "text-right"
-                                : "text-left",
+                            "flex items-start justify-between gap-3 px-3 sm:px-4 py-2 sm:py-2.5",
+                            !isLast && "border-b border-gray-50",
                           )}
                         >
-                          {content}
+                          <span className="shrink-0 text-xs font-medium text-gray-400 pt-0.5 min-w-[72px] max-w-[40%]">
+                            {col.header}
+                          </span>
+                          <div
+                            className={cn(
+                              "text-sm text-gray-800 font-medium flex-1 min-w-0",
+                              "flex justify-end items-center",
+                              col.align === "left" && "justify-start",
+                              col.align === "center" && "justify-center",
+                            )}
+                          >
+                            {content}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       )}

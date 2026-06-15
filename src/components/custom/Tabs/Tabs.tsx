@@ -306,7 +306,10 @@ function SecondaryTabs({
   showBottomBorder = true,
   className,
 }: CustomTabsProps) {
+  const outerRef = React.useRef<HTMLDivElement>(null);
+  const measureRef = React.useRef<HTMLDivElement>(null);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
+
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
@@ -319,9 +322,69 @@ function SecondaryTabs({
     ready: boolean;
   }>({ left: 0, width: 0, ready: false });
 
+  const [containerWidth, setContainerWidth] = React.useState(0);
+  const [tabWidths, setTabWidths] = React.useState<number[]>([]);
+  const [moreButtonWidth, setMoreButtonWidth] = React.useState(120);
+
+  // Track available width via ResizeObserver
+  React.useLayoutEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    setContainerWidth(el.getBoundingClientRect().width);
+  }, []);
+
+  React.useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setContainerWidth(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Re-measure individual tab widths whenever container width or tabs change.
+  // Running on containerWidth ensures responsive breakpoints (sm:px-5 etc.) are captured.
+  React.useLayoutEffect(() => {
+    if (containerWidth === 0) return;
+    const el = measureRef.current;
+    if (!el) return;
+    const btns = el.querySelectorAll("[data-measure-tab]");
+    setTabWidths(
+      Array.from(btns).map((btn) => (btn as HTMLElement).getBoundingClientRect().width),
+    );
+    const moreBtn = el.querySelector("[data-measure-more]") as HTMLElement | null;
+    if (moreBtn) setMoreButtonWidth(moreBtn.getBoundingClientRect().width);
+  }, [containerWidth, tabs, overflowLabel]);
+
+  // Compute how many tabs fit without scrolling. Respects explicit visibleTabLimit when provided.
+  const dynamicLimit = React.useMemo<number | undefined>(() => {
+    if (visibleTabLimit !== undefined) return visibleTabLimit;
+    if (containerWidth === 0 || tabWidths.length === 0) return undefined;
+
+    const GAP = 8; // gap-2 = 8px
+    let total = 0;
+    let count = 0;
+
+    for (let i = 0; i < tabs.length; i++) {
+      const tabW = (tabWidths[i] ?? 80) + (i > 0 ? GAP : 0);
+      const wouldHaveMore = count + 1 < tabs.length;
+      const projected = total + tabW + (wouldHaveMore ? moreButtonWidth + GAP : 0);
+      if (projected <= containerWidth) {
+        total += tabW;
+        count++;
+      } else {
+        break;
+      }
+    }
+
+    return count > 0 ? count : 1;
+  }, [visibleTabLimit, containerWidth, tabWidths, tabs, moreButtonWidth]);
+
   const { visibleTabs, overflowTabs } = React.useMemo(
-    () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
-    [activeValue, tabs, visibleTabLimit],
+    () => getVisibleTabs(tabs, activeValue, dynamicLimit),
+    [activeValue, tabs, dynamicLimit],
   );
 
   const measureIndicator = React.useCallback(() => {
@@ -337,7 +400,7 @@ function SecondaryTabs({
     const containerRect = wrapper.getBoundingClientRect();
     const btnRect = btn.getBoundingClientRect();
     setIndicator({
-      left: btnRect.left - containerRect.left + wrapper.scrollLeft,
+      left: btnRect.left - containerRect.left,
       width: btnRect.width,
       ready: true,
     });
@@ -362,16 +425,36 @@ function SecondaryTabs({
       onValueChange={handleChange}
       className={cn("w-full", className)}
     >
-      <div className="relative w-full">
-        {/*
-          Two-part layout:
-          - Left: scrollable tabs area (shrinks on mobile, natural width on desktop)
-          - Right: More Options button outside the scroll — never overlaps tabs
-        */}
+      {/* Hidden off-screen container to measure natural tab widths at the current breakpoint */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        style={{ position: "fixed", top: -9999, left: -9999, visibility: "hidden", pointerEvents: "none" }}
+        className="flex items-center"
+      >
+        {tabs.map((tab) => (
+          <span
+            key={tab.value}
+            data-measure-tab
+            className="relative flex items-center gap-2 whitespace-nowrap rounded-t-lg px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium"
+          >
+            {tab.label}
+          </span>
+        ))}
+        <span
+          data-measure-more
+          className="inline-flex flex-none items-center gap-1 whitespace-nowrap rounded-t-lg px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium"
+        >
+          <span>{overflowLabel}</span>
+          <ChevronDown size={16} strokeWidth={2.25} />
+        </span>
+      </div>
+
+      <div ref={outerRef} className="relative w-full">
         <div className={cn("inline-flex max-w-full items-end", showBottomBorder && "border-b border-[#E5E7EB]")}>
           <div
             ref={wrapperRef}
-            className="relative min-w-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="relative min-w-0 overflow-hidden"
           >
             <TabsList
               variant="line"
