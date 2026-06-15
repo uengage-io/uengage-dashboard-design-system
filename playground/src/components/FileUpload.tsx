@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Camera, Pencil, Store } from "lucide-react";
 import { FileUpload } from "@uengage/ui";
 
 // ─── Sample assets ────────────────────────────────────────────────────────────
@@ -433,6 +434,43 @@ export default function FileUploadPreview() {
                 accept=".csv"
                 placeholder="Drop your CSV here"
                 description="Must have columns: name, email"
+              />
+            </div>
+          </ColGrid>
+        </Section>
+
+        {/* ── Icon badge ────────────────────────────────────────────────────────── */}
+        <Section
+          title="Icon badge"
+          description="Pass any ReactNode via icon — rendered as a small badge in the bottom-right corner of the image or avatar preview."
+        >
+          <ColGrid cols={3}>
+            <div>
+              <ColLabel>avatar + camera</ColLabel>
+              <FileUpload
+                variant="avatar"
+                size="lg"
+                value={AVATAR_URL}
+                icon={<Camera size={13} />}
+                description="Bottom-right badge"
+              />
+            </div>
+            <div>
+              <ColLabel>image + pencil</ColLabel>
+              <FileUpload
+                variant="image"
+                value={BANNER_URL}
+                icon={<Pencil size={12} />}
+                description="PNG, JPG"
+              />
+            </div>
+            <div>
+              <ColLabel>image + brand icon</ColLabel>
+              <FileUpload
+                variant="image"
+                value={BANNER_URL}
+                icon={<Store size={12} />}
+                description="Custom brand indicator"
               />
             </div>
           </ColGrid>
