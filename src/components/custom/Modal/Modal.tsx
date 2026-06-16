@@ -44,13 +44,20 @@ export function Modal({
   modalClassName,
 }: ModalProps) {
   React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (!isOpen) return;
+    // Capture scroll position before locking — iOS Safari ignores overflow:hidden on body,
+    // so we use position:fixed + top offset to prevent background scroll on all platforms.
+    const scrollY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
     return () => {
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
 
@@ -63,7 +70,7 @@ export function Modal({
   const modal = (
     <div
       className="fixed inset-0 bg-[#00000066] flex items-center justify-center px-4 outline-none"
-      style={{ zIndex: 10002 }}
+      style={{ zIndex: 9999 }}
       onClick={handleBackdropClick}
     >
       <div className={cn(modalSizeVariants({ size }), modalClassName)}>

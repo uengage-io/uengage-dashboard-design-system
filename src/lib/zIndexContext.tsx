@@ -10,7 +10,11 @@ export function useZIndex() {
   return React.useContext(ZIndexContext);
 }
 
-export function SidebarZIndexProvider({ children }: { children: React.ReactNode }) {
+export function SidebarZIndexProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <ZIndexContext.Provider value={{ popover: 50 }}>
       {children}
@@ -18,9 +22,13 @@ export function SidebarZIndexProvider({ children }: { children: React.ReactNode 
   );
 }
 
-export function ModalZIndexProvider({ children }: { children: React.ReactNode }) {
+export function ModalZIndexProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ZIndexContext.Provider value={{ popover: 10003 }}>
+    <ZIndexContext.Provider value={{ popover: 10001 }}>
       {children}
     </ZIndexContext.Provider>
   );
