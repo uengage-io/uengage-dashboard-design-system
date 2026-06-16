@@ -4340,7 +4340,7 @@ function Table({ className, ...props }) {
     "div",
     {
       "data-slot": "table-container",
-      className: "uengage-ui relative w-full overflow-x-auto",
+      className: "uengage-ui relative w-full",
       children: /* @__PURE__ */ jsx(
         "table",
         {
@@ -4719,7 +4719,7 @@ function Table2({
               Table,
               {
                 className: "w-full",
-                style: tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : { minWidth: "max-content" },
+                style: tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : { width: "max-content", minWidth: "100%" },
                 children: [
                   /* @__PURE__ */ jsx("colgroup", { children: columns.map((col, i) => /* @__PURE__ */ jsx(
                     "col",
