@@ -5,6 +5,18 @@ import { trackVariants, thumbVariants } from "./toggleVariants";
 import type { ToggleVariantSize } from "./toggleVariants";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 
+const PILL_PADDING: Record<ToggleVariantSize, string> = {
+  sm: "gap-1.5 px-2.5 py-1.5",
+  md: "gap-2 px-3 py-2",
+  lg: "gap-2.5 px-4 py-2.5",
+};
+
+const GAP_ONLY: Record<ToggleVariantSize, string> = {
+  sm: "gap-1.5",
+  md: "gap-2",
+  lg: "gap-2.5",
+};
+
 export interface ToggleProps extends Omit<
   React.ComponentProps<typeof SwitchPrimitive.Root>,
   "onChange" | "defaultChecked" | "checked"
@@ -29,6 +41,10 @@ export interface ToggleProps extends Omit<
   wrapperClassName?: string;
   /** When true, the toggle shows its current state but cannot be changed. */
   readOnly?: boolean;
+  /** When provided together with bgColor, enables pill look. Border color applied when checked. */
+  borderColor?: string;
+  /** When provided together with borderColor, enables pill look. Background color applied when checked. */
+  bgColor?: string;
 }
 
 export const Toggle = React.forwardRef<
@@ -48,13 +64,47 @@ export const Toggle = React.forwardRef<
       disabled,
       readOnly,
       wrapperClassName,
+      borderColor,
+      bgColor,
       ...props
     },
     ref,
   ) => {
+    const internalRef = React.useRef<React.ElementRef<typeof SwitchPrimitive.Root>>(null);
+    const [isChecked, setIsChecked] = React.useState(false);
+
+    const mergedRef = React.useCallback(
+      (node: React.ElementRef<typeof SwitchPrimitive.Root> | null) => {
+        internalRef.current = node;
+        if (typeof ref === "function") ref(node);
+        else if (ref) (ref as React.MutableRefObject<typeof node>).current = node;
+      },
+      [ref],
+    );
+
+    React.useEffect(() => {
+      const el = internalRef.current;
+      if (!el) return;
+      setIsChecked(el.dataset.state === "checked");
+      const observer = new MutationObserver(() => {
+        setIsChecked(el.dataset.state === "checked");
+      });
+      observer.observe(el, { attributes: true, attributeFilter: ["data-state"] });
+      return () => observer.disconnect();
+    }, []);
+
+    const hasCustomColors = !!(borderColor || bgColor);
+
+    const pillStyle: React.CSSProperties | undefined = hasCustomColors
+      ? {
+          ...(isChecked && borderColor ? { borderColor } : {}),
+          ...(isChecked && bgColor ? { backgroundColor: bgColor } : {}),
+        }
+      : undefined;
+
     const switchEl = (
       <SwitchPrimitive.Root
-        ref={ref}
+        ref={mergedRef}
         checked={checked !== undefined ? checked : undefined}
         defaultChecked={checked !== undefined ? undefined : defaultChecked}
         onCheckedChange={readOnly ? undefined : onChange}
@@ -71,8 +121,13 @@ export const Toggle = React.forwardRef<
 
     const inlineEl = title ? (
       <label
+        style={pillStyle}
         className={cn(
-          "inline-flex cursor-pointer items-center gap-2",
+          "inline-flex cursor-pointer items-center transition-colors",
+          hasCustomColors
+            ? cn("rounded-xl border", PILL_PADDING[size], "border-gray-200")
+            : GAP_ONLY[size],
+          disabled && "cursor-not-allowed opacity-60",
           readOnly && "pointer-events-none cursor-default",
         )}
       >
@@ -84,6 +139,19 @@ export const Toggle = React.forwardRef<
           <span className="text-sm font-medium text-[#1F2937]">{title}</span>
         )}
       </label>
+    ) : hasCustomColors ? (
+      <div
+        style={pillStyle}
+        className={cn(
+          "inline-flex items-center transition-colors rounded-xl border",
+          PILL_PADDING[size],
+          "border-gray-200",
+          disabled && "opacity-60",
+          readOnly && "pointer-events-none cursor-default",
+        )}
+      >
+        {switchEl}
+      </div>
     ) : (
       switchEl
     );

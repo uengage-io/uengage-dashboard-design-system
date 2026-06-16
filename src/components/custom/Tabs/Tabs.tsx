@@ -364,13 +364,21 @@ function SecondaryTabs({
     if (containerWidth === 0 || tabWidths.length === 0) return undefined;
 
     const GAP = 8; // gap-2 = 8px
+
+    // If all tabs fit naturally, no overflow button is needed at all.
+    const totalAllTabs = tabWidths.reduce(
+      (sum, w, i) => sum + w + (i > 0 ? GAP : 0),
+      0,
+    );
+    if (totalAllTabs <= containerWidth) return undefined;
+
+    // Otherwise find how many tabs fit alongside the overflow button.
     let total = 0;
     let count = 0;
 
     for (let i = 0; i < tabs.length; i++) {
       const tabW = (tabWidths[i] ?? 80) + (i > 0 ? GAP : 0);
-      const wouldHaveMore = count + 1 < tabs.length;
-      const projected = total + tabW + (wouldHaveMore ? moreButtonWidth + GAP : 0);
+      const projected = total + tabW + moreButtonWidth + GAP;
       if (projected <= containerWidth) {
         total += tabW;
         count++;

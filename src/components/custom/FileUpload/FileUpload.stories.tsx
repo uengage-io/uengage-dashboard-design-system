@@ -31,7 +31,7 @@ const meta = {
   argTypes: {
     variant: {
       control: "radio",
-      options: ["image", "file", "avatar"],
+      options: ["image", "file", "avatar", "video"],
       description: "Controls the visual layout and the default `accept` type.",
     },
     size: {
@@ -168,6 +168,58 @@ export const AvatarVariant: Story = {
     variant:     "avatar",
     label:       "Profile Photo",
     description: "Square image recommended",
+  },
+  render: (args) => (
+    <div className="w-96">
+      <FileUpload {...args} />
+    </div>
+  ),
+};
+
+export const VideoVariant: Story = {
+  name: "Variant · Video",
+  args: {
+    variant:     "video",
+    label:       "Product Video",
+    description: "MP4, WebM up to 50 MB",
+  },
+  render: (args) => (
+    <div className="w-96">
+      <FileUpload {...args} />
+    </div>
+  ),
+};
+
+export const VideoWithValue: Story = {
+  name: "Video · With value",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass a URL via `value` to display an already-uploaded video. Hover over the player to reveal the **Change** / **Remove** overlay.",
+      },
+    },
+  },
+  args: {
+    variant: "video",
+    label:   "Product Video",
+    value:   "https://www.w3schools.com/html/mov_bbb.mp4",
+  },
+  render: (args) => (
+    <div className="w-96">
+      <FileUpload {...args} />
+    </div>
+  ),
+};
+
+export const MultipleVideos: Story = {
+  name: "Video · Multiple",
+  args: {
+    variant:     "video",
+    label:       "Video Gallery",
+    multiple:    true,
+    maxFiles:    4,
+    description: "MP4, WebM — up to 4 videos",
   },
   render: (args) => (
     <div className="w-96">
@@ -718,6 +770,11 @@ export const AllVariantsOverview: Story = {
         label="Avatar — with photo"
         value={AVATAR_URL}
         size="md"
+      />
+      <FileUpload
+        variant="video"
+        label="Video — empty"
+        description="MP4, WebM up to 50 MB"
       />
     </div>
   ),

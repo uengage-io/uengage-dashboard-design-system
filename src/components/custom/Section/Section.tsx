@@ -9,10 +9,14 @@ import { Separator } from "../../ui/separator";
 
 interface SectionContextValue {
   collapsible: boolean;
+  isOpen: boolean;
+  divider: boolean;
 }
 
 const SectionContext = React.createContext<SectionContextValue>({
   collapsible: false,
+  isOpen: true,
+  divider: false,
 });
 
 // ─── SectionHeader ────────────────────────────────────────────────────────────
@@ -36,7 +40,7 @@ function SectionHeader({
   className,
   ...props
 }: SectionHeaderProps) {
-  const { collapsible } = React.useContext(SectionContext);
+  const { collapsible, isOpen, divider } = React.useContext(SectionContext);
 
   const inner = (
     <>
@@ -89,7 +93,10 @@ function SectionHeader({
           >
             <ChevronDown
               size={16}
-              className="transition-transform duration-200 group-data-[state=open]:rotate-180"
+              className={cn(
+                "transition-transform duration-200",
+                isOpen && "rotate-180",
+              )}
             />
           </span>
         )}
@@ -102,17 +109,25 @@ function SectionHeader({
       <Collapsible.Trigger
         data-slot="section-header"
         className={cn(
-          "w-full flex items-start justify-between gap-3 text-left",
-          "data-[state=open]:pb-4",
-          "data-[state=open]:-mx-4 data-[state=open]:px-4 sm:data-[state=open]:-mx-5 sm:data-[state=open]:px-5 md:data-[state=open]:-mx-6 md:data-[state=open]:px-6",
+          "flex flex-col justify-center text-left",
+          "-ml-4 sm:-ml-5 md:-ml-6",
+          "w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-[calc(100%+3rem)]",
+          "pl-4 sm:pl-5 md:pl-6 pr-4 sm:pr-5 md:pr-6",
+          "py-3 sm:py-3.5 md:py-4 -my-3 sm:-my-3.5 md:-my-4",
+          "rounded-2xl hover:bg-[#fafff7] transition-colors duration-150",
           "cursor-pointer select-none",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b7a3b] focus-visible:ring-offset-1",
-          "group transition-colors",
+          "group",
           className,
         )}
         {...(props as React.ComponentProps<typeof Collapsible.Trigger>)}
       >
-        {inner}
+        <div className="flex items-center justify-between gap-3 w-full">
+          {inner}
+        </div>
+        {divider && isOpen && (
+          <div className="w-full mt-3 sm:mt-3.5 md:mt-4 border-t border-[#F3F4F6]" />
+        )}
       </Collapsible.Trigger>
     );
   }
@@ -207,7 +222,7 @@ function SectionContent({ className, children, ...props }: SectionContentProps) 
   const inner = (
     <div
       data-slot="section-content"
-      className={cn("flex flex-col gap-0", className)}
+      className={cn("flex flex-col gap-0", collapsible && "pt-4", className)}
       {...props}
     >
       {children}
@@ -400,6 +415,7 @@ function SectionTableContent({
         "-mx-4 sm:-mx-5 md:-mx-6",
         "-mb-4 sm:-mb-5 md:-mb-6",
         "overflow-hidden rounded-b-2xl",
+        collapsible && "mt-4",
         divider && "border-t border-[#E5E7EB]",
         className,
       )}
@@ -472,6 +488,11 @@ export interface SectionProps extends React.ComponentProps<"div"> {
   /** Enables the collapse/expand toggle. A chevron button appears in the header. */
   collapsible?: boolean;
   /**
+   * When true (and collapsible is true), shows a light divider line below the
+   * header when the section is open.
+   */
+  divider?: boolean;
+  /**
    * Initial open state when uncontrolled (default: true).
    * Only used when `collapsible` is true and `open` is not provided.
    */
@@ -491,23 +512,38 @@ export interface SectionProps extends React.ComponentProps<"div"> {
 function Section({
   bare = false,
   collapsible = false,
+  divider = false,
   defaultOpen = true,
-  open,
+  open: openProp,
   onOpenChange,
   className,
   children,
   ...props
 }: SectionProps) {
+  const isControlled = openProp !== undefined;
+  const [internalOpen, setInternalOpen] = React.useState(
+    isControlled ? openProp! : defaultOpen,
+  );
+  const isOpen = isControlled ? openProp! : internalOpen;
+
+  const handleOpenChange = React.useCallback(
+    (next: boolean) => {
+      if (!isControlled) setInternalOpen(next);
+      onOpenChange?.(next);
+    },
+    [isControlled, onOpenChange],
+  );
+
   const cardClass = cn(
     "uengage-ui",
     "flex flex-col gap-0 rounded-2xl border border-[#E5E7EB] bg-white",
     "p-4 sm:p-5 md:p-6",
     "shadow-none text-sm text-[#202020]",
-    collapsible && "[transition:padding_200ms_cubic-bezier(0.4,0,0.2,1),background-color_150ms_ease] data-[state=open]:[transition:padding_280ms_cubic-bezier(0.22,1,0.36,1),background-color_150ms_ease] data-[state=closed]:hover:bg-[#F9FAFB] data-[state=closed]:cursor-pointer data-[state=closed]:py-3 sm:data-[state=closed]:py-3 md:data-[state=closed]:py-3",
+    collapsible && "py-3 sm:py-3.5 md:py-4",
     className,
   );
 
-  const ctx: SectionContextValue = { collapsible };
+  const ctx: SectionContextValue = { collapsible, isOpen, divider };
 
   if (bare) {
     return (
@@ -524,14 +560,9 @@ function Section({
   }
 
   if (collapsible) {
-    const collapsibleProps =
-      open !== undefined
-        ? { open, onOpenChange }
-        : { defaultOpen };
-
     return (
       <SectionContext.Provider value={ctx}>
-        <Collapsible.Root {...collapsibleProps} asChild>
+        <Collapsible.Root open={isOpen} onOpenChange={handleOpenChange} asChild>
           <ShadcnCard
             data-slot="section"
             className={cardClass}
