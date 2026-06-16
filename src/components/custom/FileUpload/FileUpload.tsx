@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Upload, X, ImageIcon, Plus, File as FileIcon } from "lucide-react";
+import { Upload, X, ImageIcon, Plus, File as FileIcon, Video as VideoIcon, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 import { InputHelper } from "@/components/custom/Input/InputHelper";
@@ -16,7 +16,7 @@ import {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type FileUploadVariant = "image" | "file" | "avatar";
+export type FileUploadVariant = "image" | "file" | "avatar" | "video";
 export type FileUploadSize = "sm" | "md" | "lg";
 
 /** Internal representation of a locally-selected file with a preview URL. */
@@ -137,6 +137,7 @@ function formatBytes(bytes: number, decimals = 1): string {
 
 function getDefaultAccept(variant: FileUploadVariant): string | undefined {
   if (variant === "image" || variant === "avatar") return "image/*";
+  if (variant === "video") return "video/*";
   return undefined;
 }
 
@@ -202,6 +203,7 @@ function FileUpload({
   const [validationErrors, setValidationErrors] = React.useState<string[]>([]);
 
   const isImageVariant = variant === "image" || variant === "avatar";
+  const isPreviewVariant = isImageVariant || variant === "video";
   const effectiveAccept = accept ?? getDefaultAccept(variant);
 
   // Derive controlled URLs
@@ -294,7 +296,7 @@ function FileUpload({
 
       if (valid.length === 0) return;
 
-      if (showLocalPreview && isImageVariant) {
+      if (showLocalPreview && isPreviewVariant) {
         const newLocal: FileUploadLocalFile[] = valid.map((file) => ({
           file,
           previewUrl: URL.createObjectURL(file),
@@ -315,7 +317,7 @@ function FileUpload({
             return updated;
           });
         }
-      } else if (!isImageVariant && multiple) {
+      } else if (!isPreviewVariant && multiple) {
         const newLocal: FileUploadLocalFile[] = valid.map((file) => ({
           file,
           previewUrl: "",
@@ -326,7 +328,7 @@ function FileUpload({
           onFilesChange?.(updated);
           return updated;
         });
-      } else if (!isImageVariant) {
+      } else if (!isPreviewVariant) {
         const newLocal: FileUploadLocalFile[] = valid.slice(0, 1).map((file) => ({
           file,
           previewUrl: "",
@@ -569,88 +571,94 @@ function FileUpload({
     }
 
     // ── Multiple images ────────────────────────────────────────────────────────
-    return (
-      <div className="flex flex-wrap gap-2">
-        {displayItems.map((item) => {
-          const url =
-            item.kind === "url" ? item.url : item.localFile.previewUrl;
-          return (
-            <div
-              key={item.kind === "url" ? `url-${item.index}` : item.localFile.id}
-              className="relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0"
-            >
-              <img
-                src={url}
-                alt={`Image ${item.index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              {!disabled && !readOnly && clearable && (
-                <button
-                  type="button"
-                  onClick={(e) => handleRemoveItem(e, item)}
-                  className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  aria-label="Remove"
-                >
-                  <X size={10} className="text-white" />
-                </button>
-              )}
-            </div>
-          );
-        })}
 
-        {/* Add-more slot */}
-        {canAddMore && (
-          <button
-            type="button"
-            onClick={openFilePicker}
+    // Empty state — dropzone already has fixed height via dropzoneVariants
+    if (displayItems.length === 0) {
+      return (
+        <div
+          {...dropzoneInteractionProps}
+          className={cn(dropzoneVariants({ size, state: dzState }), "w-full", dropzoneClassName)}
+        >
+          <div className={iconWrapperVariants({ size })}>
+            <ImageIcon size={iconSize} className="text-gray-400" />
+          </div>
+          <span
             className={cn(
-              "rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
-              "w-20 h-20",
-            )}
-            aria-label="Add image"
-          >
-            <Plus size={18} />
-            <span className="text-[10px] font-medium">Add</span>
-          </button>
-        )}
-
-        {/* Empty slot (nothing uploaded yet) */}
-        {displayItems.length === 0 && (
-          <div
-            {...dropzoneInteractionProps}
-            className={cn(
-              dropzoneVariants({ size, state: dzState }),
-              "w-full",
-              dropzoneClassName,
+              "font-medium text-gray-600",
+              size === "sm" && "text-xs",
+              size === "md" && "text-sm",
+              size === "lg" && "text-base",
             )}
           >
-            <div className={iconWrapperVariants({ size })}>
-              <ImageIcon size={iconSize} className="text-gray-400" />
-            </div>
+            {placeholder ?? PLACEHOLDER_TEXT.image}
+          </span>
+          {description && (
             <span
               className={cn(
-                "font-medium text-gray-600",
-                size === "sm" && "text-xs",
-                size === "md" && "text-sm",
-                size === "lg" && "text-base",
+                "text-gray-400",
+                size === "sm" && "text-[10px]",
+                size === "md" && "text-xs",
+                size === "lg" && "text-sm",
               )}
             >
-              {placeholder ?? PLACEHOLDER_TEXT.image}
+              {description}
             </span>
-            {description && (
-              <span
-                className={cn(
-                  "text-gray-400",
-                  size === "sm" && "text-[10px]",
-                  size === "md" && "text-xs",
-                  size === "lg" && "text-sm",
-                )}
-              >
-                {description}
-              </span>
-            )}
-          </div>
+          )}
+        </div>
+      );
+    }
+
+    // Filled state — fixed-height scrollable grid
+    return (
+      <div
+        className={cn(
+          "w-full overflow-y-auto rounded-xl border border-gray-200",
+          size === "sm" && "h-24",
+          size === "md" && "h-32",
+          size === "lg" && "h-44",
         )}
+      >
+        <div className="flex flex-wrap gap-2 p-2">
+          {displayItems.map((item) => {
+            const url =
+              item.kind === "url" ? item.url : item.localFile.previewUrl;
+            return (
+              <div
+                key={item.kind === "url" ? `url-${item.index}` : item.localFile.id}
+                className="relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0"
+              >
+                <img
+                  src={url}
+                  alt={`Image ${item.index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                {!disabled && !readOnly && clearable && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleRemoveItem(e, item)}
+                    className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Remove"
+                  >
+                    <X size={10} className="text-white" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Add-more slot */}
+          {canAddMore && (
+            <button
+              type="button"
+              onClick={openFilePicker}
+              className="rounded-xl border-2 border-dashed border-gray-300 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]"
+              aria-label="Add image"
+            >
+              <Plus size={18} />
+              <span className="text-[10px] font-medium">Add</span>
+            </button>
+          )}
+        </div>
       </div>
     );
   };
@@ -756,56 +764,61 @@ function FileUpload({
       return (
         <div
           className={cn(
-            "w-full rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100",
+            "w-full rounded-xl border border-gray-200 overflow-hidden flex flex-col",
+            size === "sm" && "h-24",
+            size === "md" && "h-32",
+            size === "lg" && "h-44",
             disabled && "opacity-50",
           )}
         >
-          {displayItems.map((item) => {
-            const name =
-              item.kind === "file"
-                ? item.localFile.file.name
-                : item.url.split("/").pop() ?? item.url;
-            const size_ =
-              item.kind === "file" ? formatBytes(item.localFile.file.size) : null;
+          <div className="flex-1 overflow-y-auto divide-y divide-gray-100 min-h-0">
+            {displayItems.map((item) => {
+              const name =
+                item.kind === "file"
+                  ? item.localFile.file.name
+                  : item.url.split("/").pop() ?? item.url;
+              const size_ =
+                item.kind === "file" ? formatBytes(item.localFile.file.size) : null;
 
-            return (
-              <div
-                key={
-                  item.kind === "url"
-                    ? `url-${item.index}`
-                    : item.localFile.id
-                }
-                className="flex items-center gap-3 px-3 py-2.5 bg-white"
-              >
-                <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                  <FileIcon size={15} className="text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">{name}</p>
-                  {size_ && (
-                    <p className="text-xs text-gray-400">{size_}</p>
+              return (
+                <div
+                  key={
+                    item.kind === "url"
+                      ? `url-${item.index}`
+                      : item.localFile.id
+                  }
+                  className="flex items-center gap-3 px-3 py-2.5 bg-white"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <FileIcon size={15} className="text-gray-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{name}</p>
+                    {size_ && (
+                      <p className="text-xs text-gray-400">{size_}</p>
+                    )}
+                  </div>
+                  {clearable && !disabled && !readOnly && (
+                    <button
+                      type="button"
+                      onClick={(e) => handleRemoveItem(e, item)}
+                      className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors rounded flex-shrink-0"
+                      aria-label={`Remove ${name}`}
+                    >
+                      <X size={14} />
+                    </button>
                   )}
                 </div>
-                {clearable && !disabled && !readOnly && (
-                  <button
-                    type="button"
-                    onClick={(e) => handleRemoveItem(e, item)}
-                    className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors rounded flex-shrink-0"
-                    aria-label={`Remove ${name}`}
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
 
-          {/* Add-more row */}
+          {/* Add-more row — pinned to bottom */}
           {multiple && canAddMore && (
             <button
               type="button"
               onClick={openFilePicker}
-              className="w-full flex items-center gap-2 px-3 py-2.5 bg-gray-50 text-sm text-gray-500 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#007a4d]"
+              className="flex-shrink-0 w-full flex items-center gap-2 px-3 py-2.5 bg-gray-50 border-t border-gray-100 text-sm text-gray-500 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#007a4d]"
             >
               <Plus size={14} />
               Add more files
@@ -856,6 +869,205 @@ function FileUpload({
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER: video variant
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const renderVideoVariant = () => {
+    // ── Single video ───────────────────────────────────────────────────────────
+    if (!multiple) {
+      const item = displayItems[0];
+      const previewUrl = item
+        ? item.kind === "url"
+          ? item.url
+          : item.localFile.previewUrl
+        : null;
+
+      if (previewUrl) {
+        return (
+          <div
+            className={cn(
+              "relative w-full overflow-hidden rounded-xl border border-gray-200 bg-black group",
+              size === "sm" && "h-24",
+              size === "md" && "h-32",
+              size === "lg" && "h-44",
+            )}
+          >
+            <video
+              src={previewUrl}
+              className="absolute inset-0 w-full h-full object-contain"
+              controls
+              preload="metadata"
+            />
+            {!disabled && !readOnly && (changeable || clearable) && (
+              <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-2.5 bg-gradient-to-b from-black/65 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto">
+                {changeable && (
+                  <button
+                    type="button"
+                    onClick={openFilePicker}
+                    onKeyDown={handleKeyDown}
+                    className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    aria-label="Change video"
+                  >
+                    <VideoIcon size={12} />
+                    Change
+                  </button>
+                )}
+                {clearable && (
+                  <button
+                    type="button"
+                    onClick={(e) => item && handleRemoveItem(e, item)}
+                    className="flex items-center gap-1.5 bg-red-500/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                    aria-label="Remove video"
+                  >
+                    <X size={12} />
+                    Remove
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // Empty state
+      return (
+        <div
+          {...dropzoneInteractionProps}
+          className={cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName)}
+        >
+          <div className={iconWrapperVariants({ size })}>
+            <VideoIcon size={iconSize} className="text-gray-400" />
+          </div>
+          <div className="flex flex-col items-center gap-0.5 text-center">
+            <span
+              className={cn(
+                "font-medium text-gray-600",
+                size === "sm" && "text-xs",
+                size === "md" && "text-sm",
+                size === "lg" && "text-base",
+              )}
+            >
+              {placeholder ?? PLACEHOLDER_TEXT.video}
+            </span>
+            {description && (
+              <span
+                className={cn(
+                  "text-gray-400",
+                  size === "sm" && "text-[10px]",
+                  size === "md" && "text-xs",
+                  size === "lg" && "text-sm",
+                )}
+              >
+                {description}
+              </span>
+            )}
+          </div>
+          {dragAndDrop && (
+            <span className="text-[10px] text-gray-300">Drag &amp; drop supported</span>
+          )}
+        </div>
+      );
+    }
+
+    // ── Multiple videos ────────────────────────────────────────────────────────
+
+    // Empty state — dropzone already has fixed height via dropzoneVariants
+    if (displayItems.length === 0) {
+      return (
+        <div
+          {...dropzoneInteractionProps}
+          className={cn(dropzoneVariants({ size, state: dzState }), "w-full", dropzoneClassName)}
+        >
+          <div className={iconWrapperVariants({ size })}>
+            <VideoIcon size={iconSize} className="text-gray-400" />
+          </div>
+          <span
+            className={cn(
+              "font-medium text-gray-600",
+              size === "sm" && "text-xs",
+              size === "md" && "text-sm",
+              size === "lg" && "text-base",
+            )}
+          >
+            {placeholder ?? PLACEHOLDER_TEXT.video}
+          </span>
+          {description && (
+            <span
+              className={cn(
+                "text-gray-400",
+                size === "sm" && "text-[10px]",
+                size === "md" && "text-xs",
+                size === "lg" && "text-sm",
+              )}
+            >
+              {description}
+            </span>
+          )}
+        </div>
+      );
+    }
+
+    // Filled state — fixed-height scrollable grid
+    return (
+      <div
+        className={cn(
+          "w-full overflow-y-auto rounded-xl border border-gray-200",
+          size === "sm" && "h-24",
+          size === "md" && "h-32",
+          size === "lg" && "h-44",
+        )}
+      >
+        <div className="flex flex-wrap gap-2 p-2">
+          {displayItems.map((item) => {
+            const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
+            return (
+              <div
+                key={item.kind === "url" ? `url-${item.index}` : item.localFile.id}
+                className="relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0 bg-black"
+              >
+                <video
+                  src={url}
+                  className="w-full h-full object-cover"
+                  muted
+                  preload="metadata"
+                />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-6 h-6 rounded-full bg-black/50 flex items-center justify-center">
+                    <Play size={10} className="text-white ml-0.5" />
+                  </div>
+                </div>
+                {!disabled && !readOnly && clearable && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleRemoveItem(e, item)}
+                    className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Remove"
+                  >
+                    <X size={10} className="text-white" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Add-more slot */}
+          {canAddMore && (
+            <button
+              type="button"
+              onClick={openFilePicker}
+              className="rounded-xl border-2 border-dashed border-gray-300 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]"
+              aria-label="Add video"
+            >
+              <Plus size={18} />
+              <span className="text-[10px] font-medium">Add</span>
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // MAIN RENDER
   // ─────────────────────────────────────────────────────────────────────────────
 
@@ -877,6 +1089,8 @@ function FileUpload({
         ? renderAvatarVariant()
         : variant === "image"
         ? renderImageVariant()
+        : variant === "video"
+        ? renderVideoVariant()
         : renderFileVariant()}
 
       {/* Hidden native file input — shadcn ui/input base */}

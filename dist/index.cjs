@@ -2576,12 +2576,16 @@ function SecondaryTabs({
     if (visibleTabLimit !== void 0) return visibleTabLimit;
     if (containerWidth === 0 || tabWidths.length === 0) return void 0;
     const GAP = 8;
+    const totalAllTabs = tabWidths.reduce(
+      (sum, w, i) => sum + w + (i > 0 ? GAP : 0),
+      0
+    );
+    if (totalAllTabs <= containerWidth) return void 0;
     let total = 0;
     let count = 0;
     for (let i = 0; i < tabs.length; i++) {
       const tabW = (tabWidths[i] ?? 80) + (i > 0 ? GAP : 0);
-      const wouldHaveMore = count + 1 < tabs.length;
-      const projected = total + tabW + (wouldHaveMore ? moreButtonWidth + GAP : 0);
+      const projected = total + tabW + moreButtonWidth + GAP;
       if (projected <= containerWidth) {
         total += tabW;
         count++;
@@ -4907,6 +4911,16 @@ var thumbVariants = classVarianceAuthority.cva(
     }
   }
 );
+var PILL_PADDING3 = {
+  sm: "gap-1.5 px-2.5 py-1.5",
+  md: "gap-2 px-3 py-2",
+  lg: "gap-2.5 px-4 py-2.5"
+};
+var GAP_ONLY3 = {
+  sm: "gap-1.5",
+  md: "gap-2",
+  lg: "gap-2.5"
+};
 var Toggle = React9__namespace.forwardRef(
   ({
     size = "md",
@@ -4920,12 +4934,39 @@ var Toggle = React9__namespace.forwardRef(
     disabled,
     readOnly,
     wrapperClassName,
+    borderColor,
+    bgColor,
     ...props
   }, ref) => {
+    const internalRef = React9__namespace.useRef(null);
+    const [isChecked, setIsChecked] = React9__namespace.useState(false);
+    const mergedRef = React9__namespace.useCallback(
+      (node) => {
+        internalRef.current = node;
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
+      },
+      [ref]
+    );
+    React9__namespace.useEffect(() => {
+      const el = internalRef.current;
+      if (!el) return;
+      setIsChecked(el.dataset.state === "checked");
+      const observer = new MutationObserver(() => {
+        setIsChecked(el.dataset.state === "checked");
+      });
+      observer.observe(el, { attributes: true, attributeFilter: ["data-state"] });
+      return () => observer.disconnect();
+    }, []);
+    const hasCustomColors2 = !!(borderColor || bgColor);
+    const pillStyle = hasCustomColors2 ? {
+      ...isChecked && borderColor ? { borderColor } : {},
+      ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
+    } : void 0;
     const switchEl = /* @__PURE__ */ jsxRuntime.jsx(
       radixUi.Switch.Root,
       {
-        ref,
+        ref: mergedRef,
         checked: checked !== void 0 ? checked : void 0,
         defaultChecked: checked !== void 0 ? void 0 : defaultChecked,
         onCheckedChange: readOnly ? void 0 : onChange,
@@ -4941,8 +4982,11 @@ var Toggle = React9__namespace.forwardRef(
     const inlineEl = title ? /* @__PURE__ */ jsxRuntime.jsxs(
       "label",
       {
+        style: pillStyle,
         className: cn(
-          "inline-flex cursor-pointer items-center gap-2",
+          "inline-flex cursor-pointer items-center transition-colors",
+          hasCustomColors2 ? cn("rounded-xl border", PILL_PADDING3[size], "border-gray-200") : GAP_ONLY3[size],
+          disabled && "cursor-not-allowed opacity-60",
           readOnly && "pointer-events-none cursor-default"
         ),
         children: [
@@ -4950,6 +4994,19 @@ var Toggle = React9__namespace.forwardRef(
           switchEl,
           titlePosition === "right" && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-medium text-[#1F2937]", children: title })
         ]
+      }
+    ) : hasCustomColors2 ? /* @__PURE__ */ jsxRuntime.jsx(
+      "div",
+      {
+        style: pillStyle,
+        className: cn(
+          "inline-flex items-center transition-colors rounded-xl border",
+          PILL_PADDING3[size],
+          "border-gray-200",
+          disabled && "opacity-60",
+          readOnly && "pointer-events-none cursor-default"
+        ),
+        children: switchEl
       }
     ) : switchEl;
     if (label) {
@@ -6510,7 +6567,9 @@ function Banner({
 }
 Banner.displayName = "Banner";
 var SectionContext = React9__namespace.createContext({
-  collapsible: false
+  collapsible: false,
+  isOpen: true,
+  divider: false
 });
 function SectionHeader({
   icon,
@@ -6520,7 +6579,7 @@ function SectionHeader({
   className,
   ...props
 }) {
-  const { collapsible } = React9__namespace.useContext(SectionContext);
+  const { collapsible, isOpen, divider } = React9__namespace.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
     /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2 min-w-0 pointer-events-none", children: [
       icon && /* @__PURE__ */ jsxRuntime.jsx(
@@ -6572,7 +6631,10 @@ function SectionHeader({
             lucideReact.ChevronDown,
             {
               size: 16,
-              className: "transition-transform duration-200 group-data-[state=open]:rotate-180"
+              className: cn(
+                "transition-transform duration-200",
+                isOpen && "rotate-180"
+              )
             }
           )
         }
@@ -6580,21 +6642,27 @@ function SectionHeader({
     ] })
   ] });
   if (collapsible) {
-    return /* @__PURE__ */ jsxRuntime.jsx(
+    return /* @__PURE__ */ jsxRuntime.jsxs(
       radixUi.Collapsible.Trigger,
       {
         "data-slot": "section-header",
         className: cn(
-          "w-full flex items-start justify-between gap-3 text-left",
-          "data-[state=open]:pb-4",
-          "data-[state=open]:-mx-4 data-[state=open]:px-4 sm:data-[state=open]:-mx-5 sm:data-[state=open]:px-5 md:data-[state=open]:-mx-6 md:data-[state=open]:px-6",
+          "flex flex-col justify-center text-left",
+          "-ml-4 sm:-ml-5 md:-ml-6",
+          "w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-[calc(100%+3rem)]",
+          "pl-4 sm:pl-5 md:pl-6 pr-4 sm:pr-5 md:pr-6",
+          "py-3 sm:py-3.5 md:py-4 -my-3 sm:-my-3.5 md:-my-4",
+          "rounded-2xl hover:bg-[#fafff7] transition-colors duration-150",
           "cursor-pointer select-none",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b7a3b] focus-visible:ring-offset-1",
-          "group transition-colors",
+          "group",
           className
         ),
         ...props,
-        children: inner
+        children: [
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center justify-between gap-3 w-full", children: inner }),
+          divider && isOpen && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-full mt-3 sm:mt-3.5 md:mt-4 border-t border-[#F3F4F6]" })
+        ]
       }
     );
   }
@@ -6664,7 +6732,7 @@ function SectionContent({ className, children, ...props }) {
     "div",
     {
       "data-slot": "section-content",
-      className: cn("flex flex-col gap-0", className),
+      className: cn("flex flex-col gap-0", collapsible && "pt-4", className),
       ...props,
       children
     }
@@ -6785,6 +6853,7 @@ function SectionTableContent({
         "-mx-4 sm:-mx-5 md:-mx-6",
         "-mb-4 sm:-mb-5 md:-mb-6",
         "overflow-hidden rounded-b-2xl",
+        collapsible && "mt-4",
         divider && "border-t border-[#E5E7EB]",
         className
       ),
@@ -6797,25 +6866,67 @@ function SectionTableContent({
   }
   return inner;
 }
+function SectionGroup({
+  defaultOpen = 0,
+  className,
+  children,
+  ...props
+}) {
+  const [openIndex, setOpenIndex] = React9__namespace.useState(defaultOpen);
+  const items = React9__namespace.Children.toArray(children).filter(Boolean);
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "section-group",
+      className: cn("flex flex-col gap-4", className),
+      ...props,
+      children: items.map((child, i) => {
+        if (!React9__namespace.isValidElement(child)) return child;
+        return React9__namespace.cloneElement(child, {
+          key: i,
+          collapsible: true,
+          open: openIndex === i,
+          onOpenChange: (open) => {
+            setOpenIndex(open ? i : null);
+          }
+        });
+      })
+    }
+  );
+}
+SectionGroup.displayName = "SectionGroup";
 function Section({
   bare = false,
   collapsible = false,
+  divider = false,
   defaultOpen = true,
-  open,
+  open: openProp,
   onOpenChange,
   className,
   children,
   ...props
 }) {
+  const isControlled = openProp !== void 0;
+  const [internalOpen, setInternalOpen] = React9__namespace.useState(
+    isControlled ? openProp : defaultOpen
+  );
+  const isOpen = isControlled ? openProp : internalOpen;
+  const handleOpenChange = React9__namespace.useCallback(
+    (next) => {
+      if (!isControlled) setInternalOpen(next);
+      onOpenChange?.(next);
+    },
+    [isControlled, onOpenChange]
+  );
   const cardClass = cn(
     "uengage-ui",
     "flex flex-col gap-0 rounded-2xl border border-[#E5E7EB] bg-white",
     "p-4 sm:p-5 md:p-6",
     "shadow-none text-sm text-[#202020]",
-    collapsible && "[transition:padding_200ms_cubic-bezier(0.4,0,0.2,1),background-color_150ms_ease] data-[state=open]:[transition:padding_280ms_cubic-bezier(0.22,1,0.36,1),background-color_150ms_ease] data-[state=closed]:hover:bg-[#F9FAFB] data-[state=closed]:cursor-pointer data-[state=closed]:py-3 sm:data-[state=closed]:py-3 md:data-[state=closed]:py-3",
+    collapsible && "py-3 sm:py-3.5 md:py-4",
     className
   );
-  const ctx = { collapsible };
+  const ctx = { collapsible, isOpen, divider };
   if (bare) {
     return /* @__PURE__ */ jsxRuntime.jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsxRuntime.jsx(
       "div",
@@ -6828,8 +6939,7 @@ function Section({
     ) });
   }
   if (collapsible) {
-    const collapsibleProps = open !== void 0 ? { open, onOpenChange } : { defaultOpen };
-    return /* @__PURE__ */ jsxRuntime.jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Collapsible.Root, { ...collapsibleProps, asChild: true, children: /* @__PURE__ */ jsxRuntime.jsx(
+    return /* @__PURE__ */ jsxRuntime.jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Collapsible.Root, { open: isOpen, onOpenChange: handleOpenChange, asChild: true, children: /* @__PURE__ */ jsxRuntime.jsx(
       Card,
       {
         "data-slot": "section",
@@ -6916,7 +7026,8 @@ var AVATAR_ICON_SIZES = { sm: 16, md: 20, lg: 26 };
 var PLACEHOLDER_TEXT = {
   image: "Click or drag to upload image",
   file: "Click or drag to upload file",
-  avatar: "Upload photo"
+  avatar: "Upload photo",
+  video: "Click or drag to upload video"
 };
 function formatBytes(bytes, decimals = 1) {
   if (bytes === 0) return "0 B";
@@ -6927,6 +7038,7 @@ function formatBytes(bytes, decimals = 1) {
 }
 function getDefaultAccept(variant) {
   if (variant === "image" || variant === "avatar") return "image/*";
+  if (variant === "video") return "video/*";
   return void 0;
 }
 function makeId() {
@@ -6983,6 +7095,7 @@ function FileUpload({
   const [localFiles, setLocalFiles] = React9__namespace.useState([]);
   const [validationErrors, setValidationErrors] = React9__namespace.useState([]);
   const isImageVariant = variant === "image" || variant === "avatar";
+  const isPreviewVariant = isImageVariant || variant === "video";
   const effectiveAccept = accept ?? getDefaultAccept(variant);
   const controlledUrls = React9__namespace.useMemo(() => {
     if (!value) return [];
@@ -7047,7 +7160,7 @@ function FileUpload({
         setValidationErrors([]);
       }
       if (valid.length === 0) return;
-      if (showLocalPreview && isImageVariant) {
+      if (showLocalPreview && isPreviewVariant) {
         const newLocal = valid.map((file) => ({
           file,
           previewUrl: URL.createObjectURL(file),
@@ -7067,7 +7180,7 @@ function FileUpload({
             return updated;
           });
         }
-      } else if (!isImageVariant && multiple) {
+      } else if (!isPreviewVariant && multiple) {
         const newLocal = valid.map((file) => ({
           file,
           previewUrl: "",
@@ -7078,7 +7191,7 @@ function FileUpload({
           onFilesChange?.(updated);
           return updated;
         });
-      } else if (!isImageVariant) {
+      } else if (!isPreviewVariant) {
         const newLocal = valid.slice(0, 1).map((file) => ({
           file,
           previewUrl: "",
@@ -7278,62 +7391,12 @@ function FileUpload({
         }
       );
     }
-    return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-wrap gap-2", children: [
-      displayItems.map((item) => {
-        const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
-        return /* @__PURE__ */ jsxRuntime.jsxs(
-          "div",
-          {
-            className: "relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0",
-            children: [
-              /* @__PURE__ */ jsxRuntime.jsx(
-                "img",
-                {
-                  src: url,
-                  alt: `Image ${item.index + 1}`,
-                  className: "w-full h-full object-cover"
-                }
-              ),
-              !disabled && !readOnly && clearable && /* @__PURE__ */ jsxRuntime.jsx(
-                "button",
-                {
-                  type: "button",
-                  onClick: (e) => handleRemoveItem(e, item),
-                  className: "absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
-                  "aria-label": "Remove",
-                  children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 10, className: "text-white" })
-                }
-              )
-            ]
-          },
-          item.kind === "url" ? `url-${item.index}` : item.localFile.id
-        );
-      }),
-      canAddMore && /* @__PURE__ */ jsxRuntime.jsxs(
-        "button",
-        {
-          type: "button",
-          onClick: openFilePicker,
-          className: cn(
-            "rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
-            "w-20 h-20"
-          ),
-          "aria-label": "Add image",
-          children: [
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Plus, { size: 18 }),
-            /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] font-medium", children: "Add" })
-          ]
-        }
-      ),
-      displayItems.length === 0 && /* @__PURE__ */ jsxRuntime.jsxs(
+    if (displayItems.length === 0) {
+      return /* @__PURE__ */ jsxRuntime.jsxs(
         "div",
         {
           ...dropzoneInteractionProps,
-          className: cn(
-            dropzoneVariants({ size, state: dzState }),
-            "w-full",
-            dropzoneClassName
-          ),
+          className: cn(dropzoneVariants({ size, state: dzState }), "w-full", dropzoneClassName),
           children: [
             /* @__PURE__ */ jsxRuntime.jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ImageIcon, { size: iconSize, className: "text-gray-400" }) }),
             /* @__PURE__ */ jsxRuntime.jsx(
@@ -7362,8 +7425,64 @@ function FileUpload({
             )
           ]
         }
-      )
-    ] });
+      );
+    }
+    return /* @__PURE__ */ jsxRuntime.jsx(
+      "div",
+      {
+        className: cn(
+          "w-full overflow-y-auto rounded-xl border border-gray-200",
+          size === "sm" && "h-24",
+          size === "md" && "h-32",
+          size === "lg" && "h-44"
+        ),
+        children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-wrap gap-2 p-2", children: [
+          displayItems.map((item) => {
+            const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
+            return /* @__PURE__ */ jsxRuntime.jsxs(
+              "div",
+              {
+                className: "relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0",
+                children: [
+                  /* @__PURE__ */ jsxRuntime.jsx(
+                    "img",
+                    {
+                      src: url,
+                      alt: `Image ${item.index + 1}`,
+                      className: "w-full h-full object-cover"
+                    }
+                  ),
+                  !disabled && !readOnly && clearable && /* @__PURE__ */ jsxRuntime.jsx(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: (e) => handleRemoveItem(e, item),
+                      className: "absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
+                      "aria-label": "Remove",
+                      children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 10, className: "text-white" })
+                    }
+                  )
+                ]
+              },
+              item.kind === "url" ? `url-${item.index}` : item.localFile.id
+            );
+          }),
+          canAddMore && /* @__PURE__ */ jsxRuntime.jsxs(
+            "button",
+            {
+              type: "button",
+              onClick: openFilePicker,
+              className: "rounded-xl border-2 border-dashed border-gray-300 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
+              "aria-label": "Add image",
+              children: [
+                /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Plus, { size: 18 }),
+                /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] font-medium", children: "Add" })
+              ]
+            }
+          )
+        ] })
+      }
+    );
   };
   const renderAvatarVariant = () => {
     const item = displayItems[0];
@@ -7441,11 +7560,14 @@ function FileUpload({
         "div",
         {
           className: cn(
-            "w-full rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100",
+            "w-full rounded-xl border border-gray-200 overflow-hidden flex flex-col",
+            size === "sm" && "h-24",
+            size === "md" && "h-32",
+            size === "lg" && "h-44",
             disabled && "opacity-50"
           ),
           children: [
-            displayItems.map((item) => {
+            /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 overflow-y-auto divide-y divide-gray-100 min-h-0", children: displayItems.map((item) => {
               const name2 = item.kind === "file" ? item.localFile.file.name : item.url.split("/").pop() ?? item.url;
               const size_ = item.kind === "file" ? formatBytes(item.localFile.file.size) : null;
               return /* @__PURE__ */ jsxRuntime.jsxs(
@@ -7472,13 +7594,13 @@ function FileUpload({
                 },
                 item.kind === "url" ? `url-${item.index}` : item.localFile.id
               );
-            }),
+            }) }),
             multiple && canAddMore && /* @__PURE__ */ jsxRuntime.jsxs(
               "button",
               {
                 type: "button",
                 onClick: openFilePicker,
-                className: "w-full flex items-center gap-2 px-3 py-2.5 bg-gray-50 text-sm text-gray-500 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#007a4d]",
+                className: "flex-shrink-0 w-full flex items-center gap-2 px-3 py-2.5 bg-gray-50 border-t border-gray-100 text-sm text-gray-500 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#007a4d]",
                 children: [
                   /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Plus, { size: 14 }),
                   "Add more files"
@@ -7527,6 +7649,196 @@ function FileUpload({
       }
     );
   };
+  const renderVideoVariant = () => {
+    if (!multiple) {
+      const item = displayItems[0];
+      const previewUrl = item ? item.kind === "url" ? item.url : item.localFile.previewUrl : null;
+      if (previewUrl) {
+        return /* @__PURE__ */ jsxRuntime.jsxs(
+          "div",
+          {
+            className: cn(
+              "relative w-full overflow-hidden rounded-xl border border-gray-200 bg-black group",
+              size === "sm" && "h-24",
+              size === "md" && "h-32",
+              size === "lg" && "h-44"
+            ),
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "video",
+                {
+                  src: previewUrl,
+                  className: "absolute inset-0 w-full h-full object-contain",
+                  controls: true,
+                  preload: "metadata"
+                }
+              ),
+              !disabled && !readOnly && (changeable || clearable) && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-2.5 bg-gradient-to-b from-black/65 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto", children: [
+                changeable && /* @__PURE__ */ jsxRuntime.jsxs(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: openFilePicker,
+                    onKeyDown: handleKeyDown,
+                    className: "flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+                    "aria-label": "Change video",
+                    children: [
+                      /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Video, { size: 12 }),
+                      "Change"
+                    ]
+                  }
+                ),
+                clearable && /* @__PURE__ */ jsxRuntime.jsxs(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: (e) => item && handleRemoveItem(e, item),
+                    className: "flex items-center gap-1.5 bg-red-500/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400",
+                    "aria-label": "Remove video",
+                    children: [
+                      /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 12 }),
+                      "Remove"
+                    ]
+                  }
+                )
+              ] })
+            ]
+          }
+        );
+      }
+      return /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          ...dropzoneInteractionProps,
+          className: cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName),
+          children: [
+            /* @__PURE__ */ jsxRuntime.jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Video, { size: iconSize, className: "text-gray-400" }) }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col items-center gap-0.5 text-center", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "span",
+                {
+                  className: cn(
+                    "font-medium text-gray-600",
+                    size === "sm" && "text-xs",
+                    size === "md" && "text-sm",
+                    size === "lg" && "text-base"
+                  ),
+                  children: placeholder ?? PLACEHOLDER_TEXT.video
+                }
+              ),
+              description && /* @__PURE__ */ jsxRuntime.jsx(
+                "span",
+                {
+                  className: cn(
+                    "text-gray-400",
+                    size === "sm" && "text-[10px]",
+                    size === "md" && "text-xs",
+                    size === "lg" && "text-sm"
+                  ),
+                  children: description
+                }
+              )
+            ] }),
+            dragAndDrop && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] text-gray-300", children: "Drag & drop supported" })
+          ]
+        }
+      );
+    }
+    if (displayItems.length === 0) {
+      return /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          ...dropzoneInteractionProps,
+          className: cn(dropzoneVariants({ size, state: dzState }), "w-full", dropzoneClassName),
+          children: [
+            /* @__PURE__ */ jsxRuntime.jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Video, { size: iconSize, className: "text-gray-400" }) }),
+            /* @__PURE__ */ jsxRuntime.jsx(
+              "span",
+              {
+                className: cn(
+                  "font-medium text-gray-600",
+                  size === "sm" && "text-xs",
+                  size === "md" && "text-sm",
+                  size === "lg" && "text-base"
+                ),
+                children: placeholder ?? PLACEHOLDER_TEXT.video
+              }
+            ),
+            description && /* @__PURE__ */ jsxRuntime.jsx(
+              "span",
+              {
+                className: cn(
+                  "text-gray-400",
+                  size === "sm" && "text-[10px]",
+                  size === "md" && "text-xs",
+                  size === "lg" && "text-sm"
+                ),
+                children: description
+              }
+            )
+          ]
+        }
+      );
+    }
+    return /* @__PURE__ */ jsxRuntime.jsx(
+      "div",
+      {
+        className: cn(
+          "w-full overflow-y-auto rounded-xl border border-gray-200",
+          size === "sm" && "h-24",
+          size === "md" && "h-32",
+          size === "lg" && "h-44"
+        ),
+        children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-wrap gap-2 p-2", children: [
+          displayItems.map((item) => {
+            const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
+            return /* @__PURE__ */ jsxRuntime.jsxs(
+              "div",
+              {
+                className: "relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0 bg-black",
+                children: [
+                  /* @__PURE__ */ jsxRuntime.jsx(
+                    "video",
+                    {
+                      src: url,
+                      className: "w-full h-full object-cover",
+                      muted: true,
+                      preload: "metadata"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute inset-0 flex items-center justify-center pointer-events-none", children: /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-6 h-6 rounded-full bg-black/50 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Play, { size: 10, className: "text-white ml-0.5" }) }) }),
+                  !disabled && !readOnly && clearable && /* @__PURE__ */ jsxRuntime.jsx(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: (e) => handleRemoveItem(e, item),
+                      className: "absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
+                      "aria-label": "Remove",
+                      children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.X, { size: 10, className: "text-white" })
+                    }
+                  )
+                ]
+              },
+              item.kind === "url" ? `url-${item.index}` : item.localFile.id
+            );
+          }),
+          canAddMore && /* @__PURE__ */ jsxRuntime.jsxs(
+            "button",
+            {
+              type: "button",
+              onClick: openFilePicker,
+              className: "rounded-xl border-2 border-dashed border-gray-300 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
+              "aria-label": "Add video",
+              children: [
+                /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Plus, { size: 18 }),
+                /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] font-medium", children: "Add" })
+              ]
+            }
+          )
+        ] })
+      }
+    );
+  };
   return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex flex-col gap-1.5 w-full", className), children: [
     label && /* @__PURE__ */ jsxRuntime.jsx(
       InputLabel,
@@ -7537,7 +7849,7 @@ function FileUpload({
         children: label
       }
     ),
-    variant === "avatar" ? renderAvatarVariant() : variant === "image" ? renderImageVariant() : renderFileVariant(),
+    variant === "avatar" ? renderAvatarVariant() : variant === "image" ? renderImageVariant() : variant === "video" ? renderVideoVariant() : renderFileVariant(),
     /* @__PURE__ */ jsxRuntime.jsx(
       "input",
       {
@@ -7638,6 +7950,7 @@ exports.Section = Section;
 exports.SectionContent = SectionContent;
 exports.SectionDivider = SectionDivider;
 exports.SectionField = SectionField;
+exports.SectionGroup = SectionGroup;
 exports.SectionHeader = SectionHeader;
 exports.SectionRow = SectionRow;
 exports.SectionSubsection = SectionSubsection;

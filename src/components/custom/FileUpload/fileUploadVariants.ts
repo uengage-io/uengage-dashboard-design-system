@@ -68,7 +68,8 @@ export const ICON_SIZES: Record<string, number> = { sm: 14, md: 18, lg: 22 };
 export const AVATAR_ICON_SIZES: Record<string, number> = { sm: 16, md: 20, lg: 26 };
 
 export const PLACEHOLDER_TEXT: Record<string, string> = {
-  image: "Click or drag to upload image",
-  file:  "Click or drag to upload file",
+  image:  "Click or drag to upload image",
+  file:   "Click or drag to upload file",
   avatar: "Upload photo",
+  video:  "Click or drag to upload video",
 };

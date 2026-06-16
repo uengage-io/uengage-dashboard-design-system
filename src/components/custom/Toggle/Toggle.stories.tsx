@@ -166,6 +166,30 @@ export const ReadOnlyWithLabel: Story = {
   },
 };
 
+/* ── Pill (custom colors) ───────────────────────────────────────── */
+
+export const PillCustomColors: Story = {
+  name: "Pill · Custom colors",
+  args: {
+    title: "Enable notifications",
+    titlePosition: "right",
+    borderColor: "#1F6B32",
+    bgColor: "#F0F7F0",
+    size: "md",
+  },
+};
+
+export const PillSizes: Story = {
+  name: "Pill · All sizes",
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <Toggle size="sm" title="Small" titlePosition="right" borderColor="#1F6B32" bgColor="#F0F7F0" />
+      <Toggle size="md" title="Medium" titlePosition="right" borderColor="#1F6B32" bgColor="#F0F7F0" />
+      <Toggle size="lg" title="Large" titlePosition="right" borderColor="#1F6B32" bgColor="#F0F7F0" />
+    </div>
+  ),
+};
+
 /* ── Controlled ─────────────────────────────────────────────────── */
 
 export const Controlled: Story = {

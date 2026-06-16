@@ -7,6 +7,7 @@ import {
   SectionRow,
   SectionField,
   SectionDivider,
+  SectionGroup,
 } from "@uengage/ui";
 import { Input } from "@uengage/ui";
 import { Select } from "@uengage/ui";
@@ -271,22 +272,198 @@ function PaymentDemo() {
   );
 }
 
+// ─── Demo: Single collapsible section ────────────────────────────────────────
+
+function CollapsibleSingleDemo() {
+  return (
+    <Section collapsible className="max-w-4xl">
+      <SectionHeader
+        icon={<Clock size={18} />}
+        title="Operating Hours"
+        description="Expand to configure your outlet's opening and closing times"
+      />
+      <SectionContent>
+        <SectionSubsection separator={false} title="Weekdays">
+          <SectionRow columns={2}>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Opening Time</span>
+              <Input placeholder="09:00 AM" />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Closing Time</span>
+              <Input placeholder="10:00 PM" />
+            </SectionField>
+          </SectionRow>
+        </SectionSubsection>
+        <SectionSubsection separatorLabel="Weekend" title="Saturday & Sunday">
+          <SectionRow columns={2}>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Opening Time</span>
+              <Input placeholder="10:00 AM" />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Closing Time</span>
+              <Input placeholder="11:00 PM" />
+            </SectionField>
+          </SectionRow>
+        </SectionSubsection>
+      </SectionContent>
+    </Section>
+  );
+}
+
+// ─── Demo: Collapsible section with header action ─────────────────────────────
+
+function CollapsibleWithActionDemo() {
+  return (
+    <Section collapsible defaultOpen={false} className="max-w-4xl">
+      <SectionHeader
+        icon={<CreditCard size={18} />}
+        title="Payment Settings"
+        description="Bank account and UPI details for payouts"
+        action={
+          <Button variant="primary" size="sm">
+            Save
+          </Button>
+        }
+      />
+      <SectionContent>
+        <SectionRow columns={2}>
+          <SectionField>
+            <span className="text-xs text-[#6B7280]">UPI ID</span>
+            <Input placeholder="yourname@upi" />
+          </SectionField>
+          <SectionField>
+            <span className="text-xs text-[#6B7280]">Bank Account Number</span>
+            <Input placeholder="XXXX XXXX XXXX" />
+          </SectionField>
+        </SectionRow>
+        <SectionDivider />
+        <SectionRow columns={2}>
+          <SectionField>
+            <span className="text-xs text-[#6B7280]">IFSC Code</span>
+            <Input placeholder="HDFC0001234" />
+          </SectionField>
+          <SectionField>
+            <span className="text-xs text-[#6B7280]">Beneficiary Name</span>
+            <Input placeholder="Tim Hortons India Pvt. Ltd." />
+          </SectionField>
+        </SectionRow>
+      </SectionContent>
+    </Section>
+  );
+}
+
+// ─── Demo: SectionGroup (accordion — only one open at a time) ─────────────────
+
+function SectionGroupDemo() {
+  return (
+    <SectionGroup className="max-w-4xl">
+      <Section>
+        <SectionHeader
+          icon={<Building2 size={18} />}
+          title="Business Details"
+          description="Name, GSTIN, and registration info"
+        />
+        <SectionContent>
+          <SectionRow columns={3}>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Business Name</span>
+              <Input value="Tim Hortons" readOnly />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Legal Entity Name</span>
+              <Input value="Tim Hortons" readOnly />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">GSTIN</span>
+              <Input value="Unregistered" readOnly />
+            </SectionField>
+          </SectionRow>
+        </SectionContent>
+      </Section>
+
+      <Section>
+        <SectionHeader
+          icon={<MapPin size={18} />}
+          title="Location & Contact"
+          description="Registered address and point-of-contact details"
+        />
+        <SectionContent>
+          <SectionRow columns={3}>
+            <SectionField span={2}>
+              <span className="text-xs text-[#6B7280]">Street / Building</span>
+              <Input value="Linking Road, Bandra West" readOnly />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Pin Code</span>
+              <Input value="400050" readOnly />
+            </SectionField>
+          </SectionRow>
+        </SectionContent>
+      </Section>
+
+      <Section>
+        <SectionHeader
+          icon={<Settings size={18} />}
+          title="Advanced Settings"
+          description="Ordering window, delivery radius, and platform config"
+        />
+        <SectionContent>
+          <SectionRow columns={3}>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Pre-order Window (days)</span>
+              <Input placeholder="e.g. 7" />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Min Order Value (₹)</span>
+              <Input placeholder="e.g. 100" />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Max Order Value (₹)</span>
+              <Input placeholder="e.g. 5000" />
+            </SectionField>
+          </SectionRow>
+        </SectionContent>
+      </Section>
+    </SectionGroup>
+  );
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export default function SectionPreview() {
   return (
-    <div className="min-h-screen bg-[#F9FAFB] p-6 flex flex-col gap-5">
+    <div className="min-h-screen bg-[#F9FAFB] p-6 flex flex-col gap-8">
       <div className="max-w-4xl">
         <h1 className="text-xl font-bold text-[#202020] mb-1">Section Component</h1>
-        <p className="text-sm text-[#6B7280] mb-6">
+        <p className="text-sm text-[#6B7280]">
           Card-style section containers with headers, field grids, dividers, and subsections.
         </p>
       </div>
 
-      <BusinessDetailsDemo />
-      <AdvancedSettingsDemo />
-      <LocationContactDemo />
-      <PaymentDemo />
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-[#374151] max-w-4xl">Static sections</h2>
+        <BusinessDetailsDemo />
+        <AdvancedSettingsDemo />
+        <LocationContactDemo />
+        <PaymentDemo />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-[#374151] max-w-4xl">Collapsible — single (starts open)</h2>
+        <CollapsibleSingleDemo />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-[#374151] max-w-4xl">Collapsible — with header action (starts closed)</h2>
+        <CollapsibleWithActionDemo />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-[#374151] max-w-4xl">SectionGroup — accordion (one open at a time)</h2>
+        <SectionGroupDemo />
+      </div>
     </div>
   );
 }
