@@ -57,10 +57,25 @@ function Radio({
 }: CustomRadioItemProps) {
   const reactId = React.useId();
   const itemId = id ?? reactId;
+  const itemRef = React.useRef<HTMLButtonElement>(null);
+  const [isChecked, setIsChecked] = React.useState(false);
 
   React.useEffect(() => {
     validateLabelWordLimit(label, "Radio");
   }, [label]);
+
+  // Track checked state via MutationObserver so we don't rely on CSS :has(),
+  // which is only supported in Safari 15.4+. This handles custom-color pill styling.
+  React.useEffect(() => {
+    const el = itemRef.current;
+    if (!el) return;
+    setIsChecked(el.dataset.state === "checked");
+    const observer = new MutationObserver(() => {
+      setIsChecked(el.dataset.state === "checked");
+    });
+    observer.observe(el, { attributes: true, attributeFilter: ["data-state"] });
+    return () => observer.disconnect();
+  }, []);
 
   const state: "default" | "disabled" | "error" = disabled
     ? "disabled"
@@ -74,32 +89,24 @@ function Radio({
 
   const hasCustomColors = !!(borderColor || bgColor);
 
+  const labelStyle: React.CSSProperties | undefined = hasCustomColors
+    ? {
+        ...(isChecked && borderColor ? { borderColor } : {}),
+        ...(isChecked && bgColor ? { backgroundColor: bgColor } : {}),
+      }
+    : undefined;
+
   return (
     <label
       htmlFor={itemId}
-      style={
-        hasCustomColors
-          ? ({
-              ...(borderColor ? { "--radio-checked-border": borderColor } : {}),
-              ...(bgColor ? { "--radio-checked-bg": bgColor } : {}),
-            } as React.CSSProperties)
-          : undefined
-      }
+      style={labelStyle}
       className={cn(
         "group inline-flex cursor-pointer items-center transition-colors",
         hasCustomColors
           ? cn(
               "rounded-xl border",
               PILL_PADDING[size],
-              error
-                ? "border-red-500"
-                : cn(
-                    "border-gray-200",
-                    borderColor &&
-                      "has-[[data-state=checked]]:[border-color:var(--radio-checked-border)]",
-                    bgColor &&
-                      "has-[[data-state=checked]]:[background-color:var(--radio-checked-bg)]",
-                  ),
+              error ? "border-red-500" : "border-gray-200",
             )
           : GAP_ONLY[size],
         disabled && "cursor-not-allowed opacity-60",
@@ -109,6 +116,7 @@ function Radio({
     >
       <RadioGroupPrimitive.Item
         {...rest}
+        ref={itemRef}
         id={itemId}
         value={value}
         disabled={disabled}
@@ -128,7 +136,7 @@ function Radio({
         className={cn(
           radioLabelVariants({ size, state: labelState }),
           "whitespace-normal break-words",
-          hasCustomColors && "group-has-[[data-state=checked]]:text-[#0F8055]",
+          hasCustomColors && isChecked && "text-[#0F8055]",
         )}
       >
         {truncateLabelToWordLimit(label)}

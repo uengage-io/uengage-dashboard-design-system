@@ -703,7 +703,11 @@ function Button2({
         onPointerUp?.(e);
       },
       onFocus: (e) => {
-        if (e.target.matches(":focus-visible")) setFocused(true);
+        try {
+          if (e.target.matches(":focus-visible")) setFocused(true);
+        } catch {
+          setFocused(true);
+        }
         onFocus?.(e);
       },
       onBlur: (e) => {
@@ -1448,11 +1452,15 @@ var ZIndexContext = React9.createContext({ popover: 20 });
 function useZIndex() {
   return React9.useContext(ZIndexContext);
 }
-function SidebarZIndexProvider({ children }) {
+function SidebarZIndexProvider({
+  children
+}) {
   return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 50 }, children });
 }
-function ModalZIndexProvider({ children }) {
-  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 10003 }, children });
+function ModalZIndexProvider({
+  children
+}) {
+  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 10001 }, children });
 }
 function Popover({
   ...props
@@ -3261,30 +3269,39 @@ function Radio({
 }) {
   const reactId = React9.useId();
   const itemId = id ?? reactId;
+  const itemRef = React9.useRef(null);
+  const [isChecked, setIsChecked] = React9.useState(false);
   React9.useEffect(() => {
     validateLabelWordLimit(label, "Radio");
   }, [label]);
+  React9.useEffect(() => {
+    const el = itemRef.current;
+    if (!el) return;
+    setIsChecked(el.dataset.state === "checked");
+    const observer = new MutationObserver(() => {
+      setIsChecked(el.dataset.state === "checked");
+    });
+    observer.observe(el, { attributes: true, attributeFilter: ["data-state"] });
+    return () => observer.disconnect();
+  }, []);
   const state = disabled ? "disabled" : error ? "error" : "default";
   const labelState = disabled ? "disabled" : "default";
   const hasCustomColors2 = !!(borderColor || bgColor);
+  const labelStyle = hasCustomColors2 ? {
+    ...isChecked && borderColor ? { borderColor } : {},
+    ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
+  } : void 0;
   return /* @__PURE__ */ jsxs(
     "label",
     {
       htmlFor: itemId,
-      style: hasCustomColors2 ? {
-        ...borderColor ? { "--radio-checked-border": borderColor } : {},
-        ...bgColor ? { "--radio-checked-bg": bgColor } : {}
-      } : void 0,
+      style: labelStyle,
       className: cn(
         "group inline-flex cursor-pointer items-center transition-colors",
         hasCustomColors2 ? cn(
           "rounded-xl border",
           PILL_PADDING[size],
-          error ? "border-red-500" : cn(
-            "border-gray-200",
-            borderColor && "has-[[data-state=checked]]:[border-color:var(--radio-checked-border)]",
-            bgColor && "has-[[data-state=checked]]:[background-color:var(--radio-checked-bg)]"
-          )
+          error ? "border-red-500" : "border-gray-200"
         ) : GAP_ONLY[size],
         disabled && "cursor-not-allowed opacity-60",
         readOnly && "pointer-events-none cursor-default",
@@ -3295,6 +3312,7 @@ function Radio({
           RadioGroup$1.Item,
           {
             ...rest,
+            ref: itemRef,
             id: itemId,
             value,
             disabled,
@@ -3317,7 +3335,7 @@ function Radio({
             className: cn(
               radioLabelVariants({ size, state: labelState }),
               "whitespace-normal break-words",
-              hasCustomColors2 && "group-has-[[data-state=checked]]:text-[#0F8055]"
+              hasCustomColors2 && isChecked && "text-[#0F8055]"
             ),
             children: truncateLabelToWordLimit(label)
           }
@@ -4489,7 +4507,7 @@ function TableCell2({
         alignClass[align],
         // Allow content to wrap and break long words/URLs that would otherwise
         // force the column wider than its flex-allocated share.
-        "whitespace-normal break-words align-top",
+        "whitespace-normal break-words [hyphens:none] align-top",
         className
       ),
       ...props,
@@ -4527,13 +4545,13 @@ function TableHeaderCell({
       className: cn(
         tableHeaderRowVariants({ size }),
         alignClass2[align],
-        "whitespace-normal break-words align-middle",
+        "whitespace-normal break-words [hyphens:none] align-middle",
         sortable && "cursor-pointer select-none hover:text-gray-700",
         className
       ),
       ...props,
       children: /* @__PURE__ */ jsxs("div", { className: cn("flex items-center gap-1 min-w-0", justifyClass[align]), children: [
-        /* @__PURE__ */ jsx("span", { className: "min-w-0 break-words", children }),
+        /* @__PURE__ */ jsx("span", { className: "min-w-0 break-words [hyphens:none]", children }),
         sortable ? /* @__PURE__ */ jsx(Icon, { className: "h-3.5 w-3.5 shrink-0", "aria-hidden": "true" }) : null
       ] })
     }
@@ -4685,11 +4703,11 @@ function Table2({
           "div",
           {
             className: cn(
-              "overflow-x-auto",
+              "overflow-x-auto scroll-smooth",
               // Clip table cells to the rounded corners — overflow:auto on this
               // element also clips to border-radius, so no parent overflow-hidden needed.
               bordered && "rounded-lg",
-              stickyHeader && "overflow-y-auto",
+              stickyHeader && "overflow-y-auto scroll-smooth",
               mobileLayout === "cards" && "hidden md:block"
             ),
             style: scrollStyle,
@@ -5465,13 +5483,18 @@ function Modal({
   modalClassName
 }) {
   React9.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (!isOpen) return;
+    const scrollY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
     return () => {
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
   if (!isOpen) return null;
@@ -5482,7 +5505,7 @@ function Modal({
     "div",
     {
       className: "fixed inset-0 bg-[#00000066] flex items-center justify-center px-4 outline-none",
-      style: { zIndex: 10002 },
+      style: { zIndex: 9999 },
       onClick: handleBackdropClick,
       children: /* @__PURE__ */ jsxs("div", { className: cn(modalSizeVariants({ size }), modalClassName), children: [
         (title || showCloseButton) && /* @__PURE__ */ jsxs("div", { className: cn("flex justify-between items-center border-b border-gray-300 p-2", headerClassName), children: [

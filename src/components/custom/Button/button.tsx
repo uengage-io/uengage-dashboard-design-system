@@ -289,7 +289,12 @@ function Button({
         onPointerUp?.(e);
       }}
       onFocus={(e: React.FocusEvent<HTMLButtonElement>) => {
-        if (e.target.matches(":focus-visible")) setFocused(true);
+        try {
+          if (e.target.matches(":focus-visible")) setFocused(true);
+        } catch {
+          // Safari < 15.4 throws SyntaxError for :focus-visible in matches()
+          setFocused(true);
+        }
         onFocus?.(e);
       }}
       onBlur={(e: React.FocusEvent<HTMLButtonElement>) => {
