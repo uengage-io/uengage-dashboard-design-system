@@ -1278,7 +1278,7 @@ interface SectionDividerProps extends Omit<React.ComponentProps<"div">, "childre
     /** Label shown inline with a horizontal divider. Ignored when orientation="vertical". */
     label?: string;
     /**
-     * "horizontal" (default) — a full-width rule, optionally with an inline label.
+     * "horizontal" (default) — a dashed full-width rule, optionally with an inline label.
      * "vertical" — a thin column separator for use inside flex/grid rows.
      */
     orientation?: "horizontal" | "vertical";
@@ -1295,6 +1295,8 @@ declare function SectionContent({ className, children, ...props }: SectionConten
 interface SectionSubsectionProps extends React.ComponentProps<"div"> {
     /** Title shown above this subsection. */
     title?: string;
+    /**ClassName applied to the title element for full style customisation. */
+    titleClassName?: string;
     /** Optional description under the subsection title. */
     description?: string;
     /** Show a separator line above this subsection (default: true). */
@@ -1302,11 +1304,11 @@ interface SectionSubsectionProps extends React.ComponentProps<"div"> {
     /** Label to display on the separator line when separator=true. */
     separatorLabel?: string;
 }
-declare function SectionSubsection({ title, description, separator, separatorLabel, className, children, ...props }: SectionSubsectionProps): react_jsx_runtime.JSX.Element;
+declare function SectionSubsection({ title, titleClassName, description, separator, separatorLabel, className, children, ...props }: SectionSubsectionProps): react_jsx_runtime.JSX.Element;
 interface SectionRowProps extends React.ComponentProps<"div"> {
     /**
-     * Number of equal columns. Defaults to 3 (matching the Business Details
-     * design). Accepts 1–4 or a raw CSS grid-template-columns string.
+     * Number of equal columns. Defaults to 3.
+     * Accepts 1–4 or a raw CSS grid-template-columns string.
      */
     columns?: 1 | 2 | 3 | 4 | string;
     /**
@@ -1353,6 +1355,11 @@ interface SectionProps extends React.ComponentProps<"div"> {
      */
     divider?: boolean;
     /**
+     * Border style of the header divider. Defaults to "solid".
+     * Only used when `divider` is true.
+     */
+    dividerStyle?: "solid" | "dashed" | "dotted";
+    /**
      * Initial open state when uncontrolled (default: true).
      * Only used when `collapsible` is true and `open` is not provided.
      */
@@ -1368,7 +1375,7 @@ interface SectionProps extends React.ComponentProps<"div"> {
      */
     onOpenChange?: (open: boolean) => void;
 }
-declare function Section({ bare, collapsible, divider, defaultOpen, open: openProp, onOpenChange, className, children, ...props }: SectionProps): react_jsx_runtime.JSX.Element;
+declare function Section({ bare, collapsible, divider, dividerStyle, defaultOpen, open: openProp, onOpenChange, className, children, ...props }: SectionProps): react_jsx_runtime.JSX.Element;
 declare namespace Section {
     var displayName: string;
 }

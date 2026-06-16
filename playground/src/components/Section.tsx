@@ -312,6 +312,81 @@ function CollapsibleSingleDemo() {
   );
 }
 
+// ─── Demo: Collapsible with divider under header (solid / dashed / dotted) ────
+
+function CollapsibleWithDividerDemo() {
+  return (
+    <div className="flex flex-col gap-4">
+      {/* solid (default) */}
+      <Section collapsible divider className="max-w-4xl">
+        <SectionHeader
+          icon={<Clock size={18} />}
+          title="Operating Hours — solid divider (default)"
+          description="Expand to see the header rule"
+        />
+        <SectionContent>
+          <SectionSubsection separator={false} title="Weekdays" titleClassName="text-sm font-semibold normal-case tracking-normal text-[#374151]">
+            <SectionRow columns={2}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Opening Time</span>
+                <Input placeholder="09:00 AM" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Closing Time</span>
+                <Input placeholder="10:00 PM" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+        </SectionContent>
+      </Section>
+
+      {/* dashed */}
+      <Section collapsible divider dividerStyle="dashed" className="max-w-4xl">
+        <SectionHeader
+          icon={<Clock size={18} />}
+          title="Operating Hours — dashed divider"
+        />
+        <SectionContent>
+          <SectionSubsection separator={false} title="Weekdays">
+            <SectionRow columns={2}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Opening Time</span>
+                <Input placeholder="09:00 AM" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Closing Time</span>
+                <Input placeholder="10:00 PM" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+        </SectionContent>
+      </Section>
+
+      {/* dotted */}
+      <Section collapsible divider dividerStyle="dotted" className="max-w-4xl">
+        <SectionHeader
+          icon={<Clock size={18} />}
+          title="Operating Hours — dotted divider"
+        />
+        <SectionContent>
+          <SectionSubsection separator={false} title="Weekdays">
+            <SectionRow columns={2}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Opening Time</span>
+                <Input placeholder="09:00 AM" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Closing Time</span>
+                <Input placeholder="10:00 PM" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+        </SectionContent>
+      </Section>
+    </div>
+  );
+}
+
 // ─── Demo: Collapsible section with header action ─────────────────────────────
 
 function CollapsibleWithActionDemo() {
@@ -448,6 +523,11 @@ export default function SectionPreview() {
         <AdvancedSettingsDemo />
         <LocationContactDemo />
         <PaymentDemo />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-[#374151] max-w-4xl">Collapsible — with divider under header</h2>
+        <CollapsibleWithDividerDemo />
       </div>
 
       <div className="flex flex-col gap-3">

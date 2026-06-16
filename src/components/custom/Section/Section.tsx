@@ -3,7 +3,6 @@ import { ChevronDown } from "lucide-react";
 import { Collapsible } from "radix-ui";
 import { cn } from "../../../lib/utils";
 import { Card as ShadcnCard } from "../../ui/card";
-import { Separator } from "../../ui/separator";
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -11,12 +10,14 @@ interface SectionContextValue {
   collapsible: boolean;
   isOpen: boolean;
   divider: boolean;
+  dividerStyle: "solid" | "dashed" | "dotted";
 }
 
 const SectionContext = React.createContext<SectionContextValue>({
   collapsible: false,
   isOpen: true,
   divider: false,
+  dividerStyle: "solid",
 });
 
 // ─── SectionHeader ────────────────────────────────────────────────────────────
@@ -45,11 +46,16 @@ function SectionHeader({
   const inner = (
     <>
       {/* Left: icon + title + description */}
-      <div className="flex items-center gap-2 min-w-0 pointer-events-none">
+      <div className="flex items-center gap-[11px] min-w-0 pointer-events-none">
         {icon && (
           <span
             data-slot="section-header-icon"
-            className="flex-shrink-0 text-[#2b7a3b] w-6 h-6 flex items-center justify-center"
+            className={cn(
+              "flex-shrink-0 w-[30px] h-[30px] flex items-center justify-center",
+              "rounded-md border border-[#C8E7B8] text-[#1F5E2C]",
+              "[&>svg]:w-[17px] [&>svg]:h-[17px]",
+              collapsible && isOpen ? "bg-[#C8E7B8]" : "bg-[#FAFFF7]",
+            )}
           >
             {icon}
           </span>
@@ -75,7 +81,6 @@ function SectionHeader({
       {/* Right: action slot + chevron */}
       <div className="flex-shrink-0 flex items-center gap-2">
         {action && (
-          // stop click from bubbling to the Collapsible.Trigger
           <div
             data-slot="section-header-action"
             className="pointer-events-auto"
@@ -106,36 +111,33 @@ function SectionHeader({
 
   if (collapsible) {
     return (
-      <Collapsible.Trigger
-        data-slot="section-header"
-        className={cn(
-          "flex flex-col justify-center text-left",
-          "-ml-4 sm:-ml-5 md:-ml-6",
-          "w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-[calc(100%+3rem)]",
-          "pl-4 sm:pl-5 md:pl-6 pr-4 sm:pr-5 md:pr-6",
-          "py-3 sm:py-3.5 md:py-4 -my-3 sm:-my-3.5 md:-my-4",
-          "rounded-2xl hover:bg-[#fafff7] transition-colors duration-150",
-          "cursor-pointer select-none",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b7a3b] focus-visible:ring-offset-1",
-          "group",
-          className,
-        )}
-        {...(props as React.ComponentProps<typeof Collapsible.Trigger>)}
-      >
-        <div className="flex items-center justify-between gap-3 w-full">
+      <>
+        <Collapsible.Trigger
+          data-slot="section-header"
+          className={cn(
+            "w-[calc(100%+8px)] flex items-center justify-between gap-3 text-left",
+            "-mx-1 -mt-1 px-[21px] py-3",
+            "data-[state=closed]:-mb-1 data-[state=closed]:pb-[13px]",
+            "hover:bg-[#fafff7] transition-colors duration-150",
+            "cursor-pointer select-none",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b7a3b] focus-visible:ring-offset-1",
+            className,
+          )}
+          {...(props as React.ComponentProps<typeof Collapsible.Trigger>)}
+        >
           {inner}
-        </div>
-        {divider && isOpen && (
-          <div className="w-full mt-3 sm:mt-3.5 md:mt-4 border-t border-[#F3F4F6]" />
-        )}
-      </Collapsible.Trigger>
+        </Collapsible.Trigger>
+      </>
     );
   }
 
   return (
     <div
       data-slot="section-header"
-      className={cn("flex items-start justify-between gap-3 pb-4", className)}
+      className={cn(
+        "flex items-start justify-between gap-3 px-5 py-4",
+        className,
+      )}
       {...props}
     >
       {inner}
@@ -145,12 +147,14 @@ function SectionHeader({
 
 // ─── SectionDivider ───────────────────────────────────────────────────────────
 
-export interface SectionDividerProps
-  extends Omit<React.ComponentProps<"div">, "children"> {
+export interface SectionDividerProps extends Omit<
+  React.ComponentProps<"div">,
+  "children"
+> {
   /** Label shown inline with a horizontal divider. Ignored when orientation="vertical". */
   label?: string;
   /**
-   * "horizontal" (default) — a full-width rule, optionally with an inline label.
+   * "horizontal" (default) — a dashed full-width rule, optionally with an inline label.
    * "vertical" — a thin column separator for use inside flex/grid rows.
    */
   orientation?: "horizontal" | "vertical";
@@ -190,23 +194,27 @@ function SectionDivider({
       <div
         data-slot="section-divider"
         data-orientation="horizontal"
-        className={cn("flex items-center gap-3 mt-6 mb-4", className)}
+        className={cn("flex items-center gap-3 -mx-6 mt-6 mb-4 px-6", className)}
         {...props}
       >
-        <Separator className="flex-1 bg-[#E5E7EB]" />
+        <div className="flex-1 border-t border-[#E2E2E2]" />
         <span className="text-xs font-medium text-[#6B7280] whitespace-nowrap">
           {label}
         </span>
-        <Separator className="flex-1 bg-[#E5E7EB]" />
+        <div className="flex-1 border-t border-[#E2E2E2]" />
       </div>
     );
   }
 
   return (
-    <Separator
+    <div
       data-slot="section-divider"
       data-orientation="horizontal"
-      className={cn("mt-6 mb-4 bg-[#E5E7EB]", className)}
+      role="separator"
+      className={cn(
+        "-mx-6 mt-6 mb-4 border-t border-[#E2E2E2]",
+        className,
+      )}
       {...props}
     />
   );
@@ -216,13 +224,17 @@ function SectionDivider({
 
 export interface SectionContentProps extends React.ComponentProps<"div"> {}
 
-function SectionContent({ className, children, ...props }: SectionContentProps) {
-  const { collapsible } = React.useContext(SectionContext);
+function SectionContent({
+  className,
+  children,
+  ...props
+}: SectionContentProps) {
+  const { collapsible, divider, dividerStyle } = React.useContext(SectionContext);
 
   const inner = (
     <div
       data-slot="section-content"
-      className={cn("flex flex-col gap-0", collapsible && "pt-4", className)}
+      className={cn("flex flex-col gap-0 px-5 pt-1 pb-[22px]", className)}
       {...props}
     >
       {children}
@@ -232,6 +244,16 @@ function SectionContent({ className, children, ...props }: SectionContentProps) 
   if (collapsible) {
     return (
       <Collapsible.Content className="overflow-hidden will-change-[height] data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
+        {divider && (
+          <div
+            data-slot="section-header-rule"
+            className={cn(
+              "-mx-1 border-t border-[#EEEEEE]",
+              dividerStyle === "dashed" && "border-dashed",
+              dividerStyle === "dotted" && "border-dotted",
+            )}
+          />
+        )}
         {inner}
       </Collapsible.Content>
     );
@@ -245,6 +267,8 @@ function SectionContent({ className, children, ...props }: SectionContentProps) 
 export interface SectionSubsectionProps extends React.ComponentProps<"div"> {
   /** Title shown above this subsection. */
   title?: string;
+  /**ClassName applied to the title element for full style customisation. */
+  titleClassName?: string;
   /** Optional description under the subsection title. */
   description?: string;
   /** Show a separator line above this subsection (default: true). */
@@ -255,6 +279,7 @@ export interface SectionSubsectionProps extends React.ComponentProps<"div"> {
 
 function SectionSubsection({
   title,
+  titleClassName,
   description,
   separator = true,
   separatorLabel,
@@ -273,7 +298,9 @@ function SectionSubsection({
         {(title || description) && (
           <div className="flex flex-col gap-0.5">
             {title && (
-              <p className="text-sm font-medium text-[#374151]">{title}</p>
+              <p className={cn("text-[11.5px] font-bold uppercase tracking-[.06em] text-[#1F5E2C]", titleClassName)}>
+                {title}
+              </p>
             )}
             {description && (
               <p className="text-xs text-[#6B7280]">{description}</p>
@@ -290,8 +317,8 @@ function SectionSubsection({
 
 export interface SectionRowProps extends React.ComponentProps<"div"> {
   /**
-   * Number of equal columns. Defaults to 3 (matching the Business Details
-   * design). Accepts 1–4 or a raw CSS grid-template-columns string.
+   * Number of equal columns. Defaults to 3.
+   * Accepts 1–4 or a raw CSS grid-template-columns string.
    */
   columns?: 1 | 2 | 3 | 4 | string;
   /**
@@ -346,14 +373,12 @@ function SectionRow({
     <div
       data-slot="section-row"
       className={cn(
-        "grid gap-x-5 gap-y-4",
+        "grid gap-x-5 gap-y-[18px]",
         isPreset && COLUMN_CLASSES[key],
         className,
       )}
       style={
-        isPreset
-          ? style
-          : { gridTemplateColumns: columns as string, ...style }
+        isPreset ? style : { gridTemplateColumns: columns as string, ...style }
       }
       {...props}
     >
@@ -381,7 +406,7 @@ function SectionField({ span, className, ...props }: SectionFieldProps) {
     <div
       data-slot="section-field"
       className={cn(
-        "flex flex-col gap-1.5",
+        "flex flex-col gap-[7px]",
         span && SPAN_CLASSES[span],
         className,
       )}
@@ -412,10 +437,7 @@ function SectionTableContent({
     <div
       data-slot="section-table-content"
       className={cn(
-        "-mx-4 sm:-mx-5 md:-mx-6",
-        "-mb-4 sm:-mb-5 md:-mb-6",
-        "overflow-hidden rounded-b-2xl",
-        collapsible && "mt-4",
+        "overflow-hidden rounded-b-xl",
         divider && "border-t border-[#E5E7EB]",
         className,
       )}
@@ -493,6 +515,11 @@ export interface SectionProps extends React.ComponentProps<"div"> {
    */
   divider?: boolean;
   /**
+   * Border style of the header divider. Defaults to "solid".
+   * Only used when `divider` is true.
+   */
+  dividerStyle?: "solid" | "dashed" | "dotted";
+  /**
    * Initial open state when uncontrolled (default: true).
    * Only used when `collapsible` is true and `open` is not provided.
    */
@@ -513,6 +540,7 @@ function Section({
   bare = false,
   collapsible = false,
   divider = false,
+  dividerStyle = "solid",
   defaultOpen = true,
   open: openProp,
   onOpenChange,
@@ -536,21 +564,23 @@ function Section({
 
   const cardClass = cn(
     "uengage-ui",
-    "flex flex-col gap-0 rounded-2xl border border-[#E5E7EB] bg-white",
-    "p-4 sm:p-5 md:p-6",
-    "shadow-none text-sm text-[#202020]",
-    collapsible && "py-3 sm:py-3.5 md:py-4",
+    "flex flex-col gap-0 rounded-xl border border-[#E2E2E2] bg-white",
+    "shadow-[2px_2px_4px_0_rgba(0,0,0,0.06)]",
+    "overflow-hidden text-sm text-[#202020] p-1",
     className,
   );
 
-  const ctx: SectionContextValue = { collapsible, isOpen, divider };
+  const ctx: SectionContextValue = { collapsible, isOpen, divider, dividerStyle };
 
   if (bare) {
     return (
       <SectionContext.Provider value={ctx}>
         <div
           data-slot="section"
-          className={cn("flex flex-col gap-0 text-sm text-[#202020]", className)}
+          className={cn(
+            "flex flex-col gap-0 text-sm text-[#202020]",
+            className,
+          )}
           {...props}
         >
           {children}
@@ -563,11 +593,7 @@ function Section({
     return (
       <SectionContext.Provider value={ctx}>
         <Collapsible.Root open={isOpen} onOpenChange={handleOpenChange} asChild>
-          <ShadcnCard
-            data-slot="section"
-            className={cardClass}
-            {...props}
-          >
+          <ShadcnCard data-slot="section" className={cardClass} {...props}>
             {children}
           </ShadcnCard>
         </Collapsible.Root>
@@ -577,11 +603,7 @@ function Section({
 
   return (
     <SectionContext.Provider value={ctx}>
-      <ShadcnCard
-        data-slot="section"
-        className={cardClass}
-        {...props}
-      >
+      <ShadcnCard data-slot="section" className={cardClass} {...props}>
         {children}
       </ShadcnCard>
     </SectionContext.Provider>
