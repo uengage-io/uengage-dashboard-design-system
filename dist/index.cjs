@@ -4744,7 +4744,7 @@ function Table2({
               Table,
               {
                 className: "w-full",
-                style: tableMinWidth > 0 ? { width: "max-content", minWidth: `${tableMinWidth}px` } : { width: "max-content", minWidth: "100%" },
+                style: tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : { minWidth: "max-content" },
                 children: [
                   /* @__PURE__ */ jsxRuntime.jsx("colgroup", { children: columns.map((col, i) => /* @__PURE__ */ jsxRuntime.jsx(
                     "col",

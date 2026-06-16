@@ -187,8 +187,8 @@ export function Table<T>({
           className="w-full"
           style={
             tableMinWidth > 0
-              ? { width: "max-content", minWidth: `${tableMinWidth}px` }
-              : { width: "max-content", minWidth: "100%" }
+              ? { minWidth: `${tableMinWidth}px` }
+              : { minWidth: "max-content" }
           }
         >
           {/*
