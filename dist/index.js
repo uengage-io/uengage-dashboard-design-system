@@ -6544,7 +6544,8 @@ Banner.displayName = "Banner";
 var SectionContext = React9.createContext({
   collapsible: false,
   isOpen: true,
-  divider: false
+  divider: false,
+  dividerStyle: "solid"
 });
 function SectionHeader({
   icon,
@@ -6556,12 +6557,17 @@ function SectionHeader({
 }) {
   const { collapsible, isOpen, divider } = React9.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 min-w-0 pointer-events-none", children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-[11px] min-w-0 pointer-events-none", children: [
       icon && /* @__PURE__ */ jsx(
         "span",
         {
           "data-slot": "section-header-icon",
-          className: "flex-shrink-0 text-[#2b7a3b] w-6 h-6 flex items-center justify-center",
+          className: cn(
+            "flex-shrink-0 w-[30px] h-[30px] flex items-center justify-center",
+            "rounded-md border border-[#C8E7B8] text-[#1F5E2C]",
+            "[&>svg]:w-[17px] [&>svg]:h-[17px]",
+            collapsible && isOpen ? "bg-[#C8E7B8]" : "bg-[#FAFFF7]"
+          ),
           children: icon
         }
       ),
@@ -6585,8 +6591,7 @@ function SectionHeader({
       ] })
     ] }),
     /* @__PURE__ */ jsxs("div", { className: "flex-shrink-0 flex items-center gap-2", children: [
-      action && // stop click from bubbling to the Collapsible.Trigger
-      /* @__PURE__ */ jsx(
+      action && /* @__PURE__ */ jsx(
         "div",
         {
           "data-slot": "section-header-action",
@@ -6617,35 +6622,32 @@ function SectionHeader({
     ] })
   ] });
   if (collapsible) {
-    return /* @__PURE__ */ jsxs(
+    return /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsx(
       Collapsible.Trigger,
       {
         "data-slot": "section-header",
         className: cn(
-          "flex flex-col justify-center text-left",
-          "-ml-4 sm:-ml-5 md:-ml-6",
-          "w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-[calc(100%+3rem)]",
-          "pl-4 sm:pl-5 md:pl-6 pr-4 sm:pr-5 md:pr-6",
-          "py-3 sm:py-3.5 md:py-4 -my-3 sm:-my-3.5 md:-my-4",
-          "rounded-2xl hover:bg-[#fafff7] transition-colors duration-150",
+          "w-[calc(100%+8px)] flex items-center justify-between gap-3 text-left",
+          "-mx-1 -mt-1 px-[21px] py-3",
+          "data-[state=closed]:-mb-1 data-[state=closed]:pb-[13px]",
+          "hover:bg-[#fafff7] transition-colors duration-150",
           "cursor-pointer select-none",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b7a3b] focus-visible:ring-offset-1",
-          "group",
           className
         ),
         ...props,
-        children: [
-          /* @__PURE__ */ jsx("div", { className: "flex items-center justify-between gap-3 w-full", children: inner }),
-          divider && isOpen && /* @__PURE__ */ jsx("div", { className: "w-full mt-3 sm:mt-3.5 md:mt-4 border-t border-[#F3F4F6]" })
-        ]
+        children: inner
       }
-    );
+    ) });
   }
   return /* @__PURE__ */ jsx(
     "div",
     {
       "data-slot": "section-header",
-      className: cn("flex items-start justify-between gap-3 pb-4", className),
+      className: cn(
+        "flex items-start justify-between gap-3 px-5 py-4",
+        className
+      ),
       ...props,
       children: inner
     }
@@ -6681,44 +6683,66 @@ function SectionDivider({
       {
         "data-slot": "section-divider",
         "data-orientation": "horizontal",
-        className: cn("flex items-center gap-3 mt-6 mb-4", className),
+        className: cn("flex items-center gap-3 -mx-6 mt-6 mb-4 px-6", className),
         ...props,
         children: [
-          /* @__PURE__ */ jsx(Separator, { className: "flex-1 bg-[#E5E7EB]" }),
+          /* @__PURE__ */ jsx("div", { className: "flex-1 border-t border-[#E2E2E2]" }),
           /* @__PURE__ */ jsx("span", { className: "text-xs font-medium text-[#6B7280] whitespace-nowrap", children: label }),
-          /* @__PURE__ */ jsx(Separator, { className: "flex-1 bg-[#E5E7EB]" })
+          /* @__PURE__ */ jsx("div", { className: "flex-1 border-t border-[#E2E2E2]" })
         ]
       }
     );
   }
   return /* @__PURE__ */ jsx(
-    Separator,
+    "div",
     {
       "data-slot": "section-divider",
       "data-orientation": "horizontal",
-      className: cn("mt-6 mb-4 bg-[#E5E7EB]", className),
+      role: "separator",
+      className: cn(
+        "-mx-6 mt-6 mb-4 border-t border-[#E2E2E2]",
+        className
+      ),
       ...props
     }
   );
 }
-function SectionContent({ className, children, ...props }) {
-  const { collapsible } = React9.useContext(SectionContext);
+function SectionContent({
+  className,
+  children,
+  ...props
+}) {
+  const { collapsible, divider, dividerStyle } = React9.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsx(
     "div",
     {
       "data-slot": "section-content",
-      className: cn("flex flex-col gap-0", collapsible && "pt-4", className),
+      className: cn("flex flex-col gap-0 px-5 pt-1 pb-[22px]", className),
       ...props,
       children
     }
   );
   if (collapsible) {
-    return /* @__PURE__ */ jsx(Collapsible.Content, { className: "overflow-hidden will-change-[height] data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up", children: inner });
+    return /* @__PURE__ */ jsxs(Collapsible.Content, { className: "overflow-hidden will-change-[height] data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up", children: [
+      divider && /* @__PURE__ */ jsx(
+        "div",
+        {
+          "data-slot": "section-header-rule",
+          className: cn(
+            "-mx-1 border-t border-[#EEEEEE]",
+            dividerStyle === "dashed" && "border-dashed",
+            dividerStyle === "dotted" && "border-dotted"
+          )
+        }
+      ),
+      inner
+    ] });
   }
   return inner;
 }
 function SectionSubsection({
   title,
+  titleClassName,
   description,
   separator = true,
   separatorLabel,
@@ -6736,7 +6760,7 @@ function SectionSubsection({
         ...props,
         children: [
           (title || description) && /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-0.5", children: [
-            title && /* @__PURE__ */ jsx("p", { className: "text-sm font-medium text-[#374151]", children: title }),
+            title && /* @__PURE__ */ jsx("p", { className: cn("text-[11.5px] font-bold uppercase tracking-[.06em] text-[#1F5E2C]", titleClassName), children: title }),
             description && /* @__PURE__ */ jsx("p", { className: "text-xs text-[#6B7280]", children: description })
           ] }),
           children
@@ -6783,7 +6807,7 @@ function SectionRow({
     {
       "data-slot": "section-row",
       className: cn(
-        "grid gap-x-5 gap-y-4",
+        "grid gap-x-5 gap-y-[18px]",
         isPreset && COLUMN_CLASSES[key],
         className
       ),
@@ -6805,7 +6829,7 @@ function SectionField({ span, className, ...props }) {
     {
       "data-slot": "section-field",
       className: cn(
-        "flex flex-col gap-1.5",
+        "flex flex-col gap-[7px]",
         span && SPAN_CLASSES[span],
         className
       ),
@@ -6825,10 +6849,7 @@ function SectionTableContent({
     {
       "data-slot": "section-table-content",
       className: cn(
-        "-mx-4 sm:-mx-5 md:-mx-6",
-        "-mb-4 sm:-mb-5 md:-mb-6",
-        "overflow-hidden rounded-b-2xl",
-        collapsible && "mt-4",
+        "overflow-hidden rounded-b-xl",
         divider && "border-t border-[#E5E7EB]",
         className
       ),
@@ -6874,6 +6895,7 @@ function Section({
   bare = false,
   collapsible = false,
   divider = false,
+  dividerStyle = "solid",
   defaultOpen = true,
   open: openProp,
   onOpenChange,
@@ -6895,44 +6917,30 @@ function Section({
   );
   const cardClass = cn(
     "uengage-ui",
-    "flex flex-col gap-0 rounded-2xl border border-[#E5E7EB] bg-white",
-    "p-4 sm:p-5 md:p-6",
-    "shadow-none text-sm text-[#202020]",
-    collapsible && "py-3 sm:py-3.5 md:py-4",
+    "flex flex-col gap-0 rounded-xl border border-[#E2E2E2] bg-white",
+    "shadow-[2px_2px_4px_0_rgba(0,0,0,0.06)]",
+    "overflow-hidden text-sm text-[#202020] p-1",
     className
   );
-  const ctx = { collapsible, isOpen, divider };
+  const ctx = { collapsible, isOpen, divider, dividerStyle };
   if (bare) {
     return /* @__PURE__ */ jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsx(
       "div",
       {
         "data-slot": "section",
-        className: cn("flex flex-col gap-0 text-sm text-[#202020]", className),
+        className: cn(
+          "flex flex-col gap-0 text-sm text-[#202020]",
+          className
+        ),
         ...props,
         children
       }
     ) });
   }
   if (collapsible) {
-    return /* @__PURE__ */ jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsx(Collapsible.Root, { open: isOpen, onOpenChange: handleOpenChange, asChild: true, children: /* @__PURE__ */ jsx(
-      Card,
-      {
-        "data-slot": "section",
-        className: cardClass,
-        ...props,
-        children
-      }
-    ) }) });
+    return /* @__PURE__ */ jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsx(Collapsible.Root, { open: isOpen, onOpenChange: handleOpenChange, asChild: true, children: /* @__PURE__ */ jsx(Card, { "data-slot": "section", className: cardClass, ...props, children }) }) });
   }
-  return /* @__PURE__ */ jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsx(
-    Card,
-    {
-      "data-slot": "section",
-      className: cardClass,
-      ...props,
-      children
-    }
-  ) });
+  return /* @__PURE__ */ jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsx(Card, { "data-slot": "section", className: cardClass, ...props, children }) });
 }
 Section.displayName = "Section";
 var dropzoneVariants = cva(

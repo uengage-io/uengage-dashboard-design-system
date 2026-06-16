@@ -51,12 +51,14 @@ const meta = {
           "| `SectionField` | Single field slot, accepts optional `span` |",
           "| `SectionSubsection` | Groups fields with an optional labeled divider above |",
           "| `SectionDivider` | Standalone separator — horizontal (optionally labeled) or vertical |",
+          "| `SectionTableContent` | Drop-in replacement for `SectionContent` when content is a full-width table |",
+          "| `SectionGroup` | Accordion wrapper — only one child section open at a time |",
         ].join("\n"),
       },
     },
   },
   argTypes: {
-    // Section root
+    // ── Section root ──────────────────────────────────────────────────────────
     bare: {
       control: "boolean",
       description:
@@ -64,6 +66,64 @@ const meta = {
       table: {
         type: { summary: "boolean" },
         defaultValue: { summary: "false" },
+        category: "Section",
+      },
+    },
+    collapsible: {
+      control: "boolean",
+      description:
+        "Enables the collapse/expand toggle. A chevron button appears in the header automatically.",
+      table: {
+        type: { summary: "boolean" },
+        defaultValue: { summary: "false" },
+        category: "Section",
+      },
+    },
+    divider: {
+      control: "boolean",
+      description:
+        "When `true` (and `collapsible` is `true`), shows a light rule below the header while the section is open. The line spans the full card width.",
+      table: {
+        type: { summary: "boolean" },
+        defaultValue: { summary: "false" },
+        category: "Section",
+      },
+    },
+    dividerStyle: {
+      control: "select",
+      options: ["solid", "dashed", "dotted"],
+      description:
+        "Border style of the header divider. Only effective when `divider` is `true`.",
+      table: {
+        type: { summary: "'solid' | 'dashed' | 'dotted'" },
+        defaultValue: { summary: "'solid'" },
+        category: "Section",
+      },
+    },
+    defaultOpen: {
+      control: "boolean",
+      description:
+        "Initial open state when uncontrolled. Only used when `collapsible` is `true` and `open` is not provided.",
+      table: {
+        type: { summary: "boolean" },
+        defaultValue: { summary: "true" },
+        category: "Section",
+      },
+    },
+    open: {
+      control: "boolean",
+      description:
+        "Controlled open state. When provided, you must also pass `onOpenChange`. Only used when `collapsible` is `true`.",
+      table: {
+        type: { summary: "boolean" },
+        category: "Section",
+      },
+    },
+    onOpenChange: {
+      action: "onOpenChange",
+      description: "Called when the open state changes.",
+      table: {
+        type: { summary: "(open: boolean) => void" },
         category: "Section",
       },
     },
@@ -158,6 +218,48 @@ export const BusinessDetails: Story = {
   },
 };
 
+// ─── Header Variants ──────────────────────────────────────────────────────────
+
+export const HeaderVariants: Story = {
+  name: "Header — All Variants",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Shows the full range of `SectionHeader` prop combinations: with/without icon, with/without description, with/without action.",
+      },
+    },
+  },
+  render: (args) => (
+    <div className="flex flex-col gap-4 max-w-4xl">
+      <Section {...args}>
+        <SectionHeader title="Title only" />
+      </Section>
+      <Section {...args}>
+        <SectionHeader icon={<Building2 size={18} />} title="With icon" />
+      </Section>
+      <Section {...args}>
+        <SectionHeader
+          title="Title + description (no icon)"
+          description="A subtitle that gives extra context"
+        />
+      </Section>
+      <Section {...args}>
+        <SectionHeader
+          icon={<ShieldCheck size={18} />}
+          title="Full header"
+          description="Icon + title + description + action"
+          action={
+            <Button variant="secondary" size="sm">
+              Audit Log
+            </Button>
+          }
+        />
+      </Section>
+    </div>
+  ),
+};
+
 // ─── Vertical Dividers ────────────────────────────────────────────────────────
 
 export const VerticalDividers: Story = {
@@ -176,7 +278,6 @@ export const VerticalDividers: Story = {
   },
   render: (args) => (
     <div className="flex flex-col gap-5 max-w-4xl">
-      {/* Auto-dividers via SectionRow dividers prop */}
       <Section {...args}>
         <SectionHeader
           icon={<TrendingUp size={18} />}
@@ -209,7 +310,6 @@ export const VerticalDividers: Story = {
         </SectionContent>
       </Section>
 
-      {/* Mixed: horizontal divider then another dividers row */}
       <Section {...args}>
         <SectionHeader
           icon={<ShoppingCart size={18} />}
@@ -246,7 +346,6 @@ export const VerticalDividers: Story = {
 
           <SectionDivider />
 
-          {/* Manual vertical divider inside a flex row */}
           <div className="flex items-stretch gap-0">
             <div className="flex-1 min-w-0 flex flex-col gap-1">
               <span className="text-xs text-[#6B7280]">Top Item</span>
@@ -275,12 +374,15 @@ export const VerticalDividers: Story = {
 // ─── Advanced Settings (subsections + labeled dividers) ───────────────────────
 
 export const AdvancedSettings: Story = {
-  name: "Advanced Settings — Subsections",
+  name: "Advanced Settings — Subsections & titleClassName",
   parameters: {
     docs: {
       description: {
-        story:
+        story: [
           "Shows `SectionSubsection` with `separatorLabel` to visually group related fields using labeled horizontal dividers.",
+          "",
+          "The last subsection uses `titleClassName` to override the default uppercase green label style with a plain sentence-case heading.",
+        ].join("\n"),
       },
     },
   },
@@ -335,9 +437,12 @@ export const AdvancedSettings: Story = {
           </SectionRow>
         </SectionSubsection>
 
+        {/* titleClassName overrides the default uppercase green style */}
         <SectionSubsection
           separatorLabel="Timing"
           title="Operating Hours"
+          titleClassName="text-sm font-semibold normal-case tracking-normal text-[#374151]"
+          description="Using titleClassName to override the default uppercase green label"
         >
           <SectionRow columns={2}>
             <SectionField>
@@ -463,48 +568,6 @@ export const HorizontalDivider: Story = {
   ),
 };
 
-// ─── Header description + no icon ────────────────────────────────────────────
-
-export const HeaderVariants: Story = {
-  name: "Header — All Variants",
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Shows the full range of `SectionHeader` prop combinations: with/without icon, with/without description, with/without action.",
-      },
-    },
-  },
-  render: (args) => (
-    <div className="flex flex-col gap-4 max-w-4xl">
-      <Section {...args}>
-        <SectionHeader title="Title only" />
-      </Section>
-      <Section {...args}>
-        <SectionHeader icon={<Building2 size={18} />} title="With icon" />
-      </Section>
-      <Section {...args}>
-        <SectionHeader
-          title="Title + description (no icon)"
-          description="A subtitle that gives extra context"
-        />
-      </Section>
-      <Section {...args}>
-        <SectionHeader
-          icon={<ShieldCheck size={18} />}
-          title="Full header"
-          description="Icon + title + description + action"
-          action={
-            <Button variant="secondary" size="sm">
-              Audit Log
-            </Button>
-          }
-        />
-      </Section>
-    </div>
-  ),
-};
-
 // ─── Collapsible ─────────────────────────────────────────────────────────────
 
 export const CollapsibleSection: Story = {
@@ -549,20 +612,6 @@ export const CollapsibleSection: Story = {
                 <Input value="Unregistered" readOnly />
               </SectionField>
             </SectionRow>
-            <SectionRow columns={3} className="mt-4">
-              <SectionField>
-                <span className="text-xs text-[#6B7280]">Pin Code</span>
-                <Input value="400050" readOnly />
-              </SectionField>
-              <SectionField>
-                <span className="text-xs text-[#6B7280]">FSSAI Number</span>
-                <Input value="11523000013" readOnly />
-              </SectionField>
-              <SectionField>
-                <span className="text-xs text-[#6B7280]">Slug</span>
-                <Input value="tim-hortons-linking-road" readOnly />
-              </SectionField>
-            </SectionRow>
           </SectionContent>
         </Section>
 
@@ -599,12 +648,7 @@ export const CollapsibleSection: Story = {
               {open ? "Collapse" : "Expand"}
             </Button>
           </div>
-          <Section
-            {...args}
-            collapsible
-            open={open}
-            onOpenChange={setOpen}
-          >
+          <Section {...args} collapsible open={open} onOpenChange={setOpen}>
             <SectionHeader
               icon={<MapPin size={18} />}
               title="Location (controlled)"
@@ -628,6 +672,111 @@ export const CollapsibleSection: Story = {
       </div>
     );
   },
+};
+
+// ─── Collapsible with header divider ─────────────────────────────────────────
+
+export const CollapsibleHeaderDivider: Story = {
+  name: "Collapsible — Header Divider (divider + dividerStyle)",
+  parameters: {
+    docs: {
+      description: {
+        story: [
+          "Add `divider` to a collapsible section to show a full-width rule between the header and content when open.",
+          "The rule disappears automatically when the section collapses.",
+          "",
+          "Control the line style with `dividerStyle`:",
+          "- `'solid'` (default) — plain border",
+          "- `'dashed'` — dashed border",
+          "- `'dotted'` — dotted border",
+        ].join("\n"),
+      },
+    },
+  },
+  render: (args) => (
+    <div className="flex flex-col gap-4 max-w-4xl">
+      {/* solid */}
+      <Section {...args} collapsible divider dividerStyle="solid">
+        <SectionHeader
+          icon={<Clock size={18} />}
+          title="Operating Hours — solid (default)"
+          description="divider + dividerStyle='solid'"
+        />
+        <SectionContent>
+          <SectionSubsection separator={false} title="Weekdays">
+            <SectionRow columns={2}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Opening Time</span>
+                <Input placeholder="09:00 AM" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Closing Time</span>
+                <Input placeholder="10:00 PM" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+          <SectionSubsection separatorLabel="Weekend" title="Saturday & Sunday">
+            <SectionRow columns={2}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Opening Time</span>
+                <Input placeholder="10:00 AM" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Closing Time</span>
+                <Input placeholder="11:00 PM" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+        </SectionContent>
+      </Section>
+
+      {/* dashed */}
+      <Section {...args} collapsible divider dividerStyle="dashed">
+        <SectionHeader
+          icon={<Clock size={18} />}
+          title="Operating Hours — dashed"
+          description="divider + dividerStyle='dashed'"
+        />
+        <SectionContent>
+          <SectionSubsection separator={false} title="Weekdays">
+            <SectionRow columns={2}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Opening Time</span>
+                <Input placeholder="09:00 AM" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Closing Time</span>
+                <Input placeholder="10:00 PM" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+        </SectionContent>
+      </Section>
+
+      {/* dotted */}
+      <Section {...args} collapsible divider dividerStyle="dotted">
+        <SectionHeader
+          icon={<Clock size={18} />}
+          title="Operating Hours — dotted"
+          description="divider + dividerStyle='dotted'"
+        />
+        <SectionContent>
+          <SectionSubsection separator={false} title="Weekdays">
+            <SectionRow columns={2}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Opening Time</span>
+                <Input placeholder="09:00 AM" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Closing Time</span>
+                <Input placeholder="10:00 PM" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+        </SectionContent>
+      </Section>
+    </div>
+  ),
 };
 
 // ─── SectionGroup (accordion) ────────────────────────────────────────────────
@@ -753,7 +902,7 @@ export const Bare: Story = {
   ),
 };
 
-// ─── Cloud Brand Mapping — Table inside Section ───────────────────────────────
+// ─── Table inside Section ─────────────────────────────────────────────────────
 
 interface BrandRow {
   id: string;
@@ -787,23 +936,9 @@ const BRAND_COLUMNS: ColumnDef<BrandRow>[] = [
       </div>
     ),
   },
-  {
-    key: "outlet",
-    header: "Outlet",
-    flex: 1,
-    sortable: true,
-  },
-  {
-    key: "category",
-    header: "Category",
-    flex: 1,
-  },
-  {
-    key: "mappedOn",
-    header: "Mapped On",
-    flex: 1,
-    sortable: true,
-  },
+  { key: "outlet", header: "Outlet", flex: 1, sortable: true },
+  { key: "category", header: "Category", flex: 1 },
+  { key: "mappedOn", header: "Mapped On", flex: 1, sortable: true },
   {
     key: "status",
     header: "Status",
@@ -823,18 +958,17 @@ const BRAND_COLUMNS: ColumnDef<BrandRow>[] = [
 ];
 
 export const CloudBrandMapping: Story = {
-  name: "Table inside Section — Cloud Brand Mapping",
+  name: "Table inside Section — SectionTableContent",
   parameters: {
     layout: "padded",
     docs: {
       description: {
         story: [
-          "When a table is the primary content of a section, wrap it in `<SectionTableContent>` instead of `<SectionContent>`.",
+          "When a table is the primary content, wrap it in `<SectionTableContent>` instead of `<SectionContent>`.",
+          "It applies negative margins to cancel the section's padding so the table renders edge-to-edge inside the card.",
           "",
-          "`SectionTableContent` applies negative margins that exactly cancel the section's responsive padding (`p-4 sm:p-5 md:p-6`),",
-          "so the table extends edge-to-edge inside the card. The bottom corners are clipped to match the card's `rounded-2xl`.",
-          "",
-          "**Key rule:** no `SectionContent` wrapper — place `SectionTableContent` directly inside `<Section>`.",
+          "- `divider` (default `true`) — shows a separator line between header and table.",
+          "- Works with `collapsible` — the table animates in/out like regular content.",
         ].join("\n"),
       },
     },
@@ -846,43 +980,33 @@ export const CloudBrandMapping: Story = {
         title="Cloud Brand Mapping"
         description="Map your cloud brands to physical outlets"
         action={
-          <Button variant="primary" size="sm">
-            + Add Mapping
-          </Button>
+          <Button variant="primary" size="sm">+ Add Mapping</Button>
         }
       />
       <SectionTableContent>
-        <Table
-          columns={BRAND_COLUMNS}
-          data={BRAND_ROWS}
-          keyField="id"
-          hover
-        />
+        <Table columns={BRAND_COLUMNS} data={BRAND_ROWS} keyField="id" hover />
       </SectionTableContent>
     </Section>
   ),
 };
 
-// ─── Props reference ──────────────────────────────────────────────────────────
+// ─── Props Reference ──────────────────────────────────────────────────────────
 
-/**
- * This story renders all sub-components together purely to drive the
- * Storybook Controls panel / autodocs table for each prop.
- * The argTypes declared in each sub-story below are what appear in the docs.
- */
 export const PropsReference: Story = {
   name: "Props Reference",
   parameters: {
     docs: {
       description: {
         story: [
-          "Quick-reference for every prop across all Section sub-components.",
+          "Complete prop reference for every component in the Section family.",
           "",
           "### `<Section>`",
           "| Prop | Type | Default | Description |",
           "|---|---|---|---|",
           "| `bare` | `boolean` | `false` | Removes card border/background |",
           "| `collapsible` | `boolean` | `false` | Adds a chevron toggle; content animates on collapse |",
+          "| `divider` | `boolean` | `false` | Shows a full-width rule below the header when open (requires `collapsible`) |",
+          "| `dividerStyle` | `'solid'\\|'dashed'\\|'dotted'` | `'solid'` | Border style of the header divider |",
           "| `defaultOpen` | `boolean` | `true` | Initial open state (uncontrolled) |",
           "| `open` | `boolean` | — | Controlled open state |",
           "| `onOpenChange` | `(open: boolean) => void` | — | Called on open/close |",
@@ -911,6 +1035,7 @@ export const PropsReference: Story = {
           "| Prop | Type | Default | Description |",
           "|---|---|---|---|",
           "| `title` | `string` | — | Subsection heading |",
+          "| `titleClassName` | `string` | — | Extra classes merged onto the title element — fully overrides default style when you supply conflicting utilities |",
           "| `description` | `string` | — | Subsection subtitle |",
           "| `separator` | `boolean` | `true` | Show a divider line above this subsection |",
           "| `separatorLabel` | `string` | — | Label on the separator line |",
@@ -927,55 +1052,101 @@ export const PropsReference: Story = {
           "|---|---|---|---|",
           "| `divider` | `boolean` | `true` | Show a separator line between the header and the table |",
           "",
-          "> **Usage:** Replace `<SectionContent>` with `<SectionTableContent>` when a table is the primary content.",
-          "> It cancels the section's padding so the table renders edge-to-edge inside the card.",
+          "### `<SectionGroup>`",
+          "| Prop | Type | Default | Description |",
+          "|---|---|---|---|",
+          "| `defaultOpen` | `number\\|null` | `0` | Index of the section that starts open; `null` = all collapsed |",
+          "",
+          "> **Note:** `SectionGroup` automatically injects `collapsible`, `open`, and `onOpenChange` into its direct `<Section>` children.",
         ].join("\n"),
       },
     },
   },
   render: (args) => (
-    <Section {...args} className="max-w-4xl">
-      <SectionHeader
-        icon={<Package size={18} />}
-        title="Props Reference"
-        description="This section demonstrates every available prop"
-        action={<Button size="sm" variant="secondary">Action</Button>}
-      />
-      <SectionContent>
-        <SectionSubsection separator={false} title="Subsection title" description="Subsection description">
-          <SectionRow columns={3}>
+    <div className="flex flex-col gap-4 max-w-4xl">
+      {/* Static section with all sub-components */}
+      <Section {...args}>
+        <SectionHeader
+          icon={<Package size={18} />}
+          title="All Sub-components"
+          description="SectionContent · SectionRow · SectionField · SectionSubsection · SectionDivider"
+          action={<Button size="sm" variant="secondary">Action</Button>}
+        />
+        <SectionContent>
+          <SectionSubsection separator={false} title="Default title style">
+            <SectionRow columns={3}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">span=1</span>
+                <Input placeholder="col 1" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">span=1</span>
+                <Input placeholder="col 2" />
+              </SectionField>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">span=1</span>
+                <Input placeholder="col 3" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+
+          <SectionSubsection
+            separatorLabel="Custom title"
+            title="Custom via titleClassName"
+            titleClassName="text-sm font-semibold normal-case tracking-normal text-[#374151]"
+            description="titleClassName overrides the uppercase green default"
+          >
+            <SectionRow columns={2}>
+              <SectionField>
+                <span className="text-xs text-[#6B7280]">Field A</span>
+                <Input placeholder="value" />
+              </SectionField>
+              <SectionField span={1}>
+                <span className="text-xs text-[#6B7280]">Field B</span>
+                <Input placeholder="value" />
+              </SectionField>
+            </SectionRow>
+          </SectionSubsection>
+
+          <SectionDivider label="Labeled horizontal divider" />
+
+          <SectionRow dividers>
             <SectionField>
-              <span className="text-xs text-[#6B7280]">span=1 (default)</span>
-              <Input placeholder="col 1" />
+              <span className="text-xs text-[#6B7280]">SectionRow dividers</span>
+              <p className="text-lg font-bold text-[#202020]">Item A</p>
             </SectionField>
             <SectionField>
-              <span className="text-xs text-[#6B7280]">span=1</span>
-              <Input placeholder="col 2" />
+              <span className="text-xs text-[#6B7280]">&nbsp;</span>
+              <p className="text-lg font-bold text-[#202020]">Item B</p>
             </SectionField>
             <SectionField>
-              <span className="text-xs text-[#6B7280]">span=1</span>
-              <Input placeholder="col 3" />
+              <span className="text-xs text-[#6B7280]">&nbsp;</span>
+              <p className="text-lg font-bold text-[#202020]">Item C</p>
             </SectionField>
           </SectionRow>
-        </SectionSubsection>
+        </SectionContent>
+      </Section>
 
-        <SectionDivider label="Horizontal labeled divider" />
-
-        <SectionRow dividers>
-          <SectionField>
-            <span className="text-xs text-[#6B7280]">Vertical dividers</span>
-            <p className="text-lg font-bold text-[#202020]">Item A</p>
-          </SectionField>
-          <SectionField>
-            <span className="text-xs text-[#6B7280]">&nbsp;</span>
-            <p className="text-lg font-bold text-[#202020]">Item B</p>
-          </SectionField>
-          <SectionField>
-            <span className="text-xs text-[#6B7280]">&nbsp;</span>
-            <p className="text-lg font-bold text-[#202020]">Item C</p>
-          </SectionField>
-        </SectionRow>
-      </SectionContent>
-    </Section>
+      {/* Collapsible with all three divider styles */}
+      <Section {...args} collapsible divider dividerStyle="solid">
+        <SectionHeader
+          icon={<Users size={18} />}
+          title="Collapsible + divider + dividerStyle"
+          description="solid (default) — toggle to see the rule appear/disappear"
+        />
+        <SectionContent>
+          <SectionRow columns={2}>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Field 1</span>
+              <Input placeholder="value" />
+            </SectionField>
+            <SectionField>
+              <span className="text-xs text-[#6B7280]">Field 2</span>
+              <Input placeholder="value" />
+            </SectionField>
+          </SectionRow>
+        </SectionContent>
+      </Section>
+    </div>
   ),
 };
