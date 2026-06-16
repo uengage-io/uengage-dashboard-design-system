@@ -188,7 +188,7 @@ export function Table<T>({
           style={
             tableMinWidth > 0
               ? { minWidth: `${tableMinWidth}px` }
-              : { width: "max-content", minWidth: "100%" }
+              : { minWidth: "max-content" }
           }
         >
           {/*

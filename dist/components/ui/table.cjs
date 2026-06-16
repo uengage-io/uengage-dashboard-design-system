@@ -14,7 +14,7 @@ function Table({ className, ...props }) {
     "div",
     {
       "data-slot": "table-container",
-      className: "uengage-ui relative w-full",
+      className: "uengage-ui relative w-full overflow-x-auto",
       children: /* @__PURE__ */ jsxRuntime.jsx(
         "table",
         {
