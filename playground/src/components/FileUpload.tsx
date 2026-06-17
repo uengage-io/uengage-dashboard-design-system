@@ -4,6 +4,11 @@ import { FileUpload } from "@uengage/ui";
 
 // ─── Sample assets ────────────────────────────────────────────────────────────
 
+// Local files downloaded to playground/public/assets/
+// sample-small.jpg ~21 KB (400×300), sample-large.jpg ~57 KB (1200×800)
+const SMALL_FILE_URL = "/assets/sample-small.jpg";
+const LARGE_FILE_URL = "/assets/sample-large.jpg";
+
 const BANNER_URL = "https://picsum.photos/seed/uengage-banner/800/300";
 const AVATAR_URL = "https://picsum.photos/seed/uengage-avatar/200/200";
 const THUMB_URLS = [
@@ -113,6 +118,10 @@ export default function FileUploadPreview() {
   // ── Validation demo ────────────────────────────────────────────────────────
   const [validationError, setValidationError] = useState<string>("");
 
+  // ── allowedFiles demo ──────────────────────────────────────────────────────
+  const [allowedError, setAllowedError] = useState<string>("");
+  const [allowedDocError, setAllowedDocError] = useState<string>("");
+
   return (
     <div className="min-h-screen bg-[#F6F8FB] p-8">
       <div className="mx-auto flex max-w-4xl flex-col gap-10 rounded-3xl bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
@@ -133,6 +142,33 @@ export default function FileUploadPreview() {
             Live
           </div>
         </div>
+
+        {/* ── Local file previews ──────────────────────────────────────────────── */}
+        <Section
+          title="Local file previews"
+          description="Two files downloaded to playground/public/assets — sample-small.jpg (~21 KB, 400×300) and sample-large.jpg (~57 KB, 1200×800). Passed via the value prop so the component renders them immediately without any upload step."
+        >
+          <ColGrid cols={2}>
+            <div>
+              <ColLabel>sample-small.jpg · ~21 KB</ColLabel>
+              <FileUpload
+                variant="image"
+                label="Small image (400×300)"
+                value={SMALL_FILE_URL}
+                helperText="400 × 300 px · ~21 KB"
+              />
+            </div>
+            <div>
+              <ColLabel>sample-large.jpg · ~57 KB</ColLabel>
+              <FileUpload
+                variant="image"
+                label="Large image (1200×800)"
+                value={LARGE_FILE_URL}
+                helperText="1200 × 800 px · ~57 KB"
+              />
+            </div>
+          </ColGrid>
+        </Section>
 
         {/* ── Variants at a glance ─────────────────────────────────────────────── */}
         <Section
@@ -395,6 +431,67 @@ export default function FileUploadPreview() {
                   setMultiUrls((prev) => prev.filter((_, idx) => idx !== i))
                 }
                 description="3 / 3 — Add button hidden"
+              />
+            </div>
+          </ColGrid>
+        </Section>
+
+        {/* ── allowedFiles ──────────────────────────────────────────────────────── */}
+        <Section
+          title="allowedFiles"
+          description="Pass an array of extensions to whitelist. Files with any other extension are rejected with an inline error. The native file picker is also filtered automatically."
+        >
+          <ColGrid cols={2}>
+            <div>
+              <ColLabel>images only ['jpg','jpeg','png','webp']</ColLabel>
+              <FileUpload
+                variant="image"
+                label="Product Image"
+                allowedFiles={["jpg", "jpeg", "png", "webp"]}
+                description="Try dropping a .gif or .pdf"
+                error={allowedError || undefined}
+                onValidationError={(errs) => setAllowedError(errs[0])}
+                onChange={() => setAllowedError("")}
+              />
+              <Chip>
+                <span className="text-[#9CA3AF]">error: </span>
+                {allowedError || "—"}
+              </Chip>
+            </div>
+            <div>
+              <ColLabel>documents ['.pdf','.xlsx','.csv']</ColLabel>
+              <FileUpload
+                variant="file"
+                label="Import Document"
+                allowedFiles={[".pdf", ".xlsx", ".csv"]}
+                description="Try uploading a .txt or .docx"
+                error={allowedDocError || undefined}
+                onValidationError={(errs) => setAllowedDocError(errs[0])}
+                onChange={() => setAllowedDocError("")}
+              />
+              <Chip>
+                <span className="text-[#9CA3AF]">error: </span>
+                {allowedDocError || "—"}
+              </Chip>
+            </div>
+            <div>
+              <ColLabel>single ext ['json'] + multiple</ColLabel>
+              <FileUpload
+                variant="file"
+                label="Lottie Animations"
+                allowedFiles={["json"]}
+                multiple
+                maxFiles={3}
+                placeholder="Drop .json Lottie files"
+                description=".json only — up to 3 files"
+              />
+            </div>
+            <div>
+              <ColLabel>no restriction (default)</ColLabel>
+              <FileUpload
+                variant="file"
+                label="Any File"
+                description="No allowedFiles set — everything accepted"
               />
             </div>
           </ColGrid>

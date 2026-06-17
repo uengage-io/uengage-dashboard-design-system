@@ -7038,6 +7038,7 @@ function FileUpload({
   id,
   maxSize,
   maxFiles,
+  allowedFiles,
   value,
   onChange,
   onFilesChange,
@@ -7079,7 +7080,11 @@ function FileUpload({
   const [validationErrors, setValidationErrors] = React9.useState([]);
   const isImageVariant = variant === "image" || variant === "avatar";
   const isPreviewVariant = isImageVariant || variant === "video";
-  const effectiveAccept = accept ?? getDefaultAccept(variant);
+  const normalizedAllowedExts = React9.useMemo(
+    () => allowedFiles?.map((e) => e.startsWith(".") ? e.toLowerCase() : `.${e.toLowerCase()}`),
+    [allowedFiles]
+  );
+  const effectiveAccept = accept ?? (normalizedAllowedExts ? normalizedAllowedExts.join(",") : getDefaultAccept(variant));
   const controlledUrls = React9.useMemo(() => {
     if (!value) return [];
     return Array.isArray(value) ? value.filter(Boolean) : [value].filter(Boolean);
@@ -7110,12 +7115,29 @@ function FileUpload({
   const validateAndFilter = (incoming) => {
     const errors = [];
     let valid = incoming;
-    if (maxSize) {
-      const oversized = incoming.filter((f) => f.size > maxSize);
-      if (oversized.length > 0) {
+    if (normalizedAllowedExts && normalizedAllowedExts.length > 0) {
+      const rejected = valid.filter((f) => {
+        const ext = `.${f.name.split(".").pop()?.toLowerCase() ?? ""}`;
+        return !normalizedAllowedExts.includes(ext);
+      });
+      if (rejected.length > 0) {
         errors.push(
-          `${oversized.map((f) => f.name).join(", ")} exceed${oversized.length === 1 ? "s" : ""} the ${formatBytes(maxSize)} size limit`
+          `${rejected.map((f) => f.name).join(", ")} ${rejected.length === 1 ? "is" : "are"} not allowed. Accepted types: ${normalizedAllowedExts.join(", ")}`
         );
+        valid = valid.filter((f) => {
+          const ext = `.${f.name.split(".").pop()?.toLowerCase() ?? ""}`;
+          return normalizedAllowedExts.includes(ext);
+        });
+      }
+    }
+    if (maxSize) {
+      const oversized = valid.filter((f) => f.size > maxSize);
+      if (oversized.length > 0) {
+        oversized.forEach((f) => {
+          errors.push(
+            `${f.name} (${formatBytes(f.size)}) exceeds the ${formatBytes(maxSize)} limit`
+          );
+        });
         valid = valid.filter((f) => f.size <= maxSize);
       }
     }
@@ -7188,7 +7210,7 @@ function FileUpload({
       onChange?.(valid);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [multiple, maxFiles, maxSize, displayItems.length, isImageVariant, showLocalPreview, onChange, onFilesChange, onValidationError]
+    [multiple, maxFiles, maxSize, normalizedAllowedExts, displayItems.length, isImageVariant, showLocalPreview, onChange, onFilesChange, onValidationError]
   );
   const openFilePicker = React9.useCallback(() => {
     if (disabled || readOnly) return;
@@ -7269,6 +7291,7 @@ function FileUpload({
     onKeyDown: handleKeyDown,
     "aria-label": placeholder ?? PLACEHOLDER_TEXT[variant]
   };
+  const filledDragProps = dragAndDrop && !disabled && !readOnly ? { onDragOver: handleDragOver, onDragLeave: handleDragLeave, onDrop: handleDrop } : {};
   const renderImageVariant = () => {
     if (!multiple) {
       const item = displayItems[0];
@@ -7277,8 +7300,10 @@ function FileUpload({
         return /* @__PURE__ */ jsxs(
           "div",
           {
+            ...filledDragProps,
             className: cn(
-              "relative w-full overflow-hidden rounded-xl border border-gray-200 group",
+              "relative w-full overflow-hidden rounded-xl border group transition-colors duration-150",
+              isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
               size === "sm" && "h-24",
               size === "md" && "h-32",
               size === "lg" && "h-44"
@@ -7292,6 +7317,7 @@ function FileUpload({
                   className: "absolute inset-0 w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 }
               ),
+              isDragOver && !disabled && !readOnly && /* @__PURE__ */ jsx("div", { className: "absolute inset-0 flex items-center justify-center bg-green-50/60 backdrop-blur-[1px] pointer-events-none", children: /* @__PURE__ */ jsx("span", { className: "text-xs font-semibold text-[#007a4d]", children: "Drop to replace" }) }),
               icon && !disabled && !readOnly && /* @__PURE__ */ jsx(
                 "button",
                 {
@@ -7413,8 +7439,10 @@ function FileUpload({
     return /* @__PURE__ */ jsx(
       "div",
       {
+        ...filledDragProps,
         className: cn(
-          "w-full overflow-y-auto rounded-xl border border-gray-200",
+          "w-full overflow-y-auto rounded-xl border transition-colors duration-150",
+          isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
           size === "sm" && "h-24",
           size === "md" && "h-32",
           size === "lg" && "h-44"
@@ -7542,8 +7570,10 @@ function FileUpload({
       return /* @__PURE__ */ jsxs(
         "div",
         {
+          ...filledDragProps,
           className: cn(
-            "w-full rounded-xl border border-gray-200 overflow-hidden flex flex-col",
+            "w-full rounded-xl border overflow-hidden flex flex-col transition-colors duration-150",
+            isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
             size === "sm" && "h-24",
             size === "md" && "h-32",
             size === "lg" && "h-44",
@@ -7640,8 +7670,10 @@ function FileUpload({
         return /* @__PURE__ */ jsxs(
           "div",
           {
+            ...filledDragProps,
             className: cn(
-              "relative w-full overflow-hidden rounded-xl border border-gray-200 bg-black group",
+              "relative w-full overflow-hidden rounded-xl border bg-black group transition-colors duration-150",
+              isDragOver ? "border-[#007a4d]" : "border-gray-200",
               size === "sm" && "h-24",
               size === "md" && "h-32",
               size === "lg" && "h-44"
@@ -7656,6 +7688,7 @@ function FileUpload({
                   preload: "metadata"
                 }
               ),
+              isDragOver && !disabled && !readOnly && /* @__PURE__ */ jsx("div", { className: "absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px] pointer-events-none z-10", children: /* @__PURE__ */ jsx("span", { className: "text-xs font-semibold text-white", children: "Drop to replace" }) }),
               !disabled && !readOnly && (changeable || clearable) && /* @__PURE__ */ jsxs("div", { className: "absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-2.5 bg-gradient-to-b from-black/65 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto", children: [
                 changeable && /* @__PURE__ */ jsxs(
                   "button",
@@ -7766,8 +7799,10 @@ function FileUpload({
     return /* @__PURE__ */ jsx(
       "div",
       {
+        ...filledDragProps,
         className: cn(
-          "w-full overflow-y-auto rounded-xl border border-gray-200",
+          "w-full overflow-y-auto rounded-xl border transition-colors duration-150",
+          isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
           size === "sm" && "h-24",
           size === "md" && "h-32",
           size === "lg" && "h-44"
