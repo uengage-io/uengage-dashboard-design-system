@@ -60,6 +60,11 @@ const meta = {
       control: "number",
       description: "Maximum files allowed (multiple mode). The Add button disappears when the limit is reached.",
     },
+    allowedFiles: {
+      control: "object",
+      description:
+        "Array of allowed file extensions (with or without a leading dot). Files with any other extension are rejected with an inline error message. Also sets the native `accept` attribute — overridden by the explicit `accept` prop.",
+    },
     value: {
       control: "text",
       description: "Controlled URL(s) for showing already-uploaded content. Pass a string for single, string[] for multiple.",
@@ -471,6 +476,84 @@ export const MaxFiles: Story = {
       <FileUpload {...args} />
     </div>
   ),
+};
+
+export const AllowedFilesImages: Story = {
+  name: "Constraint · allowedFiles (images only)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass `allowedFiles={['jpg', 'jpeg', 'png', 'webp']}` to restrict accepted extensions. The native file picker already filters by these extensions. If a file with a disallowed extension is dropped or selected, it is rejected and an error message appears inline.",
+      },
+    },
+  },
+  args: {
+    variant:      "image",
+    label:        "Product Image",
+    allowedFiles: ["jpg", "jpeg", "png", "webp"],
+    description:  "JPG, JPEG, PNG, WebP only — try dropping a .gif or .pdf to see the error",
+  },
+  render: (args) => (
+    <div className="w-96">
+      <FileUpload {...args} />
+    </div>
+  ),
+};
+
+export const AllowedFilesDocuments: Story = {
+  name: "Constraint · allowedFiles (documents)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Restricts uploads to PDF, XLSX, and CSV. Extensions can be passed with or without a leading dot — both `'pdf'` and `'.pdf'` are accepted.",
+      },
+    },
+  },
+  args: {
+    variant:      "file",
+    label:        "Import Document",
+    allowedFiles: [".pdf", ".xlsx", ".csv"],
+    description:  "PDF, XLSX, CSV only",
+  },
+  render: (args) => (
+    <div className="w-96">
+      <FileUpload {...args} />
+    </div>
+  ),
+};
+
+export const AllowedFilesWithCallback: Story = {
+  name: "Constraint · allowedFiles + onValidationError",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Combine `allowedFiles` with `onValidationError` to capture the rejection reason in parent state. Try dropping any non-JSON file to trigger the error.",
+      },
+    },
+  },
+  render: function AllowedFilesCallbackStory() {
+    const [error, setError] = React.useState<string>("");
+    return (
+      <div className="flex flex-col gap-3 w-96">
+        <FileUpload
+          variant="file"
+          label="Lottie Animation"
+          allowedFiles={["json"]}
+          placeholder="Drop a .json Lottie file"
+          description=".json files only"
+          error={error || undefined}
+          onValidationError={(errs) => setError(errs[0])}
+          onChange={() => setError("")}
+        />
+        <code className="text-xs text-[#6B7280]">
+          onValidationError: {error || "—"}
+        </code>
+      </div>
+    );
+  },
 };
 
 /* ── States ───────────────────────────────────────────────────────────────── */

@@ -1410,6 +1410,12 @@ interface FileUploadProps {
     /** Maximum number of files allowed (only meaningful when multiple=true). */
     maxFiles?: number;
     /**
+     * Allowed file extensions. Files with any other extension are rejected with
+     * an error message. Accepts with or without a leading dot — e.g. `['jpg', '.png', 'pdf']`.
+     * Also sets the native `accept` attribute on the hidden input (overridden by `accept` prop).
+     */
+    allowedFiles?: string[];
+    /**
      * Controlled URL(s) for showing already-uploaded content.
      * - image / avatar: renders as <img> preview
      * - file: renders as filename chip(s)
@@ -1467,7 +1473,7 @@ interface FileUploadProps {
     /** Ref forwarded to the hidden <input type="file"> element. */
     inputRef?: React.Ref<HTMLInputElement>;
 }
-declare function FileUpload({ variant, size, accept, multiple, disabled, readOnly, name, id, maxSize, maxFiles, value, onChange, onFilesChange, onRemove, onRemoveFile, onValidationError, label, required, error, helperText, placeholder, description, dragAndDrop, showLocalPreview, clearable, changeable, icon, className, dropzoneClassName, inputRef: externalInputRef, }: FileUploadProps): react_jsx_runtime.JSX.Element;
+declare function FileUpload({ variant, size, accept, multiple, disabled, readOnly, name, id, maxSize, maxFiles, allowedFiles, value, onChange, onFilesChange, onRemove, onRemoveFile, onValidationError, label, required, error, helperText, placeholder, description, dragAndDrop, showLocalPreview, clearable, changeable, icon, className, dropzoneClassName, inputRef: externalInputRef, }: FileUploadProps): react_jsx_runtime.JSX.Element;
 declare namespace FileUpload {
     var displayName: string;
 }
