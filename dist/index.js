@@ -7937,7 +7937,51 @@ function FileUpload({
   ] });
 }
 FileUpload.displayName = "FileUpload";
+var chipVariants = cva(
+  "inline-flex items-center justify-center font-semibold rounded select-none whitespace-nowrap",
+  {
+    variants: {
+      variant: {
+        success: "bg-green-50 text-green-700",
+        error: "bg-red-50 text-red-800",
+        warning: "bg-amber-50 text-amber-700",
+        info: "bg-blue-50 text-blue-700",
+        inactive: "bg-gray-100 text-gray-500"
+      },
+      size: {
+        xs: "px-2 py-0.5 text-[10px]",
+        sm: "px-2.5 py-1 text-xs",
+        md: "px-3 py-1.5 text-sm",
+        lg: "px-4 py-2 text-base"
+      }
+    },
+    defaultVariants: {
+      variant: "success",
+      size: "md"
+    }
+  }
+);
+function Chip({
+  label,
+  variant,
+  size,
+  bgColor,
+  textColor,
+  className
+}) {
+  return /* @__PURE__ */ jsx(
+    "span",
+    {
+      className: cn(chipVariants({ variant, size }), className),
+      style: {
+        ...bgColor ? { backgroundColor: bgColor } : {},
+        ...textColor ? { color: textColor } : {}
+      },
+      children: label
+    }
+  );
+}
 
-export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
+export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

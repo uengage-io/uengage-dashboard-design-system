@@ -7962,6 +7962,50 @@ function FileUpload({
   ] });
 }
 FileUpload.displayName = "FileUpload";
+var chipVariants = classVarianceAuthority.cva(
+  "inline-flex items-center justify-center font-semibold rounded select-none whitespace-nowrap",
+  {
+    variants: {
+      variant: {
+        success: "bg-green-50 text-green-700",
+        error: "bg-red-50 text-red-800",
+        warning: "bg-amber-50 text-amber-700",
+        info: "bg-blue-50 text-blue-700",
+        inactive: "bg-gray-100 text-gray-500"
+      },
+      size: {
+        xs: "px-2 py-0.5 text-[10px]",
+        sm: "px-2.5 py-1 text-xs",
+        md: "px-3 py-1.5 text-sm",
+        lg: "px-4 py-2 text-base"
+      }
+    },
+    defaultVariants: {
+      variant: "success",
+      size: "md"
+    }
+  }
+);
+function Chip({
+  label,
+  variant,
+  size,
+  bgColor,
+  textColor,
+  className
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "span",
+    {
+      className: cn(chipVariants({ variant, size }), className),
+      style: {
+        ...bgColor ? { backgroundColor: bgColor } : {},
+        ...textColor ? { color: textColor } : {}
+      },
+      children: label
+    }
+  );
+}
 
 exports.Accordion = Accordion;
 exports.AlertDialog = AlertDialog2;
@@ -7989,6 +8033,7 @@ exports.CardHeader = CardHeader2;
 exports.CardTitle = CardTitle2;
 exports.Checkbox = Checkbox;
 exports.CheckboxGroup = CheckboxGroup;
+exports.Chip = Chip;
 exports.Command = Command;
 exports.CommandEmpty = CommandEmpty;
 exports.CommandGroup = CommandGroup;
@@ -8062,6 +8107,7 @@ exports.buttonVariants = buttonVariants;
 exports.checkboxBoxVariants = checkboxBoxVariants;
 exports.checkboxLabelVariants = checkboxLabelVariants;
 exports.chevronButtonVariants = chevronButtonVariants;
+exports.chipVariants = chipVariants;
 exports.cn = cn;
 exports.customButtonVariants = buttonVariants2;
 exports.datePickerTriggerVariants = triggerVariants2;
