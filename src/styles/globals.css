@@ -203,6 +203,30 @@
   to   { opacity: 0; transform: scale(0); }
 }
 
+/* AppSidebar — professional green scrollbar */
+[data-slot="app-sidebar-modules-scroll"] {
+  scrollbar-width: thin;
+  scrollbar-color: #a8d5b5 transparent;
+}
+[data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar {
+  width: 2px !important;
+}
+[data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar-track {
+  background: transparent !important;
+  margin-block: 6px;
+}
+[data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar-thumb {
+  background-color: #a8d5b5 !important;
+  border-radius: 9999px !important;
+  transition: background-color 0.2s ease !important;
+}
+[data-slot="app-sidebar-modules-scroll"]:hover::-webkit-scrollbar-thumb {
+  background-color: #4a9e6a !important;
+}
+[data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar-thumb:hover {
+  background-color: #2d7a50 !important;
+}
+
 /* ── Right-slide: standard slide in/out from the right edge ── */
 [data-slot="drawer-content"][data-side="right-slide"][data-state="open"] {
   animation: sidebar-slide-in-from-right var(--sb-open-dur, 300ms) cubic-bezier(0.16, 1, 0.3, 1) both;

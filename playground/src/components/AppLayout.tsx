@@ -54,7 +54,16 @@ const MODULES_BY_PRODUCT: Record<string, AppSidebarModule[]> = {
     { page: "payments", label: "Payments" },
     { page: "delivery", label: "Delivery Zones" },
     { page: "settings", label: "Settings" },
+    { page: "dashboard", label: "Dashboard" },
+    { page: "orders", label: "Orders" },
+    { page: "menu", label: "Menu Management" },
+    { page: "offers", label: "Offers & Coupons" },
+    { page: "customers", label: "Customers" },
+    { page: "payments", label: "Payments" },
+    { page: "delivery", label: "Delivery Zones" },
+    { page: "settings", label: "Settings" },
   ],
+
   dine: [
     { page: "tables", label: "Table Management" },
     { page: "reservations", label: "Reservations" },
