@@ -4524,6 +4524,7 @@ var alignClass = {
 function TableCell2({
   size = "md",
   align = "left",
+  verticalAlign = "top",
   className,
   children,
   ...props
@@ -4536,7 +4537,8 @@ function TableCell2({
         alignClass[align],
         // Allow content to wrap and break long words/URLs that would otherwise
         // force the column wider than its flex-allocated share.
-        "whitespace-normal break-words [hyphens:none] align-top",
+        "whitespace-normal break-words [hyphens:none]",
+        verticalAlign === "middle" ? "align-middle" : "align-top",
         className
       ),
       ...props,
@@ -4813,6 +4815,7 @@ function Table2({
                             {
                               size,
                               align: col.align ?? "left",
+                              verticalAlign: col.verticalAlign,
                               className: cn(
                                 col.hideOnMobile && "hidden md:table-cell",
                                 col.className
@@ -6779,19 +6782,26 @@ function SectionContent({
       children
     }
   );
+  const headerRule = divider && /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "section-header-rule",
+      className: cn(
+        "-mx-1 border-t border-[#EEEEEE]",
+        dividerStyle === "dashed" && "border-dashed",
+        dividerStyle === "dotted" && "border-dotted"
+      )
+    }
+  );
   if (collapsible) {
     return /* @__PURE__ */ jsxRuntime.jsxs(radixUi.Collapsible.Content, { className: "overflow-hidden will-change-[height] data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up", children: [
-      divider && /* @__PURE__ */ jsxRuntime.jsx(
-        "div",
-        {
-          "data-slot": "section-header-rule",
-          className: cn(
-            "-mx-1 border-t border-[#EEEEEE]",
-            dividerStyle === "dashed" && "border-dashed",
-            dividerStyle === "dotted" && "border-dotted"
-          )
-        }
-      ),
+      headerRule,
+      inner
+    ] });
+  }
+  if (divider) {
+    return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+      headerRule,
       inner
     ] });
   }
