@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { CircleCheck, CircleX, Info as InfoIcon, AlertTriangle, Star } from "lucide-react";
 import { Chip } from "./Chip";
 
 const meta = {
@@ -17,7 +18,7 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["success", "error", "warning", "info", "inactive"],
+      options: ["success", "error", "warning", "info", "common"],
       description: "Semantic color variant.",
     },
     size: {
@@ -38,6 +39,15 @@ const meta = {
       control: "color",
       description:
         "Custom text color (any valid CSS color). Overrides the variant text color.",
+    },
+    iconPosition: {
+      control: "radio",
+      options: ["left", "right"],
+      description: "Which side the icon appears on. Defaults to `\"left\"`.",
+    },
+    icon: {
+      control: false,
+      description: "Any `ReactNode` rendered alongside the label (e.g. a Lucide icon).",
     },
   },
   args: {
@@ -67,8 +77,8 @@ export const Info: Story = {
   args: { variant: "info", label: "Processing" },
 };
 
-export const Inactive: Story = {
-  args: { variant: "inactive", label: "Inactive" },
+export const Common: Story = {
+  args: { variant: "common", label: "Common" },
 };
 
 /* ── All variants side-by-side ───────────────────────────────────────────── */
@@ -88,7 +98,7 @@ export const AllVariants: Story = {
       <Chip variant="error"    label="Missed" />
       <Chip variant="warning"  label="Inaccurate" />
       <Chip variant="info"     label="Processing" />
-      <Chip variant="inactive" label="Inactive" />
+      <Chip variant="common" label="Common" />
     </div>
   ),
 };
@@ -110,6 +120,47 @@ export const AllSizes: Story = {
       <Chip variant="error" size="sm" label="sm · Missed" />
       <Chip variant="error" size="md" label="md · Missed" />
       <Chip variant="error" size="lg" label="lg · Missed" />
+    </div>
+  ),
+};
+
+/* ── With icon ───────────────────────────────────────────────────────────── */
+
+export const WithIcon: Story = {
+  name: "With icon",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass any `ReactNode` to `icon`. Use `iconPosition` to place it on the left (default) or right.",
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Chip variant="success"  label="Delivered"  icon={<CircleCheck size={12} />} />
+      <Chip variant="error"    label="Missed"      icon={<CircleX size={12} />} />
+      <Chip variant="warning"  label="Inaccurate"  icon={<AlertTriangle size={12} />} />
+      <Chip variant="info"     label="Processing"  icon={<InfoIcon size={12} />} />
+      <Chip variant="common"   label="Common"      icon={<Star size={12} />} />
+    </div>
+  ),
+};
+
+export const IconRight: Story = {
+  name: "Icon — right position",
+  parameters: {
+    docs: {
+      description: {
+        story: "Set `iconPosition=\"right\"` to move the icon after the label.",
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Chip variant="success" label="Delivered" icon={<CircleCheck size={12} />} iconPosition="right" />
+      <Chip variant="error"   label="Missed"    icon={<CircleX size={12} />}     iconPosition="right" />
+      <Chip variant="warning" label="Inaccurate" icon={<AlertTriangle size={12} />} iconPosition="right" />
     </div>
   ),
 };

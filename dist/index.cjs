@@ -7963,7 +7963,7 @@ function FileUpload({
 }
 FileUpload.displayName = "FileUpload";
 var chipVariants = classVarianceAuthority.cva(
-  "inline-flex items-center justify-center font-semibold rounded select-none whitespace-nowrap",
+  "inline-flex items-center justify-center font-semibold rounded select-none whitespace-nowrap gap-1",
   {
     variants: {
       variant: {
@@ -7971,7 +7971,7 @@ var chipVariants = classVarianceAuthority.cva(
         error: "bg-red-50 text-red-800",
         warning: "bg-amber-50 text-amber-700",
         info: "bg-blue-50 text-blue-700",
-        inactive: "bg-gray-100 text-gray-500"
+        common: "bg-gray-100 text-gray-500"
       },
       size: {
         xs: "px-2 py-0.5 text-[10px]",
@@ -7990,11 +7990,14 @@ function Chip({
   label,
   variant,
   size,
+  icon,
+  iconPosition = "left",
   bgColor,
   textColor,
   className
 }) {
-  return /* @__PURE__ */ jsxRuntime.jsx(
+  const iconNode = icon ? /* @__PURE__ */ jsxRuntime.jsx("span", { className: "inline-flex items-center flex-shrink-0", "aria-hidden": true, children: icon }) : null;
+  return /* @__PURE__ */ jsxRuntime.jsxs(
     "span",
     {
       className: cn(chipVariants({ variant, size }), className),
@@ -8002,7 +8005,11 @@ function Chip({
         ...bgColor ? { backgroundColor: bgColor } : {},
         ...textColor ? { color: textColor } : {}
       },
-      children: label
+      children: [
+        iconPosition === "left" && iconNode,
+        label,
+        iconPosition === "right" && iconNode
+      ]
     }
   );
 }
