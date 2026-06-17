@@ -340,3 +340,11 @@ export {
   iconWrapperVariants,
   avatarContainerVariants,
 } from "./components/custom/FileUpload";
+
+// Chip
+export {
+  Chip,
+  chipVariants,
+  type ChipProps,
+  type ChipVariants,
+} from "./components/custom/Chip";
