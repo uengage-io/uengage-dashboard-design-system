@@ -156,7 +156,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Generic, typed table built on shadcn Table. CVA-driven size/border variants, built-in sort (asc → desc → cleared), sticky header + max-height scroll, loading and empty states, responsive column hiding, optional row click handling, and a `hover` prop (default `true`) to control row highlight on hover.",
+          "Generic, typed table built on shadcn Table. CVA-driven size/border variants, built-in sort (asc → desc → cleared), sticky header + max-height scroll, loading and empty states, responsive column hiding, optional row click handling, and a `hover` prop (default `true`) to control row highlight on hover.\n\n**Per-column props of note:**\n- `verticalAlign?: 'top' | 'middle'` — controls vertical alignment of cell content. Defaults to `'top'`. Use `'middle'` on columns that render a single badge, toggle, or button so they stay centred when adjacent cells are taller.",
       },
     },
   },
@@ -165,6 +165,24 @@ const meta = {
     bordered: { control: "boolean" },
     size: { control: "radio", options: ["sm", "md", "lg"] },
     mobileLayout: { control: "radio", options: ["scroll", "cards"] },
+    columns: {
+      control: false,
+      description:
+        "Array of `ColumnDef<T>` column definitions. Each entry supports:\n\n" +
+        "| Prop | Type | Default | Description |\n" +
+        "|---|---|---|---|\n" +
+        "| `key` | `keyof T \\| string` | — | Data key |\n" +
+        "| `header` | `ReactNode` | — | Column header label |\n" +
+        "| `flex` | `number` | `1` | Proportional width weight |\n" +
+        "| `width` | `string` | — | Explicit CSS width, overrides flex |\n" +
+        "| `minWidth` | `number` | — | Min width in px |\n" +
+        "| `align` | `'left' \\| 'center' \\| 'right'` | `'left'` | Horizontal text alignment |\n" +
+        "| `verticalAlign` | `'top' \\| 'middle'` | `'top'` | Vertical cell alignment — use `'middle'` for single-item cells (badges, toggles, buttons) inside tall rows |\n" +
+        "| `render` | `(value, row, index) => ReactNode` | — | Custom cell renderer |\n" +
+        "| `sortable` | `boolean` | — | Enables click-to-sort on the header |\n" +
+        "| `hideOnMobile` | `boolean` | — | Hides column below `md` breakpoint |\n" +
+        "| `className` | `string` | — | Extra Tailwind classes for `<th>` and `<td>` |",
+    },
   },
   args: {
     hover: true,
@@ -277,6 +295,57 @@ export const ResponsiveHideOnMobile: Story = {
           "Columns marked `hideOnMobile: true` collapse below the Tailwind `md` breakpoint (≤768px). Resize the Storybook viewport to observe.",
       },
     },
+  },
+};
+
+export const VerticalAlignMiddle: Story = {
+  name: "Vertical align: middle",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Add `verticalAlign: 'middle'` to any column whose content is shorter than its neighbours (e.g. a single badge or button). Those cells will be centred vertically while taller cells still start at the top.",
+      },
+    },
+  },
+  args: {
+    columns: [
+      {
+        key: "customerName",
+        header: "Customer Detail",
+        flex: 1,
+        render: renderCustomer,
+      },
+      {
+        key: "address",
+        header: "Location",
+        flex: 1.5,
+        render: renderLocation,
+      },
+      {
+        key: "orderId",
+        header: "Order Id / Remarks",
+        flex: 1.3,
+        render: renderOrderRemarks,
+      },
+      {
+        key: "status",
+        header: "Status",
+        flex: 0.6,
+        align: "center",
+        verticalAlign: "middle",
+        render: (_: unknown, row: OrderRow) => (
+          <StatusBadge
+            variant={row.status === "Allocated" ? "success" : "warning"}
+            label={row.status}
+          />
+        ),
+      },
+    ] satisfies ColumnDef<OrderRow>[],
+    data: ROWS,
+    keyField: "id",
+    bordered: true,
+    size: "md",
   },
 };
 

@@ -77,6 +77,59 @@ const ORDERS: Order[] = [
   },
 ];
 
+const renderOrderDetail = (_: unknown, row: Order) => (
+  <div className="flex flex-col gap-0.5">
+    <span className="font-semibold text-gray-900">{row.orderNo}</span>
+    <span className="text-xs text-gray-500">{row.date}</span>
+    <span className="text-xs text-gray-400">{row.items}</span>
+  </div>
+);
+
+const renderCustomerDetail = (_: unknown, row: Order) => (
+  <div className="flex flex-col gap-0.5">
+    <span className="font-semibold text-gray-900">{row.customer}</span>
+    <span className="text-xs text-gray-500">{row.phone}</span>
+  </div>
+);
+
+const COLUMNS_VERTICAL_TOP: ColumnDef<Order>[] = [
+  { key: "orderNo", header: "Order", flex: 1, render: renderOrderDetail },
+  { key: "customer", header: "Customer", flex: 1.2, render: renderCustomerDetail },
+  { key: "amount", header: "Amount", flex: 0.8, align: "right", render: (v: string) => <span className="font-semibold text-gray-900">{v}</span> },
+  {
+    key: "status",
+    header: "Status",
+    flex: 0.9,
+    align: "center",
+    // verticalAlign not set — defaults to "top"
+    render: (v: "delivered" | "pending" | "cancelled") => (
+      <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[v]}`}>
+        <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[v]}`} />
+        {v.charAt(0).toUpperCase() + v.slice(1)}
+      </span>
+    ),
+  },
+];
+
+const COLUMNS_VERTICAL_MIDDLE: ColumnDef<Order>[] = [
+  { key: "orderNo", header: "Order", flex: 1, render: renderOrderDetail },
+  { key: "customer", header: "Customer", flex: 1.2, render: renderCustomerDetail },
+  { key: "amount", header: "Amount", flex: 0.8, align: "right", verticalAlign: "middle", render: (v: string) => <span className="font-semibold text-gray-900">{v}</span> },
+  {
+    key: "status",
+    header: "Status",
+    flex: 0.9,
+    align: "center",
+    verticalAlign: "middle",
+    render: (v: "delivered" | "pending" | "cancelled") => (
+      <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[v]}`}>
+        <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[v]}`} />
+        {v.charAt(0).toUpperCase() + v.slice(1)}
+      </span>
+    ),
+  },
+];
+
 const COLUMNS: ColumnDef<Order>[] = [
   {
     key: "orderNo",
@@ -327,6 +380,56 @@ export default function TablePreview() {
             size="md"
             onRowClick={(row) => console.log("clicked", row)}
           />
+        </section>
+
+        {/* verticalAlign demo */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-5">
+            <h2 className="text-base font-semibold text-[#111827]">
+              Per-column Vertical Alignment
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              When rows have multi-line content, short cells (badges, amounts)
+              can be centred vertically using{" "}
+              <code className="rounded bg-[#F3F4F6] px-1 text-[12px]">
+                verticalAlign: "middle"
+              </code>{" "}
+              on the column definition.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#9CA3AF]">
+                Default —{" "}
+                <code className="rounded bg-[#F3F4F6] px-1 normal-case">
+                  verticalAlign: "top"
+                </code>
+              </p>
+              <Table
+                columns={COLUMNS_VERTICAL_TOP}
+                data={ORDERS.slice(0, 3)}
+                keyField="id"
+                bordered
+                size="md"
+              />
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#9CA3AF]">
+                With{" "}
+                <code className="rounded bg-[#F3F4F6] px-1 normal-case">
+                  verticalAlign: "middle"
+                </code>{" "}
+                on Status &amp; Amount
+              </p>
+              <Table
+                columns={COLUMNS_VERTICAL_MIDDLE}
+                data={ORDERS.slice(0, 3)}
+                keyField="id"
+                bordered
+                size="md"
+              />
+            </div>
+          </div>
         </section>
 
         {/* Loading state */}
