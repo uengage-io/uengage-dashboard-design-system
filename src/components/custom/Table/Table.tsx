@@ -279,6 +279,7 @@ export function Table<T>({
                           key={colKey}
                           size={size}
                           align={col.align ?? "left"}
+                          verticalAlign={col.verticalAlign}
                           className={cn(
                             col.hideOnMobile && "hidden md:table-cell",
                             col.className,

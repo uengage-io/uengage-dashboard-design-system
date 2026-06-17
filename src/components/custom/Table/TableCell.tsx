@@ -9,6 +9,7 @@ import {
 export interface TableCellProps extends ComponentProps<"td"> {
   size?: TableBodyRowVariants["size"];
   align?: "left" | "center" | "right";
+  verticalAlign?: "top" | "middle";
 }
 
 const alignClass = {
@@ -20,6 +21,7 @@ const alignClass = {
 export function TableCell({
   size = "md",
   align = "left",
+  verticalAlign = "top",
   className,
   children,
   ...props
@@ -31,7 +33,8 @@ export function TableCell({
         alignClass[align],
         // Allow content to wrap and break long words/URLs that would otherwise
         // force the column wider than its flex-allocated share.
-        "whitespace-normal break-words [hyphens:none] align-top",
+        "whitespace-normal break-words [hyphens:none]",
+        verticalAlign === "middle" ? "align-middle" : "align-top",
         className,
       )}
       {...props}

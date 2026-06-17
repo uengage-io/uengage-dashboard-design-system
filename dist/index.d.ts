@@ -644,6 +644,8 @@ interface ColumnDef<T> {
     /** Minimum column width in pixels — prevents the column from shrinking below this on mobile scroll. */
     minWidth?: number;
     align?: "left" | "center" | "right";
+    /** Vertical alignment of cell content. Defaults to "top". Use "middle" to center content vertically within the row. */
+    verticalAlign?: "top" | "middle";
     render?: (value: any, row: T, index: number) => ReactNode;
     sortable?: boolean;
     hideOnMobile?: boolean;
@@ -702,8 +704,9 @@ type StatusBadgeVariants = VariantProps<typeof statusBadgeVariants>;
 interface TableCellProps extends ComponentProps<"td"> {
     size?: TableBodyRowVariants["size"];
     align?: "left" | "center" | "right";
+    verticalAlign?: "top" | "middle";
 }
-declare function TableCell({ size, align, className, children, ...props }: TableCellProps): react_jsx_runtime.JSX.Element;
+declare function TableCell({ size, align, verticalAlign, className, children, ...props }: TableCellProps): react_jsx_runtime.JSX.Element;
 
 type SortDirection = "asc" | "desc" | null;
 interface TableHeaderCellProps extends Omit<ComponentProps<"th">, "onClick"> {
@@ -1350,8 +1353,9 @@ interface SectionProps extends React.ComponentProps<"div"> {
     /** Enables the collapse/expand toggle. A chevron button appears in the header. */
     collapsible?: boolean;
     /**
-     * When true (and collapsible is true), shows a light divider line below the
-     * header when the section is open.
+     * When true, shows a light divider line below the header.
+     * Works regardless of whether `collapsible` is set.
+     * When collapsible, the divider only appears while the section is open.
      */
     divider?: boolean;
     /**

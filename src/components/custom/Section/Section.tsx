@@ -241,21 +241,32 @@ function SectionContent({
     </div>
   );
 
+  const headerRule = divider && (
+    <div
+      data-slot="section-header-rule"
+      className={cn(
+        "-mx-1 border-t border-[#EEEEEE]",
+        dividerStyle === "dashed" && "border-dashed",
+        dividerStyle === "dotted" && "border-dotted",
+      )}
+    />
+  );
+
   if (collapsible) {
     return (
       <Collapsible.Content className="overflow-hidden will-change-[height] data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
-        {divider && (
-          <div
-            data-slot="section-header-rule"
-            className={cn(
-              "-mx-1 border-t border-[#EEEEEE]",
-              dividerStyle === "dashed" && "border-dashed",
-              dividerStyle === "dotted" && "border-dotted",
-            )}
-          />
-        )}
+        {headerRule}
         {inner}
       </Collapsible.Content>
+    );
+  }
+
+  if (divider) {
+    return (
+      <>
+        {headerRule}
+        {inner}
+      </>
     );
   }
 
@@ -510,8 +521,9 @@ export interface SectionProps extends React.ComponentProps<"div"> {
   /** Enables the collapse/expand toggle. A chevron button appears in the header. */
   collapsible?: boolean;
   /**
-   * When true (and collapsible is true), shows a light divider line below the
-   * header when the section is open.
+   * When true, shows a light divider line below the header.
+   * Works regardless of whether `collapsible` is set.
+   * When collapsible, the divider only appears while the section is open.
    */
   divider?: boolean;
   /**

@@ -8,7 +8,7 @@ import SelectPreview from "./components/Select";
 import CheckboxPreview from "./components/Checkbox";
 import RadioPreview from "./components/Radio";
 import TabsPreview from "./components/Tabs";
-import BadgePreview from "./components/Badge";
+// import BadgePreview from "./components/Badge";
 import TogglePreview from "./Toggle";
 import AlertDialogPreview from "./components/AlertDialog";
 import PageContainerDemo from "./components/PageContainer";
@@ -32,13 +32,14 @@ import DemoPage from "./components/DemoPage"
 import LayoutDemo from "./components/LayoutDemo";
 import FileUploadPreview from "./components/FileUpload";
 import SectionPreview from "./components/Section";
+import BadgePreview from "./components/Badge";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <TabsPreview /> */}
     {/* <TablePreview/> */}
     {/* <TogglePreview/> */}
-    <AppLayoutPreview/>
-    <FileUploadPreview />
-    <SectionPreview />
+    {/* <AppLayoutPreview/> */}
+    <TablePreview />
+    {/* <SectionPreview /> */}
   </React.StrictMode>,
 );
