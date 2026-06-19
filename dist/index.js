@@ -4053,9 +4053,19 @@ function DatePicker({
   required,
   helperText,
   error,
-  readOnly = false
+  readOnly = false,
+  open: controlledOpen,
+  onOpenChange: onOpenChangeProp
 }) {
-  const [open, setOpen] = React9.useState(false);
+  const [internalOpen, setInternalOpen] = React9.useState(false);
+  const open = controlledOpen !== void 0 ? controlledOpen : internalOpen;
+  const setOpen = React9.useCallback(
+    (next) => {
+      if (controlledOpen === void 0) setInternalOpen(next);
+      onOpenChangeProp?.(next);
+    },
+    [controlledOpen, onOpenChangeProp]
+  );
   const touchedRef = React9.useRef(false);
   const interactedRef = React9.useRef(false);
   const [committed, setCommitted] = React9.useState(
@@ -4217,7 +4227,7 @@ function DatePicker({
           onKeyDown: (e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              if (!disabled && !readOnly) setOpen((o) => !o);
+              if (!disabled && !readOnly) setOpen(!open);
             } else if (e.key === "Escape") {
               setOpen(false);
             }
@@ -5953,6 +5963,10 @@ function AppSidebar({
     /* @__PURE__ */ jsx("style", { children: `
         [data-slot="app-sidebar-modules-scroll"] {
           scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
+          transition: scrollbar-color 0.3s ease;
+        }
+        [data-slot="app-sidebar-modules-scroll"]:hover {
           scrollbar-color: #006F42 transparent;
         }
         [data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar {
@@ -5963,15 +5977,17 @@ function AppSidebar({
           margin-block: 6px;
         }
         [data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar-thumb {
-          background-color: #006F42;
+          background-color: transparent;
           border-radius: 9999px;
+          transition: background-color 0.3s ease;
         }
         [data-slot="app-sidebar-modules-scroll"]:hover::-webkit-scrollbar-thumb {
-          background-color: #3a8a5a;
+          background-color: #006F42;
         }
         [data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar-thumb:hover {
           background-color: #1f6b40;
-        }
+
+          }
       ` }),
     /* @__PURE__ */ jsxs(
       "aside",

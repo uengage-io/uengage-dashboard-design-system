@@ -38,8 +38,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <TabsPreview /> */}
     {/* <TablePreview/> */}
     {/* <TogglePreview/> */}
-    {/* <AppLayoutPreview/> */}
-    <TablePreview />
+    <DatePickerPreview/>
+    {/* <TablePreview /> */}
     {/* <SectionPreview /> */}
   </React.StrictMode>,
 );

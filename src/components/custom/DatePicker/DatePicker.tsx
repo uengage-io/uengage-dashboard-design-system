@@ -78,8 +78,18 @@ function DatePicker({
   helperText,
   error,
   readOnly = false,
+  open: controlledOpen,
+  onOpenChange: onOpenChangeProp,
 }: DatePickerProps) {
-  const [open, setOpen] = React.useState(false);
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = React.useCallback(
+    (next: boolean) => {
+      if (controlledOpen === undefined) setInternalOpen(next);
+      onOpenChangeProp?.(next);
+    },
+    [controlledOpen, onOpenChangeProp],
+  );
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
 
@@ -315,7 +325,7 @@ function DatePicker({
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                if (!disabled && !readOnly) setOpen((o) => !o);
+                if (!disabled && !readOnly) setOpen(!open);
               } else if (e.key === "Escape") {
                 setOpen(false);
               }

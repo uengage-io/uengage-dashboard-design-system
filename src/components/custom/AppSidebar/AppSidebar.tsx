@@ -59,6 +59,10 @@ function AppSidebar({
       <style>{`
         [data-slot="app-sidebar-modules-scroll"] {
           scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
+          transition: scrollbar-color 0.3s ease;
+        }
+        [data-slot="app-sidebar-modules-scroll"]:hover {
           scrollbar-color: #006F42 transparent;
         }
         [data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar {
@@ -69,15 +73,17 @@ function AppSidebar({
           margin-block: 6px;
         }
         [data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar-thumb {
-          background-color: #006F42;
+          background-color: transparent;
           border-radius: 9999px;
+          transition: background-color 0.3s ease;
         }
         [data-slot="app-sidebar-modules-scroll"]:hover::-webkit-scrollbar-thumb {
-          background-color: #3a8a5a;
+          background-color: #006F42;
         }
         [data-slot="app-sidebar-modules-scroll"]::-webkit-scrollbar-thumb:hover {
           background-color: #1f6b40;
-        }
+
+          }
       `}</style>
       <aside
       data-slot="app-sidebar"
