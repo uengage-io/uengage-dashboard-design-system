@@ -6269,10 +6269,11 @@ function Accordion(props) {
 Accordion.displayName = "Accordion";
 function findDatePickerInTree(node) {
   if (!React9__namespace.isValidElement(node)) return null;
-  if (node.type.displayName === "DatePicker") {
+  const props = node.props;
+  if (node.type.displayName === "DatePicker" && props.open === void 0) {
     return node;
   }
-  const children = node.props.children;
+  const children = props.children;
   if (!children) return null;
   for (const child of React9__namespace.Children.toArray(children)) {
     const found = findDatePickerInTree(child);

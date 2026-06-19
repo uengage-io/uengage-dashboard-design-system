@@ -26,10 +26,14 @@ function findDatePickerInTree(
   node: React.ReactNode,
 ): React.ReactElement | null {
   if (!React.isValidElement(node)) return null;
-  if ((node.type as { displayName?: string }).displayName === "DatePicker") {
+  const props = node.props as { open?: boolean; children?: React.ReactNode };
+  if (
+    (node.type as { displayName?: string }).displayName === "DatePicker" &&
+    props.open === undefined
+  ) {
     return node;
   }
-  const children = (node.props as { children?: React.ReactNode }).children;
+  const children = props.children;
   if (!children) return null;
   for (const child of React.Children.toArray(children)) {
     const found = findDatePickerInTree(child);
