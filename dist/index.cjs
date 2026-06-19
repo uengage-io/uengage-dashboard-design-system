@@ -2208,7 +2208,7 @@ var tabOverlayClass = "absolute inset-0 rounded-t-lg bg-transparent";
 var STRIP_SHADCN_DEFAULTS = [
   "after:hidden after:content-none after:bg-transparent after:opacity-0",
   "border-0 shadow-none bg-transparent",
-  "data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-transparent",
+  "data-[state=active]:!bg-transparent data-[state=active]:shadow-none data-[state=active]:border-transparent",
   "focus-visible:border-transparent focus-visible:ring-0 focus-visible:outline-none"
 ].join(" ");
 function CustomTabsTrigger({
@@ -2230,7 +2230,7 @@ function CustomTabsTrigger({
           "rounded-full px-2 py-0.5 sm:px-2.5 text-[12px] sm:text-[13px] font-semibold",
           "transition-colors duration-300 ease-out outline-none",
           "text-[#595959] hover:text-black data-[state=active]:!text-black!",
-          "bg-transparent data-[state=active]:bg-transparent",
+          "bg-transparent data-[state=active]:!bg-transparent",
           "border-0 shadow-none",
           "data-[state=active]:border-0 data-[state=active]:shadow-none",
           "after:hidden after:content-none",
