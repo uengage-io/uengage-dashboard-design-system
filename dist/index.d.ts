@@ -605,9 +605,17 @@ interface DatePickerProps {
     error?: string;
     /** When true, the trigger shows the current value but the calendar cannot be opened. */
     readOnly?: boolean;
+    /**
+     * Controlled open state. When provided, the popover open/close is driven
+     * externally — e.g. triggered by a "Custom date" option in a dashboard dropdown.
+     * Pair with `onOpenChange` to sync state back.
+     */
+    open?: boolean;
+    /** Called whenever the popover wants to open or close. Mirror this back into `open` to stay in sync. */
+    onOpenChange?: (open: boolean) => void;
 }
 
-declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, readOnly, }: DatePickerProps): react_jsx_runtime.JSX.Element;
+declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, readOnly, open: controlledOpen, onOpenChange: onOpenChangeProp, }: DatePickerProps): react_jsx_runtime.JSX.Element;
 declare namespace DatePicker {
     var displayName: string;
 }

@@ -37,4 +37,12 @@ export interface DatePickerProps {
   error?: string;
   /** When true, the trigger shows the current value but the calendar cannot be opened. */
   readOnly?: boolean;
+  /**
+   * Controlled open state. When provided, the popover open/close is driven
+   * externally — e.g. triggered by a "Custom date" option in a dashboard dropdown.
+   * Pair with `onOpenChange` to sync state back.
+   */
+  open?: boolean;
+  /** Called whenever the popover wants to open or close. Mirror this back into `open` to stay in sync. */
+  onOpenChange?: (open: boolean) => void;
 }
