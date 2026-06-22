@@ -36,6 +36,14 @@ const meta: Meta<typeof Toggle> = {
       control: { type: "boolean" },
       description: "Shows the current state but prevents toggling.",
     },
+    bgColor: {
+      control: { type: "color" },
+      description: "Custom background color of the toggle pill.",
+    },
+    borderColor: {
+      control: { type: "color" },
+      description: "Custom border color of the toggle pill.",
+    },
   },
   args: {
     size: "md",

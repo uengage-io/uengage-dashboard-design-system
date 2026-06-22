@@ -2,6 +2,7 @@ import * as React from "react";
 import { Popover as PopoverPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { useZIndex } from "@/lib/zIndexContext";
+import { FilterGroupMobileContext } from "@/lib/filterGroupContext";
 
 function Popover({
   ...props
@@ -20,6 +21,7 @@ function PopoverContent({
   align = "start",
   sideOffset = 4,
   style,
+  children,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
   const { popover } = useZIndex();
@@ -36,7 +38,13 @@ function PopoverContent({
         )}
         style={{ zIndex: popover, ...style }}
         {...props}
-      />
+      >
+        {/* Reset mobile-drawer context so nested Selects (e.g. DatePickerCalendar's
+            month/year navigation) render as popovers, not flat tap-lists. */}
+        <FilterGroupMobileContext.Provider value={false}>
+          {children}
+        </FilterGroupMobileContext.Provider>
+      </PopoverPrimitive.Content>
     </PopoverPrimitive.Portal>
   );
 }

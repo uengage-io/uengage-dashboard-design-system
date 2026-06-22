@@ -27,6 +27,7 @@ import PrevDemo from "./components/Prev";
 import AppLayoutPreview from "./components/AppLayout";
 import Demo from "./components/Demo";
 import FilterGroupPreview from "./components/FilterGroup"
+import FilterGroupDatePickerPreview from "./components/FilterGroupDatePicker"
 import BannerPreview from "./components/Banner"
 import DemoPage from "./components/DemoPage"
 import LayoutDemo from "./components/LayoutDemo";
@@ -38,8 +39,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <TabsPreview /> */}
     {/* <TablePreview/> */}
     {/* <TogglePreview/> */}
-    <DatePickerPreview/>
+    {/* <DatePickerPreview/> */}
     {/* <TablePreview /> */}
     {/* <SectionPreview /> */}
+    <FilterGroupDatePickerPreview />
   </React.StrictMode>,
 );

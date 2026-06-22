@@ -4,10 +4,10 @@ export type MobilePreviewFrameColor = "midnight" | "silver" | "gold" | "white";
 
 /** Portrait frame outer dimensions (w × h) in px. */
 export const FRAME_SIZES: Record<MobilePreviewSize, { w: number; h: number }> = {
-  sm: { w: 210,  h: 455  },
-  md: { w: 270,  h: 585  },
-  lg: { w: 320,  h: 693  },
-  xl: { w: 375,  h: 812  },
+  sm: { w: 225,  h: 455  },
+  md: { w: 285,  h: 585  },
+  lg: { w: 335,  h: 693  },
+  xl: { w: 390,  h: 812  },
 };
 
 /** Frame colour palette: background fill, outer border, and side-button colour. */
@@ -51,7 +51,7 @@ export const BOTTOM_BAR_H: Record<MobilePreviewDevice, number> = {
 
 /** Dynamic-island pill dimensions (px) — iphone only. */
 export const DYNAMIC_ISLAND: Record<MobilePreviewDevice, { w: number; h: number } | null> = {
-  iphone:  { w: 96, h: 30 },
+  iphone:  { w: 76, h: 24 },
   android: null,
   generic: null,
 };
@@ -64,7 +64,7 @@ export const PUNCH_HOLE: Record<MobilePreviewDevice, { size: number } | null> = 
 };
 
 /** Width of the simulated hardware side buttons (px). */
-export const SIDE_BUTTON_W = 4;
+export const SIDE_BUTTON_W = 3;
 
 /**
  * Portrait side-button layout as % of frame height.

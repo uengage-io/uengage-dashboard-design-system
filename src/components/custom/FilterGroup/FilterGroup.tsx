@@ -2,6 +2,7 @@ import * as React from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FilterGroupMobileContext } from "@/lib/filterGroupContext";
+import { ModalZIndexProvider } from "@/lib/zIndexContext";
 import {
   Drawer,
   DrawerContent,
@@ -216,11 +217,13 @@ export function FilterGroup({
       return <InlineDatePickerPanel child={datePicker} />;
     }
     return (
-      <div className="p-4 [&_span.text-xs]:hidden">
-        <FilterGroupMobileContext.Provider value={true}>
-          {item.content}
-        </FilterGroupMobileContext.Provider>
-      </div>
+      <ModalZIndexProvider>
+        <div className="p-4 [&_span.text-xs]:hidden">
+          <FilterGroupMobileContext.Provider value={true}>
+            {item.content}
+          </FilterGroupMobileContext.Provider>
+        </div>
+      </ModalZIndexProvider>
     );
   };
 
@@ -246,7 +249,12 @@ export function FilterGroup({
 
       <DrawerContent
         aria-label={drawerTitle}
-       
+        onInteractOutside={(e) => {
+          const target = e.target as Element;
+          if (target.closest('[data-radix-popper-content-wrapper]')) {
+            e.preventDefault();
+          }
+        }}
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50",
           "rounded-t-2xl bg-white",
