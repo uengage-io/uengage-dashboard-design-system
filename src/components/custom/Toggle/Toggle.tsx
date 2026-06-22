@@ -70,44 +70,24 @@ export const Toggle = React.forwardRef<
     },
     ref,
   ) => {
-    const internalRef = React.useRef<React.ElementRef<typeof SwitchPrimitive.Root>>(null);
-    const [isChecked, setIsChecked] = React.useState(false);
-
-    const mergedRef = React.useCallback(
-      (node: React.ElementRef<typeof SwitchPrimitive.Root> | null) => {
-        internalRef.current = node;
-        if (typeof ref === "function") ref(node);
-        else if (ref) (ref as React.MutableRefObject<typeof node>).current = node;
-      },
-      [ref],
-    );
-
-    React.useEffect(() => {
-      const el = internalRef.current;
-      if (!el) return;
-      setIsChecked(el.dataset.state === "checked");
-      const observer = new MutationObserver(() => {
-        setIsChecked(el.dataset.state === "checked");
-      });
-      observer.observe(el, { attributes: true, attributeFilter: ["data-state"] });
-      return () => observer.disconnect();
-    }, []);
+    const [internalChecked, setInternalChecked] = React.useState(defaultChecked ?? false);
+    const isChecked = checked !== undefined ? checked : internalChecked;
 
     const hasCustomColors = !!(borderColor || bgColor);
 
     const pillStyle: React.CSSProperties | undefined = hasCustomColors
       ? {
-          ...(isChecked && borderColor ? { borderColor } : {}),
+          ...(borderColor ? { borderColor } : {}),
           ...(isChecked && bgColor ? { backgroundColor: bgColor } : {}),
         }
       : undefined;
 
     const switchEl = (
       <SwitchPrimitive.Root
-        ref={mergedRef}
+        ref={ref}
         checked={checked !== undefined ? checked : undefined}
         defaultChecked={checked !== undefined ? undefined : defaultChecked}
-        onCheckedChange={readOnly ? undefined : onChange}
+        onCheckedChange={readOnly ? undefined : (val) => { setInternalChecked(val); onChange?.(val); }}
         disabled={disabled}
         className={cn(
           trackVariants({ size }),

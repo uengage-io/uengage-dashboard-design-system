@@ -4,7 +4,7 @@ import { FilterGroup } from "./FilterGroup";
 import { Select } from "@/components/custom/Select/Select";
 import { DatePicker } from "@/components/custom/DatePicker/DatePicker";
 import { SearchBar } from "@/components/custom/SearchBar";
-import type { DateRange } from "@/components/custom/DatePicker/DatePicker.types";
+import type { DateRange, DatePickerMode } from "@/components/custom/DatePicker/DatePicker.types";
 
 // ── Shared option sets ────────────────────────────────────────────────────────
 
@@ -206,6 +206,141 @@ function ForceDrawerStory() {
   );
 }
 
+// ── Story: Dropdown-triggered DatePicker ─────────────────────────────────────
+
+const datePresetOptions = [
+  { label: "Today",        value: "today"         },
+  { label: "Yesterday",    value: "yesterday"     },
+  { label: "Last 7 Days",  value: "last_7"        },
+  { label: "Last 30 Days", value: "last_30"       },
+  { label: "This Month",   value: "this_month"    },
+  { label: "Custom Date",  value: "custom_single" },
+  { label: "Custom Range", value: "custom_range"  },
+];
+
+interface DatePresetPickerProps {
+  datePreset: string | string[];
+  onDatePresetChange: (val: string | string[]) => void;
+  pickerMode: DatePickerMode;
+  pickerOpen: boolean;
+  onPickerOpenChange: (open: boolean) => void;
+  customValue: Date | DateRange | null;
+  onCustomValueChange: (v: Date | DateRange | null) => void;
+}
+
+function DatePresetPicker({
+  datePreset,
+  onDatePresetChange,
+  pickerMode,
+  pickerOpen,
+  onPickerOpenChange,
+  customValue,
+  onCustomValueChange,
+}: DatePresetPickerProps) {
+  return (
+    <div className="relative inline-flex flex-col">
+      <Select
+        options={datePresetOptions}
+        value={datePreset}
+        onChange={onDatePresetChange}
+        placeholder="Today"
+      />
+      {/*
+        DatePicker is invisible — controlled `open` means FilterGroup skips its
+        inline-calendar detection. Inside the drawer, FilterGroup's ModalZIndexProvider
+        raises the popover to z-10001 automatically.
+      */}
+      <DatePicker
+        mode={pickerMode}
+        open={pickerOpen}
+        onOpenChange={onPickerOpenChange}
+        value={customValue}
+        onChange={(v) => onCustomValueChange(v as Date | DateRange | null)}
+        className="opacity-0 !h-0 !min-h-0 !p-0 !border-0 overflow-hidden"
+        width="w-0"
+      />
+    </div>
+  );
+}
+
+function WithDropdownDatePickerStory() {
+  const [outlet, setOutlet] = React.useState<string | string[]>("");
+  const [state, setState] = React.useState<string | string[]>("");
+  const [datePreset, setDatePreset] = React.useState<string | string[]>("today");
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [pickerMode, setPickerMode] = React.useState<DatePickerMode>("single");
+  const [customValue, setCustomValue] = React.useState<Date | DateRange | null>(null);
+
+  const handleDatePresetChange = (val: string | string[]) => {
+    const v = val as string;
+    setDatePreset(v);
+    if (v === "custom_single")     { setPickerMode("single"); setPickerOpen(true); }
+    else if (v === "custom_range") { setPickerMode("range");  setPickerOpen(true); }
+    else                           { setCustomValue(null); }
+  };
+
+  const handleReset = () => {
+    setOutlet(""); setState(""); setDatePreset("today");
+    setCustomValue(null); setPickerOpen(false);
+  };
+
+  const isCustom = datePreset === "custom_single" || datePreset === "custom_range";
+
+  const customLabel = React.useMemo(() => {
+    if (!customValue) return null;
+    if (customValue instanceof Date) return customValue.toDateString();
+    const r = customValue as DateRange;
+    return `${r.from.toDateString()} → ${r.to.toDateString()}`;
+  }, [customValue]);
+
+  const dateLabel = isCustom && customLabel
+    ? customLabel
+    : datePresetOptions.find((o) => o.value === datePreset)?.label ?? "Today";
+
+  const activeCount =
+    [outlet, state].filter((v) => Array.isArray(v) ? v.length > 0 : !!v).length +
+    (datePreset !== "today" ? 1 : 0);
+
+  const dateSlotProps: DatePresetPickerProps = {
+    datePreset,
+    onDatePresetChange: handleDatePresetChange,
+    pickerMode,
+    pickerOpen,
+    onPickerOpenChange: setPickerOpen,
+    customValue,
+    onCustomValueChange: setCustomValue,
+  };
+
+  return (
+    <div className="p-6 space-y-6 max-w-5xl">
+      <FilterGroup
+        labels={["Outlet", "State", "Date"]}
+        activeCount={activeCount}
+        onApply={() => console.log("applied", { outlet, state, datePreset, customValue })}
+        onReset={handleReset}
+        forceDrawer
+      >
+        <Select options={outletOptions} value={outlet} onChange={setOutlet} placeholder="Select Outlet" />
+        <Select options={stateOptions} value={state} onChange={setState} placeholder="Select State" />
+        <DatePresetPicker {...dateSlotProps} />
+      </FilterGroup>
+
+      <Readout value={{
+        outlet:      outlet      || null,
+        state:       state       || null,
+        datePreset,
+        pickerMode:  isCustom ? pickerMode : null,
+        customValue: customValue
+          ? customValue instanceof Date
+            ? customValue.toDateString()
+            : `${(customValue as DateRange).from.toDateString()} → ${(customValue as DateRange).to.toDateString()}`
+          : null,
+        dateLabel,
+      }} />
+    </div>
+  );
+}
+
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
@@ -288,4 +423,23 @@ export const MobileDrawerPreview: Story = {
 export const WithOnClose: Story = {
   name: "onClose — X / overlay dismiss",
   render: () => <WithOnCloseStory />,
+};
+
+/**
+ * A date slot that combines a preset `Select` dropdown with a hidden `DatePicker`.
+ * Choosing "Custom Date" or "Custom Range" opens the calendar via the controlled
+ * `open` prop. FilterGroup's `ModalZIndexProvider` on the drawer ensures the calendar
+ * renders at z-10001 — above the drawer overlay — automatically, with no extra config.
+ */
+export const DropdownTriggeredDatePicker: Story = {
+  name: "Date slot — dropdown-triggered calendar",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A compound date slot: a preset Select plus a hidden DatePicker sharing the same FilterGroup slot. Selecting \"Custom Date\" or \"Custom Range\" opens the calendar via the controlled `open` prop. Inside the drawer, `FilterGroup` wraps its content with `ModalZIndexProvider` so the popover automatically clears the drawer's z-index without any manual override at the usage site.",
+      },
+    },
+  },
+  render: () => <WithDropdownDatePickerStory />,
 };

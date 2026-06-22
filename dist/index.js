@@ -1,18 +1,32 @@
 "use client";
+import * as React9 from 'react';
+import { useMemo, useState, useRef, useLayoutEffect } from 'react';
+import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import { cva } from 'class-variance-authority';
 import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Separator$1, Dialog, Slot, Popover as Popover$1, RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Accordion as Accordion$1, Collapsible, Tabs as Tabs$1 } from 'radix-ui';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
-import * as React9 from 'react';
-import { useState, useMemo, useRef, useLayoutEffect } from 'react';
 import { X, Search, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, ChevronDown, EyeOff, Eye, Minus, ChevronLeft, ChevronRight, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Plus, Upload, File, Video, Play, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
 import * as ReactDOM from 'react-dom';
 
-// src/components/ui/button.tsx
+// src/lib/zIndexContext.tsx
+var ZIndexContext = React9.createContext({ popover: 20 });
+function useZIndex() {
+  return React9.useContext(ZIndexContext);
+}
+function SidebarZIndexProvider({
+  children
+}) {
+  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 50 }, children });
+}
+function ModalZIndexProvider({
+  children
+}) {
+  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 10001 }, children });
+}
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
@@ -1448,20 +1462,7 @@ function SearchBar({
 }
 SearchBar.displayName = "SearchBar";
 var FilterGroupMobileContext = React9.createContext(false);
-var ZIndexContext = React9.createContext({ popover: 20 });
-function useZIndex() {
-  return React9.useContext(ZIndexContext);
-}
-function SidebarZIndexProvider({
-  children
-}) {
-  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 50 }, children });
-}
-function ModalZIndexProvider({
-  children
-}) {
-  return /* @__PURE__ */ jsx(ZIndexContext.Provider, { value: { popover: 10001 }, children });
-}
+var FilterGroupDrawerCalendarContext = React9.createContext(null);
 function Popover({
   ...props
 }) {
@@ -1477,6 +1478,7 @@ function PopoverContent({
   align = "start",
   sideOffset = 4,
   style,
+  children,
   ...props
 }) {
   const { popover } = useZIndex();
@@ -1492,7 +1494,8 @@ function PopoverContent({
         className
       ),
       style: { zIndex: popover, ...style },
-      ...props
+      ...props,
+      children: /* @__PURE__ */ jsx(FilterGroupMobileContext.Provider, { value: false, children })
     }
   ) });
 }
@@ -4068,6 +4071,20 @@ function DatePicker({
   );
   const touchedRef = React9.useRef(false);
   const interactedRef = React9.useRef(false);
+  const isMobileDrawer = React9.useContext(FilterGroupMobileContext);
+  const registerDrawerCalendar = React9.useContext(FilterGroupDrawerCalendarContext);
+  const isControlled = controlledOpen !== void 0;
+  React9.useEffect(() => {
+    if (!isMobileDrawer || !isControlled || !registerDrawerCalendar) return;
+    if (open) {
+      registerDrawerCalendar({ mode, value: committed, onChange, onOpenChange: setOpen, minDate, maxDate });
+    } else {
+      registerDrawerCalendar(null);
+    }
+    return () => {
+      registerDrawerCalendar(null);
+    };
+  }, [open, isMobileDrawer, isControlled]);
   const [committed, setCommitted] = React9.useState(
     controlledValue !== void 0 ? controlledValue ?? null : null
   );
@@ -4209,6 +4226,39 @@ function DatePicker({
   };
   const canApply = draftRange !== null || pendingFrom !== null;
   const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
+  if (isMobileDrawer && isControlled && registerDrawerCalendar) {
+    return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1.5", children: [
+      label && /* @__PURE__ */ jsx(InputLabel, { size, required, children: label }),
+      /* @__PURE__ */ jsxs(
+        "div",
+        {
+          className: cn(
+            triggerVariants2({ state: triggerState, size }),
+            "gap-2 px-3 cursor-pointer select-none",
+            width,
+            className
+          ),
+          children: [
+            /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: cn(
+                  "flex-1 truncate",
+                  triggerLabel ? "text-[#111827]" : cn(
+                    "text-[#C4C9D2]",
+                    size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]"
+                  )
+                ),
+                children: triggerLabel ?? placeholder
+              }
+            ),
+            /* @__PURE__ */ jsx(CalendarIcon, { size: 15, strokeWidth: 2, className: "text-gray-600" })
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsx(InputHelper, { size, helperText, error })
+    ] });
+  }
   return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1.5", children: [
     label && /* @__PURE__ */ jsx(InputLabel, { size, required, children: label }),
     /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
@@ -4926,38 +4976,23 @@ var Toggle = React9.forwardRef(
     bgColor,
     ...props
   }, ref) => {
-    const internalRef = React9.useRef(null);
-    const [isChecked, setIsChecked] = React9.useState(false);
-    const mergedRef = React9.useCallback(
-      (node) => {
-        internalRef.current = node;
-        if (typeof ref === "function") ref(node);
-        else if (ref) ref.current = node;
-      },
-      [ref]
-    );
-    React9.useEffect(() => {
-      const el = internalRef.current;
-      if (!el) return;
-      setIsChecked(el.dataset.state === "checked");
-      const observer = new MutationObserver(() => {
-        setIsChecked(el.dataset.state === "checked");
-      });
-      observer.observe(el, { attributes: true, attributeFilter: ["data-state"] });
-      return () => observer.disconnect();
-    }, []);
+    const [internalChecked, setInternalChecked] = React9.useState(defaultChecked ?? false);
+    const isChecked = checked !== void 0 ? checked : internalChecked;
     const hasCustomColors2 = !!(borderColor || bgColor);
     const pillStyle = hasCustomColors2 ? {
-      ...isChecked && borderColor ? { borderColor } : {},
+      ...borderColor ? { borderColor } : {},
       ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
     } : void 0;
     const switchEl = /* @__PURE__ */ jsx(
       Switch.Root,
       {
-        ref: mergedRef,
+        ref,
         checked: checked !== void 0 ? checked : void 0,
         defaultChecked: checked !== void 0 ? void 0 : defaultChecked,
-        onCheckedChange: readOnly ? void 0 : onChange,
+        onCheckedChange: readOnly ? void 0 : (val) => {
+          setInternalChecked(val);
+          onChange?.(val);
+        },
         disabled,
         className: cn(
           trackVariants({ size }),
@@ -6401,7 +6436,7 @@ function FilterGroup({
     if (datePicker) {
       return /* @__PURE__ */ jsx(InlineDatePickerPanel, { child: datePicker });
     }
-    return /* @__PURE__ */ jsx("div", { className: "p-4 [&_span.text-xs]:hidden", children: /* @__PURE__ */ jsx(FilterGroupMobileContext.Provider, { value: true, children: item.content }) });
+    return /* @__PURE__ */ jsx(ModalZIndexProvider, { children: /* @__PURE__ */ jsx("div", { className: "p-4 [&_span.text-xs]:hidden", children: /* @__PURE__ */ jsx(FilterGroupMobileContext.Provider, { value: true, children: item.content }) }) });
   };
   const drawer = /* @__PURE__ */ jsxs(Drawer, { open, onOpenChange: handleOpenChange, children: [
     /* @__PURE__ */ jsx(DrawerTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
@@ -6421,6 +6456,12 @@ function FilterGroup({
       DrawerContent,
       {
         "aria-label": drawerTitle,
+        onInteractOutside: (e) => {
+          const target = e.target;
+          if (target.closest("[data-radix-popper-content-wrapper]")) {
+            e.preventDefault();
+          }
+        },
         className: cn(
           "fixed bottom-0 left-0 right-0 z-50",
           "rounded-t-2xl bg-white",
@@ -8006,6 +8047,6 @@ function Chip({
   );
 }
 
-export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, usePagination, useSweetAlert };
+export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, ModalZIndexProvider, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, SidebarZIndexProvider, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

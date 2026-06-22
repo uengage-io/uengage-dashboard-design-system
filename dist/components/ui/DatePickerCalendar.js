@@ -33,6 +33,7 @@ function useFuzzySearch(items, query) {
   }, [fuse, query, items]);
 }
 var FilterGroupMobileContext = React4.createContext(false);
+React4.createContext(null);
 var ZIndexContext = React4.createContext({ popover: 20 });
 function useZIndex() {
   return React4.useContext(ZIndexContext);
@@ -52,6 +53,7 @@ function PopoverContent({
   align = "start",
   sideOffset = 4,
   style,
+  children,
   ...props
 }) {
   const { popover } = useZIndex();
@@ -67,7 +69,8 @@ function PopoverContent({
         className
       ),
       style: { zIndex: popover, ...style },
-      ...props
+      ...props,
+      children: /* @__PURE__ */ jsx(FilterGroupMobileContext.Provider, { value: false, children })
     }
   ) });
 }

@@ -1,3 +1,6 @@
+// Z-index providers
+export { ModalZIndexProvider, SidebarZIndexProvider } from "./lib/zIndexContext";
+
 // Base (shadcn) components
 export * from "./components/ui/button";
 export * from "./components/ui/alert-dialog";
@@ -244,6 +247,9 @@ export {
 export { brand, type BrandGreen } from "./utils/colors";
 
 export { cn } from "./lib/utils";
+
+// Fuzzy search hook
+export { useFuzzySearch } from "./utils/useFuzzySearch";
 
 // Modal
 export { Modal, type ModalProps } from "./components/custom/Modal";

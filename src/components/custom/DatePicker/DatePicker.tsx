@@ -16,6 +16,10 @@ import { formatDate, formatRange, formatMonthYear } from "./dateHelpers";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 import { InputHelper } from "@/components/custom/Input/InputHelper";
 import type { DatePickerProps, DateRange } from "./DatePicker.types";
+import {
+  FilterGroupMobileContext,
+  FilterGroupDrawerCalendarContext,
+} from "@/lib/filterGroupContext";
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
 
@@ -92,6 +96,26 @@ function DatePicker({
   );
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
+
+  // ── FilterGroup drawer integration ────────────────────────────────────
+  // When this DatePicker has a controlled `open` prop and is rendered inside
+  // FilterGroup's mobile drawer, we register ourselves with FilterGroup so it
+  // can render the calendar inline (avoiding Radix Dialog modal-dismiss issues
+  // where portal clicks outside the dialog DOM close the drawer).
+  const isMobileDrawer = React.useContext(FilterGroupMobileContext);
+  const registerDrawerCalendar = React.useContext(FilterGroupDrawerCalendarContext);
+  const isControlled = controlledOpen !== undefined;
+
+  React.useEffect(() => {
+    if (!isMobileDrawer || !isControlled || !registerDrawerCalendar) return;
+    if (open) {
+      registerDrawerCalendar({ mode, value: committed, onChange: onChange as ((v: unknown) => void) | undefined, onOpenChange: setOpen, minDate, maxDate });
+    } else {
+      registerDrawerCalendar(null);
+    }
+    return () => { registerDrawerCalendar(null); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isMobileDrawer, isControlled]);
 
   // ── Committed value (shown in trigger) ───────────────────────────────
   const [committed, setCommitted] = React.useState<Date | DateRange | null>(
@@ -302,6 +326,45 @@ function DatePicker({
       : open
         ? "open"
         : "default";
+
+  // In FilterGroup's mobile drawer with a controlled `open` prop, render only the
+  // (already user-hidden) trigger — no Popover portal. FilterGroup shows the calendar
+  // inline via the registered DrawerCalendarProps (see effect above).
+  if (isMobileDrawer && isControlled && registerDrawerCalendar) {
+    return (
+      <div className="flex flex-col gap-1.5">
+        {label && (
+          <InputLabel size={size} required={required}>
+            {label}
+          </InputLabel>
+        )}
+        <div
+          className={cn(
+            triggerVariants({ state: triggerState, size }),
+            "gap-2 px-3 cursor-pointer select-none",
+            width,
+            className,
+          )}
+        >
+          <span
+            className={cn(
+              "flex-1 truncate",
+              triggerLabel
+                ? "text-[#111827]"
+                : cn(
+                    "text-[#C4C9D2]",
+                    size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]",
+                  ),
+            )}
+          >
+            {triggerLabel ?? placeholder}
+          </span>
+          <CalendarIcon size={15} strokeWidth={2} className="text-gray-600" />
+        </div>
+        <InputHelper size={size} helperText={helperText} error={error} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-1.5">

@@ -13,6 +13,8 @@ var ZIndexContext = React.createContext({ popover: 20 });
 function useZIndex() {
   return React.useContext(ZIndexContext);
 }
+var FilterGroupMobileContext = React.createContext(false);
+React.createContext(null);
 function Popover({
   ...props
 }) {
@@ -28,6 +30,7 @@ function PopoverContent({
   align = "start",
   sideOffset = 4,
   style,
+  children,
   ...props
 }) {
   const { popover } = useZIndex();
@@ -43,7 +46,8 @@ function PopoverContent({
         className
       ),
       style: { zIndex: popover, ...style },
-      ...props
+      ...props,
+      children: /* @__PURE__ */ jsx(FilterGroupMobileContext.Provider, { value: false, children })
     }
   ) });
 }

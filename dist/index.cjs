@@ -1,12 +1,12 @@
 "use client";
 'use strict';
 
+var React9 = require('react');
+var jsxRuntime = require('react/jsx-runtime');
 var classVarianceAuthority = require('class-variance-authority');
 var radixUi = require('radix-ui');
 var clsx = require('clsx');
 var tailwindMerge = require('tailwind-merge');
-var jsxRuntime = require('react/jsx-runtime');
-var React9 = require('react');
 var lucideReact = require('lucide-react');
 var Fuse = require('fuse.js');
 var cmdk = require('cmdk');
@@ -37,7 +37,21 @@ var React9__namespace = /*#__PURE__*/_interopNamespace(React9);
 var Fuse__default = /*#__PURE__*/_interopDefault(Fuse);
 var ReactDOM__namespace = /*#__PURE__*/_interopNamespace(ReactDOM);
 
-// src/components/ui/button.tsx
+// src/lib/zIndexContext.tsx
+var ZIndexContext = React9__namespace.createContext({ popover: 20 });
+function useZIndex() {
+  return React9__namespace.useContext(ZIndexContext);
+}
+function SidebarZIndexProvider({
+  children
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsx(ZIndexContext.Provider, { value: { popover: 50 }, children });
+}
+function ModalZIndexProvider({
+  children
+}) {
+  return /* @__PURE__ */ jsxRuntime.jsx(ZIndexContext.Provider, { value: { popover: 10001 }, children });
+}
 function cn(...inputs) {
   return tailwindMerge.twMerge(clsx.clsx(inputs));
 }
@@ -1473,20 +1487,7 @@ function SearchBar({
 }
 SearchBar.displayName = "SearchBar";
 var FilterGroupMobileContext = React9__namespace.createContext(false);
-var ZIndexContext = React9__namespace.createContext({ popover: 20 });
-function useZIndex() {
-  return React9__namespace.useContext(ZIndexContext);
-}
-function SidebarZIndexProvider({
-  children
-}) {
-  return /* @__PURE__ */ jsxRuntime.jsx(ZIndexContext.Provider, { value: { popover: 50 }, children });
-}
-function ModalZIndexProvider({
-  children
-}) {
-  return /* @__PURE__ */ jsxRuntime.jsx(ZIndexContext.Provider, { value: { popover: 10001 }, children });
-}
+var FilterGroupDrawerCalendarContext = React9__namespace.createContext(null);
 function Popover({
   ...props
 }) {
@@ -1502,6 +1503,7 @@ function PopoverContent({
   align = "start",
   sideOffset = 4,
   style,
+  children,
   ...props
 }) {
   const { popover } = useZIndex();
@@ -1517,7 +1519,8 @@ function PopoverContent({
         className
       ),
       style: { zIndex: popover, ...style },
-      ...props
+      ...props,
+      children: /* @__PURE__ */ jsxRuntime.jsx(FilterGroupMobileContext.Provider, { value: false, children })
     }
   ) });
 }
@@ -4093,6 +4096,20 @@ function DatePicker({
   );
   const touchedRef = React9__namespace.useRef(false);
   const interactedRef = React9__namespace.useRef(false);
+  const isMobileDrawer = React9__namespace.useContext(FilterGroupMobileContext);
+  const registerDrawerCalendar = React9__namespace.useContext(FilterGroupDrawerCalendarContext);
+  const isControlled = controlledOpen !== void 0;
+  React9__namespace.useEffect(() => {
+    if (!isMobileDrawer || !isControlled || !registerDrawerCalendar) return;
+    if (open) {
+      registerDrawerCalendar({ mode, value: committed, onChange, onOpenChange: setOpen, minDate, maxDate });
+    } else {
+      registerDrawerCalendar(null);
+    }
+    return () => {
+      registerDrawerCalendar(null);
+    };
+  }, [open, isMobileDrawer, isControlled]);
   const [committed, setCommitted] = React9__namespace.useState(
     controlledValue !== void 0 ? controlledValue ?? null : null
   );
@@ -4234,6 +4251,39 @@ function DatePicker({
   };
   const canApply = draftRange !== null || pendingFrom !== null;
   const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
+  if (isMobileDrawer && isControlled && registerDrawerCalendar) {
+    return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1.5", children: [
+      label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size, required, children: label }),
+      /* @__PURE__ */ jsxRuntime.jsxs(
+        "div",
+        {
+          className: cn(
+            triggerVariants2({ state: triggerState, size }),
+            "gap-2 px-3 cursor-pointer select-none",
+            width,
+            className
+          ),
+          children: [
+            /* @__PURE__ */ jsxRuntime.jsx(
+              "span",
+              {
+                className: cn(
+                  "flex-1 truncate",
+                  triggerLabel ? "text-[#111827]" : cn(
+                    "text-[#C4C9D2]",
+                    size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]"
+                  )
+                ),
+                children: triggerLabel ?? placeholder
+              }
+            ),
+            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.CalendarIcon, { size: 15, strokeWidth: 2, className: "text-gray-600" })
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntime.jsx(InputHelper, { size, helperText, error })
+    ] });
+  }
   return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-1.5", children: [
     label && /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size, required, children: label }),
     /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
@@ -4951,38 +5001,23 @@ var Toggle = React9__namespace.forwardRef(
     bgColor,
     ...props
   }, ref) => {
-    const internalRef = React9__namespace.useRef(null);
-    const [isChecked, setIsChecked] = React9__namespace.useState(false);
-    const mergedRef = React9__namespace.useCallback(
-      (node) => {
-        internalRef.current = node;
-        if (typeof ref === "function") ref(node);
-        else if (ref) ref.current = node;
-      },
-      [ref]
-    );
-    React9__namespace.useEffect(() => {
-      const el = internalRef.current;
-      if (!el) return;
-      setIsChecked(el.dataset.state === "checked");
-      const observer = new MutationObserver(() => {
-        setIsChecked(el.dataset.state === "checked");
-      });
-      observer.observe(el, { attributes: true, attributeFilter: ["data-state"] });
-      return () => observer.disconnect();
-    }, []);
+    const [internalChecked, setInternalChecked] = React9__namespace.useState(defaultChecked ?? false);
+    const isChecked = checked !== void 0 ? checked : internalChecked;
     const hasCustomColors2 = !!(borderColor || bgColor);
     const pillStyle = hasCustomColors2 ? {
-      ...isChecked && borderColor ? { borderColor } : {},
+      ...borderColor ? { borderColor } : {},
       ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
     } : void 0;
     const switchEl = /* @__PURE__ */ jsxRuntime.jsx(
       radixUi.Switch.Root,
       {
-        ref: mergedRef,
+        ref,
         checked: checked !== void 0 ? checked : void 0,
         defaultChecked: checked !== void 0 ? void 0 : defaultChecked,
-        onCheckedChange: readOnly ? void 0 : onChange,
+        onCheckedChange: readOnly ? void 0 : (val) => {
+          setInternalChecked(val);
+          onChange?.(val);
+        },
         disabled,
         className: cn(
           trackVariants({ size }),
@@ -6426,7 +6461,7 @@ function FilterGroup({
     if (datePicker) {
       return /* @__PURE__ */ jsxRuntime.jsx(InlineDatePickerPanel, { child: datePicker });
     }
-    return /* @__PURE__ */ jsxRuntime.jsx("div", { className: "p-4 [&_span.text-xs]:hidden", children: /* @__PURE__ */ jsxRuntime.jsx(FilterGroupMobileContext.Provider, { value: true, children: item.content }) });
+    return /* @__PURE__ */ jsxRuntime.jsx(ModalZIndexProvider, { children: /* @__PURE__ */ jsxRuntime.jsx("div", { className: "p-4 [&_span.text-xs]:hidden", children: /* @__PURE__ */ jsxRuntime.jsx(FilterGroupMobileContext.Provider, { value: true, children: item.content }) }) });
   };
   const drawer = /* @__PURE__ */ jsxRuntime.jsxs(Drawer, { open, onOpenChange: handleOpenChange, children: [
     /* @__PURE__ */ jsxRuntime.jsx(DrawerTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
@@ -6446,6 +6481,12 @@ function FilterGroup({
       DrawerContent,
       {
         "aria-label": drawerTitle,
+        onInteractOutside: (e) => {
+          const target = e.target;
+          if (target.closest("[data-radix-popper-content-wrapper]")) {
+            e.preventDefault();
+          }
+        },
         className: cn(
           "fixed bottom-0 left-0 right-0 z-50",
           "rounded-t-2xl bg-white",
@@ -8090,6 +8131,7 @@ exports.LAYOUT = LAYOUT;
 exports.Label = Label;
 exports.Loader = Loader;
 exports.Modal = Modal;
+exports.ModalZIndexProvider = ModalZIndexProvider;
 exports.MonthPickerCalendar = MonthPickerCalendar;
 exports.PATTERN_REGEX = PATTERN_REGEX;
 exports.PageContainer = PageContainer;
@@ -8112,6 +8154,7 @@ exports.SectionTableContent = SectionTableContent;
 exports.Select = Select;
 exports.Separator = Separator;
 exports.Sidebar = Sidebar;
+exports.SidebarZIndexProvider = SidebarZIndexProvider;
 exports.StatusBadge = StatusBadge;
 exports.SubHeader = SubHeader;
 exports.SweetAlertProvider = SweetAlertProvider;
@@ -8161,6 +8204,7 @@ exports.thumbVariants = thumbVariants;
 exports.toCssSize = toCssSize;
 exports.trackVariants = trackVariants;
 exports.triggerVariants = triggerVariants;
+exports.useFuzzySearch = useFuzzySearch;
 exports.usePagination = usePagination;
 exports.useSweetAlert = useSweetAlert;
 //# sourceMappingURL=index.cjs.map

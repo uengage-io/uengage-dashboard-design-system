@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { ChevronLeft, ChevronRight, Menu } from "lucide-react";
 import { MobilePreview } from "./MobilePreview";
 import type { MobilePreviewDevice, MobilePreviewFrameColor, MobilePreviewSize } from "./mobilePreviewVariants";
 
@@ -79,6 +80,47 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// ─── iPhone Variant ───────────────────────────────────────────────────────────
+
+const AppHeaderContent = () => (
+  <div className="flex flex-col">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <ChevronLeft size={20} className="text-gray-400" strokeWidth={1.5} />
+      <span className="text-sm font-semibold text-gray-900">Page Title</span>
+      <Menu size={18} className="text-gray-400" strokeWidth={1.5} />
+    </div>
+    <div className="px-4 py-2 flex items-center gap-1 text-[11px] text-gray-500">
+      <span>Breadcrumb</span>
+      <ChevronRight size={10} strokeWidth={1.5} />
+      <span>Apps</span>
+      <ChevronRight size={10} strokeWidth={1.5} />
+      <span>Component Collector</span>
+    </div>
+    <div className="px-4 pt-2">
+      <h2 className="text-xl font-bold text-gray-900 mb-3">Basic App Header</h2>
+      <div className="rounded-2xl bg-gray-100 h-32 border border-gray-200/60" />
+    </div>
+  </div>
+);
+
+export const IPhoneVariant: Story = {
+  parameters: {
+    docs: {
+      description: { story: "iPhone variant with dynamic island, status bar, and a sample app header layout." },
+    },
+  },
+  args: {
+    device: "iphone",
+    frameColor: "midnight",
+    size: "md",
+  },
+  render: (args) => (
+    <MobilePreview {...args}>
+      <AppHeaderContent />
+    </MobilePreview>
+  ),
+};
 
 // ─── Default ──────────────────────────────────────────────────────────────────
 
