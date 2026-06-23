@@ -297,7 +297,7 @@ declare namespace Select {
 type TriggerState = "default" | "open" | "disabled" | "readonly";
 type TriggerSize = "xs" | "sm" | "md" | "lg";
 declare const triggerVariants$1: (props?: ({
-    state?: "default" | "disabled" | "open" | "readonly" | null | undefined;
+    state?: "default" | "open" | "disabled" | "readonly" | null | undefined;
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type TriggerVariants = VariantProps<typeof triggerVariants$1>;
@@ -333,7 +333,7 @@ declare namespace CustomTabsTrigger {
 }
 
 declare const tabTriggerVariants: (props?: ({
-    state?: "disabled" | "active" | "inactive" | null | undefined;
+    state?: "active" | "disabled" | "inactive" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type TabTriggerVariants = VariantProps<typeof tabTriggerVariants>;
 
@@ -415,7 +415,7 @@ declare namespace InputHelper {
 declare const inputWrapperVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
     multiline?: boolean | null | undefined;
-    state?: "default" | "disabled" | "focused" | "error" | "readonly" | null | undefined;
+    state?: "error" | "default" | "disabled" | "focused" | "readonly" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const inputFieldVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
@@ -492,7 +492,7 @@ declare namespace RadioGroup {
 
 declare const radioCircleVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "default" | "disabled" | "error" | null | undefined;
+    state?: "error" | "default" | "disabled" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const radioDotVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
@@ -566,7 +566,7 @@ declare namespace CheckboxGroup {
 
 declare const checkboxBoxVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "disabled" | "checked" | "error" | "unchecked" | "indeterminate" | null | undefined;
+    state?: "error" | "disabled" | "checked" | "unchecked" | "indeterminate" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const checkboxLabelVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
@@ -629,7 +629,7 @@ declare namespace DatePicker {
 
 type DatePickerTriggerState = "default" | "open" | "disabled" | "readonly";
 declare const triggerVariants: (props?: ({
-    state?: "default" | "disabled" | "open" | "readonly" | null | undefined;
+    state?: "default" | "open" | "disabled" | "readonly" | null | undefined;
     size?: "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type DayCellVariant = "default" | "today" | "selected" | "inRange" | "rangeStart" | "rangeEnd" | "outsideMonth";
@@ -708,7 +708,7 @@ declare const tableBodyRowVariants: (props?: ({
     hover?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const statusBadgeVariants: (props?: ({
-    variant?: "error" | "success" | "warning" | null | undefined;
+    variant?: "success" | "error" | "warning" | null | undefined;
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type TableWrapperVariants = VariantProps<typeof tableWrapperVariants>;
@@ -828,17 +828,17 @@ interface SidebarProps {
 declare function Sidebar({ open, defaultOpen, onOpenChange, side, size, sizePercent, overlay, closeOnOutsideClick, persistentOnDesktop, trigger, heading, closeIcon, divider, className, contentClassName, children, }: SidebarProps): react_jsx_runtime.JSX.Element | null;
 
 declare const sidebarContentVariants: (props?: ({
-    side?: "bottom" | "left" | "right" | "top" | "right-slide" | null | undefined;
+    side?: "left" | "right" | "bottom" | "top" | "right-slide" | null | undefined;
     size?: "sm" | "lg" | "md" | "full" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const sidebarPersistentVariants: (props?: ({
-    side?: "bottom" | "left" | "right" | "top" | "right-slide" | null | undefined;
+    side?: "left" | "right" | "bottom" | "top" | "right-slide" | null | undefined;
     size?: "sm" | "lg" | "md" | "full" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type SidebarContentVariants = VariantProps<typeof sidebarContentVariants>;
 
 declare const iconBadgeVariants: (props?: ({
-    variant?: "error" | "success" | "warning" | "info" | "question" | null | undefined;
+    variant?: "info" | "success" | "error" | "warning" | "question" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 
 /** Badge colour variants exposed to consumers (question is icon-only, not a colour override). */
@@ -1033,7 +1033,7 @@ declare function useFuzzySearch<T extends {
 }>(items: T[], query: string): T[];
 
 declare const modalSizeVariants: (props?: ({
-    size?: "small" | "default" | "md" | "medium" | "large" | "full" | null | undefined;
+    size?: "default" | "small" | "medium" | "large" | "md" | "full" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 interface ModalProps extends VariantProps<typeof modalSizeVariants> {
     isOpen: boolean;
@@ -1063,7 +1063,7 @@ declare function Pagination({ currentPage, totalPages, onPageChange, siblingCoun
 
 declare const pageButtonVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "default" | "disabled" | "active" | null | undefined;
+    state?: "default" | "active" | "disabled" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const chevronButtonVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
@@ -1204,7 +1204,7 @@ declare const accordionItemVariants: (props?: ({
 declare const accordionTriggerVariants: (props?: ({
     variant?: "default" | "ghost" | "bordered" | null | undefined;
     size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "closed" | "open" | null | undefined;
+    state?: "open" | "closed" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const accordionContentVariants: (props?: ({
     variant?: "default" | "ghost" | "bordered" | null | undefined;
@@ -1503,18 +1503,18 @@ declare namespace FileUpload {
 
 declare const dropzoneVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "disabled" | "error" | "dragover" | "idle" | null | undefined;
+    state?: "error" | "disabled" | "dragover" | "idle" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const iconWrapperVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const avatarContainerVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "disabled" | "filled" | "empty" | null | undefined;
+    state?: "filled" | "disabled" | "empty" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 
 declare const chipVariants: (props?: ({
-    variant?: "error" | "success" | "warning" | "info" | "common" | null | undefined;
+    variant?: "info" | "success" | "error" | "warning" | "common" | null | undefined;
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type ChipVariants = VariantProps<typeof chipVariants>;

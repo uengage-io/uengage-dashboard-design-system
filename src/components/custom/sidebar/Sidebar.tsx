@@ -1,11 +1,11 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import { X } from "lucide-react";
 import { SidebarZIndexProvider } from "@/lib/zIndexContext";
 
 import {
   Drawer,
   DrawerContent,
-  DrawerOverlay,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
@@ -170,49 +170,64 @@ export function Sidebar({
     );
   }
 
+  const overlayPortal =
+    overlay && typeof document !== "undefined"
+      ? ReactDOM.createPortal(
+          <div
+            aria-hidden="true"
+            className={cn(
+              "fixed inset-0 z-40 bg-black/50 transition-opacity",
+              resolvedOpen
+                ? "opacity-100 duration-300 ease-out pointer-events-auto"
+                : "opacity-0 duration-200 ease-in pointer-events-none",
+            )}
+            onClick={() => {
+              if (closeOnOutsideClick) handleOpenChange(false);
+            }}
+          />,
+          document.body,
+        )
+      : null;
+
   return (
-    <Drawer open={resolvedOpen} onOpenChange={handleOpenChange} modal={false}>
-      {trigger ? <DrawerTrigger asChild>{trigger}</DrawerTrigger> : null}
-      {overlay ? (
-        <DrawerOverlay
-          onClick={() => {
-            if (closeOnOutsideClick) {
+    <>
+      {overlayPortal}
+      <Drawer open={resolvedOpen} onOpenChange={handleOpenChange} modal={false}>
+        {trigger ? <DrawerTrigger asChild>{trigger}</DrawerTrigger> : null}
+        <DrawerContent
+          aria-label={`${side} sidebar`}
+          data-side={side}
+          onInteractOutside={(event) => {
+            // Overlay owns outside-click logic; block Radix from also firing.
+            if (overlay) {
+              event.preventDefault();
+              return;
+            }
+            if (!closeOnOutsideClick) {
+              event.preventDefault();
+            } else {
+              // modal={false} — Radix won't auto-close, so do it explicitly.
               handleOpenChange(false);
             }
           }}
-        />
-      ) : null}
-      <DrawerContent
-        aria-label={`${side} sidebar`}
-        data-side={side}
-        onInteractOutside={(event) => {
-          // When the overlay is rendered it owns outside-click closing via its
-          // onClick. Prevent Radix's built-in dismiss so clicking the overlay
-          // never triggers two close cycles back-to-back (which restarts the
-          // close animation and causes a visible jerk/flicker).
-          if (overlay) {
-            event.preventDefault();
-            return;
-          }
-          if (!closeOnOutsideClick) event.preventDefault();
-        }}
-        className={cn(
-          sidebarContentVariants({ side, size }),
-          className,
-          contentClassName,
-        )}
-        style={{ ...animDurationStyle, ...customSizeStyle }}
-      >
-        <SidebarZIndexProvider>
-          <SidebarHeader
-            heading={heading}
-            closeIcon={closeIcon}
-            divider={divider}
-            onClose={() => handleOpenChange(false)}
-          />
-          {children}
-        </SidebarZIndexProvider>
-      </DrawerContent>
-    </Drawer>
+          className={cn(
+            sidebarContentVariants({ side, size }),
+            className,
+            contentClassName,
+          )}
+          style={{ ...animDurationStyle, ...customSizeStyle }}
+        >
+          <SidebarZIndexProvider>
+            <SidebarHeader
+              heading={heading}
+              closeIcon={closeIcon}
+              divider={divider}
+              onClose={() => handleOpenChange(false)}
+            />
+            {children}
+          </SidebarZIndexProvider>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 }
