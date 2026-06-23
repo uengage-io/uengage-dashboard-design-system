@@ -5271,50 +5271,63 @@ function Sidebar({
       }
     ) });
   }
-  return /* @__PURE__ */ jsxRuntime.jsxs(Drawer, { open: resolvedOpen, onOpenChange: handleOpenChange, modal: false, children: [
-    trigger ? /* @__PURE__ */ jsxRuntime.jsx(DrawerTrigger, { asChild: true, children: trigger }) : null,
-    overlay ? /* @__PURE__ */ jsxRuntime.jsx(
-      DrawerOverlay,
+  const overlayPortal = overlay && typeof document !== "undefined" ? ReactDOM__namespace.createPortal(
+    /* @__PURE__ */ jsxRuntime.jsx(
+      "div",
       {
+        "aria-hidden": "true",
+        className: cn(
+          "fixed inset-0 z-40 bg-black/50 transition-opacity",
+          resolvedOpen ? "opacity-100 duration-300 ease-out pointer-events-auto" : "opacity-0 duration-200 ease-in pointer-events-none"
+        ),
         onClick: () => {
-          if (closeOnOutsideClick) {
-            handleOpenChange(false);
-          }
+          if (closeOnOutsideClick) handleOpenChange(false);
         }
       }
-    ) : null,
-    /* @__PURE__ */ jsxRuntime.jsx(
-      DrawerContent,
-      {
-        "aria-label": `${side} sidebar`,
-        "data-side": side,
-        onInteractOutside: (event) => {
-          if (overlay) {
-            event.preventDefault();
-            return;
-          }
-          if (!closeOnOutsideClick) event.preventDefault();
-        },
-        className: cn(
-          sidebarContentVariants({ side, size }),
-          className,
-          contentClassName
-        ),
-        style: { ...animDurationStyle, ...customSizeStyle },
-        children: /* @__PURE__ */ jsxRuntime.jsxs(SidebarZIndexProvider, { children: [
-          /* @__PURE__ */ jsxRuntime.jsx(
-            SidebarHeader,
-            {
-              heading,
-              closeIcon,
-              divider,
-              onClose: () => handleOpenChange(false)
+    ),
+    document.body
+  ) : null;
+  return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+    overlayPortal,
+    /* @__PURE__ */ jsxRuntime.jsxs(Drawer, { open: resolvedOpen, onOpenChange: handleOpenChange, modal: false, children: [
+      trigger ? /* @__PURE__ */ jsxRuntime.jsx(DrawerTrigger, { asChild: true, children: trigger }) : null,
+      /* @__PURE__ */ jsxRuntime.jsx(
+        DrawerContent,
+        {
+          "aria-label": `${side} sidebar`,
+          "data-side": side,
+          onInteractOutside: (event) => {
+            if (overlay) {
+              event.preventDefault();
+              return;
             }
+            if (!closeOnOutsideClick) {
+              event.preventDefault();
+            } else {
+              handleOpenChange(false);
+            }
+          },
+          className: cn(
+            sidebarContentVariants({ side, size }),
+            className,
+            contentClassName
           ),
-          children
-        ] })
-      }
-    )
+          style: { ...animDurationStyle, ...customSizeStyle },
+          children: /* @__PURE__ */ jsxRuntime.jsxs(SidebarZIndexProvider, { children: [
+            /* @__PURE__ */ jsxRuntime.jsx(
+              SidebarHeader,
+              {
+                heading,
+                closeIcon,
+                divider,
+                onClose: () => handleOpenChange(false)
+              }
+            ),
+            children
+          ] })
+        }
+      )
+    ] })
   ] });
 }
 var iconBadgeVariants = classVarianceAuthority.cva(
