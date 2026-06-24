@@ -4,20 +4,20 @@ import { FOCUS_RING } from "./tokens";
 // Checked color: brand.green.darkGreen (#006F42)
 // Dot color: brand.green.deepGreen (#003C1B)
 export const radioCircleVariants = cva(
-  `relative inline-flex shrink-0 items-center justify-center rounded-full border bg-transparent transition-colors outline-none ${FOCUS_RING}`,
+  `aspect-square shrink-0 rounded-full border-2 bg-white transition-colors outline-none ${FOCUS_RING}`,
   {
     variants: {
       size: {
-        sm: "h-[14px] w-[14px]",
-        md: "h-[18px] w-[18px]",
-        lg: "h-[22px] w-[22px]",
+        sm: "size-3.5",
+        md: "size-[18px]",
+        lg: "size-[22px]",
       },
       state: {
         default:
-          "border-gray-300 bg-transparent data-[state=checked]:border-[#007A4D]",
+          "border-gray-300 data-[state=checked]:border-[#007A4D]",
         disabled:
-          "border-gray-200 bg-transparent opacity-60 cursor-not-allowed",
-        error: "border-red-500 bg-transparent",
+          "border-gray-200 opacity-60 cursor-not-allowed",
+        error: "border-red-500",
       },
     },
     defaultVariants: {
@@ -27,18 +27,21 @@ export const radioCircleVariants = cva(
   },
 );
 
-export const radioDotVariants = cva("rounded-full bg-[#007A4D]", {
-  variants: {
-    size: {
-      sm: "h-[8px] w-[8px]",
-      md: "h-[10px] w-[10px]",
-      lg: "h-[12px] w-[12px]",
+export const radioDotVariants = cva(
+  "rounded-full bg-[#007A4D] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+  {
+    variants: {
+      size: {
+        sm: "size-[5px]",
+        md: "size-[7px]",
+        lg: "size-[10px]",
+      },
+    },
+    defaultVariants: {
+      size: "md",
     },
   },
-  defaultVariants: {
-    size: "md",
-  },
-});
+);
 
 export const radioLabelVariants = cva("select-none transition-colors", {
   variants: {

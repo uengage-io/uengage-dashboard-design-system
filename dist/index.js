@@ -1183,9 +1183,9 @@ function Label({
   );
 }
 var SIZE_TEXT = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base"
+  sm: "text-[10px]",
+  md: "text-xs",
+  lg: "text-sm"
 };
 function InputLabel({
   size = "md",
@@ -3179,18 +3179,18 @@ function Input2({
 }
 Input2.displayName = "Input";
 var radioCircleVariants = cva(
-  `relative inline-flex shrink-0 items-center justify-center rounded-full border bg-transparent transition-colors outline-none ${FOCUS_RING}`,
+  `aspect-square shrink-0 rounded-full border-2 bg-white transition-colors outline-none ${FOCUS_RING}`,
   {
     variants: {
       size: {
-        sm: "h-[14px] w-[14px]",
-        md: "h-[18px] w-[18px]",
-        lg: "h-[22px] w-[22px]"
+        sm: "size-3.5",
+        md: "size-[18px]",
+        lg: "size-[22px]"
       },
       state: {
-        default: "border-gray-300 bg-transparent data-[state=checked]:border-[#007A4D]",
-        disabled: "border-gray-200 bg-transparent opacity-60 cursor-not-allowed",
-        error: "border-red-500 bg-transparent"
+        default: "border-gray-300 data-[state=checked]:border-[#007A4D]",
+        disabled: "border-gray-200 opacity-60 cursor-not-allowed",
+        error: "border-red-500"
       }
     },
     defaultVariants: {
@@ -3199,18 +3199,21 @@ var radioCircleVariants = cva(
     }
   }
 );
-var radioDotVariants = cva("rounded-full bg-[#007A4D]", {
-  variants: {
-    size: {
-      sm: "h-[8px] w-[8px]",
-      md: "h-[10px] w-[10px]",
-      lg: "h-[12px] w-[12px]"
+var radioDotVariants = cva(
+  "rounded-full bg-[#007A4D] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+  {
+    variants: {
+      size: {
+        sm: "size-[5px]",
+        md: "size-[7px]",
+        lg: "size-[10px]"
+      }
+    },
+    defaultVariants: {
+      size: "md"
     }
-  },
-  defaultVariants: {
-    size: "md"
   }
-});
+);
 var radioLabelVariants = cva("select-none transition-colors", {
   variants: {
     size: {
@@ -3329,7 +3332,7 @@ function Radio({
               RadioGroup$1.Indicator,
               {
                 "data-slot": "radio-group-indicator",
-                className: "absolute inset-0 flex items-center justify-center",
+                className: "relative flex items-center justify-center",
                 children: /* @__PURE__ */ jsx("span", { className: cn(radioDotVariants({ size })) })
               }
             )
@@ -3361,7 +3364,7 @@ function RadioGroup({
   defaultValue,
   onChange,
   size = "md",
-  layout = "vertical",
+  layout = "horizontal",
   columns = 2,
   disabled,
   label,
@@ -6751,7 +6754,7 @@ function SectionHeader({
     {
       "data-slot": "section-header",
       className: cn(
-        "flex items-start justify-between gap-3 px-5 py-4",
+        "flex items-center justify-between gap-3 px-5 py-3",
         className
       ),
       ...props,

@@ -6,11 +6,11 @@ declare function Command({ className, ...props }: React.ComponentProps<typeof Co
 declare function CommandInput({ className, ...props }: React.ComponentProps<typeof CommandInput$1>): react_jsx_runtime.JSX.Element;
 declare const CommandList: React.ForwardRefExoticComponent<Omit<{
     children?: React.ReactNode;
-} & Pick<Pick<React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, keyof React.HTMLAttributes<HTMLDivElement> | "key"> & {
+} & Pick<Pick<React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, "key" | keyof React.HTMLAttributes<HTMLDivElement>> & {
     ref?: React.Ref<HTMLDivElement>;
 } & {
     asChild?: boolean;
-}, keyof React.HTMLAttributes<HTMLDivElement> | "asChild" | "key"> & {
+}, "asChild" | "key" | keyof React.HTMLAttributes<HTMLDivElement>> & {
     label?: string;
 } & React.RefAttributes<HTMLDivElement>, "ref"> & React.RefAttributes<HTMLDivElement>>;
 declare function CommandEmpty({ className, ...props }: React.ComponentProps<typeof CommandEmpty$1>): react_jsx_runtime.JSX.Element;
