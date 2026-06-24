@@ -135,7 +135,7 @@ function SectionHeader({
     <div
       data-slot="section-header"
       className={cn(
-        "flex items-start justify-between gap-3 px-5 py-4",
+        "flex items-center justify-between gap-3 px-5 py-3",
         className,
       )}
       {...props}

@@ -11,9 +11,9 @@ export interface InputLabelProps
 }
 
 const SIZE_TEXT: Record<InputLabelSize, string> = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base",
+  sm: "text-[10px]",
+  md: "text-xs",
+  lg: "text-sm",
 };
 
 function InputLabel({

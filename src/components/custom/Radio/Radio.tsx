@@ -125,7 +125,7 @@ function Radio({
       >
         <RadioGroupPrimitive.Indicator
           data-slot="radio-group-indicator"
-          className="absolute inset-0 flex items-center justify-center"
+          className="relative flex items-center justify-center"
         >
           <span className={cn(radioDotVariants({ size }))} />
         </RadioGroupPrimitive.Indicator>

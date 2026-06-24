@@ -15,7 +15,7 @@ function RadioGroup<T = RadioOption>({
   defaultValue,
   onChange,
   size = "md",
-  layout = "vertical",
+  layout = "horizontal",
   columns = 2,
   disabled,
   label,
