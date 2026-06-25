@@ -343,7 +343,7 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
     size?: "sm" | "md" | "lg";
     inputType?: InputType;
     allowPattern?: AllowPattern;
-    label?: string;
+    label?: React.ReactNode;
     helperText?: string;
     error?: string;
     leftIcon?: React.ReactNode;
