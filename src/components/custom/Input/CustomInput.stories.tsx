@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Search, Calendar, Mail, AlignLeft } from "lucide-react";
+import { Search, Calendar, Mail, AlignLeft, Info, BadgeCheck, Sparkles } from "lucide-react";
 import { Input } from "./Input";
 
 const meta = {
@@ -392,6 +392,85 @@ export const WithLabel: Story = {
       <Input {...args} />
     </div>
   ),
+};
+
+export const CustomLabel: Story = {
+  name: "Custom label (ReactNode)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The `label` prop accepts any `ReactNode` — pass JSX to add icons, badges, tooltips, or helper links alongside the label text.",
+      },
+    },
+  },
+  render: () => (
+    <div className="flex w-90 flex-col gap-5">
+      {/* icon + text */}
+      <Input
+        placeholder="you@example.com"
+        label={
+          <span className="flex items-center gap-1">
+            <Mail size={12} className="text-slate-500" />
+            Email address
+          </span>
+        }
+      />
+
+      {/* label + optional badge */}
+      <Input
+        placeholder="Enter promo code"
+        label={
+          <span className="flex items-center gap-2">
+            Promo code
+            <span className="rounded-full bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-medium text-[#006F42]">
+              Optional
+            </span>
+          </span>
+        }
+      />
+
+      {/* label + verified badge */}
+      <Input
+        placeholder="Business name"
+        label={
+          <span className="flex items-center gap-1">
+            Business name
+            <BadgeCheck size={13} className="text-[#006F42]" />
+          </span>
+        }
+      />
+
+      {/* label + info hint on the right */}
+      <Input
+        placeholder="GST number"
+        label={
+          <span className="flex w-full items-center justify-between">
+            GST number
+            <span className="flex items-center gap-0.5 text-[10px] font-normal text-[#6B7280]">
+              <Info size={10} />
+              15-digit format
+            </span>
+          </span>
+        }
+      />
+
+      {/* label with AI badge */}
+      <Input
+        placeholder="Describe your offer…"
+        label={
+          <span className="flex items-center gap-1.5">
+            Offer description
+            <span className="flex items-center gap-0.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-600">
+              <Sparkles size={9} />
+              AI
+            </span>
+          </span>
+        }
+      />
+    </div>
+  ),
+  args: {},
 };
 
 export const Required: Story = {
