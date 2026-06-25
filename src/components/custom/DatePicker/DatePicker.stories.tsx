@@ -140,6 +140,44 @@ export const MonthWithMinMax: Story = {
   },
 };
 
+/* ── Year/Month range constraints ───────────────────────────────────── */
+
+export const SingleWithYearRange: Story = {
+  name: "Single · Year & month range",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "When `minDate` / `maxDate` span specific years, the year dropdown is bounded to that range and months outside the boundary are disabled in the month dropdown (e.g. Jan–May are disabled in 2023 because `minDate` is June 2023; Oct–Dec are disabled in 2025 because `maxDate` is September 2025).",
+      },
+    },
+  },
+  args: {
+    mode: "single",
+    placeholder: "Jun 2023 – Sep 2025 only",
+    minDate: new Date(2023, 5, 1),
+    maxDate: new Date(2025, 8, 30),
+  },
+};
+
+export const RangeWithYearRange: Story = {
+  name: "Range · Year & month range",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Range mode with `minDate` and `maxDate` bounding the year dropdown and disabling out-of-range months.",
+      },
+    },
+  },
+  args: {
+    mode: "range",
+    placeholder: "Jun 2023 – Sep 2025 only",
+    minDate: new Date(2023, 5, 1),
+    maxDate: new Date(2025, 8, 30),
+  },
+};
+
 /* ── Label & helper ──────────────────────────────────────────────────── */
 
 export const WithLabel: Story = {
