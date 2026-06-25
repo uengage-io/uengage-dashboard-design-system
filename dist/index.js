@@ -3710,9 +3710,11 @@ var MONTH_OPTIONS = [
   "November",
   "December"
 ].map((label, i) => ({ label, value: String(i) }));
-function buildYearOptions(center) {
+function buildYearOptions(center, minYear, maxYear) {
+  const from = minYear ?? center - 10;
+  const to = maxYear ?? center + 10;
   const opts = [];
-  for (let y = center - 10; y <= center + 10; y++) {
+  for (let y = from; y <= to; y++) {
     opts.push({ label: String(y), value: String(y) });
   }
   return opts;
@@ -3773,12 +3775,25 @@ function DatePickerCalendar({
   onDayMouseLeave
 }) {
   const today = React9.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? today;
+  const clampedToday = maxDate && today > maxDate ? maxDate : minDate && today < minDate ? minDate : today;
+  const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? clampedToday;
   const [viewMonth, setViewMonth] = React9.useState(initialMonth);
   const yearOptions = React9.useMemo(
-    () => buildYearOptions(today.getFullYear()),
-    [today]
+    () => buildYearOptions(
+      today.getFullYear(),
+      minDate?.getFullYear(),
+      maxDate?.getFullYear()
+    ),
+    [today, minDate, maxDate]
   );
+  const monthOptions = React9.useMemo(() => {
+    const year = viewMonth.getFullYear();
+    return MONTH_OPTIONS.map((opt) => {
+      const month = Number(opt.value);
+      const isDisabled = !!minDate && year === minDate.getFullYear() && month < minDate.getMonth() || !!maxDate && year === maxDate.getFullYear() && month > maxDate.getMonth();
+      return isDisabled ? { ...opt, disabled: true } : opt;
+    });
+  }, [viewMonth, minDate, maxDate]);
   const handlePrev = () => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1));
   const handleNext = () => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1));
   const handleMonthSelect = (val) => setViewMonth(
@@ -3804,7 +3819,7 @@ function DatePickerCalendar({
         /* @__PURE__ */ jsx(
           Select,
           {
-            options: MONTH_OPTIONS,
+            options: monthOptions,
             value: String(viewMonth.getMonth()),
             onChange: handleMonthSelect,
             size: "sm",

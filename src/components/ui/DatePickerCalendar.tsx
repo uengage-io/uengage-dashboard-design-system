@@ -27,9 +27,11 @@ const MONTH_OPTIONS: SelectOption[] = [
   "December",
 ].map((label, i) => ({ label, value: String(i) }));
 
-function buildYearOptions(center: number): SelectOption[] {
+function buildYearOptions(center: number, minYear?: number, maxYear?: number): SelectOption[] {
+  const from = minYear ?? center - 10;
+  const to = maxYear ?? center + 10;
   const opts: SelectOption[] = [];
-  for (let y = center - 10; y <= center + 10; y++) {
+  for (let y = from; y <= to; y++) {
     opts.push({ label: String(y), value: String(y) });
   }
   return opts;
@@ -136,19 +138,36 @@ export function DatePickerCalendar({
 }: DatePickerCalendarProps) {
   const today = React.useMemo(() => new Date(), []);
 
+  const clampedToday = maxDate && today > maxDate ? maxDate : minDate && today < minDate ? minDate : today;
+
   const initialMonth =
     defaultMonth ??
     (selected instanceof Date
       ? selected
       : (selected as { from?: Date } | null | undefined)?.from) ??
-    today;
+    clampedToday;
 
   const [viewMonth, setViewMonth] = React.useState<Date>(initialMonth);
 
   const yearOptions = React.useMemo(
-    () => buildYearOptions(today.getFullYear()),
-    [today],
+    () => buildYearOptions(
+      today.getFullYear(),
+      minDate?.getFullYear(),
+      maxDate?.getFullYear(),
+    ),
+    [today, minDate, maxDate],
   );
+
+  const monthOptions = React.useMemo((): SelectOption[] => {
+    const year = viewMonth.getFullYear();
+    return MONTH_OPTIONS.map((opt) => {
+      const month = Number(opt.value);
+      const isDisabled =
+        (!!minDate && year === minDate.getFullYear() && month < minDate.getMonth()) ||
+        (!!maxDate && year === maxDate.getFullYear() && month > maxDate.getMonth());
+      return isDisabled ? { ...opt, disabled: true } : opt;
+    });
+  }, [viewMonth, minDate, maxDate]);
 
   const handlePrev = () =>
     setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1));
@@ -190,7 +209,7 @@ export function DatePickerCalendar({
 
         <div className="flex flex-1 items-center justify-center gap-1.5">
           <Select
-            options={MONTH_OPTIONS}
+            options={monthOptions}
             value={String(viewMonth.getMonth())}
             onChange={handleMonthSelect}
             size="sm"
