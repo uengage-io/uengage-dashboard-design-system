@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export interface RadioOption {
   value: string;
   label: string;
@@ -20,7 +22,7 @@ export interface CustomRadioGroupProps<T = RadioOption> {
   /** Max columns at the largest breakpoint when `layout="grid"`. Smaller breakpoints scale down (mobile=1, sm=2). */
   columns?: 1 | 2 | 3 | 4;
   disabled?: boolean;
-  label?: string;
+  label?: React.ReactNode;
   required?: boolean;
   helperText?: string;
   error?: string;

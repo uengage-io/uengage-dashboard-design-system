@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export interface DateRange {
   from: Date;
   to: Date;
@@ -28,7 +30,7 @@ export interface DatePickerProps {
   /** When true, shows a clear button to reset the selected value. Defaults to false. */
   clearable?: boolean;
   /** Field label rendered above the trigger. */
-  label?: string;
+  label?: React.ReactNode;
   /** When true, appends a red asterisk directly after the label text. */
   required?: boolean;
   /** Helper text rendered below the trigger. */

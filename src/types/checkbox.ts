@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export interface CheckboxOption {
   value: string;
   label: string;
@@ -9,7 +11,7 @@ export interface CustomCheckboxProps {
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   size?: "sm" | "md" | "lg";
-  label?: string;
+  label?: React.ReactNode;
   disabled?: boolean;
   indeterminate?: boolean;
   error?: boolean;
@@ -36,7 +38,7 @@ export interface CustomCheckboxGroupProps<T = CheckboxOption> {
   layout?: "horizontal" | "vertical" | "grid";
   columns?: number;
   disabled?: boolean;
-  label?: string;
+  label?: React.ReactNode;
   required?: boolean;
   helperText?: string;
   error?: string;

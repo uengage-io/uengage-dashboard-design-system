@@ -24,7 +24,7 @@ export interface ToggleProps extends Omit<
   /** Size of the toggle */
   size?: ToggleVariantSize;
   /** Field label rendered above the toggle. */
-  label?: string;
+  label?: React.ReactNode;
   /** When true, appends a red asterisk to the label. */
   required?: boolean;
   /** Inline text rendered beside the switch. Position is controlled by `titlePosition`. */
