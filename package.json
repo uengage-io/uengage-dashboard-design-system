@@ -1,6 +1,6 @@
 {
   "name": "@uengage/ui",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Shared UI component library built with React, TypeScript, Tailwind CSS, and CVA.",
   "type": "module",
   "style": "./dist/styles.css",
