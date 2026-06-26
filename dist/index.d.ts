@@ -165,7 +165,7 @@ interface SearchBarProps<T extends string | number = string, TItem = unknown> {
     valueType?: SearchValueType;
     size?: SearchBarSize;
     /** Label displayed above the search bar. */
-    label?: string;
+    label?: React.ReactNode;
     /** When `true`, appends a red asterisk to the label. */
     required?: boolean;
     placeholder?: string;
@@ -263,7 +263,7 @@ interface SelectProps<TItem = unknown> {
     /** Show the X clear button (and pill remove buttons) when a value is selected. Defaults to `false`. */
     clearable?: boolean;
     /** Field label rendered above the trigger. */
-    label?: string;
+    label?: React.ReactNode;
     /** When true, appends a red asterisk directly after the label text. */
     required?: boolean;
     /** Helper text rendered below the trigger. */
@@ -472,7 +472,7 @@ interface CustomRadioGroupProps<T = RadioOption> {
     /** Max columns at the largest breakpoint when `layout="grid"`. Smaller breakpoints scale down (mobile=1, sm=2). */
     columns?: 1 | 2 | 3 | 4;
     disabled?: boolean;
-    label?: string;
+    label?: React.ReactNode;
     required?: boolean;
     helperText?: string;
     error?: string;
@@ -515,7 +515,7 @@ interface CustomCheckboxProps {
     defaultChecked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
     size?: "sm" | "md" | "lg";
-    label?: string;
+    label?: React.ReactNode;
     disabled?: boolean;
     indeterminate?: boolean;
     error?: boolean;
@@ -541,7 +541,7 @@ interface CustomCheckboxGroupProps<T = CheckboxOption> {
     layout?: "horizontal" | "vertical" | "grid";
     columns?: number;
     disabled?: boolean;
-    label?: string;
+    label?: React.ReactNode;
     required?: boolean;
     helperText?: string;
     error?: string;
@@ -603,7 +603,7 @@ interface DatePickerProps {
     /** When true, shows a clear button to reset the selected value. Defaults to false. */
     clearable?: boolean;
     /** Field label rendered above the trigger. */
-    label?: string;
+    label?: React.ReactNode;
     /** When true, appends a red asterisk directly after the label text. */
     required?: boolean;
     /** Helper text rendered below the trigger. */
@@ -778,7 +778,7 @@ interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "on
     /** Size of the toggle */
     size?: ToggleVariantSize;
     /** Field label rendered above the toggle. */
-    label?: string;
+    label?: React.ReactNode;
     /** When true, appends a red asterisk to the label. */
     required?: boolean;
     /** Inline text rendered beside the switch. Position is controlled by `titlePosition`. */
@@ -1458,7 +1458,7 @@ interface FileUploadProps {
     onRemoveFile?: (index: number) => void;
     /** Fired when any files are rejected due to size/count validation. */
     onValidationError?: (errors: string[]) => void;
-    label?: string;
+    label?: React.ReactNode;
     required?: boolean;
     /** Shown below the field in red. Also shown for internal validation errors. */
     error?: string;

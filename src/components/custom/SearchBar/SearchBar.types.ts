@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export type SearchValueType = "string" | "number" | "alphanumeric";
 
 export type SearchBarSize = "sm" | "md" | "lg";
@@ -8,7 +10,7 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   valueType?: SearchValueType;
   size?: SearchBarSize;
   /** Label displayed above the search bar. */
-  label?: string;
+  label?: React.ReactNode;
   /** When `true`, appends a red asterisk to the label. */
   required?: boolean;
   placeholder?: string;

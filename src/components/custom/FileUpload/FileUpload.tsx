@@ -84,7 +84,7 @@ export interface FileUploadProps {
   onValidationError?: (errors: string[]) => void;
 
   // ── Field decoration ────────────────────────────────────────────────────────
-  label?: string;
+  label?: React.ReactNode;
   required?: boolean;
   /** Shown below the field in red. Also shown for internal validation errors. */
   error?: string;
