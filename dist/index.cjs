@@ -6832,7 +6832,7 @@ function SectionDivider({
       {
         "data-slot": "section-divider",
         "data-orientation": "horizontal",
-        className: cn("flex items-center gap-3 -mx-6 mt-6 mb-4 px-6", className),
+        className: cn("flex items-center gap-3 -mx-6 px-6", className),
         ...props,
         children: [
           /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 border-t border-[#E2E2E2]" }),
@@ -6849,7 +6849,7 @@ function SectionDivider({
       "data-orientation": "horizontal",
       role: "separator",
       className: cn(
-        "-mx-6 mt-6 mb-4 border-t border-[#E2E2E2]",
+        "-mx-6 border-t border-[#E2E2E2]",
         className
       ),
       ...props
@@ -6866,7 +6866,7 @@ function SectionContent({
     "div",
     {
       "data-slot": "section-content",
-      className: cn("flex flex-col gap-0 px-5 pt-1 pb-[22px]", className),
+      className: cn("flex flex-col gap-[18px] px-5 pt-4 pb-5", className),
       ...props,
       children
     }
@@ -6906,13 +6906,13 @@ function SectionSubsection({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { "data-slot": "section-subsection-outer", className: "flex flex-col", children: [
     separator && /* @__PURE__ */ jsxRuntime.jsx(SectionDivider, { label: separatorLabel }),
     /* @__PURE__ */ jsxRuntime.jsxs(
       "div",
       {
         "data-slot": "section-subsection",
-        className: cn("flex flex-col gap-3", className),
+        className: cn("flex flex-col gap-2", separator && "pt-3", className),
         ...props,
         children: [
           (title || description) && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-0.5", children: [
