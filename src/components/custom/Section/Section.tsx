@@ -70,7 +70,7 @@ function SectionHeader({
           {description && (
             <div
               data-slot="section-header-description"
-              className="text-xs text-[#6B7280] mt-0.5"
+              className="text-xs text-[#6B7280]"
             >
               {description}
             </div>
@@ -234,7 +234,7 @@ function SectionContent({
   const inner = (
     <div
       data-slot="section-content"
-      className={cn("flex flex-col gap-[18px] px-5 pt-4 pb-5", className)}
+      className={cn("flex flex-col gap-[18px] px-4 pt-4 pb-4", className)}
       {...props}
     >
       {children}
@@ -303,7 +303,7 @@ function SectionSubsection({
       {separator && <SectionDivider label={separatorLabel} />}
       <div
         data-slot="section-subsection"
-        className={cn("flex flex-col gap-2", separator && "pt-3", className)}
+        className={cn("flex flex-col gap-2", separator && "pt-2 pb-2", className)}
         {...props}
       >
         {(title || description) && (
