@@ -44,6 +44,7 @@ function Checkbox({
   className,
   borderColor,
   bgColor,
+  textColor,
   ...rest
 }: CustomCheckboxProps &
   Omit<
@@ -101,7 +102,11 @@ function Checkbox({
       ? "checked"
       : "default";
 
-  const hasCustomColors = !!(borderColor || bgColor);
+  const effectiveBorderColor = borderColor;
+  const effectiveBgColor = bgColor;
+  const effectiveTextColor = textColor;
+
+  const hasCustomColors = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
   const isActive = (visualChecked || !!indeterminate) && !error && !disabled && !readOnly;
 
   return (
@@ -110,11 +115,12 @@ function Checkbox({
       style={
         hasCustomColors && isActive
           ? {
-              ...(borderColor ? { borderColor } : {}),
-              ...(bgColor ? { backgroundColor: bgColor } : {}),
+              ...(effectiveBorderColor ? { borderColor: effectiveBorderColor } : {}),
+              ...(effectiveBgColor ? { backgroundColor: effectiveBgColor } : {}),
             }
           : undefined
       }
+
       className={cn(
         "group inline-flex cursor-pointer items-center transition-colors",
         hasCustomColors
@@ -140,6 +146,11 @@ function Checkbox({
         onCheckedChange={handleCheckedChange}
         disabled={disabled}
         data-slot="checkbox"
+        style={
+          isActive && effectiveBorderColor
+            ? { backgroundColor: effectiveBorderColor, borderColor: effectiveBorderColor }
+            : undefined
+        }
         className={cn(checkboxBoxVariants({ size, state: boxState }))}
       >
         <CheckboxPrimitive.Indicator
@@ -158,6 +169,7 @@ function Checkbox({
       {label && (
         <Label
           htmlFor={itemId}
+          style={effectiveTextColor && isActive ? { color: effectiveTextColor } : undefined}
           className={cn(
             checkboxLabelVariants({ size, state: labelState }),
             "whitespace-normal break-words",

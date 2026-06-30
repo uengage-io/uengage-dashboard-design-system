@@ -26,6 +26,7 @@ function CheckboxGroup<T = CheckboxOption>({
   selectAll,
   borderColor,
   bgColor,
+  textColor,
   readOnly,
 }: CustomCheckboxGroupProps<T>) {
   const reactId = React.useId();
@@ -125,6 +126,7 @@ function CheckboxGroup<T = CheckboxOption>({
               onCheckedChange={(c) => toggle(optValue, c)}
               borderColor={borderColor}
               bgColor={bgColor}
+              textColor={textColor}
               readOnly={readOnly}
             />
           );

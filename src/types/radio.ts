@@ -31,6 +31,8 @@ export interface CustomRadioGroupProps<T = RadioOption> {
   borderColor?: string;
   /** When provided, applies this background color to each radio pill when its item is selected. */
   bgColor?: string;
+  /** When provided, applies this color to each item's label text when its item is selected. */
+  textColor?: string;
   /** When true, all radio items show their current state but cannot be changed. */
   readOnly?: boolean;
 }

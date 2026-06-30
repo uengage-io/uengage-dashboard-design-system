@@ -20,6 +20,8 @@ export interface CustomCheckboxProps {
   borderColor?: string;
   /** When provided, the pill wrapper uses this color for its background when checked/indeterminate. Falls back to default green tint if omitted. */
   bgColor?: string;
+  /** When provided, applies this color to the label text when checked/indeterminate. */
+  textColor?: string;
   /** When true, the checkbox is visible and shows its current value but cannot be toggled. */
   readOnly?: boolean;
 }
@@ -47,6 +49,8 @@ export interface CustomCheckboxGroupProps<T = CheckboxOption> {
   borderColor?: string;
   /** When provided, applies this background color to each pill when its item is checked. */
   bgColor?: string;
+  /** When provided, applies this color to each item's label text when its item is checked. */
+  textColor?: string;
   /** When true, all checkboxes show their current state but cannot be toggled. */
   readOnly?: boolean;
 }

@@ -443,10 +443,12 @@ interface CustomRadioItemProps extends Omit<React.ComponentProps<typeof RadioGro
     borderColor?: string;
     /** When provided, the pill wrapper uses this color for its background when checked. Falls back to default green tint if omitted. */
     bgColor?: string;
+    /** When provided, applies this color to the label text when checked. */
+    textColor?: string;
     /** When true, the item shows its current state but cannot be selected. */
     readOnly?: boolean;
 }
-declare function Radio({ id, label, size, disabled, readOnly, error, value, className, borderColor, bgColor, ...rest }: CustomRadioItemProps): react_jsx_runtime.JSX.Element;
+declare function Radio({ id, label, size, disabled, readOnly, error, value, className, borderColor, bgColor, textColor, ...rest }: CustomRadioItemProps): react_jsx_runtime.JSX.Element;
 declare namespace Radio {
     var displayName: string;
 }
@@ -481,11 +483,13 @@ interface CustomRadioGroupProps<T = RadioOption> {
     borderColor?: string;
     /** When provided, applies this background color to each radio pill when its item is selected. */
     bgColor?: string;
+    /** When provided, applies this color to each item's label text when its item is selected. */
+    textColor?: string;
     /** When true, all radio items show their current state but cannot be changed. */
     readOnly?: boolean;
 }
 
-declare function RadioGroup<T = RadioOption>({ options, getLabel, getValue, getDisabled, value, defaultValue, onChange, size, layout, columns, disabled, label, required, helperText, error, className, borderColor, bgColor, readOnly, }: CustomRadioGroupProps<T>): react_jsx_runtime.JSX.Element;
+declare function RadioGroup<T = RadioOption>({ options, getLabel, getValue, getDisabled, value, defaultValue, onChange, size, layout, columns, disabled, label, required, helperText, error, className, borderColor, bgColor, textColor, readOnly, }: CustomRadioGroupProps<T>): react_jsx_runtime.JSX.Element;
 declare namespace RadioGroup {
     var displayName: string;
 }
@@ -524,6 +528,8 @@ interface CustomCheckboxProps {
     borderColor?: string;
     /** When provided, the pill wrapper uses this color for its background when checked/indeterminate. Falls back to default green tint if omitted. */
     bgColor?: string;
+    /** When provided, applies this color to the label text when checked/indeterminate. */
+    textColor?: string;
     /** When true, the checkbox is visible and shows its current value but cannot be toggled. */
     readOnly?: boolean;
 }
@@ -550,16 +556,18 @@ interface CustomCheckboxGroupProps<T = CheckboxOption> {
     borderColor?: string;
     /** When provided, applies this background color to each pill when its item is checked. */
     bgColor?: string;
+    /** When provided, applies this color to each item's label text when its item is checked. */
+    textColor?: string;
     /** When true, all checkboxes show their current state but cannot be toggled. */
     readOnly?: boolean;
 }
 
-declare function Checkbox({ checked, defaultChecked, onCheckedChange, size, label, disabled, readOnly, indeterminate, error, className, borderColor, bgColor, ...rest }: CustomCheckboxProps & Omit<React.ComponentProps<typeof Checkbox$1.Root>, "checked" | "defaultChecked" | "onCheckedChange" | "disabled" | "className">): react_jsx_runtime.JSX.Element;
+declare function Checkbox({ checked, defaultChecked, onCheckedChange, size, label, disabled, readOnly, indeterminate, error, className, borderColor, bgColor, textColor, ...rest }: CustomCheckboxProps & Omit<React.ComponentProps<typeof Checkbox$1.Root>, "checked" | "defaultChecked" | "onCheckedChange" | "disabled" | "className">): react_jsx_runtime.JSX.Element;
 declare namespace Checkbox {
     var displayName: string;
 }
 
-declare function CheckboxGroup<T = CheckboxOption>({ options, getLabel, getValue, getDisabled, value, onChange, size, layout, columns, disabled, label, required, helperText, error, selectAll, borderColor, bgColor, readOnly, }: CustomCheckboxGroupProps<T>): react_jsx_runtime.JSX.Element;
+declare function CheckboxGroup<T = CheckboxOption>({ options, getLabel, getValue, getDisabled, value, onChange, size, layout, columns, disabled, label, required, helperText, error, selectAll, borderColor, bgColor, textColor, readOnly, }: CustomCheckboxGroupProps<T>): react_jsx_runtime.JSX.Element;
 declare namespace CheckboxGroup {
     var displayName: string;
 }
@@ -659,6 +667,8 @@ interface ColumnDef<T> {
     /** Minimum column width in pixels — prevents the column from shrinking below this on mobile scroll. */
     minWidth?: number;
     align?: "left" | "center" | "right";
+    /** Alignment override for mobile card layout only. Falls back to `align` when not set. */
+    mobileAlign?: "left" | "center" | "right";
     /** Vertical alignment of cell content. Defaults to "top". Use "middle" to center content vertically within the row. */
     verticalAlign?: "top" | "middle";
     render?: (value: any, row: T, index: number) => ReactNode;

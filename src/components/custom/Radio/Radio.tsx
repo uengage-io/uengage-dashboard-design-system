@@ -26,6 +26,8 @@ export interface CustomRadioItemProps extends Omit<
   borderColor?: string;
   /** When provided, the pill wrapper uses this color for its background when checked. Falls back to default green tint if omitted. */
   bgColor?: string;
+  /** When provided, applies this color to the label text when checked. */
+  textColor?: string;
   /** When true, the item shows its current state but cannot be selected. */
   readOnly?: boolean;
 }
@@ -53,6 +55,7 @@ function Radio({
   className,
   borderColor,
   bgColor,
+  textColor,
   ...rest
 }: CustomRadioItemProps) {
   const reactId = React.useId();
@@ -87,12 +90,16 @@ function Radio({
     ? "disabled"
     : "default";
 
-  const hasCustomColors = !!(borderColor || bgColor);
+  const effectiveBorderColor = borderColor;
+  const effectiveBgColor = bgColor;
+  const effectiveTextColor = textColor;
+
+  const hasCustomColors = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
 
   const labelStyle: React.CSSProperties | undefined = hasCustomColors
     ? {
-        ...(isChecked && borderColor ? { borderColor } : {}),
-        ...(isChecked && bgColor ? { backgroundColor: bgColor } : {}),
+        ...(isChecked && effectiveBorderColor ? { borderColor: effectiveBorderColor } : {}),
+        ...(isChecked && effectiveBgColor ? { backgroundColor: effectiveBgColor } : {}),
       }
     : undefined;
 
@@ -121,22 +128,30 @@ function Radio({
         value={value}
         disabled={disabled}
         data-slot="radio-group-item"
+        style={
+          isChecked && effectiveBorderColor
+            ? { borderColor: effectiveBorderColor }
+            : undefined
+        }
         className={cn(radioCircleVariants({ size, state }))}
       >
         <RadioGroupPrimitive.Indicator
           data-slot="radio-group-indicator"
           className="relative flex items-center justify-center"
         >
-          <span className={cn(radioDotVariants({ size }))} />
+          <span
+            className={cn(radioDotVariants({ size }))}
+            style={effectiveBorderColor ? { backgroundColor: effectiveBorderColor } : undefined}
+          />
         </RadioGroupPrimitive.Indicator>
       </RadioGroupPrimitive.Item>
 
       <Label
         htmlFor={itemId}
+        style={effectiveTextColor && isChecked ? { color: effectiveTextColor } : undefined}
         className={cn(
           radioLabelVariants({ size, state: labelState }),
           "whitespace-normal break-words",
-          hasCustomColors && isChecked && "text-[#0F8055]",
         )}
       >
         {truncateLabelToWordLimit(label)}

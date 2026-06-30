@@ -3275,6 +3275,7 @@ function Radio({
   className,
   borderColor,
   bgColor,
+  textColor,
   ...rest
 }) {
   const reactId = React9.useId();
@@ -3296,10 +3297,13 @@ function Radio({
   }, []);
   const state = disabled ? "disabled" : error ? "error" : "default";
   const labelState = disabled ? "disabled" : "default";
-  const hasCustomColors2 = !!(borderColor || bgColor);
+  const effectiveBorderColor = borderColor;
+  const effectiveBgColor = bgColor;
+  const effectiveTextColor = textColor;
+  const hasCustomColors2 = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
   const labelStyle = hasCustomColors2 ? {
-    ...isChecked && borderColor ? { borderColor } : {},
-    ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
+    ...isChecked && effectiveBorderColor ? { borderColor: effectiveBorderColor } : {},
+    ...isChecked && effectiveBgColor ? { backgroundColor: effectiveBgColor } : {}
   } : void 0;
   return /* @__PURE__ */ jsxs(
     "label",
@@ -3327,13 +3331,20 @@ function Radio({
             value,
             disabled,
             "data-slot": "radio-group-item",
+            style: isChecked && effectiveBorderColor ? { borderColor: effectiveBorderColor } : void 0,
             className: cn(radioCircleVariants({ size, state })),
             children: /* @__PURE__ */ jsx(
               RadioGroup$1.Indicator,
               {
                 "data-slot": "radio-group-indicator",
                 className: "relative flex items-center justify-center",
-                children: /* @__PURE__ */ jsx("span", { className: cn(radioDotVariants({ size })) })
+                children: /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    className: cn(radioDotVariants({ size })),
+                    style: effectiveBorderColor ? { backgroundColor: effectiveBorderColor } : void 0
+                  }
+                )
               }
             )
           }
@@ -3342,10 +3353,10 @@ function Radio({
           Label,
           {
             htmlFor: itemId,
+            style: effectiveTextColor && isChecked ? { color: effectiveTextColor } : void 0,
             className: cn(
               radioLabelVariants({ size, state: labelState }),
-              "whitespace-normal break-words",
-              hasCustomColors2 && isChecked && "text-[#0F8055]"
+              "whitespace-normal break-words"
             ),
             children: truncateLabelToWordLimit(label)
           }
@@ -3374,6 +3385,7 @@ function RadioGroup({
   className,
   borderColor,
   bgColor,
+  textColor,
   readOnly
 }) {
   const reactId = React9.useId();
@@ -3414,6 +3426,7 @@ function RadioGroup({
               error: Boolean(error),
               borderColor,
               bgColor,
+              textColor,
               readOnly
             },
             optValue
@@ -3502,6 +3515,7 @@ function Checkbox({
   className,
   borderColor,
   bgColor,
+  textColor,
   ...rest
 }) {
   const reactId = React9.useId();
@@ -3523,15 +3537,18 @@ function Checkbox({
   };
   const boxState = disabled ? "disabled" : error ? "error" : indeterminate ? "indeterminate" : visualChecked ? "checked" : "unchecked";
   const labelState = disabled ? "disabled" : visualChecked || indeterminate ? "checked" : "default";
-  const hasCustomColors2 = !!(borderColor || bgColor);
+  const effectiveBorderColor = borderColor;
+  const effectiveBgColor = bgColor;
+  const effectiveTextColor = textColor;
+  const hasCustomColors2 = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
   const isActive = (visualChecked || !!indeterminate) && !error && !disabled && !readOnly;
   return /* @__PURE__ */ jsxs(
     "label",
     {
       htmlFor: itemId,
       style: hasCustomColors2 && isActive ? {
-        ...borderColor ? { borderColor } : {},
-        ...bgColor ? { backgroundColor: bgColor } : {}
+        ...effectiveBorderColor ? { borderColor: effectiveBorderColor } : {},
+        ...effectiveBgColor ? { backgroundColor: effectiveBgColor } : {}
       } : void 0,
       className: cn(
         "group inline-flex cursor-pointer items-center transition-colors",
@@ -3554,6 +3571,7 @@ function Checkbox({
             onCheckedChange: handleCheckedChange,
             disabled,
             "data-slot": "checkbox",
+            style: isActive && effectiveBorderColor ? { backgroundColor: effectiveBorderColor, borderColor: effectiveBorderColor } : void 0,
             className: cn(checkboxBoxVariants({ size, state: boxState })),
             children: /* @__PURE__ */ jsx(
               Checkbox$1.Indicator,
@@ -3570,6 +3588,7 @@ function Checkbox({
           Label,
           {
             htmlFor: itemId,
+            style: effectiveTextColor && isActive ? { color: effectiveTextColor } : void 0,
             className: cn(
               checkboxLabelVariants({ size, state: labelState }),
               "whitespace-normal break-words"
@@ -3600,6 +3619,7 @@ function CheckboxGroup({
   selectAll,
   borderColor,
   bgColor,
+  textColor,
   readOnly
 }) {
   const reactId = React9.useId();
@@ -3665,6 +3685,7 @@ function CheckboxGroup({
           onCheckedChange: (c) => toggle(optValue, c),
           borderColor,
           bgColor,
+          textColor,
           readOnly
         },
         optValue
@@ -4768,8 +4789,8 @@ function Table2({
                           className: cn(
                             "text-sm text-gray-800 font-medium flex-1 min-w-0",
                             "flex justify-end items-center",
-                            col.align === "left" && "justify-start",
-                            col.align === "center" && "justify-center"
+                            (col.mobileAlign ?? col.align) === "left" && "justify-start",
+                            (col.mobileAlign ?? col.align) === "center" && "justify-center"
                           ),
                           children: content
                         }

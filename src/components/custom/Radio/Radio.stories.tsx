@@ -63,6 +63,7 @@ const meta = {
     defaultValue: { control: "text" },
     borderColor: { control: "color" },
     bgColor: { control: "color" },
+    textColor: { control: "color" },
     readOnly: { control: "boolean" },
     onChange: { action: "change" },
   },
@@ -379,9 +380,9 @@ export const WithCustomColors: Story = {
           onValueChange={setValue}
           className="flex flex-col gap-2"
         >
-          <Radio value="one" title="Option One" borderColor="#067D51" bgColor="#EFF9F4" />
-          <Radio value="two" title="Option Two" borderColor="#067D51" bgColor="#EFF9F4" />
-          <Radio value="three" title="Option Three" borderColor="#067D51" bgColor="#EFF9F4" />
+          <Radio value="one" label="Option One" borderColor="#067D51" bgColor="#EFF9F4" />
+          <Radio value="two" label="Option Two" borderColor="#067D51" bgColor="#EFF9F4" />
+          <Radio value="three" label="Option Three" borderColor="#067D51" bgColor="#EFF9F4" />
         </RadioGroupPrimitive.Root>
         <code className="text-xs text-gray-500">value: "{value}"</code>
       </div>
@@ -503,3 +504,4 @@ export const GroupWithCustomColorsBrandBlue: Story = {
     );
   },
 };
+
