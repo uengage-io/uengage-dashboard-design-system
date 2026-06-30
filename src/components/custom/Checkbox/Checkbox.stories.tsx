@@ -53,6 +53,7 @@ const meta = {
     error: { control: "boolean" },
     borderColor: { control: "color", description: "Pill border color when checked/indeterminate. Omit to use default plain style." },
     bgColor: { control: "color", description: "Pill background color when checked/indeterminate. Omit to use default plain style." },
+    textColor: { control: "color", description: "Label text color when checked/indeterminate. Omit to use default text color." },
     onCheckedChange: { action: "checkedChange" },
   },
   args: {
@@ -301,6 +302,7 @@ export const WithCustomColors: Story = {
           onCheckedChange={setChecked}
           borderColor="#067D51"
           bgColor="#EFF9F4"
+          textColor="#067D51"
         />
         <code className="text-xs text-gray-500">checked: {String(checked)}</code>
       </div>
@@ -338,6 +340,7 @@ export const WithCustomColorsGroup: Story = {
             onCheckedChange={(c) => toggle(opt.value, c)}
             borderColor="#067D51"
             bgColor="#EFF9F4"
+            textColor="#067D51"
           />
         ))}
       </div>
@@ -373,6 +376,7 @@ export const GroupWithCustomColors: Story = {
           layout="vertical"
           borderColor="#067D51"
           bgColor="#EFF9F4"
+          textColor="#067D51"
         />
         <code className="text-xs text-gray-500">
           selected: [{selected.map((v) => `"${v}"`).join(", ")}]
@@ -394,14 +398,17 @@ export const WithCustomColorsBrandBlue: Story = {
           onCheckedChange={setChecked}
           borderColor="#3B82F6"
           bgColor="#EFF6FF"
+          textColor="#3B82F6"
         />
         <Checkbox
           label="Marketing emails"
           defaultChecked={false}
           borderColor="#3B82F6"
           bgColor="#EFF6FF"
+          textColor="#3B82F6"
         />
       </div>
     );
   },
 };
+

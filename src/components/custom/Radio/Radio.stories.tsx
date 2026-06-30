@@ -63,6 +63,7 @@ const meta = {
     defaultValue: { control: "text" },
     borderColor: { control: "color" },
     bgColor: { control: "color" },
+    textColor: { control: "color" },
     readOnly: { control: "boolean" },
     onChange: { action: "change" },
   },
@@ -503,3 +504,4 @@ export const GroupWithCustomColorsBrandBlue: Story = {
     );
   },
 };
+

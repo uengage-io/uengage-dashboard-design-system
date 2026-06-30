@@ -14,6 +14,8 @@ export interface ColumnDef<T> {
   /** Minimum column width in pixels — prevents the column from shrinking below this on mobile scroll. */
   minWidth?: number;
   align?: "left" | "center" | "right";
+  /** Alignment override for mobile card layout only. Falls back to `align` when not set. */
+  mobileAlign?: "left" | "center" | "right";
   /** Vertical alignment of cell content. Defaults to "top". Use "middle" to center content vertically within the row. */
   verticalAlign?: "top" | "middle";
   render?: (value: any, row: T, index: number) => ReactNode;

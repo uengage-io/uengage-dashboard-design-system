@@ -154,8 +154,8 @@ export function Table<T>({
                             className={cn(
                               "text-sm text-gray-800 font-medium flex-1 min-w-0",
                               "flex justify-end items-center",
-                              col.align === "left" && "justify-start",
-                              col.align === "center" && "justify-center",
+                              (col.mobileAlign ?? col.align) === "left" && "justify-start",
+                              (col.mobileAlign ?? col.align) === "center" && "justify-center",
                             )}
                           >
                             {content}

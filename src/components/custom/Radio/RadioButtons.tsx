@@ -25,6 +25,7 @@ function RadioGroup<T = RadioOption>({
   className,
   borderColor,
   bgColor,
+  textColor,
   readOnly,
 }: CustomRadioGroupProps<T>) {
   const reactId = React.useId();
@@ -88,6 +89,7 @@ function RadioGroup<T = RadioOption>({
               error={Boolean(error)}
               borderColor={borderColor}
               bgColor={bgColor}
+              textColor={textColor}
               readOnly={readOnly}
             />
           );
