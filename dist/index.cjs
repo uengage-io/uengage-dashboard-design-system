@@ -4983,6 +4983,7 @@ var trackVariants = classVarianceAuthority.cva(
   {
     variants: {
       size: {
+        xs: "h-5 w-9",
         sm: "h-7 w-12",
         md: "h-8 w-[4.2rem]",
         lg: "h-9 w-[4.75rem]"
@@ -5003,6 +5004,7 @@ var thumbVariants = classVarianceAuthority.cva(
   {
     variants: {
       size: {
+        xs: "h-3.5 w-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-4",
         sm: "h-5 w-5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-5",
         md: "h-6 w-6 shadow-[0_2px_3px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-8",
         lg: "h-7 w-7 shadow-[0_2px_4px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-9"
@@ -5014,11 +5016,13 @@ var thumbVariants = classVarianceAuthority.cva(
   }
 );
 var PILL_PADDING3 = {
+  xs: "gap-1 px-2 py-1",
   sm: "gap-1.5 px-2.5 py-1.5",
   md: "gap-2 px-3 py-2",
   lg: "gap-2.5 px-4 py-2.5"
 };
 var GAP_ONLY3 = {
+  xs: "gap-1",
   sm: "gap-1.5",
   md: "gap-2",
   lg: "gap-2.5"
@@ -5098,7 +5102,7 @@ var Toggle = React9__namespace.forwardRef(
     ) : switchEl;
     if (label) {
       return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex flex-col gap-1.5", wrapperClassName), children: [
-        /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size, required, children: label }),
+        /* @__PURE__ */ jsxRuntime.jsx(InputLabel, { size: size === "xs" ? "sm" : size, required, children: label }),
         inlineEl
       ] });
     }

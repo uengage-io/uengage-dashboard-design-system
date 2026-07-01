@@ -774,12 +774,12 @@ interface StatusBadgeProps extends Omit<StatusBadgeVariants, "variant" | "size">
 }
 declare function StatusBadge({ variant, size, label, icon, iconPosition, className, }: StatusBadgeProps): react_jsx_runtime.JSX.Element;
 
-type ToggleVariantSize = "sm" | "md" | "lg";
+type ToggleVariantSize = "xs" | "sm" | "md" | "lg";
 declare const trackVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const thumbVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type TrackVariants = VariantProps<typeof trackVariants>;
 type ThumbVariants = VariantProps<typeof thumbVariants>;

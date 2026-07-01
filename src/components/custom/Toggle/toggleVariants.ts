@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { FOCUS_RING } from "@/utils/tokens";
 
-export type ToggleVariantSize = "sm" | "md" | "lg";
+export type ToggleVariantSize = "xs" | "sm" | "md" | "lg";
 
 export const trackVariants = cva(
   [
@@ -15,6 +15,7 @@ export const trackVariants = cva(
   {
     variants: {
       size: {
+        xs: "h-5 w-9",
         sm: "h-7 w-12",
         md: "h-8 w-[4.2rem]",
         lg: "h-9 w-[4.75rem]",
@@ -36,6 +37,7 @@ export const thumbVariants = cva(
   {
     variants: {
       size: {
+        xs: "h-3.5 w-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-4",
         sm: "h-5 w-5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-5",
         md: "h-6 w-6 shadow-[0_2px_3px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-8",
         lg: "h-7 w-7 shadow-[0_2px_4px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-9",

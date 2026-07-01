@@ -10,7 +10,7 @@ const meta: Meta<typeof Toggle> = {
   argTypes: {
     size: {
       control: { type: "select" },
-      options: ["sm", "md", "lg"],
+      options: ["xs", "sm", "md", "lg"],
     },
     label: {
       control: { type: "text" },
@@ -119,6 +119,7 @@ export const LabelAndTitle: Story = {
 export const Sizes: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
+      <Toggle size="xs" title="Extra Small" titlePosition="right" />
       <Toggle size="sm" title="Small" titlePosition="right" />
       <Toggle size="md" title="Medium" titlePosition="right" />
       <Toggle size="lg" title="Large" titlePosition="right" />
@@ -191,6 +192,7 @@ export const PillSizes: Story = {
   name: "Pill · All sizes",
   render: () => (
     <div className="flex flex-col gap-6">
+      <Toggle size="xs" title="Extra Small" titlePosition="right" borderColor="#1F6B32" bgColor="#F0F7F0" />
       <Toggle size="sm" title="Small" titlePosition="right" borderColor="#1F6B32" bgColor="#F0F7F0" />
       <Toggle size="md" title="Medium" titlePosition="right" borderColor="#1F6B32" bgColor="#F0F7F0" />
       <Toggle size="lg" title="Large" titlePosition="right" borderColor="#1F6B32" bgColor="#F0F7F0" />
