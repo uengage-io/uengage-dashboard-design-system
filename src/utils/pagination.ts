@@ -12,9 +12,9 @@ export const pageButtonVariants = cva(
       },
       state: {
         default:
-          "bg-transparent text-[#202020] font-semibold hover:bg-[#EFF8EA]",
-        active: "bg-transparent text-white font-bold",
-        disabled: "text-gray-300 pointer-events-none",
+          "bg-transparent text-[#202020] font-semibold hover:bg-[#EFF8EA] cursor-pointer",
+        active: "bg-transparent text-white font-bold cursor-pointer",
+        disabled: "text-gray-300 pointer-events-none cursor-default",
       },
     },
     defaultVariants: {
@@ -34,8 +34,8 @@ export const chevronButtonVariants = cva(
         lg: "w-10 h-10 text-base sm:w-12 sm:h-12 sm:text-lg",
       },
       state: {
-        default: "text-gray-400 hover:bg-[#EFF8EA]",
-        disabled: "text-gray-200 pointer-events-none",
+        default: "text-gray-400 hover:bg-[#EFF8EA] cursor-pointer",
+        disabled: "text-gray-200 pointer-events-none cursor-default",
       },
     },
     defaultVariants: {
