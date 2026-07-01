@@ -6,12 +6,14 @@ import type { ToggleVariantSize } from "./toggleVariants";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 
 const PILL_PADDING: Record<ToggleVariantSize, string> = {
+  xs: "gap-1 px-2 py-1",
   sm: "gap-1.5 px-2.5 py-1.5",
   md: "gap-2 px-3 py-2",
   lg: "gap-2.5 px-4 py-2.5",
 };
 
 const GAP_ONLY: Record<ToggleVariantSize, string> = {
+  xs: "gap-1",
   sm: "gap-1.5",
   md: "gap-2",
   lg: "gap-2.5",
@@ -139,7 +141,7 @@ export const Toggle = React.forwardRef<
     if (label) {
       return (
         <div className={cn("flex flex-col gap-1.5", wrapperClassName)}>
-          <InputLabel size={size} required={required}>
+          <InputLabel size={size === "xs" ? "sm" : size} required={required}>
             {label}
           </InputLabel>
           {inlineEl}
