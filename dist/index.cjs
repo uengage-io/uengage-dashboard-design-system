@@ -5668,6 +5668,7 @@ function Modal({
   bodyClassName,
   modalClassName
 }) {
+  const mouseDownOnBackdropRef = React9__namespace.useRef(false);
   React9__namespace.useEffect(() => {
     if (!isOpen) return;
     const scrollY = window.scrollY;
@@ -5684,14 +5685,20 @@ function Modal({
     };
   }, [isOpen]);
   if (!isOpen) return null;
+  const handleBackdropMouseDown = (e) => {
+    mouseDownOnBackdropRef.current = e.target === e.currentTarget;
+  };
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) onClose();
+    const shouldClose = e.target === e.currentTarget && mouseDownOnBackdropRef.current;
+    mouseDownOnBackdropRef.current = false;
+    if (shouldClose) onClose();
   };
   const modal = /* @__PURE__ */ jsxRuntime.jsx(
     "div",
     {
       className: "fixed inset-0 bg-[#00000066] flex items-center justify-center px-4 outline-none",
       style: { zIndex: 9999 },
+      onMouseDown: handleBackdropMouseDown,
       onClick: handleBackdropClick,
       children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn(modalSizeVariants({ size }), modalClassName), children: [
         (title || showCloseButton) && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex justify-between items-center border-b border-gray-300 p-2", headerClassName), children: [
