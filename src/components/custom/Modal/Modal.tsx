@@ -43,6 +43,8 @@ export function Modal({
   bodyClassName,
   modalClassName,
 }: ModalProps) {
+  const mouseDownOnBackdropRef = React.useRef(false);
+
   React.useEffect(() => {
     if (!isOpen) return;
     // Capture scroll position before locking — iOS Safari ignores overflow:hidden on body,
@@ -63,14 +65,25 @@ export function Modal({
 
   if (!isOpen) return null;
 
+  // Track whether the press *started* on the backdrop, not just where the click lands —
+  // content inside the modal (e.g. a tab switch) can resize/recenter the modal between
+  // mousedown and mouseup, landing the click on the backdrop even though the press began
+  // on an inner element. Only treat it as an outside click if both events agree.
+  const handleBackdropMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    mouseDownOnBackdropRef.current = e.target === e.currentTarget;
+  };
+
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose();
+    const shouldClose = e.target === e.currentTarget && mouseDownOnBackdropRef.current;
+    mouseDownOnBackdropRef.current = false;
+    if (shouldClose) onClose();
   };
 
   const modal = (
     <div
       className="fixed inset-0 bg-[#00000066] flex items-center justify-center px-4 outline-none"
       style={{ zIndex: 9999 }}
+      onMouseDown={handleBackdropMouseDown}
       onClick={handleBackdropClick}
     >
       <div className={cn(modalSizeVariants({ size }), modalClassName)}>
