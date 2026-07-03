@@ -7,12 +7,19 @@ import { jsx } from 'react/jsx-runtime';
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
-function Table({ className, ...props }) {
+function Table({
+  className,
+  containerClassName,
+  ...props
+}) {
   return /* @__PURE__ */ jsx(
     "div",
     {
       "data-slot": "table-container",
-      className: "uengage-ui relative w-full overflow-x-auto",
+      className: cn(
+        "uengage-ui relative w-full overflow-x-auto",
+        containerClassName
+      ),
       children: /* @__PURE__ */ jsx(
         "table",
         {

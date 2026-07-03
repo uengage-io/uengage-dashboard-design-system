@@ -4434,12 +4434,19 @@ function DatePicker({
   ] });
 }
 DatePicker.displayName = "DatePicker";
-function Table({ className, ...props }) {
+function Table({
+  className,
+  containerClassName,
+  ...props
+}) {
   return /* @__PURE__ */ jsx(
     "div",
     {
       "data-slot": "table-container",
-      className: "uengage-ui relative w-full overflow-x-auto",
+      className: cn(
+        "uengage-ui relative w-full overflow-x-auto",
+        containerClassName
+      ),
       children: /* @__PURE__ */ jsx(
         "table",
         {
@@ -4808,11 +4815,17 @@ function Table2({
           "div",
           {
             className: cn(
-              "overflow-x-auto scroll-smooth",
+              "scroll-smooth",
+              // Any non-"visible" overflow-x forces overflow-y to compute to "auto"
+              // too, which would make this div the sticky positioning container
+              // instead of the viewport. So when stickyHeader is used without a
+              // maxHeight (page-scroll mode), skip overflow-x-auto entirely —
+              // the header needs to stick against the real viewport, not this box.
+              !(stickyHeader && !maxHeight) && "overflow-x-auto",
               // Clip table cells to the rounded corners — overflow:auto on this
               // element also clips to border-radius, so no parent overflow-hidden needed.
               bordered && "rounded-lg",
-              stickyHeader && "overflow-y-auto scroll-smooth",
+              stickyHeader && maxHeight && "overflow-y-auto scroll-smooth",
               mobileLayout === "cards" && "hidden md:block"
             ),
             style: scrollStyle,
@@ -4820,6 +4833,7 @@ function Table2({
               Table,
               {
                 className: "w-full",
+                containerClassName: stickyHeader && !maxHeight ? "overflow-visible" : void 0,
                 style: tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : { minWidth: "max-content" },
                 children: [
                   /* @__PURE__ */ jsx("colgroup", { children: columns.map((col, i) => /* @__PURE__ */ jsx(
