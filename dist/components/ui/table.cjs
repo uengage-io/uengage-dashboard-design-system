@@ -9,12 +9,19 @@ var jsxRuntime = require('react/jsx-runtime');
 function cn(...inputs) {
   return tailwindMerge.twMerge(clsx.clsx(inputs));
 }
-function Table({ className, ...props }) {
+function Table({
+  className,
+  containerClassName,
+  ...props
+}) {
   return /* @__PURE__ */ jsxRuntime.jsx(
     "div",
     {
       "data-slot": "table-container",
-      className: "uengage-ui relative w-full overflow-x-auto",
+      className: cn(
+        "uengage-ui relative w-full overflow-x-auto",
+        containerClassName
+      ),
       children: /* @__PURE__ */ jsxRuntime.jsx(
         "table",
         {

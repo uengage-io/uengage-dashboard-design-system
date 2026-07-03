@@ -156,7 +156,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Generic, typed table built on shadcn Table. CVA-driven size/border variants, built-in sort (asc → desc → cleared), sticky header + max-height scroll, loading and empty states, responsive column hiding, optional row click handling, and a `hover` prop (default `true`) to control row highlight on hover.\n\n**Per-column props of note:**\n- `verticalAlign?: 'top' | 'middle'` — controls vertical alignment of cell content. Defaults to `'top'`. Use `'middle'` on columns that render a single badge, toggle, or button so they stay centred when adjacent cells are taller.",
+          "Generic, typed table built on shadcn Table. CVA-driven size/border variants, built-in sort (asc → desc → cleared), sticky header (bounded scroll box or full page scroll), loading and empty states, responsive column hiding, optional row click handling, and a `hover` prop (default `true`) to control row highlight on hover.\n\n**Sticky header — two modes:**\n- `stickyHeader` + `maxHeight` — header sticks within a fixed-height, internally scrolling box.\n- `stickyHeader` alone (no `maxHeight`) — header sticks to the top of the viewport as the whole page scrolls.\n\n**Per-column props of note:**\n- `verticalAlign?: 'top' | 'middle'` — controls vertical alignment of cell content. Defaults to `'top'`. Use `'middle'` on columns that render a single badge, toggle, or button so they stay centred when adjacent cells are taller.",
       },
     },
   },
@@ -165,6 +165,16 @@ const meta = {
     bordered: { control: "boolean" },
     size: { control: "radio", options: ["sm", "md", "lg"] },
     mobileLayout: { control: "radio", options: ["scroll", "cards"] },
+    stickyHeader: {
+      control: "boolean",
+      description:
+        "Sticks the header row as content scrolls. Pair with `maxHeight` to sticky within a bounded, internally scrolling box; omit `maxHeight` to sticky against the page/viewport as the whole page scrolls.",
+    },
+    maxHeight: {
+      control: "text",
+      description:
+        "CSS max-height (e.g. `'400px'`) for the table's scroll box. Only takes effect together with `stickyHeader`.",
+    },
     columns: {
       control: false,
       description:
@@ -269,6 +279,37 @@ export const StickyHeader: Story = {
     bordered: true,
     stickyHeader: true,
     maxHeight: "400px",
+  },
+};
+
+export const StickyHeaderPageScroll: Story = {
+  name: "Sticky header: page scroll",
+  parameters: {
+    layout: "fullscreen",
+    docs: {
+      description: {
+        story:
+          "Omit `maxHeight` while `stickyHeader` is set and the header sticks to the top of the viewport as the whole page scrolls, instead of only within an inner scroll box. Scroll the canvas to see it in action.",
+      },
+    },
+  },
+  render: (args) => (
+    <div className="p-6">
+      <div className="mb-4 h-[50vh] rounded-md border border-dashed border-gray-300 flex items-center justify-center text-sm text-gray-500">
+        Scroll down — filler content above the table
+      </div>
+      <Table {...args} />
+      <div className="mt-4 h-[80vh] rounded-md border border-dashed border-gray-300 flex items-center justify-center text-sm text-gray-500">
+        Filler content below the table
+      </div>
+    </div>
+  ),
+  args: {
+    columns: BASE_COLUMNS,
+    data: [...LONG_ROWS, ...LONG_ROWS].map((row, i) => ({ ...row, id: `row-${i}` })),
+    keyField: "id",
+    bordered: true,
+    stickyHeader: true,
   },
 };
 

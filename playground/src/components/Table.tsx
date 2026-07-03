@@ -382,6 +382,39 @@ export default function TablePreview() {
           />
         </section>
 
+        {/* Sticky header — page scroll (no maxHeight) */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-5">
+            <h2 className="text-base font-semibold text-[#111827]">
+              Sticky Header — Page Scroll
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              With{" "}
+              <code className="rounded bg-[#F3F4F6] px-1 text-[12px]">
+                stickyHeader
+              </code>{" "}
+              set and no{" "}
+              <code className="rounded bg-[#F3F4F6] px-1 text-[12px]">
+                maxHeight
+              </code>
+              , the header sticks to the top of the screen as the whole page
+              scrolls, instead of only within an inner scroll container. Scroll
+              this page to see it in action.
+            </p>
+          </div>
+          <Table
+            columns={COLUMNS}
+            data={[...ORDERS, ...ORDERS, ...ORDERS].map((o, i) => ({
+              ...o,
+              id: i + 1,
+            }))}
+            keyField="id"
+            bordered
+            stickyHeader
+            size="md"
+          />
+        </section>
+
         {/* verticalAlign demo */}
         <section className="rounded-2xl bg-white p-6 shadow-sm">
           <div className="mb-5">

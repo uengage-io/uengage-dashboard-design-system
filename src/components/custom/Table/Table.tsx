@@ -174,17 +174,30 @@ export function Table<T>({
       {/* ── Table view (always on "scroll"; md+ only on "cards") ──────── */}
       <div
         className={cn(
-          "overflow-x-auto scroll-smooth",
+          "scroll-smooth",
+          // Any non-"visible" overflow-x forces overflow-y to compute to "auto"
+          // too, which would make this div the sticky positioning container
+          // instead of the viewport. So when stickyHeader is used without a
+          // maxHeight (page-scroll mode), skip overflow-x-auto entirely —
+          // the header needs to stick against the real viewport, not this box.
+          !(stickyHeader && !maxHeight) && "overflow-x-auto",
           // Clip table cells to the rounded corners — overflow:auto on this
           // element also clips to border-radius, so no parent overflow-hidden needed.
           bordered && "rounded-lg",
-          stickyHeader && "overflow-y-auto scroll-smooth",
+          stickyHeader && maxHeight && "overflow-y-auto scroll-smooth",
           mobileLayout === "cards" && "hidden md:block",
         )}
         style={scrollStyle}
       >
         <T
           className="w-full"
+          // shadcn's Table wraps <table> in its own "overflow-x-auto" div —
+          // in page-scroll sticky mode that div would also force overflow-y
+          // to compute to "auto" and hijack the sticky containing block, so
+          // it needs to be neutralized here too, not just on our own wrapper.
+          containerClassName={
+            stickyHeader && !maxHeight ? "overflow-visible" : undefined
+          }
           style={
             tableMinWidth > 0
               ? { minWidth: `${tableMinWidth}px` }
