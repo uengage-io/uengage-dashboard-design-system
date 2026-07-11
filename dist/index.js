@@ -5099,6 +5099,30 @@ var Toggle = React9.forwardRef(
   }
 );
 Toggle.displayName = "Toggle";
+
+// src/lib/bodyScrollLock.ts
+var lockCount = 0;
+var lockedScrollY = 0;
+function lockBodyScroll() {
+  if (lockCount === 0) {
+    lockedScrollY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${lockedScrollY}px`;
+    document.body.style.width = "100%";
+  }
+  lockCount++;
+}
+function unlockBodyScroll() {
+  lockCount = Math.max(0, lockCount - 1);
+  if (lockCount === 0) {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    window.scrollTo(0, lockedScrollY);
+  }
+}
 var sidebarContentVariants = cva(
   "fixed z-40 bg-background border shadow-lg outline-none will-change-transform",
   {
@@ -5178,28 +5202,6 @@ var sidebarPersistentVariants = cva("bg-background border", {
     size: "md"
   }
 });
-var bodyScrollLockCount = 0;
-var bodyScrollLockY = 0;
-function lockBodyScroll() {
-  if (bodyScrollLockCount === 0) {
-    bodyScrollLockY = window.scrollY;
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${bodyScrollLockY}px`;
-    document.body.style.width = "100%";
-  }
-  bodyScrollLockCount++;
-}
-function unlockBodyScroll() {
-  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
-  if (bodyScrollLockCount === 0) {
-    document.body.style.overflow = "";
-    document.body.style.position = "";
-    document.body.style.top = "";
-    document.body.style.width = "";
-    window.scrollTo(0, bodyScrollLockY);
-  }
-}
 function useIsDesktop(breakpoint = 768) {
   const [isDesktop, setIsDesktop] = React9.useState(false);
   React9.useEffect(() => {
@@ -5687,18 +5689,8 @@ function Modal({
   const mouseDownOnBackdropRef = React9.useRef(false);
   React9.useEffect(() => {
     if (!isOpen) return;
-    const scrollY = window.scrollY;
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-      window.scrollTo(0, scrollY);
-    };
+    lockBodyScroll();
+    return unlockBodyScroll;
   }, [isOpen]);
   if (!isOpen) return null;
   const handleBackdropMouseDown = (e) => {

@@ -9,39 +9,12 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/bodyScrollLock";
 import {
   sidebarContentVariants,
   sidebarPersistentVariants,
 } from "./Sidebar.variants";
 import type { SidebarProps } from "./Sidebar.types";
-
-// Module-level so multiple overlay Sidebars nest correctly — only the
-// outermost lock/unlock touches the DOM. iOS Safari ignores plain
-// overflow:hidden on body, hence the position:fixed + top offset.
-let bodyScrollLockCount = 0;
-let bodyScrollLockY = 0;
-
-function lockBodyScroll() {
-  if (bodyScrollLockCount === 0) {
-    bodyScrollLockY = window.scrollY;
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${bodyScrollLockY}px`;
-    document.body.style.width = "100%";
-  }
-  bodyScrollLockCount++;
-}
-
-function unlockBodyScroll() {
-  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
-  if (bodyScrollLockCount === 0) {
-    document.body.style.overflow = "";
-    document.body.style.position = "";
-    document.body.style.top = "";
-    document.body.style.width = "";
-    window.scrollTo(0, bodyScrollLockY);
-  }
-}
 
 function useIsDesktop(breakpoint = 768) {
   const [isDesktop, setIsDesktop] = React.useState(false);
