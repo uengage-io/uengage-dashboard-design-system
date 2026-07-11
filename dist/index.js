@@ -5275,11 +5275,19 @@ function Sidebar({
     };
   }, [size, sizePercent]);
   const shouldRenderPersistent = persistentOnDesktop && isDesktop;
+  React9.useEffect(() => {
+    if (!resolvedOpen || shouldRenderPersistent) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [resolvedOpen, shouldRenderPersistent]);
   if (shouldRenderPersistent) {
     if (!resolvedOpen) {
       return null;
     }
-    return /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsxs(
+    return /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsx(
       "aside",
       {
         className: cn(
@@ -5288,7 +5296,7 @@ function Sidebar({
           contentClassName
         ),
         style: customSizeStyle,
-        children: [
+        children: /* @__PURE__ */ jsxs("div", { className: "flex h-full min-h-0 flex-col", children: [
           /* @__PURE__ */ jsx(
             SidebarHeader,
             {
@@ -5298,8 +5306,8 @@ function Sidebar({
               onClose: () => handleOpenChange(false)
             }
           ),
-          children
-        ]
+          /* @__PURE__ */ jsx("div", { className: "min-h-0 flex-1 overflow-y-auto", children })
+        ] })
       }
     ) });
   }
@@ -5345,7 +5353,7 @@ function Sidebar({
             contentClassName
           ),
           style: { ...animDurationStyle, ...customSizeStyle },
-          children: /* @__PURE__ */ jsxs(SidebarZIndexProvider, { children: [
+          children: /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsxs("div", { className: "flex h-full min-h-0 flex-col", children: [
             /* @__PURE__ */ jsx(
               SidebarHeader,
               {
@@ -5355,8 +5363,8 @@ function Sidebar({
                 onClose: () => handleOpenChange(false)
               }
             ),
-            children
-          ] })
+            /* @__PURE__ */ jsx("div", { className: "min-h-0 flex-1 overflow-y-auto", children })
+          ] }) })
         }
       )
     ] })
