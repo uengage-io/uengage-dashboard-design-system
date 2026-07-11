@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { ModalZIndexProvider } from "@/lib/zIndexContext";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/bodyScrollLock";
 
 const modalSizeVariants = cva("bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-hidden flex flex-col w-full", {
   variants: {
@@ -47,20 +48,8 @@ export function Modal({
 
   React.useEffect(() => {
     if (!isOpen) return;
-    // Capture scroll position before locking — iOS Safari ignores overflow:hidden on body,
-    // so we use position:fixed + top offset to prevent background scroll on all platforms.
-    const scrollY = window.scrollY;
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-      window.scrollTo(0, scrollY);
-    };
+    lockBodyScroll();
+    return unlockBodyScroll;
   }, [isOpen]);
 
   if (!isOpen) return null;
