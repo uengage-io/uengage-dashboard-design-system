@@ -5178,6 +5178,28 @@ var sidebarPersistentVariants = cva("bg-background border", {
     size: "md"
   }
 });
+var bodyScrollLockCount = 0;
+var bodyScrollLockY = 0;
+function lockBodyScroll() {
+  if (bodyScrollLockCount === 0) {
+    bodyScrollLockY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${bodyScrollLockY}px`;
+    document.body.style.width = "100%";
+  }
+  bodyScrollLockCount++;
+}
+function unlockBodyScroll() {
+  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+  if (bodyScrollLockCount === 0) {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    window.scrollTo(0, bodyScrollLockY);
+  }
+}
 function useIsDesktop(breakpoint = 768) {
   const [isDesktop, setIsDesktop] = React9.useState(false);
   React9.useEffect(() => {
@@ -5275,11 +5297,16 @@ function Sidebar({
     };
   }, [size, sizePercent]);
   const shouldRenderPersistent = persistentOnDesktop && isDesktop;
+  React9.useEffect(() => {
+    if (!resolvedOpen || shouldRenderPersistent || !overlay) return;
+    lockBodyScroll();
+    return unlockBodyScroll;
+  }, [resolvedOpen, shouldRenderPersistent, overlay]);
   if (shouldRenderPersistent) {
     if (!resolvedOpen) {
       return null;
     }
-    return /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsxs(
+    return /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsx(
       "aside",
       {
         className: cn(
@@ -5288,7 +5315,7 @@ function Sidebar({
           contentClassName
         ),
         style: customSizeStyle,
-        children: [
+        children: /* @__PURE__ */ jsxs("div", { className: "flex h-full min-h-0 flex-col", children: [
           /* @__PURE__ */ jsx(
             SidebarHeader,
             {
@@ -5298,8 +5325,8 @@ function Sidebar({
               onClose: () => handleOpenChange(false)
             }
           ),
-          children
-        ]
+          /* @__PURE__ */ jsx("div", { className: "min-h-0 flex-1 overflow-y-auto", children })
+        ] })
       }
     ) });
   }
@@ -5345,7 +5372,7 @@ function Sidebar({
             contentClassName
           ),
           style: { ...animDurationStyle, ...customSizeStyle },
-          children: /* @__PURE__ */ jsxs(SidebarZIndexProvider, { children: [
+          children: /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsxs("div", { className: "flex h-full min-h-0 flex-col", children: [
             /* @__PURE__ */ jsx(
               SidebarHeader,
               {
@@ -5355,8 +5382,8 @@ function Sidebar({
                 onClose: () => handleOpenChange(false)
               }
             ),
-            children
-          ] })
+            /* @__PURE__ */ jsx("div", { className: "min-h-0 flex-1 overflow-y-auto", children })
+          ] }) })
         }
       )
     ] })
