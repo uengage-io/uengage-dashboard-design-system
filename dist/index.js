@@ -5178,6 +5178,28 @@ var sidebarPersistentVariants = cva("bg-background border", {
     size: "md"
   }
 });
+var bodyScrollLockCount = 0;
+var bodyScrollLockY = 0;
+function lockBodyScroll() {
+  if (bodyScrollLockCount === 0) {
+    bodyScrollLockY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${bodyScrollLockY}px`;
+    document.body.style.width = "100%";
+  }
+  bodyScrollLockCount++;
+}
+function unlockBodyScroll() {
+  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+  if (bodyScrollLockCount === 0) {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    window.scrollTo(0, bodyScrollLockY);
+  }
+}
 function useIsDesktop(breakpoint = 768) {
   const [isDesktop, setIsDesktop] = React9.useState(false);
   React9.useEffect(() => {
@@ -5276,13 +5298,10 @@ function Sidebar({
   }, [size, sizePercent]);
   const shouldRenderPersistent = persistentOnDesktop && isDesktop;
   React9.useEffect(() => {
-    if (!resolvedOpen || shouldRenderPersistent) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [resolvedOpen, shouldRenderPersistent]);
+    if (!resolvedOpen || shouldRenderPersistent || !overlay) return;
+    lockBodyScroll();
+    return unlockBodyScroll;
+  }, [resolvedOpen, shouldRenderPersistent, overlay]);
   if (shouldRenderPersistent) {
     if (!resolvedOpen) {
       return null;
