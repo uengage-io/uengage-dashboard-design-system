@@ -39,7 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <TabsPreview /> */}
     {/* <TablePreview/> */}
     {/* <TogglePreview/> */}
-    <TablePreview/>
+    <AppLayoutPreview/>
     {/* <TablePreview /> */}
     {/* <SectionPreview /> */}
     {/* <FilterGroupDatePickerPreview /> */}
