@@ -9,6 +9,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/bodyScrollLock";
 import {
   sidebarContentVariants,
   sidebarPersistentVariants,
@@ -143,6 +144,16 @@ export function Sidebar({
 
   const shouldRenderPersistent = persistentOnDesktop && isDesktop;
 
+  // The Drawer renders non-modal (modal={false}, see below) so Radix never
+  // locks background scroll on its own. Lock it here whenever the sidebar is
+  // shown as a blocking overlay so the page behind can't scroll together with it.
+  // Skipped for overlay={false}, which is meant to coexist with page scrolling.
+  React.useEffect(() => {
+    if (!resolvedOpen || shouldRenderPersistent || !overlay) return;
+    lockBodyScroll();
+    return unlockBodyScroll;
+  }, [resolvedOpen, shouldRenderPersistent, overlay]);
+
   if (shouldRenderPersistent) {
     if (!resolvedOpen) {
       return null;
@@ -158,13 +169,15 @@ export function Sidebar({
           )}
           style={customSizeStyle}
         >
-          <SidebarHeader
-            heading={heading}
-            closeIcon={closeIcon}
-            divider={divider}
-            onClose={() => handleOpenChange(false)}
-          />
-          {children}
+          <div className="flex h-full min-h-0 flex-col">
+            <SidebarHeader
+              heading={heading}
+              closeIcon={closeIcon}
+              divider={divider}
+              onClose={() => handleOpenChange(false)}
+            />
+            <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+          </div>
         </aside>
       </SidebarZIndexProvider>
     );
@@ -218,13 +231,15 @@ export function Sidebar({
           style={{ ...animDurationStyle, ...customSizeStyle }}
         >
           <SidebarZIndexProvider>
-            <SidebarHeader
-              heading={heading}
-              closeIcon={closeIcon}
-              divider={divider}
-              onClose={() => handleOpenChange(false)}
-            />
-            {children}
+            <div className="flex h-full min-h-0 flex-col">
+              <SidebarHeader
+                heading={heading}
+                closeIcon={closeIcon}
+                divider={divider}
+                onClose={() => handleOpenChange(false)}
+              />
+              <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+            </div>
           </SidebarZIndexProvider>
         </DrawerContent>
       </Drawer>

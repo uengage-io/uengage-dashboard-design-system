@@ -5290,6 +5290,30 @@ var Toggle = React9.forwardRef(
   }
 );
 Toggle.displayName = "Toggle";
+
+// src/lib/bodyScrollLock.ts
+var lockCount = 0;
+var lockedScrollY = 0;
+function lockBodyScroll() {
+  if (lockCount === 0) {
+    lockedScrollY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${lockedScrollY}px`;
+    document.body.style.width = "100%";
+  }
+  lockCount++;
+}
+function unlockBodyScroll() {
+  lockCount = Math.max(0, lockCount - 1);
+  if (lockCount === 0) {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    window.scrollTo(0, lockedScrollY);
+  }
+}
 var sidebarContentVariants = cva(
   "fixed z-40 bg-background border shadow-lg outline-none will-change-transform",
   {
@@ -5466,11 +5490,16 @@ function Sidebar({
     };
   }, [size, sizePercent]);
   const shouldRenderPersistent = persistentOnDesktop && isDesktop;
+  React9.useEffect(() => {
+    if (!resolvedOpen || shouldRenderPersistent || !overlay) return;
+    lockBodyScroll();
+    return unlockBodyScroll;
+  }, [resolvedOpen, shouldRenderPersistent, overlay]);
   if (shouldRenderPersistent) {
     if (!resolvedOpen) {
       return null;
     }
-    return /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsxs(
+    return /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsx(
       "aside",
       {
         className: cn(
@@ -5479,7 +5508,7 @@ function Sidebar({
           contentClassName
         ),
         style: customSizeStyle,
-        children: [
+        children: /* @__PURE__ */ jsxs("div", { className: "flex h-full min-h-0 flex-col", children: [
           /* @__PURE__ */ jsx(
             SidebarHeader,
             {
@@ -5489,8 +5518,8 @@ function Sidebar({
               onClose: () => handleOpenChange(false)
             }
           ),
-          children
-        ]
+          /* @__PURE__ */ jsx("div", { className: "min-h-0 flex-1 overflow-y-auto", children })
+        ] })
       }
     ) });
   }
@@ -5536,7 +5565,7 @@ function Sidebar({
             contentClassName
           ),
           style: { ...animDurationStyle, ...customSizeStyle },
-          children: /* @__PURE__ */ jsxs(SidebarZIndexProvider, { children: [
+          children: /* @__PURE__ */ jsx(SidebarZIndexProvider, { children: /* @__PURE__ */ jsxs("div", { className: "flex h-full min-h-0 flex-col", children: [
             /* @__PURE__ */ jsx(
               SidebarHeader,
               {
@@ -5546,8 +5575,8 @@ function Sidebar({
                 onClose: () => handleOpenChange(false)
               }
             ),
-            children
-          ] })
+            /* @__PURE__ */ jsx("div", { className: "min-h-0 flex-1 overflow-y-auto", children })
+          ] }) })
         }
       )
     ] })
@@ -5851,18 +5880,8 @@ function Modal({
   const mouseDownOnBackdropRef = React9.useRef(false);
   React9.useEffect(() => {
     if (!isOpen) return;
-    const scrollY = window.scrollY;
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-      window.scrollTo(0, scrollY);
-    };
+    lockBodyScroll();
+    return unlockBodyScroll;
   }, [isOpen]);
   if (!isOpen) return null;
   const handleBackdropMouseDown = (e) => {
