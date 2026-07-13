@@ -6212,7 +6212,7 @@ function AppHeader({
     {
       "data-slot": "app-header",
       className: cn(
-        "uengage-ui fixed left-0 right-0 top-0 z-30 w-full bg-[#FAFFF7]",
+        "uengage-ui fixed left-0 right-0 top-0 z-30 w-full bg-white",
         className
       ),
       style,
@@ -6318,7 +6318,7 @@ function AppSidebar({
         "data-collapsed": collapsed,
         className: cn(
           "uengage-ui fixed bottom-0 left-0 z-40 flex w-full flex-col md:w-[240px]",
-          "bg-[#FAFFF7] transition-transform duration-[250ms] ease-in-out",
+          "bg-white transition-transform duration-[250ms] ease-in-out",
           collapsed && "-translate-x-full",
           className
         ),
@@ -6330,7 +6330,7 @@ function AppSidebar({
               "div",
               {
                 "data-slot": "app-sidebar-products",
-                className: "relative flex w-[35%] flex-col items-end bg-[#FAFFF7]",
+                className: "relative flex w-[35%] flex-col items-end bg-white",
                 children: products.map((product) => {
                   const isActive = product.id === activeProductId;
                   return /* @__PURE__ */ jsxs(
@@ -6371,7 +6371,7 @@ function AppSidebar({
               "div",
               {
                 "data-slot": "app-sidebar-modules",
-                className: "flex h-full w-[65%] flex-col bg-[#FAFFF7]",
+                className: "flex h-full w-[65%] flex-col bg-white",
                 style: {
                   borderLeft: "1px solid",
                   borderImage: "linear-gradient(134.33deg, #C8E7B8 3.98%, #00A86B 104.92%) 1"
@@ -6409,7 +6409,7 @@ function AppSidebar({
             "div",
             {
               "data-slot": "app-sidebar-footer",
-              className: "w-full shrink-0 border-t bg-[#FAFFF7]",
+              className: "w-full shrink-0 border-t bg-white",
               children: footer
             }
           )

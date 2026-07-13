@@ -42,7 +42,7 @@ function AppHeader({
     <header
       data-slot="app-header"
       className={cn(
-        "uengage-ui fixed left-0 right-0 top-0 z-30 w-full bg-[#FAFFF7]",
+        "uengage-ui fixed left-0 right-0 top-0 z-30 w-full bg-white",
         className,
       )}
       style={style}

@@ -90,7 +90,7 @@ function AppSidebar({
       data-collapsed={collapsed}
       className={cn(
         "uengage-ui fixed bottom-0 left-0 z-40 flex w-full flex-col md:w-[240px]",
-        "bg-[#FAFFF7] transition-transform duration-[250ms] ease-in-out",
+        "bg-white transition-transform duration-[250ms] ease-in-out",
         collapsed && "-translate-x-full",
         className,
       )}
@@ -102,7 +102,7 @@ function AppSidebar({
         {/* ── Left: product list ── */}
         <div
           data-slot="app-sidebar-products"
-          className="relative flex w-[35%] flex-col items-end bg-[#FAFFF7]"
+          className="relative flex w-[35%] flex-col items-end bg-white"
         >
           {products.map((product) => {
             const isActive = product.id === activeProductId;
@@ -143,7 +143,7 @@ function AppSidebar({
         {/* ── Right: module list ── */}
         <div
           data-slot="app-sidebar-modules"
-          className="flex h-full w-[65%] flex-col bg-[#FAFFF7]"
+          className="flex h-full w-[65%] flex-col bg-white"
           style={{
             borderLeft: "1px solid",
             borderImage:
@@ -188,7 +188,7 @@ function AppSidebar({
       {footer != null && (
         <div
           data-slot="app-sidebar-footer"
-          className="w-full shrink-0 border-t bg-[#FAFFF7]"
+          className="w-full shrink-0 border-t bg-white"
         >
           {footer}
         </div>
