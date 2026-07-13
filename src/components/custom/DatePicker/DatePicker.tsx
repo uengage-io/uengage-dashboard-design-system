@@ -12,7 +12,8 @@ import {
   MonthPickerCalendar,
 } from "../../ui/DatePickerCalendar";
 import { triggerVariants } from "./datepickerVariants";
-import { formatDate, formatRange, formatMonthYear } from "./dateHelpers";
+import { formatDate, formatDateTime, formatRange, formatMonthYear } from "./dateHelpers";
+import { TimePicker, type TimeValue } from "./TimePicker";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 import { InputHelper } from "@/components/custom/Input/InputHelper";
 import type { DatePickerProps, DateRange } from "./DatePicker.types";
@@ -84,7 +85,9 @@ function DatePicker({
   readOnly = false,
   open: controlledOpen,
   onOpenChange: onOpenChangeProp,
+  showTime = false,
 }: DatePickerProps) {
+  const isSingleWithTime = mode === "single" && showTime;
   const [internalOpen, setInternalOpen] = React.useState(false);
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = React.useCallback(
@@ -134,6 +137,16 @@ function DatePicker({
   // hoverDate: live preview while pendingFrom is set
   const [hoverDate, setHoverDate] = React.useState<Date | null>(null);
 
+  // ── Single + time draft state ─────────────────────────────────────────
+  // draftSingleDate: day picked but not yet applied (single + showTime mode)
+  const [draftSingleDate, setDraftSingleDate] = React.useState<Date | null>(
+    null,
+  );
+  const [draftTime, setDraftTime] = React.useState<TimeValue>({
+    hours: new Date().getHours(),
+    minutes: new Date().getMinutes(),
+  });
+
   // Reset draft when popover opens so it starts from the committed value
   const prevOpen = React.useRef(false);
   React.useEffect(() => {
@@ -144,6 +157,14 @@ function DatePicker({
       setDraftRange(
         mode === "range" && isDateRange(committed) ? committed : null,
       );
+      if (isSingleWithTime) {
+        const base = committed instanceof Date ? committed : null;
+        setDraftSingleDate(base);
+        setDraftTime({
+          hours: base ? base.getHours() : new Date().getHours(),
+          minutes: base ? base.getMinutes() : new Date().getMinutes(),
+        });
+      }
     }
     if (!open && prevOpen.current) {
       // Closing: discard any mid-selection state
@@ -151,7 +172,7 @@ function DatePicker({
       setHoverDate(null);
     }
     prevOpen.current = open;
-  }, [open, committed, mode]);
+  }, [open, committed, mode, isSingleWithTime]);
 
   // ── Disabled date matchers ────────────────────────────────────────────
   const calendarDisabled = React.useMemo(() => {
@@ -165,13 +186,15 @@ function DatePicker({
   const triggerLabel = React.useMemo((): string | null => {
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
-      return formatDate(committed);
+      return isSingleWithTime
+        ? formatDateTime(committed)
+        : formatDate(committed);
     if (mode === "month" && committed instanceof Date)
       return formatMonthYear(committed);
     if (mode === "range" && isDateRange(committed))
       return formatRange(committed.from, committed.to) ?? null;
     return null;
-  }, [committed, mode]);
+  }, [committed, mode, isSingleWithTime]);
 
   // ── Effective display range (draft + hover preview) ──
   // Returns { from, to? } — to may be undefined when only the first click is done.
@@ -196,10 +219,15 @@ function DatePicker({
   // ── Calendar selection ────────────────────────────────────────────────
   const calendarSelected = React.useMemo(() => {
     if (mode === "single") {
+      if (isSingleWithTime) {
+        return (
+          draftSingleDate ?? (committed instanceof Date ? committed : undefined)
+        );
+      }
       return committed instanceof Date ? committed : undefined;
     }
     return effectiveDisplayRange ?? undefined;
-  }, [mode, committed, effectiveDisplayRange]);
+  }, [mode, committed, effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
 
   // ── From/To box labels ────────────────────────────────────────────────
   const fromLabel = React.useMemo((): string | null => {
@@ -218,6 +246,10 @@ function DatePicker({
     if (modifiers.disabled) return;
 
     if (mode === "single") {
+      if (isSingleWithTime) {
+        setDraftSingleDate(date);
+        return;
+      }
       setCommitted(date);
       onChange?.(date);
       setOpen(false);
@@ -285,6 +317,21 @@ function DatePicker({
     setOpen(false);
   };
 
+  const handleApplySingleTime = () => {
+    if (!draftSingleDate) return;
+    const combined = new Date(draftSingleDate);
+    combined.setHours(draftTime.hours, draftTime.minutes, 0, 0);
+    setDraftSingleDate(null);
+    setCommitted(combined);
+    onChange?.(combined);
+    setOpen(false);
+  };
+
+  const handleCancelSingleTime = () => {
+    setDraftSingleDate(null);
+    setOpen(false);
+  };
+
   const handleClearTrigger = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -292,6 +339,7 @@ function DatePicker({
     setDraftRange(null);
     setPendingFrom(null);
     setHoverDate(null);
+    setDraftSingleDate(null);
     onChange?.(null);
   };
 
@@ -469,38 +517,43 @@ function DatePicker({
 
             {/* ── Day calendar (single / range) ── */}
             {mode !== "month" && (
-              <DatePickerCalendar
-                mode={mode}
-                selected={calendarSelected}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                disabled={calendarDisabled as any}
-                minDate={minDate}
-                maxDate={maxDate}
-                onDayClick={(date, modifiers) =>
-                  handleDayClick(date, modifiers)
-                }
-                onDayMouseEnter={(date) => handleDayMouseEnter(date)}
-                onDayMouseLeave={() => handleDayMouseLeave()}
-              />
+              <div className="flex">
+                <DatePickerCalendar
+                  mode={mode}
+                  selected={calendarSelected}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  disabled={calendarDisabled as any}
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  onDayClick={(date, modifiers) =>
+                    handleDayClick(date, modifiers)
+                  }
+                  onDayMouseEnter={(date) => handleDayMouseEnter(date)}
+                  onDayMouseLeave={() => handleDayMouseLeave()}
+                />
+                {isSingleWithTime && (
+                  <TimePicker value={draftTime} onChange={setDraftTime} />
+                )}
+              </div>
             )}
 
-            {/* ── Cancel / Apply footer (range mode only) ── */}
-            {mode === "range" && (
+            {/* ── Cancel / Apply footer (range mode, or single + showTime) ── */}
+            {(mode === "range" || isSingleWithTime) && (
               <div className="flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5">
                 <button
                   type="button"
-                  onClick={handleCancel}
+                  onClick={isSingleWithTime ? handleCancelSingleTime : handleCancel}
                   className="rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  onClick={handleApply}
-                  disabled={!canApply}
+                  onClick={isSingleWithTime ? handleApplySingleTime : handleApply}
+                  disabled={isSingleWithTime ? !draftSingleDate : !canApply}
                   className={cn(
                     "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
-                    canApply
+                    (isSingleWithTime ? draftSingleDate : canApply)
                       ? "border-[#006F42] text-[#006F42]"
                       : "border-gray-300 text-gray-400 cursor-not-allowed",
                   )}

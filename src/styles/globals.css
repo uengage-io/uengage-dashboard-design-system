@@ -227,6 +227,15 @@
   background-color: #2d7a50 !important;
 }
 
+/* DatePicker TimePicker — hidden-scrollbar wheel columns */
+.time-picker-column {
+  scrollbar-width: none;
+  scroll-snap-type: y mandatory;
+}
+.time-picker-column::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Right-slide: standard slide in/out from the right edge ── */
 [data-slot="drawer-content"][data-side="right-slide"][data-state="open"] {
   animation: sidebar-slide-in-from-right var(--sb-open-dur, 300ms) cubic-bezier(0.16, 1, 0.3, 1) both;

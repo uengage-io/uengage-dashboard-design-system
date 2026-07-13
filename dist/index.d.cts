@@ -628,9 +628,15 @@ interface DatePickerProps {
     open?: boolean;
     /** Called whenever the popover wants to open or close. Mirror this back into `open` to stay in sync. */
     onOpenChange?: (open: boolean) => void;
+    /**
+     * When true and `mode` is `"single"`, shows an hour/minute/AM-PM picker
+     * alongside the calendar. The selected date and time are committed together
+     * via an Apply button (same pattern as range mode). Ignored for other modes.
+     */
+    showTime?: boolean;
 }
 
-declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, readOnly, open: controlledOpen, onOpenChange: onOpenChangeProp, }: DatePickerProps): react_jsx_runtime.JSX.Element;
+declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, readOnly, open: controlledOpen, onOpenChange: onOpenChangeProp, showTime, }: DatePickerProps): react_jsx_runtime.JSX.Element;
 declare namespace DatePicker {
     var displayName: string;
 }
