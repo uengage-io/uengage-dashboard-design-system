@@ -4067,6 +4067,15 @@ function formatDate(date) {
   if (!date) return null;
   return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
+function formatDateTime(date) {
+  if (!date) return null;
+  const datePart = formatDate(date);
+  const hours = date.getHours();
+  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const period = hours >= 12 ? "PM" : "AM";
+  return `${datePart}, ${hour12}:${minutes} ${period}`;
+}
 function formatRange(from, to) {
   const f = formatDate(from);
   const t = formatDate(to);
@@ -4080,6 +4089,147 @@ function formatMonthYear(date) {
 function isSameDay(a, b) {
   if (!a || !b) return false;
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+var ITEM_HEIGHT = 36;
+var VISIBLE_ITEMS = 5;
+var COLUMN_HEIGHT = ITEM_HEIGHT * VISIBLE_ITEMS;
+function TimeColumn({
+  items,
+  selected,
+  onSelect
+}) {
+  const containerRef = React9__namespace.useRef(null);
+  const settleTimeout = React9__namespace.useRef(
+    void 0
+  );
+  React9__namespace.useEffect(() => {
+    const index = items.findIndex((item) => item.value === selected);
+    if (containerRef.current && index >= 0) {
+      containerRef.current.scrollTop = index * ITEM_HEIGHT;
+    }
+  }, []);
+  const handleScroll = () => {
+    if (settleTimeout.current) clearTimeout(settleTimeout.current);
+    settleTimeout.current = setTimeout(() => {
+      const el = containerRef.current;
+      if (!el) return;
+      const index = Math.min(
+        Math.max(Math.round(el.scrollTop / ITEM_HEIGHT), 0),
+        items.length - 1
+      );
+      const item = items[index];
+      if (item && item.value !== selected) onSelect(item.value);
+    }, 120);
+  };
+  const scrollItemToCenter = (value) => {
+    const index = items.findIndex((item) => item.value === value);
+    if (containerRef.current && index >= 0) {
+      containerRef.current.scrollTo({
+        top: index * ITEM_HEIGHT,
+        behavior: "smooth"
+      });
+    }
+  };
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    "div",
+    {
+      ref: containerRef,
+      onScroll: handleScroll,
+      className: "time-picker-column relative overflow-y-auto scroll-smooth",
+      style: { height: COLUMN_HEIGHT },
+      children: [
+        /* @__PURE__ */ jsxRuntime.jsx("div", { style: { height: (COLUMN_HEIGHT - ITEM_HEIGHT) / 2 } }),
+        items.map((item) => {
+          const isSelected = item.value === selected;
+          return /* @__PURE__ */ jsxRuntime.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => scrollItemToCenter(item.value),
+              style: { height: ITEM_HEIGHT, scrollSnapAlign: "center" },
+              className: cn(
+                "flex w-full shrink-0 items-center justify-center text-sm tabular-nums transition-all duration-150",
+                isSelected ? "scale-105 font-semibold text-[#006F42]" : "text-[#9CA3AF] hover:text-[#374151]"
+              ),
+              children: item.label
+            },
+            item.value
+          );
+        }),
+        /* @__PURE__ */ jsxRuntime.jsx("div", { style: { height: (COLUMN_HEIGHT - ITEM_HEIGHT) / 2 } })
+      ]
+    }
+  );
+}
+var HOURS = Array.from({ length: 12 }, (_, i) => ({
+  label: String(i + 1).padStart(2, "0"),
+  value: i + 1
+}));
+var MINUTES = Array.from({ length: 60 }, (_, i) => ({
+  label: String(i).padStart(2, "0"),
+  value: i
+}));
+var PERIODS = [
+  { label: "AM", value: 0 },
+  { label: "PM", value: 1 }
+];
+function TimePicker({
+  value,
+  onChange,
+  className
+}) {
+  const hour12 = value.hours % 12 === 0 ? 12 : value.hours % 12;
+  const period = value.hours >= 12 ? 1 : 0;
+  const setHour12 = (h) => {
+    const hours = period === 1 ? h % 12 + 12 : h % 12;
+    onChange({ ...value, hours });
+  };
+  const setMinutes = (minutes) => onChange({ ...value, minutes });
+  const setPeriod = (p) => {
+    const base = value.hours % 12;
+    onChange({ ...value, hours: p === 1 ? base + 12 : base });
+  };
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    "div",
+    {
+      className: cn(
+        "flex w-[176px] flex-col border-l border-[#F3F4F6]",
+        className
+      ),
+      children: [
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-center gap-1.5 border-b border-[#F3F4F6] py-2.5 text-xs font-medium text-[#374151]", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Clock, { size: 13, strokeWidth: 2, className: "text-[#006F42]" }),
+          "Select time"
+        ] }),
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative flex justify-center px-2", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(
+            "div",
+            {
+              className: "pointer-events-none absolute inset-x-2 z-0 rounded-md bg-[#F0FBF5]",
+              style: {
+                top: (COLUMN_HEIGHT - ITEM_HEIGHT) / 2,
+                height: ITEM_HEIGHT
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "pointer-events-none absolute inset-x-2 top-0 z-10 h-6 bg-gradient-to-b from-white to-transparent" }),
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "pointer-events-none absolute inset-x-2 bottom-0 z-10 h-6 bg-gradient-to-t from-white to-transparent" }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative z-0 flex gap-2", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(TimeColumn, { items: HOURS, selected: hour12, onSelect: setHour12 }),
+            /* @__PURE__ */ jsxRuntime.jsx(
+              TimeColumn,
+              {
+                items: MINUTES,
+                selected: value.minutes,
+                onSelect: setMinutes
+              }
+            ),
+            /* @__PURE__ */ jsxRuntime.jsx(TimeColumn, { items: PERIODS, selected: period, onSelect: setPeriod })
+          ] })
+        ] })
+      ]
+    }
+  );
 }
 function isDateRange(v) {
   return !!v && typeof v === "object" && "from" in v && "to" in v && (v.from instanceof Date || v.to instanceof Date);
@@ -4122,8 +4272,10 @@ function DatePicker({
   error,
   readOnly = false,
   open: controlledOpen,
-  onOpenChange: onOpenChangeProp
+  onOpenChange: onOpenChangeProp,
+  showTime = false
 }) {
+  const isSingleWithTime = mode === "single" && showTime;
   const [internalOpen, setInternalOpen] = React9__namespace.useState(false);
   const open = controlledOpen !== void 0 ? controlledOpen : internalOpen;
   const setOpen = React9__namespace.useCallback(
@@ -4158,6 +4310,13 @@ function DatePicker({
   const [pendingFrom, setPendingFrom] = React9__namespace.useState(null);
   const [draftRange, setDraftRange] = React9__namespace.useState(null);
   const [hoverDate, setHoverDate] = React9__namespace.useState(null);
+  const [draftSingleDate, setDraftSingleDate] = React9__namespace.useState(
+    null
+  );
+  const [draftTime, setDraftTime] = React9__namespace.useState({
+    hours: (/* @__PURE__ */ new Date()).getHours(),
+    minutes: (/* @__PURE__ */ new Date()).getMinutes()
+  });
   const prevOpen = React9__namespace.useRef(false);
   React9__namespace.useEffect(() => {
     if (open && !prevOpen.current) {
@@ -4166,13 +4325,21 @@ function DatePicker({
       setDraftRange(
         mode === "range" && isDateRange(committed) ? committed : null
       );
+      if (isSingleWithTime) {
+        const base = committed instanceof Date ? committed : null;
+        setDraftSingleDate(base);
+        setDraftTime({
+          hours: base ? base.getHours() : (/* @__PURE__ */ new Date()).getHours(),
+          minutes: base ? base.getMinutes() : (/* @__PURE__ */ new Date()).getMinutes()
+        });
+      }
     }
     if (!open && prevOpen.current) {
       setPendingFrom(null);
       setHoverDate(null);
     }
     prevOpen.current = open;
-  }, [open, committed, mode]);
+  }, [open, committed, mode, isSingleWithTime]);
   const calendarDisabled = React9__namespace.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
@@ -4182,13 +4349,13 @@ function DatePicker({
   const triggerLabel = React9__namespace.useMemo(() => {
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
-      return formatDate(committed);
+      return isSingleWithTime ? formatDateTime(committed) : formatDate(committed);
     if (mode === "month" && committed instanceof Date)
       return formatMonthYear(committed);
     if (mode === "range" && isDateRange(committed))
       return formatRange(committed.from, committed.to) ?? null;
     return null;
-  }, [committed, mode]);
+  }, [committed, mode, isSingleWithTime]);
   const effectiveDisplayRange = React9__namespace.useMemo(() => {
     if (mode !== "range") return null;
     const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
@@ -4199,10 +4366,13 @@ function DatePicker({
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
   const calendarSelected = React9__namespace.useMemo(() => {
     if (mode === "single") {
+      if (isSingleWithTime) {
+        return draftSingleDate ?? (committed instanceof Date ? committed : void 0);
+      }
       return committed instanceof Date ? committed : void 0;
     }
     return effectiveDisplayRange ?? void 0;
-  }, [mode, committed, effectiveDisplayRange]);
+  }, [mode, committed, effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
   const fromLabel = React9__namespace.useMemo(() => {
     if (!effectiveDisplayRange) return null;
     return formatDate(effectiveDisplayRange.from);
@@ -4214,6 +4384,10 @@ function DatePicker({
   const handleDayClick = (date, modifiers) => {
     if (modifiers.disabled) return;
     if (mode === "single") {
+      if (isSingleWithTime) {
+        setDraftSingleDate(date);
+        return;
+      }
       setCommitted(date);
       onChange?.(date);
       setOpen(false);
@@ -4261,6 +4435,19 @@ function DatePicker({
     setDraftRange(null);
     setOpen(false);
   };
+  const handleApplySingleTime = () => {
+    if (!draftSingleDate) return;
+    const combined = new Date(draftSingleDate);
+    combined.setHours(draftTime.hours, draftTime.minutes, 0, 0);
+    setDraftSingleDate(null);
+    setCommitted(combined);
+    onChange?.(combined);
+    setOpen(false);
+  };
+  const handleCancelSingleTime = () => {
+    setDraftSingleDate(null);
+    setOpen(false);
+  };
   const handleClearTrigger = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -4268,6 +4455,7 @@ function DatePicker({
     setDraftRange(null);
     setPendingFrom(null);
     setHoverDate(null);
+    setDraftSingleDate(null);
     onChange?.(null);
   };
   const handleOpenChange = (next) => {
@@ -4414,25 +4602,28 @@ function DatePicker({
                 }
               }
             ),
-            mode !== "month" && /* @__PURE__ */ jsxRuntime.jsx(
-              DatePickerCalendar,
-              {
-                mode,
-                selected: calendarSelected,
-                disabled: calendarDisabled,
-                minDate,
-                maxDate,
-                onDayClick: (date, modifiers) => handleDayClick(date, modifiers),
-                onDayMouseEnter: (date) => handleDayMouseEnter(date),
-                onDayMouseLeave: () => handleDayMouseLeave()
-              }
-            ),
-            mode === "range" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5", children: [
+            mode !== "month" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                DatePickerCalendar,
+                {
+                  mode,
+                  selected: calendarSelected,
+                  disabled: calendarDisabled,
+                  minDate,
+                  maxDate,
+                  onDayClick: (date, modifiers) => handleDayClick(date, modifiers),
+                  onDayMouseEnter: (date) => handleDayMouseEnter(date),
+                  onDayMouseLeave: () => handleDayMouseLeave()
+                }
+              ),
+              isSingleWithTime && /* @__PURE__ */ jsxRuntime.jsx(TimePicker, { value: draftTime, onChange: setDraftTime })
+            ] }),
+            (mode === "range" || isSingleWithTime) && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5", children: [
               /* @__PURE__ */ jsxRuntime.jsx(
                 "button",
                 {
                   type: "button",
-                  onClick: handleCancel,
+                  onClick: isSingleWithTime ? handleCancelSingleTime : handleCancel,
                   className: "rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]",
                   children: "Cancel"
                 }
@@ -4441,11 +4632,11 @@ function DatePicker({
                 "button",
                 {
                   type: "button",
-                  onClick: handleApply,
-                  disabled: !canApply,
+                  onClick: isSingleWithTime ? handleApplySingleTime : handleApply,
+                  disabled: isSingleWithTime ? !draftSingleDate : !canApply,
                   className: cn(
                     "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
-                    canApply ? "border-[#006F42] text-[#006F42]" : "border-gray-300 text-gray-400 cursor-not-allowed"
+                    (isSingleWithTime ? draftSingleDate : canApply) ? "border-[#006F42] text-[#006F42]" : "border-gray-300 text-gray-400 cursor-not-allowed"
                   ),
                   children: "Apply"
                 }

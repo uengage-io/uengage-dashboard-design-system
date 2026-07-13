@@ -1,6 +1,9 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { DatePicker } from "./DatePicker";
+import { Input } from "@/components/custom/Input/Input";
+import { TimePicker, type TimeValue } from "./TimePicker";
+import { formatDateTime } from "./dateHelpers";
 import type { DateRange, DatePickerMode } from "./DatePicker.types";
 
 const meta = {
@@ -35,6 +38,10 @@ const meta = {
     disabled: { control: "boolean" },
     readOnly: { control: "boolean" },
     clearable: { control: "boolean" },
+    showTime: {
+      control: "boolean",
+      description: "Single mode only — shows an hour/minute/AM-PM picker alongside the calendar, committed via Apply.",
+    },
     className: { control: "text" },
     minDate: { control: "date" },
     maxDate: { control: "date" },
@@ -79,9 +86,120 @@ export const SingleClearable: Story = {
   args: { mode: "single", clearable: true, placeholder: "Select a date" },
 };
 
+export const SingleWithTime: Story = {
+  name: "Single · With time",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`showTime` adds an hour/minute/AM-PM picker next to the calendar (single mode only). Pick a day, adjust the time columns, then Apply to commit both together.",
+      },
+    },
+  },
+  render: function SingleWithTimeStory(args) {
+    const [value, setValue] = React.useState<Date | DateRange | null>(null);
+    return (
+      <div className="flex flex-col gap-2">
+        <DatePicker {...args} value={value} onChange={setValue} />
+        <code className="text-xs text-[#6B7280]">
+          {value instanceof Date ? value.toLocaleString() : "null"}
+        </code>
+      </div>
+    );
+  },
+  args: {
+    mode: "single",
+    showTime: true,
+    clearable: true,
+    placeholder: "Select date & time",
+  },
+};
+
 /* ── Range ───────────────────────────────────────────────────────────── */
 
 export const Range: Story = {
+  args: { mode: "range", placeholder: "Date range" },
+};
+
+export const RangeWithTimePreview: Story = {
+  name: "Range · With time preview",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`showTime` only applies in single mode, so a from/to range with times is composed from the range calendar plus two `TimePicker` instances — one for the start time, one for the end. The preview line below combines all four values live.",
+      },
+    },
+  },
+  render: function RangeWithTimePreviewStory(args) {
+    const [range, setRange] = React.useState<DateRange | null>(null);
+    const [fromTime, setFromTime] = React.useState<TimeValue>({
+      hours: 9,
+      minutes: 0,
+    });
+    const [toTime, setToTime] = React.useState<TimeValue>({
+      hours: 18,
+      minutes: 30,
+    });
+
+    const combinedFrom = React.useMemo(() => {
+      if (!range?.from) return null;
+      const d = new Date(range.from);
+      d.setHours(fromTime.hours, fromTime.minutes, 0, 0);
+      return d;
+    }, [range, fromTime]);
+
+    const combinedTo = React.useMemo(() => {
+      if (!range?.to) return null;
+      const d = new Date(range.to);
+      d.setHours(toTime.hours, toTime.minutes, 0, 0);
+      return d;
+    }, [range, toTime]);
+
+    return (
+      <div className="flex flex-col gap-3">
+        <DatePicker
+          {...args}
+          mode="range"
+          value={range}
+          onChange={(v) => setRange(v as DateRange | null)}
+        />
+
+        <div className="flex gap-4">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-medium text-[#6B7280]">
+              Start time
+            </span>
+            <div className="rounded-lg border border-[#F3F4F6]">
+              <TimePicker
+                value={fromTime}
+                onChange={setFromTime}
+                className="border-l-0"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-medium text-[#6B7280]">
+              End time
+            </span>
+            <div className="rounded-lg border border-[#F3F4F6]">
+              <TimePicker
+                value={toTime}
+                onChange={setToTime}
+                className="border-l-0"
+              />
+            </div>
+          </div>
+        </div>
+
+        <code className="text-xs text-[#6B7280]">
+          {combinedFrom && combinedTo
+            ? `${formatDateTime(combinedFrom)} → ${formatDateTime(combinedTo)}`
+            : "Select a date range"}
+        </code>
+      </div>
+    );
+  },
   args: { mode: "range", placeholder: "Date range" },
 };
 
