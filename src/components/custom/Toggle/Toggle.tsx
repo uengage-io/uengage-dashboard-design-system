@@ -2,7 +2,7 @@ import * as React from "react";
 import { Switch as SwitchPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { trackVariants, thumbVariants } from "./toggleVariants";
-import type { ToggleVariantSize } from "./toggleVariants";
+import type { ToggleVariantSize, ToggleVariantType } from "./toggleVariants";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 
 const PILL_PADDING: Record<ToggleVariantSize, string> = {
@@ -21,10 +21,12 @@ const GAP_ONLY: Record<ToggleVariantSize, string> = {
 
 export interface ToggleProps extends Omit<
   React.ComponentProps<typeof SwitchPrimitive.Root>,
-  "onChange" | "defaultChecked" | "checked"
+  "onChange" | "defaultChecked" | "checked" | "type"
 > {
   /** Size of the toggle */
   size?: ToggleVariantSize;
+  /** Color variant of the toggle's off (unchecked) state. Defaults to `"default"` (gray); `"danger"` makes it red. */
+  type?: ToggleVariantType;
   /** Field label rendered above the toggle. */
   label?: React.ReactNode;
   /** When true, appends a red asterisk to the label. */
@@ -47,6 +49,10 @@ export interface ToggleProps extends Omit<
   borderColor?: string;
   /** When provided together with borderColor, enables pill look. Background color applied when checked. */
   bgColor?: string;
+  /** Border color applied to the track (and pill, if used) when the toggle is off (unchecked). */
+  offBorderColor?: string;
+  /** Background color applied to the track (and pill, if used) when the toggle is off (unchecked). */
+  offBgColor?: string;
 }
 
 export const Toggle = React.forwardRef<
@@ -56,6 +62,7 @@ export const Toggle = React.forwardRef<
   (
     {
       size = "md",
+      type = "default",
       label,
       required,
       title,
@@ -68,6 +75,8 @@ export const Toggle = React.forwardRef<
       wrapperClassName,
       borderColor,
       bgColor,
+      offBorderColor,
+      offBgColor,
       ...props
     },
     ref,
@@ -75,14 +84,28 @@ export const Toggle = React.forwardRef<
     const [internalChecked, setInternalChecked] = React.useState(defaultChecked ?? false);
     const isChecked = checked !== undefined ? checked : internalChecked;
 
+    const hasOffColors = !!(offBorderColor || offBgColor);
     const hasCustomColors = !!(borderColor || bgColor);
+    const applyOffColors = !isChecked && hasOffColors;
 
     const pillStyle: React.CSSProperties | undefined = hasCustomColors
       ? {
           ...(borderColor ? { borderColor } : {}),
           ...(isChecked && bgColor ? { backgroundColor: bgColor } : {}),
+          ...(applyOffColors && offBorderColor ? { borderColor: offBorderColor } : {}),
+          ...(applyOffColors && offBgColor ? { backgroundColor: offBgColor } : {}),
         }
       : undefined;
+
+    const trackStyle: React.CSSProperties | undefined = applyOffColors
+      ? {
+          ...(offBorderColor ? { borderColor: offBorderColor } : {}),
+          ...(offBgColor ? { backgroundColor: offBgColor } : {}),
+        }
+      : undefined;
+
+    const thumbStyle: React.CSSProperties | undefined =
+      applyOffColors && offBorderColor ? { backgroundColor: offBorderColor } : undefined;
 
     const switchEl = (
       <SwitchPrimitive.Root
@@ -91,13 +114,15 @@ export const Toggle = React.forwardRef<
         defaultChecked={checked !== undefined ? undefined : defaultChecked}
         onCheckedChange={readOnly ? undefined : (val) => { setInternalChecked(val); onChange?.(val); }}
         disabled={disabled}
+        style={trackStyle}
         className={cn(
-          trackVariants({ size }),
+          trackVariants({ size, type }),
           readOnly && "pointer-events-none cursor-default",
+          applyOffColors && "disabled:opacity-100",
         )}
         {...props}
       >
-        <SwitchPrimitive.Thumb className={thumbVariants({ size })} />
+        <SwitchPrimitive.Thumb className={thumbVariants({ size, type })} style={thumbStyle} />
       </SwitchPrimitive.Root>
     );
 
@@ -109,7 +134,7 @@ export const Toggle = React.forwardRef<
           hasCustomColors
             ? cn("rounded-xl border", PILL_PADDING[size], "border-gray-200")
             : GAP_ONLY[size],
-          disabled && "cursor-not-allowed opacity-60",
+          disabled && (applyOffColors ? "cursor-not-allowed" : "cursor-not-allowed opacity-60"),
           readOnly && "pointer-events-none cursor-default",
         )}
       >
@@ -128,7 +153,7 @@ export const Toggle = React.forwardRef<
           "inline-flex items-center transition-colors rounded-xl border",
           PILL_PADDING[size],
           "border-gray-200",
-          disabled && "opacity-60",
+          disabled && !applyOffColors && "opacity-60",
           readOnly && "pointer-events-none cursor-default",
         )}
       >

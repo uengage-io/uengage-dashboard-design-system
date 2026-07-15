@@ -5157,7 +5157,6 @@ var trackVariants = cva(
     "transition-all duration-200 cursor-pointer select-none shadow-[0_2px_6px_rgba(15,23,42,0.12)]",
     `outline-none ${FOCUS_RING}`,
     "disabled:cursor-not-allowed disabled:opacity-50",
-    "data-[state=unchecked]:bg-[#F7FAF7] data-[state=unchecked]:border-[#9FB49F]",
     "data-[state=checked]:bg-[#C8D8B6] data-[state=checked]:border-[#1F6B32]"
   ].join(" "),
   {
@@ -5167,16 +5166,21 @@ var trackVariants = cva(
         sm: "h-7 w-12",
         md: "h-8 w-[4.2rem]",
         lg: "h-9 w-[4.75rem]"
+      },
+      type: {
+        default: "data-[state=unchecked]:bg-[#F7FAF7] data-[state=unchecked]:border-[#9FB49F]",
+        danger: "data-[state=unchecked]:bg-[#F5C6C6] data-[state=unchecked]:border-[#991B1B]"
       }
     },
     defaultVariants: {
-      size: "md"
+      size: "md",
+      type: "default"
     }
   }
 );
 var thumbVariants = cva(
   [
-    "pointer-events-none absolute left-0.5 top-1/2 block rounded-full border border-transparent bg-[#A8B8A2]",
+    "pointer-events-none absolute left-0.5 top-1/2 block rounded-full border border-transparent",
     "-translate-y-1/2 transition-transform duration-200",
     "data-[state=unchecked]:translate-x-0",
     "data-[state=checked]:bg-[#1F6B32] data-[state=checked]:border-[#165126]"
@@ -5188,10 +5192,15 @@ var thumbVariants = cva(
         sm: "h-5 w-5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-5",
         md: "h-6 w-6 shadow-[0_2px_3px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-8",
         lg: "h-7 w-7 shadow-[0_2px_4px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-9"
+      },
+      type: {
+        default: "data-[state=unchecked]:bg-[#A8B8A2]",
+        danger: "data-[state=unchecked]:bg-[#991B1B]"
       }
     },
     defaultVariants: {
-      size: "md"
+      size: "md",
+      type: "default"
     }
   }
 );
@@ -5210,6 +5219,7 @@ var GAP_ONLY3 = {
 var Toggle = React9.forwardRef(
   ({
     size = "md",
+    type = "default",
     label,
     required,
     title,
@@ -5222,15 +5232,26 @@ var Toggle = React9.forwardRef(
     wrapperClassName,
     borderColor,
     bgColor,
+    offBorderColor,
+    offBgColor,
     ...props
   }, ref) => {
     const [internalChecked, setInternalChecked] = React9.useState(defaultChecked ?? false);
     const isChecked = checked !== void 0 ? checked : internalChecked;
+    const hasOffColors = !!(offBorderColor || offBgColor);
     const hasCustomColors2 = !!(borderColor || bgColor);
+    const applyOffColors = !isChecked && hasOffColors;
     const pillStyle = hasCustomColors2 ? {
       ...borderColor ? { borderColor } : {},
-      ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
+      ...isChecked && bgColor ? { backgroundColor: bgColor } : {},
+      ...applyOffColors && offBorderColor ? { borderColor: offBorderColor } : {},
+      ...applyOffColors && offBgColor ? { backgroundColor: offBgColor } : {}
     } : void 0;
+    const trackStyle = applyOffColors ? {
+      ...offBorderColor ? { borderColor: offBorderColor } : {},
+      ...offBgColor ? { backgroundColor: offBgColor } : {}
+    } : void 0;
+    const thumbStyle = applyOffColors && offBorderColor ? { backgroundColor: offBorderColor } : void 0;
     const switchEl = /* @__PURE__ */ jsx(
       Switch.Root,
       {
@@ -5242,12 +5263,14 @@ var Toggle = React9.forwardRef(
           onChange?.(val);
         },
         disabled,
+        style: trackStyle,
         className: cn(
-          trackVariants({ size }),
-          readOnly && "pointer-events-none cursor-default"
+          trackVariants({ size, type }),
+          readOnly && "pointer-events-none cursor-default",
+          applyOffColors && "disabled:opacity-100"
         ),
         ...props,
-        children: /* @__PURE__ */ jsx(Switch.Thumb, { className: thumbVariants({ size }) })
+        children: /* @__PURE__ */ jsx(Switch.Thumb, { className: thumbVariants({ size, type }), style: thumbStyle })
       }
     );
     const inlineEl = title ? /* @__PURE__ */ jsxs(
@@ -5257,7 +5280,7 @@ var Toggle = React9.forwardRef(
         className: cn(
           "inline-flex cursor-pointer items-center transition-colors",
           hasCustomColors2 ? cn("rounded-xl border", PILL_PADDING3[size], "border-gray-200") : GAP_ONLY3[size],
-          disabled && "cursor-not-allowed opacity-60",
+          disabled && (applyOffColors ? "cursor-not-allowed" : "cursor-not-allowed opacity-60"),
           readOnly && "pointer-events-none cursor-default"
         ),
         children: [
@@ -5274,7 +5297,7 @@ var Toggle = React9.forwardRef(
           "inline-flex items-center transition-colors rounded-xl border",
           PILL_PADDING3[size],
           "border-gray-200",
-          disabled && "opacity-60",
+          disabled && !applyOffColors && "opacity-60",
           readOnly && "pointer-events-none cursor-default"
         ),
         children: switchEl
