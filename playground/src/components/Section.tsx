@@ -397,9 +397,14 @@ function CollapsibleWithActionDemo() {
         title="Payment Settings"
         description="Bank account and UPI details for payouts"
         action={
+          <>
           <Button variant="primary" size="sm">
+            Save As Draft
+          </Button>
+           <Button variant="primary" size="sm">
             Save
           </Button>
+          </>
         }
       />
       <SectionContent>

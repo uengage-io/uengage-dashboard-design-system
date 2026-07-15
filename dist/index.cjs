@@ -6985,69 +6985,70 @@ function SectionHeader({
 }) {
   const { collapsible, isOpen, divider } = React9__namespace.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-[11px] min-w-0 pointer-events-none", children: [
-      icon && /* @__PURE__ */ jsxRuntime.jsx(
-        "span",
-        {
-          "data-slot": "section-header-icon",
-          className: cn(
-            "flex-shrink-0 w-[30px] h-[30px] flex items-center justify-center",
-            "rounded-md border border-[#C8E7B8] text-[#1F5E2C]",
-            "[&>svg]:w-[17px] [&>svg]:h-[17px]",
-            collapsible && isOpen ? "bg-[#C8E7B8]" : "bg-[#FAFFF7]"
-          ),
-          children: icon
-        }
-      ),
-      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsxRuntime.jsx(
-          "div",
+    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-1 min-w-0 flex-wrap items-center gap-3", children: [
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-[11px] min-w-0 pointer-events-none", children: [
+        icon && /* @__PURE__ */ jsxRuntime.jsx(
+          "span",
           {
-            "data-slot": "section-header-title",
-            className: "text-base font-semibold text-[#202020] leading-snug",
-            children: title
+            "data-slot": "section-header-icon",
+            className: cn(
+              "flex-shrink-0 w-[30px] h-[30px] flex items-center justify-center",
+              "rounded-md border border-[#C8E7B8] text-[#1F5E2C]",
+              "[&>svg]:w-[17px] [&>svg]:h-[17px]",
+              collapsible && isOpen ? "bg-[#C8E7B8]" : "bg-[#FAFFF7]"
+            ),
+            children: icon
           }
         ),
-        description && /* @__PURE__ */ jsxRuntime.jsx(
-          "div",
-          {
-            "data-slot": "section-header-description",
-            className: "text-xs text-[#6B7280]",
-            children: description
-          }
-        )
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex-shrink-0 flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(
+            "div",
+            {
+              "data-slot": "section-header-title",
+              className: "text-base font-semibold text-[#202020] leading-snug break-words",
+              children: title
+            }
+          ),
+          description && /* @__PURE__ */ jsxRuntime.jsx(
+            "div",
+            {
+              "data-slot": "section-header-description",
+              className: "text-xs text-[#6B7280] break-words",
+              children: description
+            }
+          )
+        ] })
+      ] }),
+      collapsible && /* @__PURE__ */ jsxRuntime.jsx("div", { "aria-hidden": true, className: "w-7 h-7 flex-shrink-0" }),
       action && /* @__PURE__ */ jsxRuntime.jsx(
         "div",
         {
           "data-slot": "section-header-action",
-          className: "pointer-events-auto",
+          className: "pointer-events-auto flex items-center flex-wrap justify-start gap-2 sm:ml-auto",
           onClick: (e) => e.stopPropagation(),
           onKeyDown: (e) => e.stopPropagation(),
           children: action
         }
-      ),
-      collapsible && /* @__PURE__ */ jsxRuntime.jsx(
-        "span",
-        {
-          "data-slot": "section-collapse-indicator",
-          className: "flex h-7 w-7 items-center justify-center rounded-md text-[#6B7280]",
-          "aria-hidden": true,
-          children: /* @__PURE__ */ jsxRuntime.jsx(
-            lucideReact.ChevronDown,
-            {
-              size: 16,
-              className: cn(
-                "transition-transform duration-200",
-                isOpen && "rotate-180"
-              )
-            }
-          )
-        }
       )
-    ] })
+    ] }),
+    collapsible && /* @__PURE__ */ jsxRuntime.jsx(
+      "span",
+      {
+        "data-slot": "section-collapse-indicator",
+        className: "absolute right-5 top-3 flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-md text-[#6B7280]",
+        "aria-hidden": true,
+        children: /* @__PURE__ */ jsxRuntime.jsx(
+          lucideReact.ChevronDown,
+          {
+            size: 16,
+            className: cn(
+              "transition-transform duration-200",
+              isOpen && "rotate-180"
+            )
+          }
+        )
+      }
+    )
   ] });
   if (collapsible) {
     return /* @__PURE__ */ jsxRuntime.jsx(jsxRuntime.Fragment, { children: /* @__PURE__ */ jsxRuntime.jsx(
@@ -7055,7 +7056,7 @@ function SectionHeader({
       {
         "data-slot": "section-header",
         className: cn(
-          "w-[calc(100%+8px)] flex items-center justify-between gap-3 text-left",
+          "relative w-[calc(100%+8px)] flex items-start gap-3 text-left",
           "-mx-1 -mt-1 px-[21px] py-3",
           "data-[state=closed]:-mb-1 data-[state=closed]:pb-[13px]",
           "hover:bg-[#fafff7] transition-colors duration-150",
@@ -7073,7 +7074,7 @@ function SectionHeader({
     {
       "data-slot": "section-header",
       className: cn(
-        "flex items-center justify-between gap-3 px-5 py-3",
+        "relative flex items-start gap-3 px-5 py-3",
         className
       ),
       ...props,
