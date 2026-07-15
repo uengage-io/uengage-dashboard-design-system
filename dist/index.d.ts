@@ -815,6 +815,10 @@ interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "on
     borderColor?: string;
     /** When provided together with borderColor, enables pill look. Background color applied when checked. */
     bgColor?: string;
+    /** Border color applied to the track (and pill, if used) when the toggle is off (unchecked). */
+    offBorderColor?: string;
+    /** Background color applied to the track (and pill, if used) when the toggle is off (unchecked). */
+    offBgColor?: string;
 }
 declare const Toggle: React.ForwardRefExoticComponent<Omit<ToggleProps, "ref"> & React.RefAttributes<HTMLButtonElement>>;
 

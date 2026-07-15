@@ -5222,15 +5222,26 @@ var Toggle = React9.forwardRef(
     wrapperClassName,
     borderColor,
     bgColor,
+    offBorderColor,
+    offBgColor,
     ...props
   }, ref) => {
     const [internalChecked, setInternalChecked] = React9.useState(defaultChecked ?? false);
     const isChecked = checked !== void 0 ? checked : internalChecked;
+    const hasOffColors = !!(offBorderColor || offBgColor);
     const hasCustomColors2 = !!(borderColor || bgColor);
+    const applyOffColors = !isChecked && hasOffColors;
     const pillStyle = hasCustomColors2 ? {
       ...borderColor ? { borderColor } : {},
-      ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
+      ...isChecked && bgColor ? { backgroundColor: bgColor } : {},
+      ...applyOffColors && offBorderColor ? { borderColor: offBorderColor } : {},
+      ...applyOffColors && offBgColor ? { backgroundColor: offBgColor } : {}
     } : void 0;
+    const trackStyle = applyOffColors ? {
+      ...offBorderColor ? { borderColor: offBorderColor } : {},
+      ...offBgColor ? { backgroundColor: offBgColor } : {}
+    } : void 0;
+    const thumbStyle = applyOffColors && offBorderColor ? { backgroundColor: offBorderColor } : void 0;
     const switchEl = /* @__PURE__ */ jsx(
       Switch.Root,
       {
@@ -5242,12 +5253,14 @@ var Toggle = React9.forwardRef(
           onChange?.(val);
         },
         disabled,
+        style: trackStyle,
         className: cn(
           trackVariants({ size }),
-          readOnly && "pointer-events-none cursor-default"
+          readOnly && "pointer-events-none cursor-default",
+          applyOffColors && "disabled:opacity-100"
         ),
         ...props,
-        children: /* @__PURE__ */ jsx(Switch.Thumb, { className: thumbVariants({ size }) })
+        children: /* @__PURE__ */ jsx(Switch.Thumb, { className: thumbVariants({ size }), style: thumbStyle })
       }
     );
     const inlineEl = title ? /* @__PURE__ */ jsxs(
@@ -5257,7 +5270,7 @@ var Toggle = React9.forwardRef(
         className: cn(
           "inline-flex cursor-pointer items-center transition-colors",
           hasCustomColors2 ? cn("rounded-xl border", PILL_PADDING3[size], "border-gray-200") : GAP_ONLY3[size],
-          disabled && "cursor-not-allowed opacity-60",
+          disabled && (applyOffColors ? "cursor-not-allowed" : "cursor-not-allowed opacity-60"),
           readOnly && "pointer-events-none cursor-default"
         ),
         children: [
@@ -5274,7 +5287,7 @@ var Toggle = React9.forwardRef(
           "inline-flex items-center transition-colors rounded-xl border",
           PILL_PADDING3[size],
           "border-gray-200",
-          disabled && "opacity-60",
+          disabled && !applyOffColors && "opacity-60",
           readOnly && "pointer-events-none cursor-default"
         ),
         children: switchEl

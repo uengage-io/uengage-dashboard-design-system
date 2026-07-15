@@ -44,6 +44,14 @@ const meta: Meta<typeof Toggle> = {
       control: { type: "color" },
       description: "Custom border color of the toggle pill.",
     },
+    offBgColor: {
+      control: { type: "color" },
+      description: "Background color applied to the track (and pill, if used) when the toggle is off (unchecked).",
+    },
+    offBorderColor: {
+      control: { type: "color" },
+      description: "Border color applied to the track (and pill, if used) when the toggle is off (unchecked).",
+    },
   },
   args: {
     size: "md",
@@ -156,6 +164,29 @@ export const ReadOnly: Story = {
   },
 };
 
+export const OffCustomColors: Story = {
+  name: "Off · Custom colors",
+  args: {
+    title: "Notifications",
+    titlePosition: "right",
+    defaultChecked: false,
+    offBorderColor: "#D1D5DB",
+    offBgColor: "#F3F4F6",
+  },
+};
+
+export const DisabledOffCustomColors: Story = {
+  name: "Disabled · Off · Custom colors",
+  args: {
+    title: "Notifications",
+    titlePosition: "right",
+    disabled: true,
+    defaultChecked: false,
+    offBorderColor: "#D1D5DB",
+    offBgColor: "#F3F4F6",
+  },
+};
+
 export const ReadOnlyOff: Story = {
   name: "Read only (off)",
   args: {
@@ -184,6 +215,20 @@ export const PillCustomColors: Story = {
     titlePosition: "right",
     borderColor: "#1F6B32",
     bgColor: "#F0F7F0",
+    size: "md",
+  },
+};
+
+export const PillOffCustomColors: Story = {
+  name: "Pill · Off · Custom colors",
+  args: {
+    title: "Enable notifications",
+    titlePosition: "right",
+    borderColor: "#1F6B32",
+    bgColor: "#F0F7F0",
+    defaultChecked: false,
+    offBorderColor: "#D1D5DB",
+    offBgColor: "#F3F4F6",
     size: "md",
   },
 };
