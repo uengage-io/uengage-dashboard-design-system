@@ -12,6 +12,11 @@ const meta: Meta<typeof Toggle> = {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg"],
     },
+    type: {
+      control: { type: "select" },
+      options: ["default", "danger"],
+      description: "Color variant of the off (unchecked) state. `\"default\"` is gray, `\"danger\"` is red.",
+    },
     label: {
       control: { type: "text" },
       description: "Field label rendered above the toggle.",
@@ -55,6 +60,7 @@ const meta: Meta<typeof Toggle> = {
   },
   args: {
     size: "md",
+    type: "default",
     titlePosition: "right",
     disabled: false,
     required: false,
@@ -119,6 +125,18 @@ export const LabelAndTitle: Story = {
     title: "Enable push alerts",
     titlePosition: "right",
     size: "md",
+  },
+};
+
+/* ── Type (off-state color variant) ─────────────────────────────── */
+
+export const DangerType: Story = {
+  name: "Type · Danger",
+  args: {
+    title: "Auto-delete after 30 days",
+    titlePosition: "right",
+    type: "danger",
+    defaultChecked: false,
   },
 };
 

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Switch as SwitchPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { trackVariants, thumbVariants } from "./toggleVariants";
-import type { ToggleVariantSize } from "./toggleVariants";
+import type { ToggleVariantSize, ToggleVariantType } from "./toggleVariants";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 
 const PILL_PADDING: Record<ToggleVariantSize, string> = {
@@ -21,10 +21,12 @@ const GAP_ONLY: Record<ToggleVariantSize, string> = {
 
 export interface ToggleProps extends Omit<
   React.ComponentProps<typeof SwitchPrimitive.Root>,
-  "onChange" | "defaultChecked" | "checked"
+  "onChange" | "defaultChecked" | "checked" | "type"
 > {
   /** Size of the toggle */
   size?: ToggleVariantSize;
+  /** Color variant of the toggle's off (unchecked) state. Defaults to `"default"` (gray); `"danger"` makes it red. */
+  type?: ToggleVariantType;
   /** Field label rendered above the toggle. */
   label?: React.ReactNode;
   /** When true, appends a red asterisk to the label. */
@@ -60,6 +62,7 @@ export const Toggle = React.forwardRef<
   (
     {
       size = "md",
+      type = "default",
       label,
       required,
       title,
@@ -113,13 +116,13 @@ export const Toggle = React.forwardRef<
         disabled={disabled}
         style={trackStyle}
         className={cn(
-          trackVariants({ size }),
+          trackVariants({ size, type }),
           readOnly && "pointer-events-none cursor-default",
           applyOffColors && "disabled:opacity-100",
         )}
         {...props}
       >
-        <SwitchPrimitive.Thumb className={thumbVariants({ size })} style={thumbStyle} />
+        <SwitchPrimitive.Thumb className={thumbVariants({ size, type })} style={thumbStyle} />
       </SwitchPrimitive.Root>
     );
 

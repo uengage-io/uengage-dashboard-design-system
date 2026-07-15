@@ -781,18 +781,23 @@ interface StatusBadgeProps extends Omit<StatusBadgeVariants, "variant" | "size">
 declare function StatusBadge({ variant, size, label, icon, iconPosition, className, }: StatusBadgeProps): react_jsx_runtime.JSX.Element;
 
 type ToggleVariantSize = "xs" | "sm" | "md" | "lg";
+type ToggleVariantType = "default" | "danger";
 declare const trackVariants: (props?: ({
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
+    type?: "default" | "danger" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const thumbVariants: (props?: ({
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
+    type?: "default" | "danger" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type TrackVariants = VariantProps<typeof trackVariants>;
 type ThumbVariants = VariantProps<typeof thumbVariants>;
 
-interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "onChange" | "defaultChecked" | "checked"> {
+interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "onChange" | "defaultChecked" | "checked" | "type"> {
     /** Size of the toggle */
     size?: ToggleVariantSize;
+    /** Color variant of the toggle's off (unchecked) state. Defaults to `"default"` (gray); `"danger"` makes it red. */
+    type?: ToggleVariantType;
     /** Field label rendered above the toggle. */
     label?: React.ReactNode;
     /** When true, appends a red asterisk to the label. */

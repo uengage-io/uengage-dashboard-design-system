@@ -5182,7 +5182,6 @@ var trackVariants = classVarianceAuthority.cva(
     "transition-all duration-200 cursor-pointer select-none shadow-[0_2px_6px_rgba(15,23,42,0.12)]",
     `outline-none ${FOCUS_RING}`,
     "disabled:cursor-not-allowed disabled:opacity-50",
-    "data-[state=unchecked]:bg-[#F7FAF7] data-[state=unchecked]:border-[#9FB49F]",
     "data-[state=checked]:bg-[#C8D8B6] data-[state=checked]:border-[#1F6B32]"
   ].join(" "),
   {
@@ -5192,16 +5191,21 @@ var trackVariants = classVarianceAuthority.cva(
         sm: "h-7 w-12",
         md: "h-8 w-[4.2rem]",
         lg: "h-9 w-[4.75rem]"
+      },
+      type: {
+        default: "data-[state=unchecked]:bg-[#F7FAF7] data-[state=unchecked]:border-[#9FB49F]",
+        danger: "data-[state=unchecked]:bg-[#F5C6C6] data-[state=unchecked]:border-[#991B1B]"
       }
     },
     defaultVariants: {
-      size: "md"
+      size: "md",
+      type: "default"
     }
   }
 );
 var thumbVariants = classVarianceAuthority.cva(
   [
-    "pointer-events-none absolute left-0.5 top-1/2 block rounded-full border border-transparent bg-[#A8B8A2]",
+    "pointer-events-none absolute left-0.5 top-1/2 block rounded-full border border-transparent",
     "-translate-y-1/2 transition-transform duration-200",
     "data-[state=unchecked]:translate-x-0",
     "data-[state=checked]:bg-[#1F6B32] data-[state=checked]:border-[#165126]"
@@ -5213,10 +5217,15 @@ var thumbVariants = classVarianceAuthority.cva(
         sm: "h-5 w-5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-5",
         md: "h-6 w-6 shadow-[0_2px_3px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-8",
         lg: "h-7 w-7 shadow-[0_2px_4px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-9"
+      },
+      type: {
+        default: "data-[state=unchecked]:bg-[#A8B8A2]",
+        danger: "data-[state=unchecked]:bg-[#991B1B]"
       }
     },
     defaultVariants: {
-      size: "md"
+      size: "md",
+      type: "default"
     }
   }
 );
@@ -5235,6 +5244,7 @@ var GAP_ONLY3 = {
 var Toggle = React9__namespace.forwardRef(
   ({
     size = "md",
+    type = "default",
     label,
     required,
     title,
@@ -5280,12 +5290,12 @@ var Toggle = React9__namespace.forwardRef(
         disabled,
         style: trackStyle,
         className: cn(
-          trackVariants({ size }),
+          trackVariants({ size, type }),
           readOnly && "pointer-events-none cursor-default",
           applyOffColors && "disabled:opacity-100"
         ),
         ...props,
-        children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Switch.Thumb, { className: thumbVariants({ size }), style: thumbStyle })
+        children: /* @__PURE__ */ jsxRuntime.jsx(radixUi.Switch.Thumb, { className: thumbVariants({ size, type }), style: thumbStyle })
       }
     );
     const inlineEl = title ? /* @__PURE__ */ jsxRuntime.jsxs(
