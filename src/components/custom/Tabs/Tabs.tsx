@@ -408,7 +408,7 @@ function SecondaryTabs({
     const containerRect = wrapper.getBoundingClientRect();
     const btnRect = btn.getBoundingClientRect();
     setIndicator({
-      left: btnRect.left - containerRect.left,
+      left: btnRect.left - containerRect.left + wrapper.scrollLeft,
       width: btnRect.width,
       ready: true,
     });
@@ -462,7 +462,7 @@ function SecondaryTabs({
         <div className={cn("inline-flex max-w-full items-end", showBottomBorder && "border-b border-[#E5E7EB]")}>
           <div
             ref={wrapperRef}
-            className="relative min-w-0 overflow-hidden"
+            className="relative min-w-0 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             <TabsList
               variant="line"

@@ -247,6 +247,7 @@ export default function TabsPreview() {
             value={desktopTab}
             tabs={TABS_MANY}
             overflowLabel="More Options"
+            visibleTabLimit={4}
             onChange={setDesktopTab}
             showBottomBorder
           />
