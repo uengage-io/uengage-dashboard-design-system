@@ -45,67 +45,75 @@ function SectionHeader({
 
   const inner = (
     <>
-      {/* Left: icon + title + description */}
-      <div className="flex items-center gap-[11px] min-w-0 pointer-events-none">
-        {icon && (
-          <span
-            data-slot="section-header-icon"
-            className={cn(
-              "flex-shrink-0 w-[30px] h-[30px] flex items-center justify-center",
-              "rounded-md border border-[#C8E7B8] text-[#1F5E2C]",
-              "[&>svg]:w-[17px] [&>svg]:h-[17px]",
-              collapsible && isOpen ? "bg-[#C8E7B8]" : "bg-[#FAFFF7]",
-            )}
-          >
-            {icon}
-          </span>
-        )}
-        <div className="min-w-0">
-          <div
-            data-slot="section-header-title"
-            className="text-base font-semibold text-[#202020] leading-snug"
-          >
-            {title}
-          </div>
-          {description && (
-            <div
-              data-slot="section-header-description"
-              className="text-xs text-[#6B7280]"
+      {/* Single flex-wrap group: title/description + spacer + action, so every
+          wrapped line spans the header's full width. The chevron is pinned
+          separately via absolute positioning so it never gets pulled down
+          when the action wraps. */}
+      <div className="flex flex-1 min-w-0 flex-wrap items-center gap-3">
+        {/* icon + title + description */}
+        <div className="flex items-center gap-[11px] min-w-0 pointer-events-none">
+          {icon && (
+            <span
+              data-slot="section-header-icon"
+              className={cn(
+                "flex-shrink-0 w-[30px] h-[30px] flex items-center justify-center",
+                "rounded-md border border-[#C8E7B8] text-[#1F5E2C]",
+                "[&>svg]:w-[17px] [&>svg]:h-[17px]",
+                collapsible && isOpen ? "bg-[#C8E7B8]" : "bg-[#FAFFF7]",
+              )}
             >
-              {description}
-            </div>
+              {icon}
+            </span>
           )}
+          <div className="min-w-0">
+            <div
+              data-slot="section-header-title"
+              className="text-base font-semibold text-[#202020] leading-snug break-words"
+            >
+              {title}
+            </div>
+            {description && (
+              <div
+                data-slot="section-header-description"
+                className="text-xs text-[#6B7280] break-words"
+              >
+                {description}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Right: action slot + chevron */}
-      <div className="flex-shrink-0 flex items-center gap-2">
+        {/* Reserves room on this line so title text never runs under the
+            absolutely-positioned chevron. */}
+        {collapsible && <div aria-hidden className="w-7 h-7 flex-shrink-0" />}
+
         {action && (
           <div
             data-slot="section-header-action"
-            className="pointer-events-auto"
+            className="pointer-events-auto flex items-center flex-wrap justify-start gap-2 sm:ml-auto"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
           >
             {action}
           </div>
         )}
-        {collapsible && (
-          <span
-            data-slot="section-collapse-indicator"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-[#6B7280]"
-            aria-hidden
-          >
-            <ChevronDown
-              size={16}
-              className={cn(
-                "transition-transform duration-200",
-                isOpen && "rotate-180",
-              )}
-            />
-          </span>
-        )}
       </div>
+
+      {collapsible && (
+        <span
+          data-slot="section-collapse-indicator"
+          className="absolute right-5 top-3 flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-md text-[#6B7280]"
+          aria-hidden
+        >
+          <ChevronDown
+            size={16}
+            className={cn(
+              "transition-transform duration-200",
+              isOpen && "rotate-180",
+            )}
+          />
+        </span>
+      )}
     </>
   );
 
@@ -115,7 +123,7 @@ function SectionHeader({
         <Collapsible.Trigger
           data-slot="section-header"
           className={cn(
-            "w-[calc(100%+8px)] flex items-center justify-between gap-3 text-left",
+            "relative w-[calc(100%+8px)] flex items-start gap-3 text-left",
             "-mx-1 -mt-1 px-[21px] py-3",
             "data-[state=closed]:-mb-1 data-[state=closed]:pb-[13px]",
             "hover:bg-[#fafff7] transition-colors duration-150",
@@ -135,7 +143,7 @@ function SectionHeader({
     <div
       data-slot="section-header"
       className={cn(
-        "flex items-center justify-between gap-3 px-5 py-3",
+        "relative flex items-start gap-3 px-5 py-3",
         className,
       )}
       {...props}
