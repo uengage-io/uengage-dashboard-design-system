@@ -20,6 +20,7 @@ interface CustomInputComposedProps extends CustomInputProps {
 
 function Input({
   size = "md",
+  variant = "default",
   inputType = "text",
   allowPattern,
   label,
@@ -178,7 +179,7 @@ function Input({
       : undefined;
 
   const fieldClass = cn(
-    inputFieldVariants({ size, multiline, hasLeftIcon, hasRightIcon }),
+    inputFieldVariants({ size, multiline, appearance: variant, hasLeftIcon, hasRightIcon }),
     doubleRightPadding,
   );
 
@@ -191,7 +192,7 @@ function Input({
       )}
 
       <div ref={wrapperRef} className="relative">
-        <div className={cn(inputWrapperVariants({ size, multiline, state }))}>
+        <div className={cn(inputWrapperVariants({ size, multiline, appearance: variant, state }))}>
           {hasLeftIcon && (
             <span
               className={cn(

@@ -2827,7 +2827,7 @@ function TertiaryTabs({
 }
 Tabs2.displayName = "Tabs";
 var inputWrapperVariants = cva(
-  "relative flex w-full rounded-[4px] border bg-white transition-colors",
+  "relative flex w-full transition-colors",
   {
     variants: {
       size: {
@@ -2839,23 +2839,54 @@ var inputWrapperVariants = cva(
         false: "items-center",
         true: "items-start h-auto"
       },
+      appearance: {
+        default: "rounded-[4px] border bg-white",
+        underline: "rounded-none border-0 border-b-2 bg-transparent"
+      },
       state: {
-        default: "border-gray-400 hover:border-gray-500 hover:shadow-sm",
-        focused: "border-gray-500 ring-1 ring-gray-200",
-        error: "border-red-500",
-        disabled: "bg-gray-50 border-gray-300 text-gray-400 cursor-not-allowed opacity-60",
-        readonly: "bg-gray-50 border-gray-300 text-gray-700 cursor-default"
+        default: "",
+        focused: "",
+        error: "",
+        disabled: "",
+        readonly: ""
       }
     },
     compoundVariants: [
       { multiline: false, size: "sm", className: COMPONENT_HEIGHT.sm },
       { multiline: false, size: "md", className: COMPONENT_HEIGHT.md },
-      { multiline: false, size: "lg", className: COMPONENT_HEIGHT.lg }
+      { multiline: false, size: "lg", className: COMPONENT_HEIGHT.lg },
+      { appearance: "default", state: "default", className: "border-gray-400 hover:border-gray-500 hover:shadow-sm" },
+      { appearance: "default", state: "focused", className: "border-gray-500 ring-1 ring-gray-200" },
+      { appearance: "default", state: "error", className: "border-red-500" },
+      {
+        appearance: "default",
+        state: "disabled",
+        className: "bg-gray-50 border-gray-300 text-gray-400 cursor-not-allowed opacity-60"
+      },
+      {
+        appearance: "default",
+        state: "readonly",
+        className: "bg-gray-50 border-gray-300 text-gray-700 cursor-default"
+      },
+      { appearance: "underline", state: "default", className: "border-b-gray-300 hover:border-b-gray-400" },
+      { appearance: "underline", state: "focused", className: "border-b-gray-900" },
+      { appearance: "underline", state: "error", className: "border-b-red-500" },
+      {
+        appearance: "underline",
+        state: "disabled",
+        className: "border-b-gray-200 text-gray-400 cursor-not-allowed opacity-60"
+      },
+      {
+        appearance: "underline",
+        state: "readonly",
+        className: "border-b-gray-200 text-gray-700 cursor-default"
+      }
     ],
     defaultVariants: {
       size: "md",
       multiline: false,
-      state: "default"
+      state: "default",
+      appearance: "default"
     }
   }
 );
@@ -2872,6 +2903,10 @@ var inputFieldVariants = cva(
         false: "py-0",
         true: "py-2"
       },
+      appearance: {
+        default: "",
+        underline: ""
+      },
       hasLeftIcon: {
         true: "",
         false: ""
@@ -2887,11 +2922,14 @@ var inputFieldVariants = cva(
       { size: "lg", hasLeftIcon: true, className: "pl-10" },
       { size: "sm", hasRightIcon: true, className: "pr-8" },
       { size: "md", hasRightIcon: true, className: "pr-9" },
-      { size: "lg", hasRightIcon: true, className: "pr-10" }
+      { size: "lg", hasRightIcon: true, className: "pr-10" },
+      { appearance: "underline", hasLeftIcon: false, className: "pl-0" },
+      { appearance: "underline", hasRightIcon: false, className: "pr-0" }
     ],
     defaultVariants: {
       size: "md",
       multiline: false,
+      appearance: "default",
       hasLeftIcon: false,
       hasRightIcon: false
     }
@@ -2938,6 +2976,7 @@ var PATTERN_REGEX = {
 };
 function Input2({
   size = "md",
+  variant = "default",
   inputType = "text",
   allowPattern,
   label,
@@ -3047,13 +3086,13 @@ function Input2({
   };
   const describedById = effectiveError ? `${inputId}-error` : helperText ? `${inputId}-helper` : void 0;
   const fieldClass = cn(
-    inputFieldVariants({ size, multiline, hasLeftIcon, hasRightIcon }),
+    inputFieldVariants({ size, multiline, appearance: variant, hasLeftIcon, hasRightIcon }),
     doubleRightPadding
   );
   return /* @__PURE__ */ jsxs("div", { className: cn("flex flex-col gap-1.5 min-w-0", width, className), children: [
     label && /* @__PURE__ */ jsx(InputLabel, { htmlFor: inputId, size, required, children: label }),
     /* @__PURE__ */ jsxs("div", { ref: wrapperRef, className: "relative", children: [
-      /* @__PURE__ */ jsxs("div", { className: cn(inputWrapperVariants({ size, multiline, state })), children: [
+      /* @__PURE__ */ jsxs("div", { className: cn(inputWrapperVariants({ size, multiline, appearance: variant, state })), children: [
         hasLeftIcon && /* @__PURE__ */ jsx(
           "span",
           {
