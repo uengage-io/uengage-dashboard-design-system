@@ -341,6 +341,14 @@ type InputType = "text" | "email" | "password" | "number" | "tel" | "url" | "sea
 type AllowPattern = "alphanumeric" | "alpha" | "numeric" | "decimal" | "phone" | "none";
 interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "width" | "height" | "onChange"> {
     size?: "sm" | "md" | "lg";
+    /**
+     * `"default"` renders the usual bordered box. `"underline"` drops the box
+     * entirely — transparent background, no side/top border, just a bottom
+     * rule that turns solid on focus. Matches borderless title-style fields
+     * (e.g. a "New ticket" modal's title input) where the placeholder should
+     * read directly on the surface behind it.
+     */
+    variant?: "default" | "underline";
     inputType?: InputType;
     allowPattern?: AllowPattern;
     label?: React.ReactNode;
@@ -386,7 +394,7 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
 interface CustomInputComposedProps extends CustomInputProps {
     required?: boolean;
 }
-declare function Input({ size, inputType, allowPattern, label, helperText, error, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, multiline, rows, resize, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
+declare function Input({ size, variant, inputType, allowPattern, label, helperText, error, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, multiline, rows, resize, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
 declare namespace Input {
     var displayName: string;
 }
@@ -415,11 +423,13 @@ declare namespace InputHelper {
 declare const inputWrapperVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
     multiline?: boolean | null | undefined;
+    appearance?: "default" | "underline" | null | undefined;
     state?: "default" | "disabled" | "focused" | "error" | "readonly" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const inputFieldVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
     multiline?: boolean | null | undefined;
+    appearance?: "default" | "underline" | null | undefined;
     hasLeftIcon?: boolean | null | undefined;
     hasRightIcon?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;

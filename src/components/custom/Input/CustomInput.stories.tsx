@@ -18,6 +18,12 @@ const meta = {
   },
   argTypes: {
     size: { control: "radio", options: ["sm", "md", "lg"] },
+    variant: {
+      control: "radio",
+      options: ["default", "underline"],
+      description:
+        "`default` is the bordered box. `underline` drops the box entirely — transparent background, no border, just a bottom rule that solidifies on focus. Used for borderless title-style fields (e.g. a modal's title input).",
+    },
     inputType: {
       control: "select",
       options: ["text", "email", "password", "number", "tel", "url", "search"],
@@ -64,6 +70,7 @@ const meta = {
   },
   args: {
     size: "md",
+    variant: "default",
     inputType: "text",
     placeholder: "Enter ticket name",
     disabled: false,
@@ -719,6 +726,108 @@ export const ClearableWithPassword: Story = {
     clearable: true,
     defaultValue: "secretpass",
     helperText: "Clear button sits left of the eye toggle.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+/* ── Underline variant ──────────────────────────────────────── */
+
+export const Underline: Story = {
+  args: {
+    variant: "underline",
+    placeholder: "What needs to be done?",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "No box, no side/top border — just a bottom rule that solidifies on focus. Matches borderless title fields such as a \"New ticket\" modal's title input, where the placeholder should read directly on the surface behind it.",
+      },
+    },
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const UnderlineSizes: Story = {
+  name: "Underline / Sizes",
+  render: () => (
+    <div className="flex w-90 flex-col gap-5">
+      <Input variant="underline" size="sm" placeholder="Small underline" />
+      <Input variant="underline" size="md" placeholder="Medium underline" />
+      <Input variant="underline" size="lg" placeholder="Large underline" />
+    </div>
+  ),
+};
+
+export const UnderlineTicketTitle: Story = {
+  name: "Underline / Ticket title (modal)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The exact usage this variant was built for — a ticket-creation modal's title field, where a boxed input would compete with the surrounding chrome.",
+      },
+    },
+  },
+  render: function UnderlineTicketTitleStory() {
+    const [value, setValue] = React.useState("");
+    return (
+      <div className="w-140 max-w-full rounded-2xl border border-[#EEEEEE] bg-white p-5 shadow-lg">
+        <Input
+          variant="underline"
+          size="lg"
+          placeholder="What needs to be done?"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          autoFocus
+        />
+      </div>
+    );
+  },
+};
+
+export const UnderlineWithError: Story = {
+  name: "Underline / With error",
+  args: {
+    variant: "underline",
+    placeholder: "What needs to be done?",
+    error: "Title is required.",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const UnderlineDisabled: Story = {
+  name: "Underline / Disabled",
+  args: {
+    variant: "underline",
+    disabled: true,
+    value: "Locked — cannot edit",
+  },
+  render: (args) => (
+    <div className="w-90">
+      <Input {...args} />
+    </div>
+  ),
+};
+
+export const UnderlineWithIcon: Story = {
+  name: "Underline / With icon",
+  args: {
+    variant: "underline",
+    placeholder: "Search tickets…",
+    leftIcon: <Search />,
   },
   render: (args) => (
     <div className="w-90">

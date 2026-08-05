@@ -23,6 +23,14 @@ export interface CustomInputProps
     "size" | "width" | "height" | "onChange"
   > {
   size?: "sm" | "md" | "lg";
+  /**
+   * `"default"` renders the usual bordered box. `"underline"` drops the box
+   * entirely — transparent background, no side/top border, just a bottom
+   * rule that turns solid on focus. Matches borderless title-style fields
+   * (e.g. a "New ticket" modal's title input) where the placeholder should
+   * read directly on the surface behind it.
+   */
+  variant?: "default" | "underline";
   inputType?: InputType;
   allowPattern?: AllowPattern;
   label?: React.ReactNode;
