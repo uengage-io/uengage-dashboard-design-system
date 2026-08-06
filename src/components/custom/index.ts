@@ -25,3 +25,8 @@ export {
   type FileUploadSize,
   type FileUploadLocalFile,
 } from "./FileUpload";
+export {
+  ColorPicker,
+  type ColorPickerProps,
+  type ColorPickerFormat,
+} from "./ColorPicker";
