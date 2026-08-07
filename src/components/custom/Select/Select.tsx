@@ -1,12 +1,15 @@
 import * as React from "react";
-import { ChevronDown, Check, X } from "lucide-react";
+import { ArrowDownAZ, ArrowUpAZ, ChevronDown, Check, X } from "lucide-react";
 import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import { cn } from "@/lib/utils";
+import { FilterGroupMobileContext } from "@/lib/filterGroupContext";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { InputLabel } from "@/components/custom/Input/InputLabel";
+import { InputHelper } from "@/components/custom/Input/InputHelper";
 import {
   Command,
   CommandEmpty,
@@ -52,7 +55,17 @@ function Select<TItem = unknown>({
   onChange,
   onTouch,
   spellCheck = true,
+  clearable = false,
+  label,
+  required,
+  helperText,
+  error,
+  readOnly = false,
+  sorting = false,
+  indexing = false,
+  search: searchEnabled = true,
 }: SelectProps<TItem>) {
+  const isMobileDrawer = React.useContext(FilterGroupMobileContext);
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
   const resolvedOptions = React.useMemo<SelectOption[]>(() => {
@@ -67,8 +80,36 @@ function Select<TItem = unknown>({
   }, [items, getLabel, getValue, getDisabled, options]);
 
   const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = React.useState("");
-  const filteredOptions = useFuzzySearch(resolvedOptions, search);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
+  const listRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    listRef.current?.scrollTo({ top: 0 });
+  }, [sortOrder]);
+
+  const sortedOptions = React.useMemo<SelectOption[]>(() => {
+    if (!sorting) return resolvedOptions;
+    return [...resolvedOptions].sort((a, b) =>
+      sortOrder === "asc"
+        ? a.label.localeCompare(b.label)
+        : b.label.localeCompare(a.label),
+    );
+  }, [resolvedOptions, sorting, sortOrder]);
+
+  const fuseFilteredOptions = useFuzzySearch(sortedOptions, searchQuery);
+
+  const visibleOptions = React.useMemo<SelectOption[]>(() => {
+    if (!searchEnabled) return sortedOptions;
+    const q = searchQuery.trim();
+    if (indexing && /^\d+$/.test(q)) {
+      const n = parseInt(q, 10);
+      const pos = n - 1;
+      const opt = sortedOptions[pos];
+      return opt ? [opt] : [];
+    }
+    return fuseFilteredOptions;
+  }, [searchEnabled, searchQuery, indexing, sorting, sortOrder, sortedOptions, fuseFilteredOptions]);
   const [selected, setSelected] = React.useState<string | string[]>(
     controlledValue ?? defaultValue ?? (mode === "multi" ? [] : ""),
   );
@@ -80,7 +121,7 @@ function Select<TItem = unknown>({
   const selectedArr: string[] =
     mode === "multi" ? (Array.isArray(selected) ? selected : []) : [];
 
-  const enabledOptions = resolvedOptions.filter((o) => !o.disabled);
+  const enabledOptions = sortedOptions.filter((o) => !o.disabled);
   const allSelected =
     enabledOptions.length > 0 &&
     enabledOptions.every((o) => selectedArr.includes(o.value));
@@ -89,7 +130,10 @@ function Select<TItem = unknown>({
     mode === "single" ? selected === val : selectedArr.includes(val);
 
   const commit = (next: string | string[]) => {
-    setSelected(next);
+    // In uncontrolled mode update internal state immediately.
+    // In controlled mode the parent owns the value — don't touch internal state
+    // so the display stays at the last confirmed value until the parent updates the prop.
+    if (controlledValue === undefined) setSelected(next);
     onChange?.(next);
   };
 
@@ -175,7 +219,13 @@ function Select<TItem = unknown>({
       ? resolvedOptions.find((o) => o.value === selected)?.label
       : undefined;
 
-  const triggerState = disabled ? "disabled" : open ? "open" : "default";
+  const triggerState = disabled
+    ? "disabled"
+    : readOnly
+      ? "readonly"
+      : open
+        ? "open"
+        : "default";
 
   const placeholderSizeClass =
     size === "lg"
@@ -199,9 +249,9 @@ function Select<TItem = unknown>({
         : "px-2.5 py-1.5 text-xs";
 
   const handleOpenChange = (next: boolean) => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setOpen(next);
-    if (!next) setSearch(""); // reset search so next open starts fresh
+    if (!next) setSearchQuery(""); // reset search so next open starts fresh
     if (next) {
       interactedRef.current = true;
     } else if (interactedRef.current && !touchedRef.current) {
@@ -220,180 +270,262 @@ function Select<TItem = unknown>({
     onTouch?.();
   };
 
+  // ── Flat list mode inside FilterGroup mobile drawer ──────────────────────
+  if (isMobileDrawer) {
+    return (
+      <ul className="divide-y divide-gray-100">
+        {resolvedOptions.map((opt) => {
+          const selected = isSelected(opt.value);
+          return (
+            <li key={opt.value}>
+              <button
+                type="button"
+                disabled={opt.disabled}
+                onClick={() => !opt.disabled && handleSelect(opt.value)}
+                className={cn(
+                  "w-full flex items-center justify-between px-4 py-4 text-sm transition-colors",
+                  selected
+                    ? "text-[#006F42] font-semibold"
+                    : "text-gray-800 font-normal",
+                  opt.disabled
+                    ? "opacity-40 cursor-not-allowed"
+                    : "hover:bg-gray-50 active:bg-gray-100 cursor-pointer",
+                )}
+              >
+                <span>{opt.label}</span>
+                {selected && (
+                  <Check
+                    size={16}
+                    strokeWidth={2.5}
+                    className="shrink-0 text-[#006F42]"
+                  />
+                )}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
-        <div
-          role="button"
-          tabIndex={disabled ? -1 : 0}
-          aria-disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          onFocus={() => {
-            interactedRef.current = true;
-          }}
-          onBlur={handleTriggerBlur}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              if (!disabled) setOpen((o) => !o);
-            } else if (e.key === "Escape") {
-              setOpen(false);
-            }
-          }}
-          className={cn(
-            triggerVariants({ state: triggerState, size }),
-            width,
-            className,
-          )}
-        >
-          {/* ── Left: pills / label ── */}
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <InputLabel size={size === "xs" ? "sm" : size} required={required}>
+          {label}
+        </InputLabel>
+      )}
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
           <div
-            ref={mode === "multi" ? pillsContainerRef : undefined}
-            className="flex flex-1 items-center gap-1 overflow-hidden min-w-0"
+            role="button"
+            tabIndex={disabled ? -1 : 0}
+            aria-disabled={disabled}
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            onFocus={() => {
+              interactedRef.current = true;
+            }}
+            onBlur={handleTriggerBlur}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!disabled && !readOnly) setOpen((o) => !o);
+              } else if (e.key === "Escape") {
+                setOpen(false);
+              }
+            }}
+            className={cn(
+              triggerVariants({ state: triggerState, size }),
+              width,
+              className,
+            )}
           >
-            {mode === "multi" ? (
-              selectedArr.length > 0 ? (
-                <>
-                  {displayedPills.map((val) => {
-                    const opt = resolvedOptions.find((o) => o.value === val);
-                    if (!opt) return null;
-                    return (
-                      <span
-                        key={val}
-                        data-pill
-                        className="inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]"
-                      >
-                        <span className="truncate">{opt.label}</span>
-                        <button
-                          type="button"
-                          tabIndex={-1}
-                          onClick={(e) => removePill(val, e)}
-                          className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
-                          aria-label={`Remove ${opt.label}`}
+            {/* ── Left: pills / label ── */}
+            <div
+              ref={mode === "multi" ? pillsContainerRef : undefined}
+              className="flex flex-1 items-center gap-1 overflow-hidden min-w-0"
+            >
+              {mode === "multi" ? (
+                selectedArr.length > 0 ? (
+                  <>
+                    {displayedPills.map((val) => {
+                      const opt = resolvedOptions.find((o) => o.value === val);
+                      if (!opt) return null;
+                      return (
+                        <span
+                          key={val}
+                          data-pill
+                          className="inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]"
                         >
-                          <X
-                            size={10}
-                            strokeWidth={2}
-                            className="hover:text-red-500"
-                          />
-                        </button>
+                          <span className="truncate">{opt.label}</span>
+                          {clearable && (
+                            <button
+                              type="button"
+                              tabIndex={-1}
+                              onClick={(e) => removePill(val, e)}
+                              className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
+                              aria-label={`Remove ${opt.label}`}
+                            >
+                              <X
+                                size={10}
+                                strokeWidth={2}
+                                className="hover:text-red-500"
+                              />
+                            </button>
+                          )}
+                        </span>
+                      );
+                    })}
+                    {overflowCount > 0 && (
+                      <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]">
+                        +{overflowCount}
                       </span>
-                    );
-                  })}
-                  {overflowCount > 0 && (
-                    <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]">
-                      +{overflowCount}
-                    </span>
-                  )}
-                </>
+                    )}
+                  </>
+                ) : (
+                  <span
+                    className={cn(
+                      "truncate text-[#C4C9D2]",
+                      placeholderSizeClass,
+                    )}
+                  >
+                    {placeholder}
+                  </span>
+                )
               ) : (
                 <span
                   className={cn(
-                    "truncate text-[#C4C9D2]",
-                    placeholderSizeClass,
+                    "truncate",
+                    singleLabel
+                      ? "text-[#111827]"
+                      : cn("text-[#C4C9D2]", placeholderSizeClass),
                   )}
                 >
-                  {placeholder}
+                  {singleLabel ?? placeholder}
                 </span>
-              )
-            ) : (
-              <span
-                className={cn(
-                  "truncate",
-                  singleLabel
-                    ? "text-[#111827]"
-                    : cn("text-[#C4C9D2]", placeholderSizeClass),
-                )}
-              >
-                {singleLabel ?? placeholder}
-              </span>
-            )}
-          </div>
-
-          <div className="flex shrink-0 items-center gap-1">
-            {hasSelection && (
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={clearAll}
-                className="flex items-center text-gray-400 hover:text-gray-600"
-                aria-label="Clear selection"
-              >
-                <X size={14} className="hover:text-red-500" strokeWidth={2} />
-              </button>
-            )}
-            <ChevronDown
-              size={16}
-              strokeWidth={2}
-              className={cn(
-                "text-gray-600 transition-transform duration-200",
-                open && "rotate-180",
               )}
-            />
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1">
+              {clearable && hasSelection && (
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={clearAll}
+                  className="flex items-center text-gray-400 hover:text-gray-600"
+                  aria-label="Clear selection"
+                >
+                  <X size={14} className="hover:text-red-500" strokeWidth={2} />
+                </button>
+              )}
+              {sorting && (
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
+                  }}
+                  disabled={disabled}
+                  className="flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label={sortOrder === "asc" ? "Sorted A→Z, click for Z→A" : "Sorted Z→A, click for A→Z"}
+                >
+                  {sortOrder === "asc" ? (
+                    <ArrowUpAZ size={14} strokeWidth={2} />
+                  ) : (
+                    <ArrowDownAZ size={14} strokeWidth={2} />
+                  )}
+                </button>
+              )}
+              <ChevronDown
+                size={16}
+                strokeWidth={2}
+                className={cn(
+                  "text-gray-600 transition-transform duration-200",
+                  open && "rotate-180",
+                )}
+              />
+            </div>
           </div>
-        </div>
-      </PopoverTrigger>
+        </PopoverTrigger>
 
-      <PopoverContent
-        className="max-w-[calc(100vw-1rem)]"
-        style={{
-          width: "var(--radix-popover-trigger-width)",
-        }}
-      >
-        {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Search..."
-            value={search}
-            onValueChange={setSearch}
-            spellCheck={spellCheck}
-            className={commandInputSizeClass}
-          />
-          <CommandList>
-            {filteredOptions.length === 0 && search.trim() ? (
-              <CommandEmpty>No results found.</CommandEmpty>
-            ) : null}
-
-            {mode === "multi" && (
-              <CommandItem
-                value={SELECT_ALL}
-                onSelect={() => handleSelect(SELECT_ALL)}
-                className={cn(
-                  "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                  commandItemSizeClass,
-                )}
-              >
-                <CheckboxIcon checked={allSelected} />
-                <span className="flex-1">Select all</span>
-              </CommandItem>
+        <PopoverContent
+          className="max-w-[calc(100vw-1rem)]"
+          collisionPadding={{ top: 64 }}
+          style={{
+            width: "var(--radix-popover-trigger-width)",
+          }}
+        >
+          {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
+          <Command shouldFilter={false}>
+            {searchEnabled && (
+              <CommandInput
+                placeholder="Search..."
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+                spellCheck={spellCheck}
+                className={commandInputSizeClass}
+              />
             )}
+            <CommandList ref={listRef}>
+              {visibleOptions.length === 0 && searchQuery.trim() ? (
+                <CommandEmpty>No results found.</CommandEmpty>
+              ) : null}
 
-            {filteredOptions.map((option) => (
-              <CommandItem
-                key={option.value}
-                value={option.value}
-                disabled={option.disabled}
-                aria-selected={isSelected(option.value)}
-                onSelect={() => handleSelect(option.value)}
-                className={cn(
-                  "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                  commandItemSizeClass,
-                )}
-              >
-                {mode === "multi" && (
-                  <CheckboxIcon checked={isSelected(option.value)} />
-                )}
-                <span className="flex-1 truncate">{option.label}</span>
-                {mode === "single" && isSelected(option.value) && (
-                  <Check size={14} className="shrink-0 text-[#006F42]" />
-                )}
-              </CommandItem>
-            ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+              {mode === "multi" && (
+                <CommandItem
+                  value={SELECT_ALL}
+                  onSelect={() => handleSelect(SELECT_ALL)}
+                  className={cn(
+                    "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                    commandItemSizeClass,
+                  )}
+                >
+                  <CheckboxIcon checked={allSelected} />
+                  <span className="flex-1">Select all</span>
+                </CommandItem>
+              )}
+
+              {visibleOptions.map((option) => {
+                const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
+                const displayIndex = originalIdx + 1;
+                return (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    disabled={option.disabled}
+                    aria-selected={isSelected(option.value)}
+                    onSelect={() => handleSelect(option.value)}
+                    className={cn(
+                      "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
+                      commandItemSizeClass,
+                    )}
+                  >
+                    {mode === "multi" && (
+                      <CheckboxIcon checked={isSelected(option.value)} />
+                    )}
+                    {indexing && (
+                      <span className="shrink-0 text-[#9CA3AF] tabular-nums">{displayIndex}.</span>
+                    )}
+                    <span className="flex-1 truncate">{option.label}</span>
+                    {mode === "single" && isSelected(option.value) && (
+                      <Check size={14} className="shrink-0 text-[#006F42]" />
+                    )}
+                  </CommandItem>
+                );
+              })}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <InputHelper
+        size={size === "xs" ? "sm" : size}
+        helperText={helperText}
+        error={error}
+      />
+    </div>
   );
 }
 

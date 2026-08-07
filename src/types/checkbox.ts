@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export interface CheckboxOption {
   value: string;
   label: string;
@@ -9,11 +11,19 @@ export interface CustomCheckboxProps {
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   size?: "sm" | "md" | "lg";
-  label?: string;
+  label?: React.ReactNode;
   disabled?: boolean;
   indeterminate?: boolean;
   error?: boolean;
   className?: string;
+  /** When provided, the pill wrapper uses this color for its border when checked/indeterminate. Falls back to default green if omitted. */
+  borderColor?: string;
+  /** When provided, the pill wrapper uses this color for its background when checked/indeterminate. Falls back to default green tint if omitted. */
+  bgColor?: string;
+  /** When provided, applies this color to the label text when checked/indeterminate. */
+  textColor?: string;
+  /** When true, the checkbox is visible and shows its current value but cannot be toggled. */
+  readOnly?: boolean;
 }
 
 export interface CustomCheckboxGroupProps<T = CheckboxOption> {
@@ -30,8 +40,17 @@ export interface CustomCheckboxGroupProps<T = CheckboxOption> {
   layout?: "horizontal" | "vertical" | "grid";
   columns?: number;
   disabled?: boolean;
-  label?: string;
+  label?: React.ReactNode;
+  required?: boolean;
   helperText?: string;
   error?: string;
   selectAll?: boolean;
+  /** When provided, applies this border color to each pill when its item is checked. */
+  borderColor?: string;
+  /** When provided, applies this background color to each pill when its item is checked. */
+  bgColor?: string;
+  /** When provided, applies this color to each item's label text when its item is checked. */
+  textColor?: string;
+  /** When true, all checkboxes show their current state but cannot be toggled. */
+  readOnly?: boolean;
 }

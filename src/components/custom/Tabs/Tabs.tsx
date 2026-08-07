@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createPortal } from "react-dom";
+
 import { Tabs as T, TabsList } from "@/components/ui/tabs";
 import { CustomTabsTrigger } from "@/components/custom/Tabs/CustomTabsTrigger";
 import {
@@ -14,10 +14,6 @@ import type {
   CustomTabsProps,
   TabItem,
 } from "@/components/custom/Tabs/Tabs.types";
-
-// Active/accent color for tab states — intentionally a shade darker than the
-// global #006F42 focus color for visual distinction within the tabs palette.
-const TAB_COLOR = "#0A5A2A";
 
 function getInitialValue(
   tabs: TabItem[],
@@ -121,19 +117,18 @@ function getVisibleTabs(
   return { visibleTabs: nextVisibleTabs, overflowTabs };
 }
 
+// Used by TertiaryTabs (pill/chip variant) overflow
 function OverflowTabsSelect({
   overflowTabs,
   overflowLabel,
   activeValue,
   onChange,
-  variant,
   className,
 }: {
   overflowTabs: TabItem[];
   overflowLabel: string;
   activeValue: string;
   onChange: (value: string) => void;
-  variant: "primary" | "secondary";
   className?: string;
 }) {
   const [open, setOpen] = React.useState(false);
@@ -147,14 +142,8 @@ function OverflowTabsSelect({
           type="button"
           className={cn(
             "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-            variant === "primary" && [
-              "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
-              `hover:text-[#0c6e20] ${FOCUS_RING}`,
-            ],
-            variant === "secondary" && [
-              "relative z-10 gap-1 rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold text-[#595959]",
-              `hover:text-black ${FOCUS_RING}`,
-            ],
+            "relative z-10 gap-1 rounded-full px-2 py-1 sm:px-3 text-[13px] sm:text-[14px] font-semibold text-[#595959]",
+            `hover:text-black ${FOCUS_RING}`,
             className,
           )}
         >
@@ -172,7 +161,8 @@ function OverflowTabsSelect({
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-[220px] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
+        collisionPadding={8}
+        className="w-[220px] max-w-[calc(100vw-1rem)] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
       >
         <div className="flex flex-col">
           {overflowTabs.map((tab) => {
@@ -214,179 +204,112 @@ function OverflowTabsSelect({
   );
 }
 
-// ── Primary overflow: trigger lives inside the scroll row (scrolls with tabs),
-//    panel renders OUTSIDE the overflow-x-auto container so it is never clipped
-//    and positions correctly on every screen size.
-
-function PrimaryOverflowTrigger({
-  label,
-  open,
-  onClick,
-  btnRef,
-}: {
-  label: string;
-  open: boolean;
-  onClick: () => void;
-  btnRef: React.RefObject<HTMLButtonElement | null>;
-}) {
-  return (
-    <button
-      ref={btnRef}
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "inline-flex shrink-0 items-center whitespace-nowrap transition-colors duration-200",
-        "relative flex-none gap-1 rounded-t-lg px-2 py-3 sm:px-3 sm:py-5 text-[13px] sm:text-[14px] font-medium text-[#595959]",
-
-        `hover:text-[#0A5A2A] ${FOCUS_RING}`,
-      )}
-    >
-      <span>{label}</span>
-      <ChevronDown
-        size={16}
-        strokeWidth={2.25}
-        className={cn(
-          "text-[#0A5A2A] transition-transform duration-200",
-          open && "rotate-180",
-        )}
-      />
-    </button>
-  );
-}
-
-function PrimaryOverflowPanel({
+// Used by PrimaryTabs overflow — Popover handles positioning on all screen sizes
+function LineTabsOverflow({
   overflowTabs,
+  overflowLabel,
   activeValue,
   onChange,
-  onClose,
-  triggerRef,
 }: {
   overflowTabs: TabItem[];
+  overflowLabel: string;
   activeValue: string;
   onChange: (value: string) => void;
-  onClose: () => void;
-  triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
-  const panelRef = React.useRef<HTMLDivElement>(null);
-  const [panelStyle, setPanelStyle] = React.useState<React.CSSProperties>({});
+  const [open, setOpen] = React.useState(false);
 
-  // Compute fixed coordinates from the trigger's bounding rect so the panel
-  // always aligns with the button regardless of any scroll/overflow ancestor.
-  React.useLayoutEffect(() => {
-    const btn = triggerRef.current;
-    if (!btn) return;
-    const rect = btn.getBoundingClientRect();
-    setPanelStyle({
-      position: "fixed",
-      top: rect.bottom + 8,
-      right: Math.max(0, window.innerWidth - rect.right),
-      zIndex: 9999,
-    });
-  }, [triggerRef]);
+  if (overflowTabs.length === 0) return null;
 
-  React.useEffect(() => {
-    const handleOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (
-        panelRef.current?.contains(target) ||
-        triggerRef.current?.contains(target)
-      )
-        return;
-      onClose();
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    // Close on scroll so the panel doesn't drift away from the trigger.
-    const handleScroll = () => onClose();
-    document.addEventListener("mousedown", handleOutside);
-    document.addEventListener("keydown", handleKey);
-    window.addEventListener("scroll", handleScroll, { capture: true });
-    return () => {
-      document.removeEventListener("mousedown", handleOutside);
-      document.removeEventListener("keydown", handleKey);
-      window.removeEventListener("scroll", handleScroll, { capture: true });
-    };
-  }, [onClose, triggerRef]);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "inline-flex flex-none items-center gap-1 whitespace-nowrap cursor-pointer select-none",
+            "rounded-t-lg px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium",
+            "text-gray-500 hover:text-[#0A5A2A] hover:bg-gray-50 transition-all duration-200",
+            FOCUS_RING,
+          )}
+        >
+          <span>{overflowLabel}</span>
+          <ChevronDown
+            size={16}
+            strokeWidth={2.25}
+            className={cn(
+              "text-[#0A5A2A] transition-transform duration-200",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        sideOffset={8}
+        collisionPadding={8}
+        className="w-[220px] max-w-[calc(100vw-1rem)] rounded-[10px] border border-[#E5E7EB] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
+      >
+        <div className="flex flex-col">
+          {overflowTabs.map((tab) => {
+            const isActive = tab.value === activeValue;
 
-  // Portal to document.body so the panel escapes every stacking context
-  // (including overflow-x:auto ancestors on iOS Safari).
-  return createPortal(
-    <div
-      ref={panelRef}
-      style={panelStyle}
-      className={cn(
-        "w-[220px] max-w-[calc(100vw-1rem)]",
-        "rounded-[10px] border border-[#E5E7EB] bg-white p-1",
-        "shadow-[0_12px_32px_rgba(15,23,42,0.12)]",
-        "animate-[uengage-popover-in_140ms_ease-out]",
-      )}
-    >
-      <div className="flex flex-col">
-        {overflowTabs.map((tab) => {
-          const isActive = tab.value === activeValue;
-          return (
-            <button
-              key={tab.value}
-              type="button"
-              disabled={tab.disabled}
-              className={cn(
-                "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
-                "transition-colors duration-150",
-                isActive
-                  ? "bg-[#F0F9F4] font-semibold text-[#0A5A2A]"
-                  : "text-[#374151] hover:bg-[#F8FAFC]",
-                tab.disabled && "cursor-not-allowed opacity-50",
-              )}
-              onClick={() => {
-                if (tab.disabled) return;
-                onChange(tab.value);
-                onClose();
-              }}
-            >
-              <span className="truncate">{tab.label}</span>
-              {isActive && (
-                <Check
-                  size={16}
-                  strokeWidth={2.5}
-                  className="shrink-0 text-[#0A5A2A]"
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </div>,
-    document.body,
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                disabled={tab.disabled}
+                className={cn(
+                  "flex w-full items-center justify-between gap-3 rounded-[8px] px-3 py-2 text-left text-[13px] sm:text-[14px]",
+                  "transition-colors duration-150",
+                  isActive
+                    ? "bg-[#F0F9F4] font-semibold text-[#0A5A2A]"
+                    : "text-[#374151] hover:bg-[#F8FAFC]",
+                  tab.disabled && "cursor-not-allowed opacity-50",
+                )}
+                onClick={() => {
+                  if (tab.disabled) return;
+                  onChange(tab.value);
+                  setOpen(false);
+                }}
+              >
+                <span className="truncate">{tab.label}</span>
+                {isActive && (
+                  <Check
+                    size={16}
+                    strokeWidth={2.5}
+                    className="shrink-0 text-[#0A5A2A]"
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
 function Tabs(props: CustomTabsProps) {
-  if (!props.tabs || props.tabs.length < 2) {
-    throw new Error(
-      `Tabs: at least two tabs are required to render (received ${props.tabs?.length ?? 0}).`,
-    );
-  }
   const variant = props.variant ?? "primary";
-  return variant === "secondary" ? (
-    <SecondaryTabs {...props} />
-  ) : (
-    <PrimaryTabs {...props} />
-  );
+  if (variant === "secondary") return <TertiaryTabs {...props} />;
+  return <SecondaryTabs {...props} />;
 }
 
-function PrimaryTabs({
+// Primary: green active text, thin indicator, subtle overlay
+function SecondaryTabs({
   tabs,
   defaultValue,
   value,
   onChange,
   visibleTabLimit,
   overflowLabel = "More Options",
+  showBottomBorder = true,
   className,
 }: CustomTabsProps) {
+  const outerRef = React.useRef<HTMLDivElement>(null);
+  const measureRef = React.useRef<HTMLDivElement>(null);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
-  const overflowBtnRef = React.useRef<HTMLButtonElement>(null);
-  const [overflowOpen, setOverflowOpen] = React.useState(false);
+
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
@@ -399,21 +322,80 @@ function PrimaryTabs({
     ready: boolean;
   }>({ left: 0, width: 0, ready: false });
 
-  const { visibleTabs, overflowTabs } = React.useMemo(
-    () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
-    [activeValue, tabs, visibleTabLimit],
-  );
+  const [containerWidth, setContainerWidth] = React.useState(0);
+  const [tabWidths, setTabWidths] = React.useState<number[]>([]);
+  const [moreButtonWidth, setMoreButtonWidth] = React.useState(120);
 
-  // Close overflow panel whenever the active tab changes
-  const handleChangeAndClose = React.useCallback(
-    (v: string) => {
-      handleChange(v);
-      setOverflowOpen(false);
-    },
-    [handleChange],
-  );
-
+  // Track available width via ResizeObserver
   React.useLayoutEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    setContainerWidth(el.getBoundingClientRect().width);
+  }, []);
+
+  React.useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setContainerWidth(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Re-measure individual tab widths whenever container width or tabs change.
+  // Running on containerWidth ensures responsive breakpoints (sm:px-5 etc.) are captured.
+  React.useLayoutEffect(() => {
+    if (containerWidth === 0) return;
+    const el = measureRef.current;
+    if (!el) return;
+    const btns = el.querySelectorAll("[data-measure-tab]");
+    setTabWidths(
+      Array.from(btns).map((btn) => (btn as HTMLElement).getBoundingClientRect().width),
+    );
+    const moreBtn = el.querySelector("[data-measure-more]") as HTMLElement | null;
+    if (moreBtn) setMoreButtonWidth(moreBtn.getBoundingClientRect().width);
+  }, [containerWidth, tabs, overflowLabel]);
+
+  // Compute how many tabs fit without scrolling. Respects explicit visibleTabLimit when provided.
+  const dynamicLimit = React.useMemo<number | undefined>(() => {
+    if (visibleTabLimit !== undefined) return visibleTabLimit;
+    if (containerWidth === 0 || tabWidths.length === 0) return undefined;
+
+    const GAP = 8; // gap-2 = 8px
+
+    // If all tabs fit naturally, no overflow button is needed at all.
+    const totalAllTabs = tabWidths.reduce(
+      (sum, w, i) => sum + w + (i > 0 ? GAP : 0),
+      0,
+    );
+    if (totalAllTabs <= containerWidth) return undefined;
+
+    // Otherwise find how many tabs fit alongside the overflow button.
+    let total = 0;
+    let count = 0;
+
+    for (let i = 0; i < tabs.length; i++) {
+      const tabW = (tabWidths[i] ?? 80) + (i > 0 ? GAP : 0);
+      const projected = total + tabW + moreButtonWidth + GAP;
+      if (projected <= containerWidth) {
+        total += tabW;
+        count++;
+      } else {
+        break;
+      }
+    }
+
+    return count > 0 ? count : 1;
+  }, [visibleTabLimit, containerWidth, tabWidths, tabs, moreButtonWidth]);
+
+  const { visibleTabs, overflowTabs } = React.useMemo(
+    () => getVisibleTabs(tabs, activeValue, dynamicLimit),
+    [activeValue, tabs, dynamicLimit],
+  );
+
+  const measureIndicator = React.useCallback(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper || !activeValue) return;
     const btn = wrapper.querySelector(
@@ -423,106 +405,115 @@ function PrimaryTabs({
       setIndicator((i) => ({ ...i, ready: false }));
       return;
     }
+    const containerRect = wrapper.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
     setIndicator({
-      left: btn.offsetLeft,
-      width: btn.offsetWidth,
+      left: btnRect.left - containerRect.left + wrapper.scrollLeft,
+      width: btnRect.width,
       ready: true,
     });
+  }, [activeValue]);
+
+  React.useLayoutEffect(() => {
+    measureIndicator();
   }, [
-    activeValue,
+    measureIndicator,
     visibleTabs.length,
-    visibleTabs.map((t) => t.value).join("|"),
+    visibleTabs.map((t) => t.value + t.label).join("|"),
   ]);
 
   React.useEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return;
-    const handle = () => {
-      const btn = wrapper.querySelector(
-        `[data-tab-value="${escapeTabValue(activeValue)}"]`,
-      ) as HTMLElement | null;
-      if (!btn) return;
-      setIndicator((prev) => ({
-        left: btn.offsetLeft,
-        width: btn.offsetWidth,
-        ready: prev.ready,
-      }));
-    };
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, [activeValue]);
+    window.addEventListener("resize", measureIndicator);
+    return () => window.removeEventListener("resize", measureIndicator);
+  }, [measureIndicator]);
 
   return (
     <T
       value={activeValue}
-      onValueChange={handleChangeAndClose}
+      onValueChange={handleChange}
       className={cn("w-full", className)}
     >
-      <div className="relative w-full border-b border-[#E5E7EB]">
-        <div
-          ref={wrapperRef}
-          className="relative flex min-w-0 items-end gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          <TabsList
-            variant="line"
-            className={cn(
-              "flex w-max min-w-0 flex-row items-center justify-start",
-              "h-auto! rounded-none bg-transparent p-0 gap-2",
-            )}
+      {/* Hidden off-screen container to measure natural tab widths at the current breakpoint */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        style={{ position: "fixed", top: -9999, left: -9999, visibility: "hidden", pointerEvents: "none" }}
+        className="flex items-center"
+      >
+        {tabs.map((tab) => (
+          <span
+            key={tab.value}
+            data-measure-tab
+            className="relative flex items-center gap-2 whitespace-nowrap rounded-t-lg px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium"
           >
-            {visibleTabs.map((tab) => (
-              <CustomTabsTrigger
-                key={tab.value}
-                value={tab.value}
-                disabled={tab.disabled}
-                variant="primary"
-              >
-                {tab.label}
-              </CustomTabsTrigger>
-            ))}
-          </TabsList>
+            {tab.label}
+          </span>
+        ))}
+        <span
+          data-measure-more
+          className="inline-flex flex-none items-center gap-1 whitespace-nowrap rounded-t-lg px-3 py-2 sm:px-5 sm:py-3 text-[13px] sm:text-[14px] font-medium"
+        >
+          <span>{overflowLabel}</span>
+          <ChevronDown size={16} strokeWidth={2.25} />
+        </span>
+      </div>
 
-          {/* Trigger scrolls with tabs, separator keeps it visually distinct */}
+      <div ref={outerRef} className="relative w-full">
+        <div className={cn("inline-flex max-w-full items-end", showBottomBorder && "border-b border-[#E5E7EB]")}>
+          <div
+            ref={wrapperRef}
+            className="relative min-w-0 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            <TabsList
+              variant="line"
+              className={cn(
+                "flex w-max min-w-0 flex-row items-center justify-start",
+                "h-auto! rounded-none bg-transparent p-0 gap-2",
+              )}
+            >
+              {visibleTabs.map((tab) => (
+                <CustomTabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  disabled={tab.disabled}
+                  variant="secondary"
+                >
+                  {tab.label}
+                </CustomTabsTrigger>
+              ))}
+            </TabsList>
+
+            <span
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0b652d]",
+                indicator.ready
+                  ? "transition-all duration-300 ease-out opacity-100"
+                  : "opacity-0",
+              )}
+              style={{
+                transform: `translateX(${indicator.left}px)`,
+                width: indicator.width,
+              }}
+            />
+          </div>
+
           {overflowTabs.length > 0 && (
-            <PrimaryOverflowTrigger
-              label={overflowLabel}
-              open={overflowOpen}
-              onClick={() => setOverflowOpen((o) => !o)}
-              btnRef={overflowBtnRef}
+            <LineTabsOverflow
+              overflowTabs={overflowTabs}
+              overflowLabel={overflowLabel}
+              activeValue={activeValue}
+              onChange={handleChange}
             />
           )}
-
-          <span
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-full bg-[#0A5A2A]",
-              indicator.ready
-                ? "transition-all duration-300 ease-out opacity-100"
-                : "opacity-0",
-            )}
-            style={{
-              transform: `translateX(${indicator.left}px)`,
-              width: indicator.width,
-            }}
-          />
         </div>
-
-        {/* Panel is portaled to document.body so it is never clipped */}
-        {overflowOpen && overflowTabs.length > 0 && (
-          <PrimaryOverflowPanel
-            overflowTabs={overflowTabs}
-            activeValue={activeValue}
-            onChange={handleChangeAndClose}
-            onClose={() => setOverflowOpen(false)}
-            triggerRef={overflowBtnRef}
-          />
-        )}
       </div>
     </T>
   );
 }
 
-function SecondaryTabs({
+// Secondary: pill/chip style with animated background slab
+function TertiaryTabs({
   tabs,
   defaultValue,
   value,
@@ -549,7 +540,7 @@ function SecondaryTabs({
     [activeValue, tabs, visibleTabLimit],
   );
 
-  React.useLayoutEffect(() => {
+  const measureChip = React.useCallback(() => {
     const list = listRef.current;
     if (!list || !activeValue) return;
     const btn = list.querySelector(
@@ -559,34 +550,27 @@ function SecondaryTabs({
       setChip((c) => ({ ...c, ready: false }));
       return;
     }
+    const containerRect = list.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
     setChip({
-      left: btn.offsetLeft,
-      width: btn.offsetWidth,
+      left: btnRect.left - containerRect.left + list.scrollLeft,
+      width: btnRect.width,
       ready: true,
     });
+  }, [activeValue]);
+
+  React.useLayoutEffect(() => {
+    measureChip();
   }, [
-    activeValue,
+    measureChip,
     visibleTabs.length,
-    visibleTabs.map((t) => t.value).join("|"),
+    visibleTabs.map((t) => t.value + t.label).join("|"),
   ]);
 
   React.useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const handle = () => {
-      const btn = list.querySelector(
-        `[data-tab-value="${escapeTabValue(activeValue)}"]`,
-      ) as HTMLElement | null;
-      if (!btn) return;
-      setChip((prev) => ({
-        left: btn.offsetLeft,
-        width: btn.offsetWidth,
-        ready: prev.ready,
-      }));
-    };
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, [activeValue]);
+    window.addEventListener("resize", measureChip);
+    return () => window.removeEventListener("resize", measureChip);
+  }, [measureChip]);
 
   return (
     <T
@@ -599,7 +583,7 @@ function SecondaryTabs({
           ref={listRef}
           className={cn(
             "relative inline-flex max-w-full items-center",
-            "rounded-full bg-[#dde4f0] p-0.5",
+            "rounded-full bg-[#F3F5F9] p-0.5",
             "overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
           )}
         >
@@ -629,22 +613,23 @@ function SecondaryTabs({
                 key={tab.value}
                 value={tab.value}
                 disabled={tab.disabled}
-                variant="secondary"
+                variant="tertiary"
               >
                 {tab.label}
               </CustomTabsTrigger>
             ))}
           </TabsList>
-          {/* Separator + overflow button scrolls with tabs at the end of the list */}
           {overflowTabs.length > 0 && (
-            <span className="mx-1 h-4 w-px shrink-0 bg-[#b8c4d9]" aria-hidden="true" />
+            <span
+              className="mx-1 h-4 w-px shrink-0 bg-[#b8c4d9]"
+              aria-hidden="true"
+            />
           )}
           <OverflowTabsSelect
             overflowTabs={overflowTabs}
             overflowLabel={overflowLabel}
             activeValue={activeValue}
             onChange={handleChange}
-            variant="secondary"
           />
         </div>
       </div>

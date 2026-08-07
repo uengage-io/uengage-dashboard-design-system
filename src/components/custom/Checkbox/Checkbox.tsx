@@ -19,10 +19,16 @@ const ICON_SIZE: Record<"sm" | "md" | "lg", string> = {
   lg: "size-5",
 };
 
-const GAP: Record<"sm" | "md" | "lg", string> = {
+const PILL_PADDING: Record<"sm" | "md" | "lg", string> = {
+  sm: "gap-1.5 px-2.5 py-1.5",
+  md: "gap-2 px-3 py-2",
+  lg: "gap-2.5 px-4 py-2.5",
+};
+
+const GAP_ONLY: Record<"sm" | "md" | "lg", string> = {
   sm: "gap-1.5",
-  md: "gap-2.5",
-  lg: "gap-3",
+  md: "gap-2",
+  lg: "gap-2.5",
 };
 
 function Checkbox({
@@ -32,9 +38,13 @@ function Checkbox({
   size = "md",
   label,
   disabled,
+  readOnly,
   indeterminate,
   error,
   className,
+  borderColor,
+  bgColor,
+  textColor,
   ...rest
 }: CustomCheckboxProps &
   Omit<
@@ -65,6 +75,7 @@ function Checkbox({
       : internalChecked;
 
   const handleCheckedChange = (next: CheckboxPrimitive.CheckedState) => {
+    if (readOnly) return;
     const nextBool = next === true;
     if (!isControlled) setInternalChecked(nextBool);
     onCheckedChange?.(nextBool);
@@ -91,13 +102,40 @@ function Checkbox({
       ? "checked"
       : "default";
 
+  const effectiveBorderColor = borderColor;
+  const effectiveBgColor = bgColor;
+  const effectiveTextColor = textColor;
+
+  const hasCustomColors = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
+  const isActive = (visualChecked || !!indeterminate) && !error && !disabled && !readOnly;
+
   return (
     <label
       htmlFor={itemId}
+      style={
+        hasCustomColors && isActive
+          ? {
+              ...(effectiveBorderColor ? { borderColor: effectiveBorderColor } : {}),
+              ...(effectiveBgColor ? { backgroundColor: effectiveBgColor } : {}),
+            }
+          : undefined
+      }
+
       className={cn(
-        "group inline-flex cursor-pointer items-center",
-        GAP[size],
+        "group inline-flex cursor-pointer items-center transition-colors",
+        hasCustomColors
+          ? cn(
+              "rounded-xl border",
+              PILL_PADDING[size],
+              error
+                ? "border-red-500"
+                : disabled
+                  ? "border-gray-200"
+                  : "border-gray-200",
+            )
+          : GAP_ONLY[size],
         disabled && "cursor-not-allowed",
+        readOnly && "pointer-events-none cursor-default",
         className,
       )}
     >
@@ -108,6 +146,11 @@ function Checkbox({
         onCheckedChange={handleCheckedChange}
         disabled={disabled}
         data-slot="checkbox"
+        style={
+          isActive && effectiveBorderColor
+            ? { backgroundColor: effectiveBorderColor, borderColor: effectiveBorderColor }
+            : undefined
+        }
         className={cn(checkboxBoxVariants({ size, state: boxState }))}
       >
         <CheckboxPrimitive.Indicator
@@ -126,6 +169,7 @@ function Checkbox({
       {label && (
         <Label
           htmlFor={itemId}
+          style={effectiveTextColor && isActive ? { color: effectiveTextColor } : undefined}
           className={cn(
             checkboxLabelVariants({ size, state: labelState }),
             "whitespace-normal break-words",

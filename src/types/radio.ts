@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export interface RadioOption {
   value: string;
   label: string;
@@ -20,8 +22,17 @@ export interface CustomRadioGroupProps<T = RadioOption> {
   /** Max columns at the largest breakpoint when `layout="grid"`. Smaller breakpoints scale down (mobile=1, sm=2). */
   columns?: 1 | 2 | 3 | 4;
   disabled?: boolean;
-  label?: string;
+  label?: React.ReactNode;
+  required?: boolean;
   helperText?: string;
   error?: string;
   className?: string;
+  /** When provided, applies this border color to each radio pill when its item is selected. */
+  borderColor?: string;
+  /** When provided, applies this background color to each radio pill when its item is selected. */
+  bgColor?: string;
+  /** When provided, applies this color to each item's label text when its item is selected. */
+  textColor?: string;
+  /** When true, all radio items show their current state but cannot be changed. */
+  readOnly?: boolean;
 }

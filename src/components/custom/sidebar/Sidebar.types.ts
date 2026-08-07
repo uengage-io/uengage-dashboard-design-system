@@ -1,6 +1,6 @@
 import type * as React from "react"
 
-export type SidebarSide = "left" | "right" | "top" | "bottom" | "right-bottom"
+export type SidebarSide = "left" | "right" | "right-slide" | "top" | "bottom"
 export type SidebarSize = "sm" | "md" | "lg" | "full"
 
 export interface SidebarProps {
@@ -18,6 +18,10 @@ export interface SidebarProps {
   closeOnOutsideClick?: boolean
   persistentOnDesktop?: boolean
   trigger?: React.ReactNode
+
+  heading?: React.ReactNode
+  closeIcon?: boolean
+  divider?: boolean
 
   className?: string
   contentClassName?: string

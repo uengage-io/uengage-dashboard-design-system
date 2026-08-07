@@ -11,9 +11,9 @@ export interface InputLabelProps
 }
 
 const SIZE_TEXT: Record<InputLabelSize, string> = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base",
+  sm: "text-[10px]",
+  md: "text-xs",
+  lg: "text-sm",
 };
 
 function InputLabel({
@@ -28,12 +28,12 @@ function InputLabel({
       className={cn(SIZE_TEXT[size], "font-medium text-slate-700", className)}
       {...props}
     >
-      {children}
-      {required && (
-        <span aria-hidden="true" className="ml-0.5 text-red-500">
-          *
-        </span>
-      )}
+      <span className="inline">
+        {children}
+        {required && (
+          <span aria-hidden="true" className="ml-0.5 text-red-500">*</span>
+        )}
+      </span>
     </Label>
   );
 }

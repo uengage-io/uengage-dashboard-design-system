@@ -20,6 +20,9 @@ type StateColors = {
   readonly borderWidth: number;
   readonly text: string;
   readonly opacity?: number;
+  readonly gradientDirection?: string;
+  /** Exact CSS gradient string from Figma — overrides `background` + `gradientDirection` when provided. */
+  readonly backgroundGradient?: string;
 };
 
 const BASE_CLASSES = [
@@ -42,14 +45,14 @@ const VARIANT_SIZE_OVERRIDES: Partial<
   Record<ColorVariant, Partial<Record<ButtonSize, string>>>
 > = {
   alertPrimary: {
-    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[12px] [&_svg]:size-[12px]",
-    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[14px] [&_svg]:size-[14px]",
+    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
+    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[12px] [&_svg]:size-[14px]",
     md: "pt-[6px] pr-[12px] pb-[6px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
     lg: "pt-[10px] pr-[16px] pb-[10px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]",
   },
   alertSecondary: {
-    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[12px] [&_svg]:size-[12px]",
-    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[14px] [&_svg]:size-[14px]",
+    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
+    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[12px] [&_svg]:size-[14px]",
     md: "pt-[6px] pr-[12px] pb-[6px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
     lg: "pt-[10px] pr-[16px] pb-[10px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]",
   },
@@ -74,14 +77,14 @@ const buttonVariants = cva(BASE_CLASSES, {
   defaultVariants: { size: "md" },
 });
 
-function toGradientCSS(value: readonly string[] | string): string {
+function toGradientCSS(value: readonly string[] | string, direction = "to bottom"): string {
   if (typeof value === "string") {
     return `linear-gradient(${value}, ${value})`;
   }
   if (value.length === 1) {
     return `linear-gradient(${value[0]}, ${value[0]})`;
   }
-  return `linear-gradient(to bottom, ${value[0]}, ${value[1]})`;
+  return `linear-gradient(${direction}, ${value[0]}, ${value[1]})`;
 }
 
 function resolveStateColors(
@@ -121,8 +124,9 @@ function getButtonStyle(
   // Tertiary uses plain solid borders — no gradient padding-box/border-box trick.
   // This keeps the background genuinely transparent in every state that declares it.
   if (variant === "tertiary") {
-    const bg =
-      colors.background === "transparent"
+    const bg = colors.backgroundGradient
+      ? colors.backgroundGradient
+      : colors.background === "transparent"
         ? "transparent"
         : Array.isArray(colors.background)
           ? colors.background[0]
@@ -150,23 +154,35 @@ function getButtonStyle(
     return style;
   }
 
-  const borderCSS = toGradientCSS(colors.border);
-  const innerCSS =
-    colors.background === "transparent"
+  const dir = colors.gradientDirection ?? "to bottom"
+  const borderCSS = toGradientCSS(colors.border, dir);
+  const innerCSS = colors.backgroundGradient
+    ? colors.backgroundGradient
+    : colors.background === "transparent"
       ? "linear-gradient(var(--btn-stroke-bg, #fff), var(--btn-stroke-bg, #fff))"
-      : toGradientCSS(colors.background);
+      : toGradientCSS(colors.background, dir);
 
   const insetShadow = "0px 2px 4px 0px #0000000A inset";
   const liftShadow = "2px 2px 4px 0px #0000001F";
+  const noLiftVariants: ColorVariant[] = ["secondary"];
   const boxShadow =
     state === "disabled"
       ? "none"
       : state === "hover" || state === "pressed"
-        ? `${insetShadow}, ${liftShadow}`
+        ? noLiftVariants.includes(variant)
+          ? insetShadow
+          : `${insetShadow}, ${liftShadow}`
         : insetShadow;
 
+  // When backgroundGradient contains rgba transparency a solid white backing is
+  // needed so the border-box layer doesn't bleed through the transparent stop.
+  // Must use linear-gradient() — plain color values are invalid as bg-image layers.
+  const backgroundValue = colors.backgroundGradient
+    ? `${innerCSS} padding-box, linear-gradient(#FFFFFF, #FFFFFF) padding-box, ${borderCSS} border-box`
+    : `${innerCSS} padding-box, ${borderCSS} border-box`
+
   const style: React.CSSProperties = {
-    background: `${innerCSS} padding-box, ${borderCSS} border-box`,
+    background: backgroundValue,
     border: `${borderWidth}px solid transparent`,
     borderRadius,
     color: colors.text,
@@ -273,7 +289,12 @@ function Button({
         onPointerUp?.(e);
       }}
       onFocus={(e: React.FocusEvent<HTMLButtonElement>) => {
-        if (e.target.matches(":focus-visible")) setFocused(true);
+        try {
+          if (e.target.matches(":focus-visible")) setFocused(true);
+        } catch {
+          // Safari < 15.4 throws SyntaxError for :focus-visible in matches()
+          setFocused(true);
+        }
         onFocus?.(e);
       }}
       onBlur={(e: React.FocusEvent<HTMLButtonElement>) => {

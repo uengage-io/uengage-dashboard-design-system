@@ -22,7 +22,7 @@ export default function SelectPreview() {
     size="sm"
     placeholder="Select"
     onChange={(val)=>console.log("Selected:", val)}
-
+sorting
     
      />
        <Select 

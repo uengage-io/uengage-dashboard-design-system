@@ -7,15 +7,32 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DatePickerCalendar } from "../../ui/DatePickerCalendar";
+import {
+  DatePickerCalendar,
+  MonthPickerCalendar,
+} from "../../ui/DatePickerCalendar";
 import { triggerVariants } from "./datepickerVariants";
-import { formatDate, formatRange } from "./dateHelpers";
+import { formatDate, formatDateTime, formatRange, formatMonthYear } from "./dateHelpers";
+import { TimePicker, type TimeValue } from "./TimePicker";
+import { InputLabel } from "@/components/custom/Input/InputLabel";
+import { InputHelper } from "@/components/custom/Input/InputHelper";
 import type { DatePickerProps, DateRange } from "./DatePicker.types";
+import {
+  FilterGroupMobileContext,
+  FilterGroupDrawerCalendarContext,
+} from "@/lib/filterGroupContext";
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
 
 function isDateRange(v: unknown): v is DateRange {
-  return !!v && typeof v === "object" && "from" in v && "to" in v;
+  return (
+    !!v &&
+    typeof v === "object" &&
+    "from" in v &&
+    "to" in v &&
+    ((v as DateRange).from instanceof Date ||
+      (v as DateRange).to instanceof Date)
+  );
 }
 
 function orderedRange(a: Date, b: Date): DateRange {
@@ -60,10 +77,48 @@ function DatePicker({
   minDate,
   maxDate,
   onTouch,
+  clearable = false,
+  label,
+  required,
+  helperText,
+  error,
+  readOnly = false,
+  open: controlledOpen,
+  onOpenChange: onOpenChangeProp,
+  showTime = false,
 }: DatePickerProps) {
-  const [open, setOpen] = React.useState(false);
+  const isSingleWithTime = mode === "single" && showTime;
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = React.useCallback(
+    (next: boolean) => {
+      if (controlledOpen === undefined) setInternalOpen(next);
+      onOpenChangeProp?.(next);
+    },
+    [controlledOpen, onOpenChangeProp],
+  );
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
+
+  // ── FilterGroup drawer integration ────────────────────────────────────
+  // When this DatePicker has a controlled `open` prop and is rendered inside
+  // FilterGroup's mobile drawer, we register ourselves with FilterGroup so it
+  // can render the calendar inline (avoiding Radix Dialog modal-dismiss issues
+  // where portal clicks outside the dialog DOM close the drawer).
+  const isMobileDrawer = React.useContext(FilterGroupMobileContext);
+  const registerDrawerCalendar = React.useContext(FilterGroupDrawerCalendarContext);
+  const isControlled = controlledOpen !== undefined;
+
+  React.useEffect(() => {
+    if (!isMobileDrawer || !isControlled || !registerDrawerCalendar) return;
+    if (open) {
+      registerDrawerCalendar({ mode, value: committed, onChange: onChange as ((v: unknown) => void) | undefined, onOpenChange: setOpen, minDate, maxDate });
+    } else {
+      registerDrawerCalendar(null);
+    }
+    return () => { registerDrawerCalendar(null); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isMobileDrawer, isControlled]);
 
   // ── Committed value (shown in trigger) ───────────────────────────────
   const [committed, setCommitted] = React.useState<Date | DateRange | null>(
@@ -82,6 +137,16 @@ function DatePicker({
   // hoverDate: live preview while pendingFrom is set
   const [hoverDate, setHoverDate] = React.useState<Date | null>(null);
 
+  // ── Single + time draft state ─────────────────────────────────────────
+  // draftSingleDate: day picked but not yet applied (single + showTime mode)
+  const [draftSingleDate, setDraftSingleDate] = React.useState<Date | null>(
+    null,
+  );
+  const [draftTime, setDraftTime] = React.useState<TimeValue>({
+    hours: new Date().getHours(),
+    minutes: new Date().getMinutes(),
+  });
+
   // Reset draft when popover opens so it starts from the committed value
   const prevOpen = React.useRef(false);
   React.useEffect(() => {
@@ -92,6 +157,14 @@ function DatePicker({
       setDraftRange(
         mode === "range" && isDateRange(committed) ? committed : null,
       );
+      if (isSingleWithTime) {
+        const base = committed instanceof Date ? committed : null;
+        setDraftSingleDate(base);
+        setDraftTime({
+          hours: base ? base.getHours() : new Date().getHours(),
+          minutes: base ? base.getMinutes() : new Date().getMinutes(),
+        });
+      }
     }
     if (!open && prevOpen.current) {
       // Closing: discard any mid-selection state
@@ -99,7 +172,7 @@ function DatePicker({
       setHoverDate(null);
     }
     prevOpen.current = open;
-  }, [open, committed, mode]);
+  }, [open, committed, mode, isSingleWithTime]);
 
   // ── Disabled date matchers ────────────────────────────────────────────
   const calendarDisabled = React.useMemo(() => {
@@ -113,44 +186,59 @@ function DatePicker({
   const triggerLabel = React.useMemo((): string | null => {
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
-      return formatDate(committed);
+      return isSingleWithTime
+        ? formatDateTime(committed)
+        : formatDate(committed);
+    if (mode === "month" && committed instanceof Date)
+      return formatMonthYear(committed);
     if (mode === "range" && isDateRange(committed))
-      return formatRange(committed.from, committed.to);
+      return formatRange(committed.from, committed.to) ?? null;
     return null;
-  }, [committed, mode]);
+  }, [committed, mode, isSingleWithTime]);
 
-  // ── Calendar selection (draft + hover preview) ────────────────────────
+  // ── Effective display range (draft + hover preview) ──
+  // Returns { from, to? } — to may be undefined when only the first click is done.
+  const effectiveDisplayRange = React.useMemo((): {
+    from: Date;
+    to?: Date;
+  } | null => {
+    if (mode !== "range") return null;
+    const existingRange =
+      draftRange ?? (isDateRange(committed) ? committed : null);
+
+    if (pendingFrom) {
+      // Mid two-click selection: show from→hover (or just from if no hover yet)
+      return hoverDate
+        ? orderedRange(pendingFrom, hoverDate)
+        : { from: pendingFrom };
+    }
+
+    return existingRange;
+  }, [mode, committed, pendingFrom, draftRange, hoverDate]);
+
+  // ── Calendar selection ────────────────────────────────────────────────
   const calendarSelected = React.useMemo(() => {
     if (mode === "single") {
+      if (isSingleWithTime) {
+        return (
+          draftSingleDate ?? (committed instanceof Date ? committed : undefined)
+        );
+      }
       return committed instanceof Date ? committed : undefined;
     }
-    // Range: show draft/preview
-    if (pendingFrom) {
-      const end = hoverDate ?? pendingFrom;
-      return orderedRange(pendingFrom, end);
-    }
-    if (draftRange) return draftRange;
-    if (isDateRange(committed)) return committed;
-    return undefined;
-  }, [mode, committed, pendingFrom, draftRange, hoverDate]);
+    return effectiveDisplayRange ?? undefined;
+  }, [mode, committed, effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
 
   // ── From/To box labels ────────────────────────────────────────────────
   const fromLabel = React.useMemo((): string | null => {
-    if (pendingFrom) return formatDate(pendingFrom);
-    if (draftRange) return formatDate(draftRange.from);
-    if (isDateRange(committed)) return formatDate(committed.from);
-    return null;
-  }, [pendingFrom, draftRange, committed]);
+    if (!effectiveDisplayRange) return null;
+    return formatDate(effectiveDisplayRange.from);
+  }, [effectiveDisplayRange]);
 
   const toLabel = React.useMemo((): string | null => {
-    if (pendingFrom)
-      return hoverDate
-        ? formatDate(orderedRange(pendingFrom, hoverDate).to)
-        : null;
-    if (draftRange) return formatDate(draftRange.to);
-    if (isDateRange(committed)) return formatDate(committed.to);
-    return null;
-  }, [pendingFrom, hoverDate, draftRange, committed]);
+    if (!effectiveDisplayRange?.to) return null;
+    return formatDate(effectiveDisplayRange.to);
+  }, [effectiveDisplayRange]);
 
   // ── Event handlers ────────────────────────────────────────────────────
 
@@ -158,6 +246,10 @@ function DatePicker({
     if (modifiers.disabled) return;
 
     if (mode === "single") {
+      if (isSingleWithTime) {
+        setDraftSingleDate(date);
+        return;
+      }
       setCommitted(date);
       onChange?.(date);
       setOpen(false);
@@ -166,9 +258,10 @@ function DatePicker({
 
     // Range mode state machine
     if (pendingFrom === null) {
-      // First click: start a new selection
+      // Always start a fresh two-click selection
       setPendingFrom(date);
       setDraftRange(null);
+      setHoverDate(null);
     } else {
       // Second click: complete the draft range
       const range = orderedRange(pendingFrom, date);
@@ -179,7 +272,21 @@ function DatePicker({
   };
 
   const handleDayMouseEnter = (date: Date) => {
-    if (pendingFrom) setHoverDate(date);
+    if (pendingFrom) {
+      setHoverDate(date);
+      return;
+    }
+    // Show elongation preview when hovering outside the existing range
+    const existingRange =
+      draftRange ?? (isDateRange(committed) ? committed : null);
+    if (
+      existingRange &&
+      (date < existingRange.from || date > existingRange.to)
+    ) {
+      setHoverDate(date);
+    } else {
+      setHoverDate(null);
+    }
   };
 
   const handleDayMouseLeave = () => {
@@ -210,6 +317,21 @@ function DatePicker({
     setOpen(false);
   };
 
+  const handleApplySingleTime = () => {
+    if (!draftSingleDate) return;
+    const combined = new Date(draftSingleDate);
+    combined.setHours(draftTime.hours, draftTime.minutes, 0, 0);
+    setDraftSingleDate(null);
+    setCommitted(combined);
+    onChange?.(combined);
+    setOpen(false);
+  };
+
+  const handleCancelSingleTime = () => {
+    setDraftSingleDate(null);
+    setOpen(false);
+  };
+
   const handleClearTrigger = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -217,11 +339,12 @@ function DatePicker({
     setDraftRange(null);
     setPendingFrom(null);
     setHoverDate(null);
+    setDraftSingleDate(null);
     onChange?.(null);
   };
 
   const handleOpenChange = (next: boolean) => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setOpen(next);
     if (next) {
       interactedRef.current = true;
@@ -244,29 +367,26 @@ function DatePicker({
 
   const canApply = draftRange !== null || pendingFrom !== null;
 
-  const triggerState = disabled ? "disabled" : open ? "open" : "default";
+  const triggerState = disabled
+    ? "disabled"
+    : readOnly
+      ? "readonly"
+      : open
+        ? "open"
+        : "default";
 
-  return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
+  // In FilterGroup's mobile drawer with a controlled `open` prop, render only the
+  // (already user-hidden) trigger — no Popover portal. FilterGroup shows the calendar
+  // inline via the registered DrawerCalendarProps (see effect above).
+  if (isMobileDrawer && isControlled && registerDrawerCalendar) {
+    return (
+      <div className="flex flex-col gap-1.5">
+        {label && (
+          <InputLabel size={size} required={required}>
+            {label}
+          </InputLabel>
+        )}
         <div
-          role="button"
-          tabIndex={disabled ? -1 : 0}
-          aria-disabled={disabled}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          onFocus={() => {
-            interactedRef.current = true;
-          }}
-          onBlur={handleTriggerBlur}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              if (!disabled) setOpen((o) => !o);
-            } else if (e.key === "Escape") {
-              setOpen(false);
-            }
-          }}
           className={cn(
             triggerVariants({ state: triggerState, size }),
             "gap-2 px-3 cursor-pointer select-none",
@@ -281,92 +401,172 @@ function DatePicker({
                 ? "text-[#111827]"
                 : cn(
                     "text-[#C4C9D2]",
-                    size === "lg"
-                      ? "text-[14px]"
-                      : size === "md"
-                        ? "text-[12px]"
-                        : "text-[11px]",
+                    size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]",
                   ),
             )}
           >
             {triggerLabel ?? placeholder}
           </span>
+          <CalendarIcon size={15} strokeWidth={2} className="text-gray-600" />
+        </div>
+        <InputHelper size={size} helperText={helperText} error={error} />
+      </div>
+    );
+  }
 
-          <div className="flex shrink-0 items-center gap-1">
-            {committed && (
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={handleClearTrigger}
-                className="flex items-center text-gray-400 transition-colors hover:text-gray-600"
-                aria-label="Clear"
-              >
-                <X size={13} strokeWidth={2} className="hover:text-red-500" />
-              </button>
+  return (
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <InputLabel size={size} required={required}>
+          {label}
+        </InputLabel>
+      )}
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
+          <div
+            role="button"
+            tabIndex={disabled ? -1 : 0}
+            aria-disabled={disabled}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            onFocus={() => {
+              interactedRef.current = true;
+            }}
+            onBlur={handleTriggerBlur}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!disabled && !readOnly) setOpen(!open);
+              } else if (e.key === "Escape") {
+                setOpen(false);
+              }
+            }}
+            className={cn(
+              triggerVariants({ state: triggerState, size }),
+              "gap-2 px-3 cursor-pointer select-none",
+              width,
+              className,
             )}
-            <CalendarIcon
-              size={15}
-              strokeWidth={2}
-              className="text-gray-600"
-            />
+          >
+            <span
+              className={cn(
+                "flex-1 truncate",
+                triggerLabel
+                  ? "text-[#111827]"
+                  : cn(
+                      "text-[#C4C9D2]",
+                      size === "lg"
+                        ? "text-[14px]"
+                        : size === "md"
+                          ? "text-[12px]"
+                          : "text-[11px]",
+                    ),
+              )}
+            >
+              {triggerLabel ?? placeholder}
+            </span>
+
+            <div className="flex shrink-0 items-center gap-1">
+              {clearable && committed && (
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={handleClearTrigger}
+                  className="flex items-center text-gray-400 transition-colors hover:text-gray-600"
+                  aria-label="Clear"
+                >
+                  <X size={13} strokeWidth={2} className="hover:text-red-500" />
+                </button>
+              )}
+              <CalendarIcon
+                size={15}
+                strokeWidth={2}
+                className="text-gray-600"
+              />
+            </div>
           </div>
-        </div>
-      </PopoverTrigger>
+        </PopoverTrigger>
 
-      <PopoverContent
-        align="start"
-        className="w-auto max-w-[calc(100vw-1rem)] p-0"
-      >
-        <div className="overflow-hidden rounded-lg bg-white shadow-md">
-          {/* ── From / To boxes (range mode only) ── */}
-          {mode === "range" && (
-            <div className="flex gap-2 px-3 pt-3">
-              <DateBox label={fromLabel} active={!!fromLabel} />
-              <DateBox label={toLabel} active={false} />
-            </div>
-          )}
+        <PopoverContent
+          align="center"
+          className="w-auto max-w-[calc(100vw-1rem)] p-0"
+          collisionPadding={{ top: 64 }}
+        >
+          <div className="overflow-hidden rounded-lg bg-white shadow-md">
+            {/* ── From / To boxes (range mode only) ── */}
+            {mode === "range" && (
+              <div className="flex gap-2 px-3 pt-3">
+                <DateBox label={fromLabel} active={!!fromLabel} />
+                <DateBox label={toLabel} active={false} />
+              </div>
+            )}
 
-          {/* ── Calendar ── */}
-          <DatePickerCalendar
-            mode={mode}
-            selected={calendarSelected}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            disabled={calendarDisabled as any}
-            minDate={minDate}
-            maxDate={maxDate}
-            onDayClick={(date, modifiers) => handleDayClick(date, modifiers)}
-            onDayMouseEnter={(date) => handleDayMouseEnter(date)}
-            onDayMouseLeave={() => handleDayMouseLeave()}
-          />
+            {/* ── Month picker calendar ── */}
+            {mode === "month" && (
+              <MonthPickerCalendar
+                selected={committed instanceof Date ? committed : null}
+                minDate={minDate}
+                maxDate={maxDate}
+                onSelect={(date) => {
+                  setCommitted(date);
+                  onChange?.(date);
+                  setOpen(false);
+                }}
+              />
+            )}
 
-          {/* ── Cancel / Apply footer (range mode only) ── */}
-          {mode === "range" && (
-            <div className="flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleApply}
-                disabled={!canApply}
-                className={cn(
-                  "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
-                  canApply
-                    ? "border-[#006F42] text-[#006F42]"
-                    : "border-gray-300 text-gray-400 cursor-not-allowed",
+            {/* ── Day calendar (single / range) ── */}
+            {mode !== "month" && (
+              <div className="flex">
+                <DatePickerCalendar
+                  mode={mode}
+                  selected={calendarSelected}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  disabled={calendarDisabled as any}
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  onDayClick={(date, modifiers) =>
+                    handleDayClick(date, modifiers)
+                  }
+                  onDayMouseEnter={(date) => handleDayMouseEnter(date)}
+                  onDayMouseLeave={() => handleDayMouseLeave()}
+                />
+                {isSingleWithTime && (
+                  <TimePicker value={draftTime} onChange={setDraftTime} />
                 )}
-              >
-                Apply
-              </button>
-            </div>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
+              </div>
+            )}
+
+            {/* ── Cancel / Apply footer (range mode, or single + showTime) ── */}
+            {(mode === "range" || isSingleWithTime) && (
+              <div className="flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5">
+                <button
+                  type="button"
+                  onClick={isSingleWithTime ? handleCancelSingleTime : handleCancel}
+                  className="rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={isSingleWithTime ? handleApplySingleTime : handleApply}
+                  disabled={isSingleWithTime ? !draftSingleDate : !canApply}
+                  className={cn(
+                    "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
+                    (isSingleWithTime ? draftSingleDate : canApply)
+                      ? "border-[#006F42] text-[#006F42]"
+                      : "border-gray-300 text-gray-400 cursor-not-allowed",
+                  )}
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+      <InputHelper size={size} helperText={helperText} error={error} />
+    </div>
   );
 }
 

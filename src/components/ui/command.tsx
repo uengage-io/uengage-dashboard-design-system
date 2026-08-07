@@ -35,15 +35,18 @@ function CommandInput({ className, ...props }: React.ComponentProps<typeof Comma
   );
 }
 
-function CommandList({ className, ...props }: React.ComponentProps<typeof CommandListPrimitive>) {
-  return (
-    <CommandListPrimitive
-      data-slot="command-list"
-      className={cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className)}
-      {...props}
-    />
-  );
-}
+const CommandList = React.forwardRef<
+  React.ElementRef<typeof CommandListPrimitive>,
+  React.ComponentProps<typeof CommandListPrimitive>
+>(({ className, ...props }, ref) => (
+  <CommandListPrimitive
+    ref={ref}
+    data-slot="command-list"
+    className={cn("max-h-60 overflow-y-auto overflow-x-hidden py-1", className)}
+    {...props}
+  />
+));
+CommandList.displayName = "CommandList";
 
 function CommandEmpty({ className, ...props }: React.ComponentProps<typeof CommandEmptyPrimitive>) {
   return (

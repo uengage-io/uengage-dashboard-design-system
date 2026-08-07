@@ -39,7 +39,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Radix-backed checkbox wrapper. Supports `sm` / `md` / `lg` sizes, optional `label`, `indeterminate`, `error`, `disabled`, controlled and uncontrolled modes. The companion `CustomCheckboxGroup` composes multiple checkboxes with layouts, a select-all helper, and group-level error/helper text.",
+          "Radix-backed checkbox. By default renders a plain checkbox + label (no wrapper). Pass `borderColor` and/or `bgColor` to opt into a pill wrapper that applies those colors when checked/indeterminate. Supports `sm` / `md` / `lg` sizes, optional `label`, `indeterminate`, `error`, `disabled`, controlled and uncontrolled modes.",
       },
     },
   },
@@ -49,13 +49,18 @@ const meta = {
     checked: { control: "boolean" },
     indeterminate: { control: "boolean" },
     disabled: { control: "boolean" },
+    readOnly: { control: "boolean" },
     error: { control: "boolean" },
+    borderColor: { control: "color", description: "Pill border color when checked/indeterminate. Omit to use default plain style." },
+    bgColor: { control: "color", description: "Pill background color when checked/indeterminate. Omit to use default plain style." },
+    textColor: { control: "color", description: "Label text color when checked/indeterminate. Omit to use default text color." },
     onCheckedChange: { action: "checkedChange" },
   },
   args: {
     size: "md",
     label: "Accept terms",
     disabled: false,
+    readOnly: false,
     indeterminate: false,
     error: false,
   },
@@ -94,6 +99,15 @@ export const DisabledChecked: Story = {
   args: { label: "Disabled (checked)", disabled: true, defaultChecked: true },
 };
 
+export const ReadOnly: Story = {
+  args: { label: "Read only (checked)", readOnly: true, defaultChecked: true },
+};
+
+export const ReadOnlyUnchecked: Story = {
+  name: "Read only (unchecked)",
+  args: { label: "Read only (unchecked)", readOnly: true, defaultChecked: false },
+};
+
 export const ErrorState: Story = {
   args: { label: "This field is required", error: true },
 };
@@ -124,7 +138,7 @@ export const Controlled: Story = {
 export const GroupVertical: Story = {
   name: "Group · Vertical",
   render: () => (
-    <div className="w-96">
+    <div className="w-80">
       <CheckboxGroup
         label="Notifications"
         options={THREE_OPTIONS}
@@ -215,6 +229,29 @@ export const GroupDisabled: Story = {
   ),
 };
 
+export const GroupReadOnly: Story = {
+  name: "Group · Read only",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "All items display their current state but cannot be toggled. Unlike `disabled`, there is no opacity reduction — the values look fully normal, just non-interactive.",
+      },
+    },
+  },
+  render: () => (
+    <div className="w-96">
+      <CheckboxGroup
+        label="Assigned permissions"
+        helperText="Contact an admin to change these settings."
+        options={PERMISSION_OPTIONS}
+        value={["read", "write"]}
+        readOnly
+      />
+    </div>
+  ),
+};
+
 /* ── Group: size variants ─────────────────────────────────────── */
 
 export const GroupSmall: Story = {
@@ -242,3 +279,136 @@ export const GroupLarge: Story = {
     </div>
   ),
 };
+
+/* ── Custom pill colors ───────────────────────────────────────── */
+
+export const WithCustomColors: Story = {
+  name: "Custom pill colors",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass `borderColor` and `bgColor` to opt into the pill wrapper. The pill border and background apply only when the checkbox is checked or indeterminate; unchecked state keeps the default gray border.",
+      },
+    },
+  },
+  render: function CustomColorsStory() {
+    const [checked, setChecked] = React.useState(false);
+    return (
+      <div className="flex flex-col gap-3">
+        <Checkbox
+          label="Morning (5am – 11:58am)"
+          checked={checked}
+          onCheckedChange={setChecked}
+          borderColor="#067D51"
+          bgColor="#EFF9F4"
+          textColor="#067D51"
+        />
+        <code className="text-xs text-gray-500">checked: {String(checked)}</code>
+      </div>
+    );
+  },
+};
+
+export const WithCustomColorsGroup: Story = {
+  name: "Custom pill colors · Group",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "All items in a row can carry the same `borderColor` / `bgColor`. Each item independently shows the pill when active.",
+      },
+    },
+  },
+  render: function CustomColorsGroupStory() {
+    const TIME_OPTIONS = [
+      { value: "morning", label: "Morning (5am – 11:58am)" },
+      { value: "afternoon", label: "Afternoon (12pm – 3:59pm)" },
+      { value: "evening", label: "Evening (4pm – 7:59pm)" },
+      { value: "night", label: "Night (8pm – 11:59pm)" },
+    ];
+    const [selected, setSelected] = React.useState<string[]>(["morning", "evening"]);
+    const toggle = (val: string, next: boolean) =>
+      setSelected((prev) => next ? [...prev, val] : prev.filter((v) => v !== val));
+    return (
+      <div className="flex flex-col gap-2">
+        {TIME_OPTIONS.map((opt) => (
+          <Checkbox
+            key={opt.value}
+            label={opt.label}
+            checked={selected.includes(opt.value)}
+            onCheckedChange={(c) => toggle(opt.value, c)}
+            borderColor="#067D51"
+            bgColor="#EFF9F4"
+            textColor="#067D51"
+          />
+        ))}
+      </div>
+    );
+  },
+};
+
+export const GroupWithCustomColors: Story = {
+  name: "Group · Custom pill colors",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass `borderColor` and `bgColor` directly on `CheckboxGroup` to apply pill styling to every item in the group. Each item independently shows the colored pill when checked.",
+      },
+    },
+  },
+  render: function GroupCustomColorsStory() {
+    const TIME_OPTIONS: CheckboxOption[] = [
+      { value: "morning", label: "Morning (5am – 11:58am)" },
+      { value: "afternoon", label: "Afternoon (12pm – 3:59pm)" },
+      { value: "evening", label: "Evening (4pm – 7:59pm)" },
+      { value: "night", label: "Night (8pm – 11:59pm)" },
+    ];
+    const [selected, setSelected] = React.useState<string[]>(["morning", "evening"]);
+    return (
+      <div className="flex w-[480px] flex-col gap-3">
+        <CheckboxGroup
+          label="Preferred time slots"
+          options={TIME_OPTIONS}
+          value={selected}
+          onChange={setSelected}
+          layout="vertical"
+          borderColor="#067D51"
+          bgColor="#EFF9F4"
+          textColor="#067D51"
+        />
+        <code className="text-xs text-gray-500">
+          selected: [{selected.map((v) => `"${v}"`).join(", ")}]
+        </code>
+      </div>
+    );
+  },
+};
+
+export const WithCustomColorsBrandBlue: Story = {
+  name: "Custom pill colors · Brand blue",
+  render: function BrandBlueStory() {
+    const [checked, setChecked] = React.useState(true);
+    return (
+      <div className="flex flex-col gap-3">
+        <Checkbox
+          label="Enable notifications"
+          checked={checked}
+          onCheckedChange={setChecked}
+          borderColor="#3B82F6"
+          bgColor="#EFF6FF"
+          textColor="#3B82F6"
+        />
+        <Checkbox
+          label="Marketing emails"
+          defaultChecked={false}
+          borderColor="#3B82F6"
+          bgColor="#EFF6FF"
+          textColor="#3B82F6"
+        />
+      </div>
+    );
+  },
+};
+

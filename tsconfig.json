@@ -28,5 +28,5 @@
     }
   },
   "include": ["src", "src/components/custom/Grid"],
-  "exclude": ["node_modules", "dist", "src/**/*.stories.ts", "src/**/*.stories.tsx"]
+  "exclude": ["node_modules", "dist"]
 }

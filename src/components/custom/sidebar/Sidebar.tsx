@@ -1,29 +1,74 @@
-import * as React from "react"
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { X } from "lucide-react";
+import { SidebarZIndexProvider } from "@/lib/zIndexContext";
 
 import {
   Drawer,
   DrawerContent,
-  DrawerOverlay,
   DrawerTrigger,
-} from "@/components/ui/drawer"
-import { cn } from "@/lib/utils"
-import { sidebarContentVariants, sidebarPersistentVariants } from "./Sidebar.variants"
-import type { SidebarProps } from "./Sidebar.types"
+} from "@/components/ui/drawer";
+import { cn } from "@/lib/utils";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/bodyScrollLock";
+import {
+  sidebarContentVariants,
+  sidebarPersistentVariants,
+} from "./Sidebar.variants";
+import type { SidebarProps } from "./Sidebar.types";
 
 function useIsDesktop(breakpoint = 768) {
-  const [isDesktop, setIsDesktop] = React.useState(false)
+  const [isDesktop, setIsDesktop] = React.useState(false);
 
   React.useEffect(() => {
-    const query = `(min-width: ${breakpoint}px)`
-    const media = window.matchMedia(query)
-    const setFromMedia = () => setIsDesktop(media.matches)
+    const query = `(min-width: ${breakpoint}px)`;
+    const media = window.matchMedia(query);
+    const setFromMedia = () => setIsDesktop(media.matches);
 
-    setFromMedia()
-    media.addEventListener("change", setFromMedia)
-    return () => media.removeEventListener("change", setFromMedia)
-  }, [breakpoint])
+    setFromMedia();
+    media.addEventListener("change", setFromMedia);
+    return () => media.removeEventListener("change", setFromMedia);
+  }, [breakpoint]);
 
-  return isDesktop
+  return isDesktop;
+}
+
+function SidebarHeader({
+  heading,
+  closeIcon,
+  divider,
+  onClose,
+}: {
+  heading?: React.ReactNode;
+  closeIcon?: boolean;
+  divider?: boolean;
+  onClose: () => void;
+}) {
+  if (!heading && !closeIcon) return null;
+
+  return (
+    <>
+      <div className="flex items-center justify-between px-4 py-3">
+        {heading ? (
+          <span className="text-base font-semibold leading-none">
+            {heading}
+          </span>
+        ) : (
+          <span />
+        )}
+        {closeIcon ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-sm p-1 text-[#202020] opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Close sidebar"
+          >
+            <X className="h-5 w-5 " />
+          </button>
+        ) : null}
+      </div>
+      {divider ? <div className="border-b" /> : null}
+    </>
+  );
 }
 
 export function Sidebar({
@@ -37,88 +82,167 @@ export function Sidebar({
   closeOnOutsideClick = true,
   persistentOnDesktop = false,
   trigger,
+  heading,
+  closeIcon = false,
+  divider = false,
   className,
   contentClassName,
   children,
 }: SidebarProps) {
-  const isDesktop = useIsDesktop()
-  const isControlled = open !== undefined
-  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
-  const resolvedOpen = isControlled ? open : uncontrolledOpen
+  const isDesktop = useIsDesktop();
+  const isControlled = open !== undefined;
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
+  const resolvedOpen = isControlled ? open : uncontrolledOpen;
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
       if (!isControlled) {
-        setUncontrolledOpen(nextOpen)
+        setUncontrolledOpen(nextOpen);
       }
-      onOpenChange?.(nextOpen)
+      onOpenChange?.(nextOpen);
     },
-    [isControlled, onOpenChange]
-  )
+    [isControlled, onOpenChange],
+  );
 
   // Inline styles for percentage-based sizing. vw/vh are inherently responsive
   // and override any CVA width/maxWidth class via specificity.
   // On mobile (< 768px) left/right sidebars always take the full viewport width.
   const customSizeStyle = React.useMemo<React.CSSProperties>(() => {
-    if (sizePercent == null) return {}
-    const pct = Math.min(100, Math.max(1, sizePercent))
+    if (sizePercent == null) return {};
+    const pct = Math.min(100, Math.max(1, sizePercent));
     if (side === "top" || side === "bottom") {
-      return { height: `${pct}vh`, maxHeight: "100vh" }
+      return { height: `${pct}vh`, maxHeight: "100vh" };
     }
-    if (side === "right-bottom") {
-      return { width: `${pct}vw`, maxWidth: "100vw" }
-    }
-    if (!isDesktop) return { width: "100vw", maxWidth: "100vw" }
-    return { width: `${pct}vw`, maxWidth: "100vw" }
-  }, [sizePercent, side, isDesktop])
+    if (!isDesktop) return { width: "100vw", maxWidth: "100vw" };
+    return { width: `${pct}vw`, maxWidth: "100vw" };
+  }, [sizePercent, side, isDesktop]);
 
-  const shouldRenderPersistent = persistentOnDesktop && isDesktop
+  // Animation duration scaled to panel width so wider panels don't feel like
+  // they're teleporting. --sb-open-dur / --sb-close-dur are read by globals.css.
+  // sizePercent overrides the preset — treat 1 vw ≈ 3 ms open, 2 ms close.
+  const animDurationStyle = React.useMemo<React.CSSProperties>(() => {
+    if (sizePercent != null) {
+      const pct = Math.min(100, Math.max(1, sizePercent));
+      return {
+        "--sb-open-dur": `${Math.round(pct * 3)}ms`,
+        "--sb-close-dur": `${Math.round(pct * 2)}ms`,
+      } as React.CSSProperties;
+    }
+    const presets: Record<string, { open: string; close: string }> = {
+      sm: { open: "260ms", close: "180ms" },
+      md: { open: "300ms", close: "200ms" },
+      lg: { open: "340ms", close: "220ms" },
+      full: { open: "400ms", close: "260ms" },
+    };
+    const { open: openDur, close: closeDur } =
+      presets[size ?? "md"] ?? presets["md"]!;
+    return {
+      "--sb-open-dur": openDur,
+      "--sb-close-dur": closeDur,
+    } as React.CSSProperties;
+  }, [size, sizePercent]);
+
+  const shouldRenderPersistent = persistentOnDesktop && isDesktop;
+
+  // The Drawer renders non-modal (modal={false}, see below) so Radix never
+  // locks background scroll on its own. Lock it here whenever the sidebar is
+  // shown as a blocking overlay so the page behind can't scroll together with it.
+  // Skipped for overlay={false}, which is meant to coexist with page scrolling.
+  React.useEffect(() => {
+    if (!resolvedOpen || shouldRenderPersistent || !overlay) return;
+    lockBodyScroll();
+    return unlockBodyScroll;
+  }, [resolvedOpen, shouldRenderPersistent, overlay]);
 
   if (shouldRenderPersistent) {
     if (!resolvedOpen) {
-      return null
+      return null;
     }
 
     return (
-      <aside
-        className={cn(
-          sidebarPersistentVariants({ side, size }),
-          className,
-          contentClassName
-        )}
-        style={customSizeStyle}
-      >
-        {children}
-      </aside>
-    )
+      <SidebarZIndexProvider>
+        <aside
+          className={cn(
+            sidebarPersistentVariants({ side, size }),
+            className,
+            contentClassName,
+          )}
+          style={customSizeStyle}
+        >
+          <div className="flex h-full min-h-0 flex-col">
+            <SidebarHeader
+              heading={heading}
+              closeIcon={closeIcon}
+              divider={divider}
+              onClose={() => handleOpenChange(false)}
+            />
+            <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+          </div>
+        </aside>
+      </SidebarZIndexProvider>
+    );
   }
 
+  const overlayPortal =
+    overlay && typeof document !== "undefined"
+      ? ReactDOM.createPortal(
+          <div
+            aria-hidden="true"
+            className={cn(
+              "fixed inset-0 z-40 bg-black/50 transition-opacity",
+              resolvedOpen
+                ? "opacity-100 duration-300 ease-out pointer-events-auto"
+                : "opacity-0 duration-200 ease-in pointer-events-none",
+            )}
+            onClick={() => {
+              if (closeOnOutsideClick) handleOpenChange(false);
+            }}
+          />,
+          document.body,
+        )
+      : null;
+
   return (
-    <Drawer open={resolvedOpen} onOpenChange={handleOpenChange}>
-      {trigger ? <DrawerTrigger asChild>{trigger}</DrawerTrigger> : null}
-      {overlay ? (
-        <DrawerOverlay
-          onClick={() => {
-            if (closeOnOutsideClick) {
-              handleOpenChange(false)
+    <>
+      {overlayPortal}
+      <Drawer open={resolvedOpen} onOpenChange={handleOpenChange} modal={false}>
+        {trigger ? <DrawerTrigger asChild>{trigger}</DrawerTrigger> : null}
+        <DrawerContent
+          aria-label={`${side} sidebar`}
+          data-side={side}
+          onInteractOutside={(event) => {
+            // Overlay owns outside-click logic; block Radix from also firing.
+            if (overlay) {
+              event.preventDefault();
+              return;
+            }
+            if (!closeOnOutsideClick) {
+              event.preventDefault();
+            } else {
+              // modal={false} — Radix won't auto-close, so do it explicitly.
+              handleOpenChange(false);
             }
           }}
-        />
-      ) : null}
-      <DrawerContent
-        aria-label={`${side} sidebar`}
-        onInteractOutside={
-          closeOnOutsideClick ? undefined : (event) => event.preventDefault()
-        }
-        className={cn(
-          sidebarContentVariants({ side, size }),
-          className,
-          contentClassName
-        )}
-        style={customSizeStyle}
-      >
-        {children}
-      </DrawerContent>
-    </Drawer>
-  )
+          className={cn(
+            sidebarContentVariants({ side, size }),
+            className,
+            contentClassName,
+          )}
+          style={{ ...animDurationStyle, ...customSizeStyle }}
+        >
+          <SidebarZIndexProvider>
+            <div className="flex h-full min-h-0 flex-col">
+              <SidebarHeader
+                heading={heading}
+                closeIcon={closeIcon}
+                divider={divider}
+                onClose={() => handleOpenChange(false)}
+              />
+              <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+            </div>
+          </SidebarZIndexProvider>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
 }
