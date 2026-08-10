@@ -1,5 +1,14 @@
 import * as React from "react";
-import { ArrowDownAZ, ArrowUpAZ, ChevronDown, Check, X } from "lucide-react";
+import {
+  ArrowDownAZ,
+  ArrowUpAZ,
+  Check,
+  ChevronDown,
+  CircleAlert,
+  Lock,
+  Plus,
+  X,
+} from "lucide-react";
 import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import { cn } from "@/lib/utils";
 import { FilterGroupMobileContext } from "@/lib/filterGroupContext";
@@ -10,31 +19,78 @@ import {
 } from "@/components/ui/popover";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 import { InputHelper } from "@/components/custom/Input/InputHelper";
+import { getLabelColor } from "@/components/custom/Input/inputVariants";
 import {
   Command,
-  CommandEmpty,
   CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { triggerVariants } from "@/components/custom/Select/selectVariants";
+import {
+  MENU,
+  SELECT_COLORS,
+  SELECT_GAP,
+  SELECT_SIZES,
+  SELECT_TRANSITION,
+  getTriggerStyle,
+  triggerVariants,
+  type SelectVisualState,
+} from "@/components/custom/Select/selectVariants";
 import type {
   SelectOption,
   SelectProps,
 } from "@/components/custom/Select/Select.types";
 
-const SELECT_ALL = "__select_all__";
+const CREATE_VALUE = "__create__";
 
+/** 14px box, 1.5px hairline, filled forest when checked. */
 function CheckboxIcon({ checked }: { checked: boolean }) {
   return (
     <span
-      className={cn(
-        "flex shrink-0 h-[14px] w-[14px] items-center justify-center rounded-[3px] border",
-        checked ? "border-[#006F42] bg-[#006F42]" : "border-[#D1D5DB] bg-white",
-      )}
+      className="flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px]"
+      style={{
+        background: checked ? MENU.checkboxOn : "transparent",
+        border: `1.5px solid ${checked ? MENU.checkboxOn : MENU.checkboxOff}`,
+        transition: "background 120ms linear, border-color 120ms linear",
+      }}
     >
       {checked && <Check size={9} strokeWidth={3.5} className="text-white" />}
     </span>
+  );
+}
+
+function Spinner({ size }: { size: number }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="shrink-0 animate-spin rounded-full"
+      style={{
+        width: size,
+        height: size,
+        border: `2px solid ${SELECT_COLORS.border}`,
+        borderTopColor: SELECT_COLORS.borderFocus,
+      }}
+    />
+  );
+}
+
+/** Three shimmer rows — never a centred spinner. */
+function LoadingRows({ height }: { height: number }) {
+  return (
+    <div className="flex flex-col gap-1 p-1" aria-busy="true">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="animate-pulse"
+          style={{
+            height,
+            borderRadius: MENU.optionRadius,
+            background: SELECT_COLORS.subtle,
+            opacity: 1 - i * 0.22,
+          }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -47,6 +103,7 @@ function Select<TItem = unknown>({
   value: controlledValue,
   defaultValue,
   mode = "single",
+  multiple,
   size = "md",
   placeholder = "Select...",
   disabled = false,
@@ -63,11 +120,27 @@ function Select<TItem = unknown>({
   readOnly = false,
   sorting = false,
   indexing = false,
-  search: searchEnabled = true,
+  search: searchProp = true,
+  searchable,
+  status,
+  statusMessage,
+  leftIcon,
+  loading = false,
+  maxChips,
+  onSearch,
+  creatable = false,
+  onCreate,
+  emptyState,
+  placement = "auto",
 }: SelectProps<TItem>) {
   const isMobileDrawer = React.useContext(FilterGroupMobileContext);
   const touchedRef = React.useRef(false);
   const interactedRef = React.useRef(false);
+
+  const resolvedMode = multiple ? "multi" : mode;
+  const searchEnabled = searchable ?? searchProp;
+  const spec = SELECT_SIZES[size];
+
   const resolvedOptions = React.useMemo<SelectOption[]>(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
@@ -80,6 +153,7 @@ function Select<TItem = unknown>({
   }, [items, getLabel, getValue, getDisabled, options]);
 
   const [open, setOpen] = React.useState(false);
+  const [hovered, setHovered] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
   const listRef = React.useRef<HTMLDivElement>(null);
@@ -104,14 +178,14 @@ function Select<TItem = unknown>({
     const q = searchQuery.trim();
     if (indexing && /^\d+$/.test(q)) {
       const n = parseInt(q, 10);
-      const pos = n - 1;
-      const opt = sortedOptions[pos];
+      const opt = sortedOptions[n - 1];
       return opt ? [opt] : [];
     }
     return fuseFilteredOptions;
-  }, [searchEnabled, searchQuery, indexing, sorting, sortOrder, sortedOptions, fuseFilteredOptions]);
+  }, [searchEnabled, searchQuery, indexing, sortedOptions, fuseFilteredOptions]);
+
   const [selected, setSelected] = React.useState<string | string[]>(
-    controlledValue ?? defaultValue ?? (mode === "multi" ? [] : ""),
+    controlledValue ?? defaultValue ?? (resolvedMode === "multi" ? [] : ""),
   );
 
   React.useEffect(() => {
@@ -119,7 +193,7 @@ function Select<TItem = unknown>({
   }, [controlledValue]);
 
   const selectedArr: string[] =
-    mode === "multi" ? (Array.isArray(selected) ? selected : []) : [];
+    resolvedMode === "multi" ? (Array.isArray(selected) ? selected : []) : [];
 
   const enabledOptions = sortedOptions.filter((o) => !o.disabled);
   const allSelected =
@@ -127,7 +201,7 @@ function Select<TItem = unknown>({
     enabledOptions.every((o) => selectedArr.includes(o.value));
 
   const isSelected = (val: string) =>
-    mode === "single" ? selected === val : selectedArr.includes(val);
+    resolvedMode === "single" ? selected === val : selectedArr.includes(val);
 
   const commit = (next: string | string[]) => {
     // In uncontrolled mode update internal state immediately.
@@ -138,18 +212,15 @@ function Select<TItem = unknown>({
   };
 
   const handleSelect = (val: string) => {
-    if (val === SELECT_ALL) {
-      commit(allSelected ? [] : enabledOptions.map((o) => o.value));
-      return;
-    }
-    if (mode === "single") {
+    if (resolvedMode === "single") {
       commit(val);
       setOpen(false);
     } else {
-      const next = selectedArr.includes(val)
-        ? selectedArr.filter((v) => v !== val)
-        : [...selectedArr, val];
-      commit(next);
+      commit(
+        selectedArr.includes(val)
+          ? selectedArr.filter((v) => v !== val)
+          : [...selectedArr, val],
+      );
     }
   };
 
@@ -162,27 +233,30 @@ function Select<TItem = unknown>({
   const clearAll = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    commit(mode === "multi" ? [] : "");
+    commit(resolvedMode === "multi" ? [] : "");
   };
 
   // ── Dynamic pill overflow ──────────────────────────────────────────────
   // Two-pass approach so the +N badge is always visible:
   //   Pass 1 (null)  – all pills render with no badge; layout effect measures them.
   //   Pass 2 (number) – only the fitting pills + badge render; no ghost pills taking space.
+  // `maxChips` short-circuits the measurement with a hard cap.
   const pillsContainerRef = React.useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = React.useState<number | null>(null);
 
-  // When selection changes, reset to measuring pass.
   React.useLayoutEffect(() => {
-    if (mode === "multi") setVisibleCount(null);
-  }, [selectedArr.join(","), mode]);
+    if (resolvedMode === "multi") setVisibleCount(null);
+  }, [selectedArr.join(","), resolvedMode]);
 
-  // During measuring pass: compute how many pills fit.
   React.useLayoutEffect(() => {
     if (visibleCount !== null) return;
+    if (maxChips !== undefined) {
+      setVisibleCount(Math.min(maxChips, selectedArr.length));
+      return;
+    }
 
     const container = pillsContainerRef.current;
-    if (!container || mode !== "multi" || selectedArr.length === 0) {
+    if (!container || resolvedMode !== "multi" || selectedArr.length === 0) {
       setVisibleCount(selectedArr.length);
       return;
     }
@@ -205,51 +279,53 @@ function Select<TItem = unknown>({
     }
 
     setVisibleCount(count);
-  }, [visibleCount]);
+  }, [visibleCount, maxChips]);
 
-  // During measuring pass show all; after measurement show only what fits.
   const displayedPills =
     visibleCount === null ? selectedArr : selectedArr.slice(0, visibleCount);
   const overflowCount =
     visibleCount === null ? 0 : selectedArr.length - visibleCount;
 
-  const hasSelection = mode === "multi" ? selectedArr.length > 0 : !!selected;
+  const hasSelection =
+    resolvedMode === "multi" ? selectedArr.length > 0 : !!selected;
   const singleLabel =
-    mode === "single"
+    resolvedMode === "single"
       ? resolvedOptions.find((o) => o.value === selected)?.label
       : undefined;
 
-  const triggerState = disabled
+  // ── Visual state ───────────────────────────────────────────────────────
+  const state: SelectVisualState = disabled
     ? "disabled"
-    : readOnly
-      ? "readonly"
-      : open
-        ? "open"
-        : "default";
+    : loading
+      ? "loading"
+      : readOnly
+        ? "readonly"
+        : error
+          ? "error"
+          : open
+            ? "open"
+            : status === "success"
+              ? "success"
+              : status === "warning"
+                ? "warning"
+                : hovered
+                  ? "hover"
+                  : "default";
 
-  const placeholderSizeClass =
-    size === "lg"
-      ? "text-[14px]"
-      : size === "md"
-        ? "text-[12px]"
-        : "text-[11px]";
+  const box = getTriggerStyle(state);
+  const showChevron = !readOnly && !loading;
 
-  const commandInputSizeClass =
-    size === "lg"
-      ? "h-10 text-base"
-      : size === "md"
-        ? "h-9 text-sm"
-        : "h-8 text-xs";
-
-  const commandItemSizeClass =
-    size === "lg"
-      ? "px-3 py-2.5 text-base"
-      : size === "md"
-        ? "px-3 py-2 text-sm"
-        : "px-2.5 py-1.5 text-xs";
+  const legacyState =
+    state === "disabled"
+      ? "disabled"
+      : state === "readonly"
+        ? "readonly"
+        : state === "open"
+          ? "open"
+          : "default";
 
   const handleOpenChange = (next: boolean) => {
-    if (disabled || readOnly) return;
+    if (disabled || readOnly || loading) return;
     setOpen(next);
     if (!next) setSearchQuery(""); // reset search so next open starts fresh
     if (next) {
@@ -270,12 +346,17 @@ function Select<TItem = unknown>({
     onTouch?.();
   };
 
+  const handleSearchChange = (q: string) => {
+    setSearchQuery(q);
+    onSearch?.(q);
+  };
+
   // ── Flat list mode inside FilterGroup mobile drawer ──────────────────────
   if (isMobileDrawer) {
     return (
       <ul className="divide-y divide-gray-100">
         {resolvedOptions.map((opt) => {
-          const selected = isSelected(opt.value);
+          const rowSelected = isSelected(opt.value);
           return (
             <li key={opt.value}>
               <button
@@ -283,22 +364,18 @@ function Select<TItem = unknown>({
                 disabled={opt.disabled}
                 onClick={() => !opt.disabled && handleSelect(opt.value)}
                 className={cn(
-                  "w-full flex items-center justify-between px-4 py-4 text-sm transition-colors",
-                  selected
-                    ? "text-[#006F42] font-semibold"
-                    : "text-gray-800 font-normal",
+                  "flex w-full items-center justify-between px-4 py-4 text-sm transition-colors",
+                  rowSelected
+                    ? "font-semibold text-[#003C1B]"
+                    : "font-normal text-gray-800",
                   opt.disabled
-                    ? "opacity-40 cursor-not-allowed"
-                    : "hover:bg-gray-50 active:bg-gray-100 cursor-pointer",
+                    ? "cursor-not-allowed opacity-40"
+                    : "cursor-pointer hover:bg-[#FAFFF7] active:bg-[#DCF3CE]",
                 )}
               >
                 <span>{opt.label}</span>
-                {selected && (
-                  <Check
-                    size={16}
-                    strokeWidth={2.5}
-                    className="shrink-0 text-[#006F42]"
-                  />
+                {rowSelected && (
+                  <Check size={16} strokeWidth={2.5} className="shrink-0 text-[#003C1B]" />
                 )}
               </button>
             </li>
@@ -308,21 +385,118 @@ function Select<TItem = unknown>({
     );
   }
 
+  // ── Menu body ──────────────────────────────────────────────────────────
+  const query = searchQuery.trim();
+  const exactMatch = visibleOptions.some(
+    (o) => o.label.toLowerCase() === query.toLowerCase(),
+  );
+  const showCreate = creatable && query.length > 0 && !exactMatch;
+  const showEmpty = visibleOptions.length === 0 && !showCreate;
+
+  /** Group options in their current order; ungrouped options keep a null key. */
+  const groups = React.useMemo(() => {
+    const out: Array<{ name: string | null; options: SelectOption[] }> = [];
+    for (const opt of visibleOptions) {
+      const name = opt.group ?? null;
+      const last = out[out.length - 1];
+      if (last && last.name === name) last.options.push(opt);
+      else out.push({ name, options: [opt] });
+    }
+    return out;
+  }, [visibleOptions]);
+
+  const renderOption = (option: SelectOption) => {
+    const checked = isSelected(option.value);
+    const isMulti = resolvedMode === "multi";
+    const rich = Boolean(option.description || option.icon);
+    const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
+
+    return (
+      <CommandItem
+        key={option.value}
+        value={option.value}
+        disabled={option.disabled}
+        aria-selected={checked}
+        onSelect={() => handleSelect(option.value)}
+        className={cn(
+          "group/opt cursor-pointer data-[disabled=true]:cursor-not-allowed",
+          rich ? "items-start" : "items-center",
+        )}
+        style={{
+          minHeight: rich ? 44 : spec.option,
+          gap: SELECT_GAP,
+          padding: rich ? "7px 10px" : "0 10px",
+          borderRadius: MENU.optionRadius,
+          fontSize: spec.font,
+          lineHeight: 1.3,
+          background: checked
+            ? isMulti
+              ? MENU.multiSelectedBg
+              : MENU.selectedBg
+            : "transparent",
+          color: checked && !isMulti ? MENU.selectedInk : SELECT_COLORS.value,
+          fontWeight: checked && !isMulti ? 600 : 500,
+          opacity: option.disabled ? 0.55 : 1,
+        }}
+      >
+        {isMulti && <CheckboxIcon checked={checked} />}
+        {indexing && (
+          <span className="shrink-0 tabular-nums" style={{ color: MENU.metaInk }}>
+            {originalIdx + 1}.
+          </span>
+        )}
+        {option.icon && <span className="flex shrink-0 items-center">{option.icon}</span>}
+
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="truncate">{option.label}</span>
+          {option.description && (
+            <span style={{ fontSize: spec.font - 2, fontWeight: 400, color: MENU.metaInk }}>
+              {option.description}
+            </span>
+          )}
+        </span>
+
+        {option.meta && (
+          <span
+            className="shrink-0 whitespace-nowrap"
+            style={{ fontSize: spec.font - 2, fontWeight: 500, color: MENU.metaInk }}
+          >
+            {option.meta}
+          </span>
+        )}
+        {!isMulti && checked && (
+          <Check size={14} strokeWidth={2.8} className="shrink-0" color={MENU.selectedInk} />
+        )}
+      </CommandItem>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <InputLabel size={size === "xs" ? "sm" : size} required={required}>
+        <InputLabel
+          size={size}
+          required={required}
+          tone={state === "error" || state === "disabled" ? getLabelColor(state) : undefined}
+        >
           {label}
         </InputLabel>
       )}
+
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <div
             role="button"
+            data-slot="select-trigger"
+            data-size={size}
+            data-state={state}
             tabIndex={disabled ? -1 : 0}
             aria-disabled={disabled}
             aria-haspopup="listbox"
             aria-expanded={open}
+            aria-busy={loading || undefined}
+            onPointerEnter={() => setHovered(true)}
+            onPointerLeave={() => setHovered(false)}
             onFocus={() => {
               interactedRef.current = true;
             }}
@@ -330,23 +504,48 @@ function Select<TItem = unknown>({
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                if (!disabled && !readOnly) setOpen((o) => !o);
+                if (!disabled && !readOnly && !loading) setOpen((o) => !o);
               } else if (e.key === "Escape") {
                 setOpen(false);
               }
             }}
             className={cn(
-              triggerVariants({ state: triggerState, size }),
+              triggerVariants({ state: legacyState, size }),
               width,
               className,
             )}
+            style={{
+              minHeight: spec.height,
+              paddingLeft: spec.padLeft,
+              paddingRight: spec.padRight,
+              paddingTop: resolvedMode === "multi" ? spec.padMultiY : 0,
+              paddingBottom: resolvedMode === "multi" ? spec.padMultiY : 0,
+              gap: SELECT_GAP,
+              borderRadius: spec.radius,
+              fontSize: spec.font,
+              background: box.background,
+              border: box.border,
+              boxShadow: box.boxShadow,
+              color: box.color,
+              cursor: box.cursor ?? "pointer",
+              transition: SELECT_TRANSITION,
+            }}
           >
-            {/* ── Left: pills / label ── */}
+            {leftIcon && (
+              <span
+                className="flex shrink-0 items-center justify-center [&>svg]:size-full"
+                style={{ width: spec.icon + 1, height: spec.icon + 1, color: SELECT_COLORS.icon }}
+              >
+                {leftIcon}
+              </span>
+            )}
+
+            {/* ── Left: chips / value / placeholder ── */}
             <div
-              ref={mode === "multi" ? pillsContainerRef : undefined}
-              className="flex flex-1 items-center gap-1 overflow-hidden min-w-0"
+              ref={resolvedMode === "multi" ? pillsContainerRef : undefined}
+              className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden"
             >
-              {mode === "multi" ? (
+              {resolvedMode === "multi" ? (
                 selectedArr.length > 0 ? (
                   <>
                     {displayedPills.map((val) => {
@@ -356,7 +555,13 @@ function Select<TItem = unknown>({
                         <span
                           key={val}
                           data-pill
-                          className="inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]"
+                          className="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-full font-semibold"
+                          style={{
+                            padding: clearable ? "4px 4px 4px 10px" : "4px 10px",
+                            background: MENU.selectedBg,
+                            color: MENU.selectedInk,
+                            fontSize: spec.font - 2,
+                          }}
                         >
                           <span className="truncate">{opt.label}</span>
                           {clearable && (
@@ -364,59 +569,64 @@ function Select<TItem = unknown>({
                               type="button"
                               tabIndex={-1}
                               onClick={(e) => removePill(val, e)}
-                              className="ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]"
                               aria-label={`Remove ${opt.label}`}
+                              className="flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full transition-colors"
+                              style={{ background: "rgba(0,60,27,.1)", color: MENU.selectedInk }}
                             >
-                              <X
-                                size={10}
-                                strokeWidth={2}
-                                className="hover:text-red-500"
-                              />
+                              <X size={8} strokeWidth={3.4} />
                             </button>
                           )}
                         </span>
                       );
                     })}
                     {overflowCount > 0 && (
-                      <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]">
+                      <span
+                        className="inline-flex shrink-0 items-center justify-center rounded-full font-semibold"
+                        style={{
+                          padding: "4px 8px",
+                          background: SELECT_COLORS.subtle,
+                          color: SELECT_COLORS.message,
+                          fontSize: spec.font - 2,
+                        }}
+                      >
                         +{overflowCount}
                       </span>
                     )}
                   </>
                 ) : (
-                  <span
-                    className={cn(
-                      "truncate text-[#C4C9D2]",
-                      placeholderSizeClass,
-                    )}
-                  >
+                  <span className="truncate" style={{ color: SELECT_COLORS.placeholder }}>
                     {placeholder}
                   </span>
                 )
               ) : (
                 <span
-                  className={cn(
-                    "truncate",
-                    singleLabel
-                      ? "text-[#111827]"
-                      : cn("text-[#C4C9D2]", placeholderSizeClass),
-                  )}
+                  className="truncate"
+                  style={{
+                    color: singleLabel ? box.color : SELECT_COLORS.placeholder,
+                  }}
                 >
                   {singleLabel ?? placeholder}
                 </span>
               )}
             </div>
 
-            <div className="flex shrink-0 items-center gap-1">
-              {clearable && hasSelection && (
+            {/* ── Right: adornments ── */}
+            <div className="flex shrink-0 items-center" style={{ gap: 6 }}>
+              {clearable && hasSelection && !readOnly && !disabled && (
                 <button
                   type="button"
                   tabIndex={-1}
                   onClick={clearAll}
-                  className="flex items-center text-gray-400 hover:text-gray-600"
                   aria-label="Clear selection"
+                  className="flex shrink-0 items-center justify-center rounded-full transition-colors"
+                  style={{
+                    width: spec.icon + 4,
+                    height: spec.icon + 4,
+                    background: SELECT_COLORS.subtle,
+                    color: SELECT_COLORS.message,
+                  }}
                 >
-                  <X size={14} className="hover:text-red-500" strokeWidth={2} />
+                  <X size={spec.icon - 6} strokeWidth={3} />
                 </button>
               )}
               {sorting && (
@@ -429,100 +639,195 @@ function Select<TItem = unknown>({
                     setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
                   }}
                   disabled={disabled}
-                  className="flex items-center text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label={sortOrder === "asc" ? "Sorted A→Z, click for Z→A" : "Sorted Z→A, click for A→Z"}
+                  aria-label={
+                    sortOrder === "asc"
+                      ? "Sorted A→Z, click for Z→A"
+                      : "Sorted Z→A, click for A→Z"
+                  }
+                  className="flex items-center transition-colors"
+                  style={{ color: SELECT_COLORS.message }}
                 >
                   {sortOrder === "asc" ? (
-                    <ArrowUpAZ size={14} strokeWidth={2} />
+                    <ArrowUpAZ size={spec.icon - 1} strokeWidth={2} />
                   ) : (
-                    <ArrowDownAZ size={14} strokeWidth={2} />
+                    <ArrowDownAZ size={spec.icon - 1} strokeWidth={2} />
                   )}
                 </button>
               )}
-              <ChevronDown
-                size={16}
-                strokeWidth={2}
-                className={cn(
-                  "text-gray-600 transition-transform duration-200",
-                  open && "rotate-180",
-                )}
-              />
+              {loading && <Spinner size={spec.icon - 2} />}
+              {state === "readonly" && (
+                <Lock size={spec.icon - 2} strokeWidth={2} color={SELECT_COLORS.placeholder} />
+              )}
+              {state === "error" && (
+                <CircleAlert size={spec.icon} strokeWidth={2.2} color={SELECT_COLORS.errorInk} />
+              )}
+              {state === "warning" && (
+                <CircleAlert size={spec.icon} strokeWidth={2.2} color={SELECT_COLORS.warningInk} />
+              )}
+              {state === "success" && (
+                <Check size={spec.icon} strokeWidth={2.6} color={SELECT_COLORS.successInk} />
+              )}
+              {showChevron && (
+                <ChevronDown
+                  size={spec.icon}
+                  strokeWidth={2}
+                  className="transition-transform duration-[120ms]"
+                  style={{
+                    color: disabled ? SELECT_COLORS.borderHover : SELECT_COLORS.placeholder,
+                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                />
+              )}
             </div>
           </div>
         </PopoverTrigger>
 
         <PopoverContent
-          className="max-w-[calc(100vw-1rem)]"
+          side={placement === "auto" ? "bottom" : placement}
+          className="max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none"
           collisionPadding={{ top: 64 }}
-          style={{
-            width: "var(--radix-popover-trigger-width)",
-          }}
+          style={{ width: "var(--radix-popover-trigger-width)" }}
         >
-          {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
-          <Command shouldFilter={false}>
-            {searchEnabled && (
-              <CommandInput
-                placeholder="Search..."
-                value={searchQuery}
-                onValueChange={setSearchQuery}
-                spellCheck={spellCheck}
-                className={commandInputSizeClass}
-              />
-            )}
-            <CommandList ref={listRef}>
-              {visibleOptions.length === 0 && searchQuery.trim() ? (
-                <CommandEmpty>No results found.</CommandEmpty>
-              ) : null}
-
-              {mode === "multi" && (
-                <CommandItem
-                  value={SELECT_ALL}
-                  onSelect={() => handleSelect(SELECT_ALL)}
-                  className={cn(
-                    "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                    commandItemSizeClass,
-                  )}
-                >
-                  <CheckboxIcon checked={allSelected} />
-                  <span className="flex-1">Select all</span>
-                </CommandItem>
+          <div
+            style={{
+              padding: MENU.padding,
+              borderRadius: MENU.radius,
+              border: MENU.border,
+              background: MENU.background,
+              boxShadow: MENU.shadow,
+            }}
+          >
+            {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
+            <Command shouldFilter={false}>
+              {searchEnabled && !loading && (
+                <CommandInput
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onValueChange={handleSearchChange}
+                  spellCheck={spellCheck}
+                  style={{ fontSize: spec.font }}
+                />
               )}
 
-              {visibleOptions.map((option) => {
-                const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
-                const displayIndex = originalIdx + 1;
-                return (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    disabled={option.disabled}
-                    aria-selected={isSelected(option.value)}
-                    onSelect={() => handleSelect(option.value)}
-                    className={cn(
-                      "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                      commandItemSizeClass,
+              {/* Sticky count bar with All / None */}
+              {resolvedMode === "multi" && !loading && visibleOptions.length > 0 && (
+                <div
+                  className="sticky top-0 z-10 flex items-center justify-between"
+                  style={{
+                    padding: "6px 10px",
+                    background: MENU.background,
+                    borderBottom: `1px solid ${MENU.groupRule}`,
+                    fontSize: spec.font - 2,
+                    color: SELECT_COLORS.message,
+                  }}
+                >
+                  <span className="font-semibold">{selectedArr.length} selected</span>
+                  <span className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => commit(enabledOptions.map((o) => o.value))}
+                      disabled={allSelected}
+                      className="font-semibold disabled:opacity-40"
+                      style={{ color: MENU.selectedInk }}
+                    >
+                      All
+                    </button>
+                    <span style={{ color: MENU.groupRule }}>|</span>
+                    <button
+                      type="button"
+                      onClick={() => commit([])}
+                      disabled={selectedArr.length === 0}
+                      className="font-semibold disabled:opacity-40"
+                      style={{ color: SELECT_COLORS.message }}
+                    >
+                      None
+                    </button>
+                  </span>
+                </div>
+              )}
+
+              <CommandList
+                ref={listRef}
+                style={{ maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 }}
+              >
+                {loading ? (
+                  <LoadingRows height={spec.option} />
+                ) : (
+                  <>
+                    {groups.map((group, gi) => (
+                      <div
+                        key={group.name ?? `__ungrouped_${gi}`}
+                        style={
+                          gi > 0 && group.name
+                            ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 }
+                            : undefined
+                        }
+                      >
+                        {group.name && (
+                          <div
+                            className="sticky top-0 z-[5] font-semibold uppercase"
+                            style={{
+                              padding: "6px 10px 4px",
+                              background: MENU.background,
+                              fontSize: 10,
+                              letterSpacing: "0.09em",
+                              color: MENU.groupInk,
+                            }}
+                          >
+                            {group.name}
+                          </div>
+                        )}
+                        {group.options.map(renderOption)}
+                      </div>
+                    ))}
+
+                    {showCreate && (
+                      <CommandItem
+                        value={CREATE_VALUE}
+                        onSelect={() => {
+                          onCreate?.(query);
+                          setOpen(false);
+                        }}
+                        className="cursor-pointer"
+                        style={{
+                          minHeight: spec.option,
+                          gap: SELECT_GAP,
+                          padding: "0 10px",
+                          marginTop: 4,
+                          borderTop: `1px solid ${MENU.groupRule}`,
+                          borderRadius: MENU.optionRadius,
+                          fontSize: spec.font,
+                          fontWeight: 600,
+                          color: MENU.selectedInk,
+                        }}
+                      >
+                        <Plus size={14} strokeWidth={2.4} className="shrink-0" />
+                        <span className="truncate">Create “{query}”</span>
+                      </CommandItem>
                     )}
-                  >
-                    {mode === "multi" && (
-                      <CheckboxIcon checked={isSelected(option.value)} />
+
+                    {showEmpty && (
+                      <div
+                        className="flex flex-col items-start gap-1"
+                        style={{ padding: "14px 10px", fontSize: spec.font }}
+                      >
+                        {emptyState ?? (
+                          <span style={{ color: SELECT_COLORS.message }}>No results found.</span>
+                        )}
+                      </div>
                     )}
-                    {indexing && (
-                      <span className="shrink-0 text-[#9CA3AF] tabular-nums">{displayIndex}.</span>
-                    )}
-                    <span className="flex-1 truncate">{option.label}</span>
-                    {mode === "single" && isSelected(option.value) && (
-                      <Check size={14} className="shrink-0 text-[#006F42]" />
-                    )}
-                  </CommandItem>
-                );
-              })}
-            </CommandList>
-          </Command>
+                  </>
+                )}
+              </CommandList>
+            </Command>
+          </div>
         </PopoverContent>
       </Popover>
+
       <InputHelper
-        size={size === "xs" ? "sm" : size}
-        helperText={helperText}
+        size={size}
+        state={state === "open" ? "focused" : state}
+        helperText={error ?? (status && statusMessage) ?? helperText}
         error={error}
       />
     </div>

@@ -225,8 +225,24 @@ interface SelectOption {
     value: string;
     label: string;
     disabled?: boolean;
+    /** Trailing muted text on the option row (e.g. "412 items", "default"). */
+    meta?: string;
+    /**
+     * Group heading this option belongs to. Options sharing a `group` render
+     * under one uppercase eyebrow, separated from the next group by a hairline.
+     */
+    group?: string;
+    /**
+     * Second line under the label. On a disabled option this is where you say
+     * *why* it is disabled — a disabled option should always explain itself.
+     */
+    description?: string;
+    /** Leading avatar/initials chip or icon for a rich row. */
+    icon?: React.ReactNode;
 }
 type SelectMode = "single" | "multi";
+/** Non-error validation states, mirroring Input. */
+type SelectStatus = "success" | "warning";
 interface SelectProps<TItem = unknown> {
     /** Pre-shaped option list. Use this when data already fits { value, label }. */
     options?: SelectOption[];
@@ -244,6 +260,11 @@ interface SelectProps<TItem = unknown> {
     value?: string | string[];
     defaultValue?: string | string[];
     mode?: SelectMode;
+    /**
+     * Alias for `mode="multi"`, matching the design's prop name. When both are
+     * given, `multiple` wins.
+     */
+    multiple?: boolean;
     /** Trigger size — controls height, padding, and text scale. */
     size?: "xs" | "sm" | "md" | "lg";
     placeholder?: string;
@@ -282,60 +303,48 @@ interface SelectProps<TItem = unknown> {
      * Defaults to `true`. Set to `false` to show only the raw option list.
      */
     search?: boolean;
+    /** Alias for `search`, matching the design's prop name. Takes priority when set. */
+    searchable?: boolean;
     /**
      * When `true`, each option in the dropdown is prefixed with its position number (1, 2, 3 …).
      * The index reflects the current displayed order (after sorting / fuzzy filtering).
      */
     indexing?: boolean;
+    /**
+     * Non-error validation state. `success` gives a green border and tick,
+     * `warning` an amber fill. Ignored while `error` is set.
+     */
+    status?: SelectStatus;
+    /** Message shown under the trigger for the active `status`. Falls back to `helperText`. */
+    statusMessage?: string;
+    /** Leading glyph inside the trigger, ahead of the value. */
+    leftIcon?: React.ReactNode;
+    /**
+     * Options are being fetched. The trigger shows a spinner and the menu shows
+     * shimmer rows rather than a centred spinner.
+     */
+    loading?: boolean;
+    /**
+     * Hard cap on how many chips a multi select renders before collapsing the
+     * rest into a `+N` counter. Without it the trigger measures how many fit.
+     */
+    maxChips?: number;
+    /** Fires as the user types in the dropdown search box — for server-side lookup. */
+    onSearch?: (query: string) => void;
+    /** Offer a "Create …" row, pinned last, when the query matches no option. */
+    creatable?: boolean;
+    /** Fires when the create row is chosen. Receives the raw query text. */
+    onCreate?: (query: string) => void;
+    /** Replaces the default "No results found." body when there is nothing to show. */
+    emptyState?: React.ReactNode;
+    /** Where the menu opens. `auto` lets it flip above the trigger near the fold. */
+    placement?: "auto" | "top" | "bottom";
 }
 
-declare function Select<TItem = unknown>({ options, items, getLabel, getValue, getDisabled, value: controlledValue, defaultValue, mode, size, placeholder, disabled, width, className, onChange, onTouch, spellCheck, clearable, label, required, helperText, error, readOnly, sorting, indexing, search: searchEnabled, }: SelectProps<TItem>): react_jsx_runtime.JSX.Element;
+declare function Select<TItem = unknown>({ options, items, getLabel, getValue, getDisabled, value: controlledValue, defaultValue, mode, multiple, size, placeholder, disabled, width, className, onChange, onTouch, spellCheck, clearable, label, required, helperText, error, readOnly, sorting, indexing, search: searchProp, searchable, status, statusMessage, leftIcon, loading, maxChips, onSearch, creatable, onCreate, emptyState, placement, }: SelectProps<TItem>): react_jsx_runtime.JSX.Element;
 declare namespace Select {
     var displayName: string;
 }
-
-type TriggerState = "default" | "open" | "disabled" | "readonly";
-type TriggerSize = "xs" | "sm" | "md" | "lg";
-declare const triggerVariants$1: (props?: ({
-    state?: "default" | "disabled" | "open" | "readonly" | null | undefined;
-    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
-} & class_variance_authority_types.ClassProp) | undefined) => string;
-type TriggerVariants = VariantProps<typeof triggerVariants$1>;
-
-type TabItem = {
-    value: string;
-    label: string;
-    disabled?: boolean;
-};
-interface CustomTabsProps {
-    tabs: TabItem[];
-    defaultValue?: string;
-    value?: string;
-    onChange?: (value: string) => void;
-    variant?: "primary" | "secondary";
-    visibleTabLimit?: number;
-    overflowLabel?: string;
-    showBottomBorder?: boolean;
-    className?: string;
-}
-
-declare function Tabs(props: CustomTabsProps): react_jsx_runtime.JSX.Element;
-declare namespace Tabs {
-    var displayName: string;
-}
-
-interface CustomTabsTriggerProps extends React.ComponentProps<typeof TabsTrigger> {
-    variant?: "secondary" | "tertiary";
-}
-declare function CustomTabsTrigger({ className, children, disabled, variant, ...props }: CustomTabsTriggerProps): react_jsx_runtime.JSX.Element;
-declare namespace CustomTabsTrigger {
-    var displayName: string;
-}
-
-declare const tabTriggerVariants: (props?: ({
-    state?: "disabled" | "active" | "inactive" | null | undefined;
-} & class_variance_authority_types.ClassProp) | undefined) => string;
-type TabTriggerVariants = VariantProps<typeof tabTriggerVariants>;
 
 type InputType = "text" | "email" | "password" | "number" | "tel" | "url" | "search";
 type AllowPattern = "alphanumeric" | "alpha" | "numeric" | "decimal" | "phone" | "none";
@@ -442,31 +451,6 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
     resize?: "none" | "vertical" | "horizontal" | "both";
 }
 
-interface CustomInputComposedProps extends CustomInputProps {
-    required?: boolean;
-}
-declare function Input({ size, variant, inputType, allowPattern, label, helperText, error, status, statusMessage, prefix, suffix, loading, showCount, align, boxStyle, reserveMessageSpace, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, multiline, rows, resize, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
-declare namespace Input {
-    var displayName: string;
-}
-
-type InputLabelSize = InputSize;
-interface InputLabelProps extends React.ComponentProps<typeof Label> {
-    size?: InputLabelSize;
-    required?: boolean;
-    /**
-     * Overrides the label colour for a signalling state (error / disabled). Left
-     * undefined the colour comes from a class, so a caller's `className` can
-     * still override it.
-     */
-    tone?: string;
-}
-/** Figtree 600 / 12px, Title Case, red asterisk when required. */
-declare function InputLabel({ size, required, tone, className, style, children, ...props }: InputLabelProps): react_jsx_runtime.JSX.Element;
-declare namespace InputLabel {
-    var displayName: string;
-}
-
 /**
  * Resolved visual state of the control. Ordering is deliberate — `disabled`
  * and `readOnly` outrank validation, and an `error` outranks a `status`.
@@ -505,6 +489,83 @@ type InputWrapperVariants = VariantProps<typeof inputWrapperVariants>;
 type InputFieldVariants = VariantProps<typeof inputFieldVariants>;
 type InputIconSlotVariants = VariantProps<typeof inputIconSlotVariants>;
 declare const PATTERN_REGEX: Record<AllowPattern, string>;
+
+type TriggerState = "default" | "open" | "disabled" | "readonly";
+type TriggerSize = "xs" | "sm" | "md" | "lg";
+/**
+ * Structural classes for the trigger. Metrics and colours ride on inline
+ * styles, so the control keeps its exact look in apps whose Tailwind build does
+ * not scan this package.
+ *
+ * The `state` and `size` variant keys are preserved from the pre-refresh API —
+ * existing calls such as `triggerVariants({ state: "open", size: "md" })` keep
+ * type-checking, they simply no longer carry the colours.
+ */
+declare const triggerVariants$1: (props?: ({
+    state?: "default" | "disabled" | "open" | "hover" | "focused" | "loading" | "validating" | "success" | "warning" | "error" | "readonly" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+type TriggerVariants = VariantProps<typeof triggerVariants$1>;
+
+type TabItem = {
+    value: string;
+    label: string;
+    disabled?: boolean;
+};
+interface CustomTabsProps {
+    tabs: TabItem[];
+    defaultValue?: string;
+    value?: string;
+    onChange?: (value: string) => void;
+    variant?: "primary" | "secondary";
+    visibleTabLimit?: number;
+    overflowLabel?: string;
+    showBottomBorder?: boolean;
+    className?: string;
+}
+
+declare function Tabs(props: CustomTabsProps): react_jsx_runtime.JSX.Element;
+declare namespace Tabs {
+    var displayName: string;
+}
+
+interface CustomTabsTriggerProps extends React.ComponentProps<typeof TabsTrigger> {
+    variant?: "secondary" | "tertiary";
+}
+declare function CustomTabsTrigger({ className, children, disabled, variant, ...props }: CustomTabsTriggerProps): react_jsx_runtime.JSX.Element;
+declare namespace CustomTabsTrigger {
+    var displayName: string;
+}
+
+declare const tabTriggerVariants: (props?: ({
+    state?: "disabled" | "active" | "inactive" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+type TabTriggerVariants = VariantProps<typeof tabTriggerVariants>;
+
+interface CustomInputComposedProps extends CustomInputProps {
+    required?: boolean;
+}
+declare function Input({ size, variant, inputType, allowPattern, label, helperText, error, status, statusMessage, prefix, suffix, loading, showCount, align, boxStyle, reserveMessageSpace, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, multiline, rows, resize, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
+declare namespace Input {
+    var displayName: string;
+}
+
+type InputLabelSize = InputSize;
+interface InputLabelProps extends React.ComponentProps<typeof Label> {
+    size?: InputLabelSize;
+    required?: boolean;
+    /**
+     * Overrides the label colour for a signalling state (error / disabled). Left
+     * undefined the colour comes from a class, so a caller's `className` can
+     * still override it.
+     */
+    tone?: string;
+}
+/** Figtree 600 / 12px, Title Case, red asterisk when required. */
+declare function InputLabel({ size, required, tone, className, style, children, ...props }: InputLabelProps): react_jsx_runtime.JSX.Element;
+declare namespace InputLabel {
+    var displayName: string;
+}
 
 type InputHelperSize = InputSize;
 interface InputHelperProps extends React.HTMLAttributes<HTMLParagraphElement> {
@@ -1655,4 +1716,4 @@ interface ChipProps extends ChipVariants {
 }
 declare function Chip({ label, variant, size, icon, iconPosition, bgColor, textColor, className, }: ChipProps): react_jsx_runtime.JSX.Element;
 
-export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerProps, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
+export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerProps, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, useFuzzySearch, usePagination, useSweetAlert };

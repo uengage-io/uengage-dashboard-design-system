@@ -2,14 +2,14 @@
 import * as React4 from 'react';
 import { useMemo } from 'react';
 import { DayPicker } from 'react-day-picker';
-import { ChevronLeft, ChevronRight, Check, X, ArrowUpAZ, ArrowDownAZ, ChevronDown, CircleAlert } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, X, ArrowUpAZ, ArrowDownAZ, Lock, CircleAlert, ChevronDown, Plus } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import Fuse from 'fuse.js';
 import { Popover as Popover$1, Label as Label$1 } from 'radix-ui';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import { cva } from 'class-variance-authority';
-import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandItem as CommandItem$1 } from 'cmdk';
+import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandItem as CommandItem$1 } from 'cmdk';
 
 // src/components/ui/DatePickerCalendar.tsx
 function cn(...inputs) {
@@ -96,14 +96,117 @@ var INPUT_SIZES = {
   md: { height: 40, padX: 13, font: 13, icon: 16, radius: 8, label: 12, message: 11 },
   lg: { height: 48, padX: 15, font: 14, icon: 18, radius: 8, label: 13, message: 11 }
 };
+var INPUT_TRANSITION = "border-color 120ms linear, box-shadow 120ms linear, background-color 120ms linear";
 var INPUT_COLORS = {
+  surface: "#FFFFFF",
+  subtle: "#F3F5F9",
+  border: "#E2E2E2",
+  borderHover: "#C6C6C6",
+  borderFocus: "#1F5E2C",
+  /** 3px lime halo that pairs with `borderFocus`. */
+  ring: "0 0 0 3px rgba(140,196,42,.28)",
+  value: "#161616",
+  placeholder: "#9C9C9C",
   message: "#9C9C9C",
+  icon: "#1F5E2C",
+  successBorder: "#00A86B",
   successInk: "#00A86B",
+  warningBg: "#FFF6D6",
+  warningBorder: "#EFD98A",
   warningInk: "#6A5300",
+  errorBg: "#FBE9EA",
+  errorBorder: "#A8000F",
   errorInk: "#7A0009",
   errorLabel: "#A8000F",
+  readOnlyBg: "#FAFFF7",
+  disabledBg: "#F3F5F9",
+  disabledInk: "#9C9C9C",
   validatingInk: "#595959"
 };
+function getInputBoxStyle(state) {
+  const c = INPUT_COLORS;
+  const hairline = `1px solid ${c.border}`;
+  switch (state) {
+    case "hover":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderHover}`,
+        boxShadow: "none",
+        color: c.value
+      };
+    case "focused":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderFocus}`,
+        boxShadow: c.ring,
+        color: c.value
+      };
+    case "validating":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderFocus}`,
+        boxShadow: "none",
+        color: c.value
+      };
+    case "success":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.successBorder}`,
+        boxShadow: "none",
+        color: c.value
+      };
+    case "warning":
+      return {
+        background: c.warningBg,
+        border: `1px solid ${c.warningBorder}`,
+        boxShadow: "none",
+        color: c.value
+      };
+    case "error":
+      return {
+        background: c.errorBg,
+        border: `1px solid ${c.errorBorder}`,
+        boxShadow: "none",
+        color: c.errorInk
+      };
+    case "readonly":
+      return {
+        background: c.readOnlyBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value,
+        cursor: "default"
+      };
+    case "loading":
+      return {
+        background: c.disabledBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.disabledInk,
+        cursor: "progress"
+      };
+    case "disabled":
+      return {
+        background: c.disabledBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.disabledInk,
+        cursor: "not-allowed"
+      };
+    default:
+      return {
+        background: c.surface,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value
+      };
+  }
+}
+function getLabelColor(state) {
+  if (state === "error") return INPUT_COLORS.errorLabel;
+  if (state === "disabled") return INPUT_COLORS.disabledInk;
+  return INPUT_COLORS.value;
+}
 function getMessageColor(state, hasError) {
   if (hasError) return INPUT_COLORS.errorInk;
   switch (state) {
@@ -292,16 +395,6 @@ var CommandList = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE
   }
 ));
 CommandList.displayName = "CommandList";
-function CommandEmpty({ className, ...props }) {
-  return /* @__PURE__ */ jsx(
-    CommandEmpty$1,
-    {
-      "data-slot": "command-empty",
-      className: cn("px-3 py-6 text-center text-sm text-[#9CA3AF]", className),
-      ...props
-    }
-  );
-}
 function CommandItem({ className, ...props }) {
   return /* @__PURE__ */ jsx(
     CommandItem$1,
@@ -318,78 +411,108 @@ function CommandItem({ className, ...props }) {
     }
   );
 }
-
-// src/utils/tokens.ts
-var COMPONENT_HEIGHT = {
-  sm: "h-8",
-  md: "h-10",
-  lg: "h-12"
+var SELECT_SIZES = {
+  xs: { height: 28, padLeft: 9, padRight: 8, padMultiY: 3, font: 12, icon: 13, option: 28, radius: 8, label: 11 },
+  sm: { height: 32, padLeft: 11, padRight: 9, padMultiY: 4, font: 12, icon: 14, option: 30, radius: 8, label: 12 },
+  md: { height: 40, padLeft: 13, padRight: 11, padMultiY: 6, font: 13, icon: 15, option: 34, radius: 8, label: 12 },
+  lg: { height: 48, padLeft: 15, padRight: 13, padMultiY: 8, font: 14, icon: 17, option: 38, radius: 8, label: 13 }
 };
-var TEXT_SIZE = {
-  xs: "text-[11px]",
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base"
+var SELECT_GAP = 9;
+var MENU = {
+  /** 4px inset padding around the option list. */
+  padding: 4,
+  radius: 8,
+  optionRadius: 6,
+  border: `1px solid ${INPUT_COLORS.border}`,
+  background: INPUT_COLORS.surface,
+  shadow: "2px 2px 4px rgba(0,0,0,.12)",
+  /** Selected row: mint fill with a check, never a blue bar. */
+  selectedBg: "#DCF3CE",
+  selectedInk: "#003C1B",
+  /** A checked row in a multi select gets the lighter wash, not the mint fill. */
+  multiSelectedBg: "#FAFFF7",
+  checkboxOn: "#003C1B",
+  checkboxOff: INPUT_COLORS.borderHover,
+  /** Group eyebrow + the hairline that separates groups. */
+  groupInk: INPUT_COLORS.message,
+  groupRule: "#EEEEEE",
+  metaInk: INPUT_COLORS.message,
+  /** Long lists cap at 8 rows and scroll. */
+  maxRows: 8
 };
-var PLACEHOLDER_SIZE = {
-  xs: "placeholder:text-[10px]",
-  sm: "placeholder:text-[11px]",
-  md: "placeholder:text-[12px]",
-  lg: "placeholder:text-[14px]"
-};
-
-// src/components/custom/Select/selectVariants.ts
+function getTriggerStyle(state) {
+  return getInputBoxStyle(state === "open" ? "focused" : state);
+}
 var triggerVariants = cva(
   [
     "flex min-w-0 items-center justify-between",
-    "rounded-[4px] border border-gray-400 bg-white",
-    "transition-colors duration-150 cursor-pointer select-none",
+    "cursor-pointer select-none",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0"
   ].join(" "),
   {
     variants: {
       state: {
-        default: [
-          "text-[#374151]",
-          "hover:border-gray-500 hover:text-[#111827] hover:shadow-sm"
-        ].join(" "),
-        open: ["border-gray-500 text-[#111827]", "ring-1 ring-gray-200"].join(
-          " "
-        ),
-        disabled: [
-          "border-gray-300 text-gray-400",
-          "opacity-50 pointer-events-none"
-        ].join(" "),
-        readonly: [
-          "bg-gray-50 border-gray-300 text-gray-700",
-          "cursor-default pointer-events-none"
-        ].join(" ")
+        default: "",
+        open: "",
+        disabled: "pointer-events-none",
+        readonly: "cursor-default pointer-events-none",
+        hover: "",
+        focused: "",
+        error: "",
+        success: "",
+        warning: "",
+        validating: "",
+        loading: "pointer-events-none"
       },
-      size: {
-        xs: `h-6 gap-1 px-1.5 ${TEXT_SIZE.xs} ${PLACEHOLDER_SIZE.xs}`,
-        sm: `${COMPONENT_HEIGHT.sm} gap-1 px-2 ${TEXT_SIZE.sm} ${PLACEHOLDER_SIZE.sm}`,
-        md: `${COMPONENT_HEIGHT.md} gap-1.5 px-3 ${TEXT_SIZE.md} ${PLACEHOLDER_SIZE.md}`,
-        lg: `${COMPONENT_HEIGHT.lg} gap-2 px-3.5 ${TEXT_SIZE.lg} ${PLACEHOLDER_SIZE.lg}`
-      }
+      size: { xs: "", sm: "", md: "", lg: "" }
     },
-    defaultVariants: {
-      state: "default",
-      size: "md"
-    }
+    defaultVariants: { state: "default", size: "md" }
   }
 );
-var SELECT_ALL = "__select_all__";
+var CREATE_VALUE = "__create__";
 function CheckboxIcon({ checked }) {
   return /* @__PURE__ */ jsx(
     "span",
     {
-      className: cn(
-        "flex shrink-0 h-[14px] w-[14px] items-center justify-center rounded-[3px] border",
-        checked ? "border-[#006F42] bg-[#006F42]" : "border-[#D1D5DB] bg-white"
-      ),
+      className: "flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px]",
+      style: {
+        background: checked ? MENU.checkboxOn : "transparent",
+        border: `1.5px solid ${checked ? MENU.checkboxOn : MENU.checkboxOff}`,
+        transition: "background 120ms linear, border-color 120ms linear"
+      },
       children: checked && /* @__PURE__ */ jsx(Check, { size: 9, strokeWidth: 3.5, className: "text-white" })
     }
   );
+}
+function Spinner({ size }) {
+  return /* @__PURE__ */ jsx(
+    "span",
+    {
+      "aria-hidden": "true",
+      className: "shrink-0 animate-spin rounded-full",
+      style: {
+        width: size,
+        height: size,
+        border: `2px solid ${INPUT_COLORS.border}`,
+        borderTopColor: INPUT_COLORS.borderFocus
+      }
+    }
+  );
+}
+function LoadingRows({ height }) {
+  return /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-1 p-1", "aria-busy": "true", children: [0, 1, 2].map((i) => /* @__PURE__ */ jsx(
+    "span",
+    {
+      className: "animate-pulse",
+      style: {
+        height,
+        borderRadius: MENU.optionRadius,
+        background: INPUT_COLORS.subtle,
+        opacity: 1 - i * 0.22
+      }
+    },
+    i
+  )) });
 }
 function Select({
   options,
@@ -400,6 +523,7 @@ function Select({
   value: controlledValue,
   defaultValue,
   mode = "single",
+  multiple,
   size = "md",
   placeholder = "Select...",
   disabled = false,
@@ -416,11 +540,25 @@ function Select({
   readOnly = false,
   sorting = false,
   indexing = false,
-  search: searchEnabled = true
+  search: searchProp = true,
+  searchable,
+  status,
+  statusMessage,
+  leftIcon,
+  loading = false,
+  maxChips,
+  onSearch,
+  creatable = false,
+  onCreate,
+  emptyState,
+  placement = "auto"
 }) {
   const isMobileDrawer = React4.useContext(FilterGroupMobileContext);
   const touchedRef = React4.useRef(false);
   const interactedRef = React4.useRef(false);
+  const resolvedMode = multiple ? "multi" : mode;
+  const searchEnabled = searchable ?? searchProp;
+  const spec = SELECT_SIZES[size];
   const resolvedOptions = React4.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
@@ -432,6 +570,7 @@ function Select({
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
   const [open, setOpen] = React4.useState(false);
+  const [hovered, setHovered] = React4.useState(false);
   const [searchQuery, setSearchQuery] = React4.useState("");
   const [sortOrder, setSortOrder] = React4.useState("asc");
   const listRef = React4.useRef(null);
@@ -450,37 +589,33 @@ function Select({
     const q = searchQuery.trim();
     if (indexing && /^\d+$/.test(q)) {
       const n = parseInt(q, 10);
-      const pos = n - 1;
-      const opt = sortedOptions[pos];
+      const opt = sortedOptions[n - 1];
       return opt ? [opt] : [];
     }
     return fuseFilteredOptions;
-  }, [searchEnabled, searchQuery, indexing, sorting, sortOrder, sortedOptions, fuseFilteredOptions]);
+  }, [searchEnabled, searchQuery, indexing, sortedOptions, fuseFilteredOptions]);
   const [selected, setSelected] = React4.useState(
-    controlledValue ?? defaultValue ?? (mode === "multi" ? [] : "")
+    controlledValue ?? defaultValue ?? (resolvedMode === "multi" ? [] : "")
   );
   React4.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
-  const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
+  const selectedArr = resolvedMode === "multi" ? Array.isArray(selected) ? selected : [] : [];
   const enabledOptions = sortedOptions.filter((o) => !o.disabled);
   const allSelected = enabledOptions.length > 0 && enabledOptions.every((o) => selectedArr.includes(o.value));
-  const isSelected = (val) => mode === "single" ? selected === val : selectedArr.includes(val);
+  const isSelected = (val) => resolvedMode === "single" ? selected === val : selectedArr.includes(val);
   const commit = (next) => {
     if (controlledValue === void 0) setSelected(next);
     onChange?.(next);
   };
   const handleSelect = (val) => {
-    if (val === SELECT_ALL) {
-      commit(allSelected ? [] : enabledOptions.map((o) => o.value));
-      return;
-    }
-    if (mode === "single") {
+    if (resolvedMode === "single") {
       commit(val);
       setOpen(false);
     } else {
-      const next = selectedArr.includes(val) ? selectedArr.filter((v) => v !== val) : [...selectedArr, val];
-      commit(next);
+      commit(
+        selectedArr.includes(val) ? selectedArr.filter((v) => v !== val) : [...selectedArr, val]
+      );
     }
   };
   const removePill = (val, e) => {
@@ -491,17 +626,21 @@ function Select({
   const clearAll = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    commit(mode === "multi" ? [] : "");
+    commit(resolvedMode === "multi" ? [] : "");
   };
   const pillsContainerRef = React4.useRef(null);
   const [visibleCount, setVisibleCount] = React4.useState(null);
   React4.useLayoutEffect(() => {
-    if (mode === "multi") setVisibleCount(null);
-  }, [selectedArr.join(","), mode]);
+    if (resolvedMode === "multi") setVisibleCount(null);
+  }, [selectedArr.join(","), resolvedMode]);
   React4.useLayoutEffect(() => {
     if (visibleCount !== null) return;
+    if (maxChips !== void 0) {
+      setVisibleCount(Math.min(maxChips, selectedArr.length));
+      return;
+    }
     const container = pillsContainerRef.current;
-    if (!container || mode !== "multi" || selectedArr.length === 0) {
+    if (!container || resolvedMode !== "multi" || selectedArr.length === 0) {
       setVisibleCount(selectedArr.length);
       return;
     }
@@ -521,17 +660,17 @@ function Select({
       }
     }
     setVisibleCount(count);
-  }, [visibleCount]);
+  }, [visibleCount, maxChips]);
   const displayedPills = visibleCount === null ? selectedArr : selectedArr.slice(0, visibleCount);
   const overflowCount = visibleCount === null ? 0 : selectedArr.length - visibleCount;
-  const hasSelection = mode === "multi" ? selectedArr.length > 0 : !!selected;
-  const singleLabel = mode === "single" ? resolvedOptions.find((o) => o.value === selected)?.label : void 0;
-  const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
-  const placeholderSizeClass = size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]";
-  const commandInputSizeClass = size === "lg" ? "h-10 text-base" : size === "md" ? "h-9 text-sm" : "h-8 text-xs";
-  const commandItemSizeClass = size === "lg" ? "px-3 py-2.5 text-base" : size === "md" ? "px-3 py-2 text-sm" : "px-2.5 py-1.5 text-xs";
+  const hasSelection = resolvedMode === "multi" ? selectedArr.length > 0 : !!selected;
+  const singleLabel = resolvedMode === "single" ? resolvedOptions.find((o) => o.value === selected)?.label : void 0;
+  const state = disabled ? "disabled" : loading ? "loading" : readOnly ? "readonly" : error ? "error" : open ? "open" : status === "success" ? "success" : status === "warning" ? "warning" : hovered ? "hover" : "default";
+  const box = getTriggerStyle(state);
+  const showChevron = !readOnly && !loading;
+  const legacyState = state === "disabled" ? "disabled" : state === "readonly" ? "readonly" : state === "open" ? "open" : "default";
   const handleOpenChange = (next) => {
-    if (disabled || readOnly) return;
+    if (disabled || readOnly || loading) return;
     setOpen(next);
     if (!next) setSearchQuery("");
     if (next) {
@@ -549,9 +688,13 @@ function Select({
     touchedRef.current = true;
     onTouch?.();
   };
+  const handleSearchChange = (q) => {
+    setSearchQuery(q);
+    onSearch?.(q);
+  };
   if (isMobileDrawer) {
     return /* @__PURE__ */ jsx("ul", { className: "divide-y divide-gray-100", children: resolvedOptions.map((opt) => {
-      const selected2 = isSelected(opt.value);
+      const rowSelected = isSelected(opt.value);
       return /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsxs(
         "button",
         {
@@ -559,36 +702,112 @@ function Select({
           disabled: opt.disabled,
           onClick: () => !opt.disabled && handleSelect(opt.value),
           className: cn(
-            "w-full flex items-center justify-between px-4 py-4 text-sm transition-colors",
-            selected2 ? "text-[#006F42] font-semibold" : "text-gray-800 font-normal",
-            opt.disabled ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
+            "flex w-full items-center justify-between px-4 py-4 text-sm transition-colors",
+            rowSelected ? "font-semibold text-[#003C1B]" : "font-normal text-gray-800",
+            opt.disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer hover:bg-[#FAFFF7] active:bg-[#DCF3CE]"
           ),
           children: [
             /* @__PURE__ */ jsx("span", { children: opt.label }),
-            selected2 && /* @__PURE__ */ jsx(
-              Check,
-              {
-                size: 16,
-                strokeWidth: 2.5,
-                className: "shrink-0 text-[#006F42]"
-              }
-            )
+            rowSelected && /* @__PURE__ */ jsx(Check, { size: 16, strokeWidth: 2.5, className: "shrink-0 text-[#003C1B]" })
           ]
         }
       ) }, opt.value);
     }) });
   }
+  const query = searchQuery.trim();
+  const exactMatch = visibleOptions.some(
+    (o) => o.label.toLowerCase() === query.toLowerCase()
+  );
+  const showCreate = creatable && query.length > 0 && !exactMatch;
+  const showEmpty = visibleOptions.length === 0 && !showCreate;
+  const groups = React4.useMemo(() => {
+    const out = [];
+    for (const opt of visibleOptions) {
+      const name = opt.group ?? null;
+      const last = out[out.length - 1];
+      if (last && last.name === name) last.options.push(opt);
+      else out.push({ name, options: [opt] });
+    }
+    return out;
+  }, [visibleOptions]);
+  const renderOption = (option) => {
+    const checked = isSelected(option.value);
+    const isMulti = resolvedMode === "multi";
+    const rich = Boolean(option.description || option.icon);
+    const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
+    return /* @__PURE__ */ jsxs(
+      CommandItem,
+      {
+        value: option.value,
+        disabled: option.disabled,
+        "aria-selected": checked,
+        onSelect: () => handleSelect(option.value),
+        className: cn(
+          "group/opt cursor-pointer data-[disabled=true]:cursor-not-allowed",
+          rich ? "items-start" : "items-center"
+        ),
+        style: {
+          minHeight: rich ? 44 : spec.option,
+          gap: SELECT_GAP,
+          padding: rich ? "7px 10px" : "0 10px",
+          borderRadius: MENU.optionRadius,
+          fontSize: spec.font,
+          lineHeight: 1.3,
+          background: checked ? isMulti ? MENU.multiSelectedBg : MENU.selectedBg : "transparent",
+          color: checked && !isMulti ? MENU.selectedInk : INPUT_COLORS.value,
+          fontWeight: checked && !isMulti ? 600 : 500,
+          opacity: option.disabled ? 0.55 : 1
+        },
+        children: [
+          isMulti && /* @__PURE__ */ jsx(CheckboxIcon, { checked }),
+          indexing && /* @__PURE__ */ jsxs("span", { className: "shrink-0 tabular-nums", style: { color: MENU.metaInk }, children: [
+            originalIdx + 1,
+            "."
+          ] }),
+          option.icon && /* @__PURE__ */ jsx("span", { className: "flex shrink-0 items-center", children: option.icon }),
+          /* @__PURE__ */ jsxs("span", { className: "flex min-w-0 flex-1 flex-col gap-0.5", children: [
+            /* @__PURE__ */ jsx("span", { className: "truncate", children: option.label }),
+            option.description && /* @__PURE__ */ jsx("span", { style: { fontSize: spec.font - 2, fontWeight: 400, color: MENU.metaInk }, children: option.description })
+          ] }),
+          option.meta && /* @__PURE__ */ jsx(
+            "span",
+            {
+              className: "shrink-0 whitespace-nowrap",
+              style: { fontSize: spec.font - 2, fontWeight: 500, color: MENU.metaInk },
+              children: option.meta
+            }
+          ),
+          !isMulti && checked && /* @__PURE__ */ jsx(Check, { size: 14, strokeWidth: 2.8, className: "shrink-0", color: MENU.selectedInk })
+        ]
+      },
+      option.value
+    );
+  };
   return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1.5", children: [
-    label && /* @__PURE__ */ jsx(InputLabel, { size: size === "xs" ? "sm" : size, required, children: label }),
+    label && /* @__PURE__ */ jsx(
+      InputLabel,
+      {
+        size,
+        required,
+        tone: state === "error" || state === "disabled" ? getLabelColor(state) : void 0,
+        children: label
+      }
+    ),
     /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
       /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
         "div",
         {
           role: "button",
+          "data-slot": "select-trigger",
+          "data-size": size,
+          "data-state": state,
           tabIndex: disabled ? -1 : 0,
           "aria-disabled": disabled,
           "aria-haspopup": "listbox",
           "aria-expanded": open,
+          "aria-busy": loading || void 0,
+          onPointerEnter: () => setHovered(true),
+          onPointerLeave: () => setHovered(false),
           onFocus: () => {
             interactedRef.current = true;
           },
@@ -596,23 +815,47 @@ function Select({
           onKeyDown: (e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              if (!disabled && !readOnly) setOpen((o) => !o);
+              if (!disabled && !readOnly && !loading) setOpen((o) => !o);
             } else if (e.key === "Escape") {
               setOpen(false);
             }
           },
           className: cn(
-            triggerVariants({ state: triggerState, size }),
+            triggerVariants({ state: legacyState, size }),
             width,
             className
           ),
+          style: {
+            minHeight: spec.height,
+            paddingLeft: spec.padLeft,
+            paddingRight: spec.padRight,
+            paddingTop: resolvedMode === "multi" ? spec.padMultiY : 0,
+            paddingBottom: resolvedMode === "multi" ? spec.padMultiY : 0,
+            gap: SELECT_GAP,
+            borderRadius: spec.radius,
+            fontSize: spec.font,
+            background: box.background,
+            border: box.border,
+            boxShadow: box.boxShadow,
+            color: box.color,
+            cursor: box.cursor ?? "pointer",
+            transition: INPUT_TRANSITION
+          },
           children: [
+            leftIcon && /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: "flex shrink-0 items-center justify-center [&>svg]:size-full",
+                style: { width: spec.icon + 1, height: spec.icon + 1, color: INPUT_COLORS.icon },
+                children: leftIcon
+              }
+            ),
             /* @__PURE__ */ jsx(
               "div",
               {
-                ref: mode === "multi" ? pillsContainerRef : void 0,
-                className: "flex flex-1 items-center gap-1 overflow-hidden min-w-0",
-                children: mode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxs(Fragment, { children: [
+                ref: resolvedMode === "multi" ? pillsContainerRef : void 0,
+                className: "flex min-w-0 flex-1 items-center gap-1 overflow-hidden",
+                children: resolvedMode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxs(Fragment, { children: [
                   displayedPills.map((val) => {
                     const opt = resolvedOptions.find((o) => o.value === val);
                     if (!opt) return null;
@@ -620,7 +863,13 @@ function Select({
                       "span",
                       {
                         "data-pill": true,
-                        className: "inline-flex shrink-0 items-center gap-0.5 max-w-[120px] rounded-[4px] bg-[#E6F4EA] px-1.5 py-0.5 text-[11px] font-medium text-[#006F42]",
+                        className: "inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-full font-semibold",
+                        style: {
+                          padding: clearable ? "4px 4px 4px 10px" : "4px 10px",
+                          background: MENU.selectedBg,
+                          color: MENU.selectedInk,
+                          fontSize: spec.font - 2
+                        },
                         children: [
                           /* @__PURE__ */ jsx("span", { className: "truncate", children: opt.label }),
                           clearable && /* @__PURE__ */ jsx(
@@ -629,16 +878,10 @@ function Select({
                               type: "button",
                               tabIndex: -1,
                               onClick: (e) => removePill(val, e),
-                              className: "ml-0.5 flex items-center text-[#006F42] hover:text-[#004d2e]",
                               "aria-label": `Remove ${opt.label}`,
-                              children: /* @__PURE__ */ jsx(
-                                X,
-                                {
-                                  size: 10,
-                                  strokeWidth: 2,
-                                  className: "hover:text-red-500"
-                                }
-                              )
+                              className: "flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full transition-colors",
+                              style: { background: "rgba(0,60,27,.1)", color: MENU.selectedInk },
+                              children: /* @__PURE__ */ jsx(X, { size: 8, strokeWidth: 3.4 })
                             }
                           )
                         ]
@@ -646,41 +889,50 @@ function Select({
                       val
                     );
                   }),
-                  overflowCount > 0 && /* @__PURE__ */ jsxs("span", { className: "inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]", children: [
-                    "+",
-                    overflowCount
-                  ] })
-                ] }) : /* @__PURE__ */ jsx(
+                  overflowCount > 0 && /* @__PURE__ */ jsxs(
+                    "span",
+                    {
+                      className: "inline-flex shrink-0 items-center justify-center rounded-full font-semibold",
+                      style: {
+                        padding: "4px 8px",
+                        background: INPUT_COLORS.subtle,
+                        color: INPUT_COLORS.message,
+                        fontSize: spec.font - 2
+                      },
+                      children: [
+                        "+",
+                        overflowCount
+                      ]
+                    }
+                  )
+                ] }) : /* @__PURE__ */ jsx("span", { className: "truncate", style: { color: INPUT_COLORS.placeholder }, children: placeholder }) : /* @__PURE__ */ jsx(
                   "span",
                   {
-                    className: cn(
-                      "truncate text-[#C4C9D2]",
-                      placeholderSizeClass
-                    ),
-                    children: placeholder
-                  }
-                ) : /* @__PURE__ */ jsx(
-                  "span",
-                  {
-                    className: cn(
-                      "truncate",
-                      singleLabel ? "text-[#111827]" : cn("text-[#C4C9D2]", placeholderSizeClass)
-                    ),
+                    className: "truncate",
+                    style: {
+                      color: singleLabel ? box.color : INPUT_COLORS.placeholder
+                    },
                     children: singleLabel ?? placeholder
                   }
                 )
               }
             ),
-            /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
-              clearable && hasSelection && /* @__PURE__ */ jsx(
+            /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center", style: { gap: 6 }, children: [
+              clearable && hasSelection && !readOnly && !disabled && /* @__PURE__ */ jsx(
                 "button",
                 {
                   type: "button",
                   tabIndex: -1,
                   onClick: clearAll,
-                  className: "flex items-center text-gray-400 hover:text-gray-600",
                   "aria-label": "Clear selection",
-                  children: /* @__PURE__ */ jsx(X, { size: 14, className: "hover:text-red-500", strokeWidth: 2 })
+                  className: "flex shrink-0 items-center justify-center rounded-full transition-colors",
+                  style: {
+                    width: spec.icon + 4,
+                    height: spec.icon + 4,
+                    background: INPUT_COLORS.subtle,
+                    color: INPUT_COLORS.message
+                  },
+                  children: /* @__PURE__ */ jsx(X, { size: spec.icon - 6, strokeWidth: 3 })
                 }
               ),
               sorting && /* @__PURE__ */ jsx(
@@ -694,20 +946,27 @@ function Select({
                     setSortOrder((o) => o === "asc" ? "desc" : "asc");
                   },
                   disabled,
-                  className: "flex items-center text-gray-400 hover:text-gray-600 transition-colors",
                   "aria-label": sortOrder === "asc" ? "Sorted A\u2192Z, click for Z\u2192A" : "Sorted Z\u2192A, click for A\u2192Z",
-                  children: sortOrder === "asc" ? /* @__PURE__ */ jsx(ArrowUpAZ, { size: 14, strokeWidth: 2 }) : /* @__PURE__ */ jsx(ArrowDownAZ, { size: 14, strokeWidth: 2 })
+                  className: "flex items-center transition-colors",
+                  style: { color: INPUT_COLORS.message },
+                  children: sortOrder === "asc" ? /* @__PURE__ */ jsx(ArrowUpAZ, { size: spec.icon - 1, strokeWidth: 2 }) : /* @__PURE__ */ jsx(ArrowDownAZ, { size: spec.icon - 1, strokeWidth: 2 })
                 }
               ),
-              /* @__PURE__ */ jsx(
+              loading && /* @__PURE__ */ jsx(Spinner, { size: spec.icon - 2 }),
+              state === "readonly" && /* @__PURE__ */ jsx(Lock, { size: spec.icon - 2, strokeWidth: 2, color: INPUT_COLORS.placeholder }),
+              state === "error" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.errorInk }),
+              state === "warning" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.warningInk }),
+              state === "success" && /* @__PURE__ */ jsx(Check, { size: spec.icon, strokeWidth: 2.6, color: INPUT_COLORS.successInk }),
+              showChevron && /* @__PURE__ */ jsx(
                 ChevronDown,
                 {
-                  size: 16,
+                  size: spec.icon,
                   strokeWidth: 2,
-                  className: cn(
-                    "text-gray-600 transition-transform duration-200",
-                    open && "rotate-180"
-                  )
+                  className: "transition-transform duration-[120ms]",
+                  style: {
+                    color: disabled ? INPUT_COLORS.borderHover : INPUT_COLORS.placeholder,
+                    transform: open ? "rotate(180deg)" : "rotate(0deg)"
+                  }
                 }
               )
             ] })
@@ -717,76 +976,158 @@ function Select({
       /* @__PURE__ */ jsx(
         PopoverContent,
         {
-          className: "max-w-[calc(100vw-1rem)]",
+          side: placement === "auto" ? "bottom" : placement,
+          className: "max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
           collisionPadding: { top: 64 },
-          style: {
-            width: "var(--radix-popover-trigger-width)"
-          },
-          children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
-            searchEnabled && /* @__PURE__ */ jsx(
-              CommandInput,
-              {
-                placeholder: "Search...",
-                value: searchQuery,
-                onValueChange: setSearchQuery,
-                spellCheck,
-                className: commandInputSizeClass
-              }
-            ),
-            /* @__PURE__ */ jsxs(CommandList, { ref: listRef, children: [
-              visibleOptions.length === 0 && searchQuery.trim() ? /* @__PURE__ */ jsx(CommandEmpty, { children: "No results found." }) : null,
-              mode === "multi" && /* @__PURE__ */ jsxs(
-                CommandItem,
-                {
-                  value: SELECT_ALL,
-                  onSelect: () => handleSelect(SELECT_ALL),
-                  className: cn(
-                    "gap-2 border-b border-[#E5E7EB] font-medium text-[#374151] hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                    commandItemSizeClass
-                  ),
-                  children: [
-                    /* @__PURE__ */ jsx(CheckboxIcon, { checked: allSelected }),
-                    /* @__PURE__ */ jsx("span", { className: "flex-1", children: "Select all" })
-                  ]
-                }
-              ),
-              visibleOptions.map((option) => {
-                const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
-                const displayIndex = originalIdx + 1;
-                return /* @__PURE__ */ jsxs(
-                  CommandItem,
+          style: { width: "var(--radix-popover-trigger-width)" },
+          children: /* @__PURE__ */ jsx(
+            "div",
+            {
+              style: {
+                padding: MENU.padding,
+                borderRadius: MENU.radius,
+                border: MENU.border,
+                background: MENU.background,
+                boxShadow: MENU.shadow
+              },
+              children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
+                searchEnabled && !loading && /* @__PURE__ */ jsx(
+                  CommandInput,
                   {
-                    value: option.value,
-                    disabled: option.disabled,
-                    "aria-selected": isSelected(option.value),
-                    onSelect: () => handleSelect(option.value),
-                    className: cn(
-                      "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                      commandItemSizeClass
-                    ),
+                    placeholder: "Search...",
+                    value: searchQuery,
+                    onValueChange: handleSearchChange,
+                    spellCheck,
+                    style: { fontSize: spec.font }
+                  }
+                ),
+                resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
+                  "div",
+                  {
+                    className: "sticky top-0 z-10 flex items-center justify-between",
+                    style: {
+                      padding: "6px 10px",
+                      background: MENU.background,
+                      borderBottom: `1px solid ${MENU.groupRule}`,
+                      fontSize: spec.font - 2,
+                      color: INPUT_COLORS.message
+                    },
                     children: [
-                      mode === "multi" && /* @__PURE__ */ jsx(CheckboxIcon, { checked: isSelected(option.value) }),
-                      indexing && /* @__PURE__ */ jsxs("span", { className: "shrink-0 text-[#9CA3AF] tabular-nums", children: [
-                        displayIndex,
-                        "."
+                      /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
+                        selectedArr.length,
+                        " selected"
                       ] }),
-                      /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: option.label }),
-                      mode === "single" && isSelected(option.value) && /* @__PURE__ */ jsx(Check, { size: 14, className: "shrink-0 text-[#006F42]" })
+                      /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
+                        /* @__PURE__ */ jsx(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: () => commit(enabledOptions.map((o) => o.value)),
+                            disabled: allSelected,
+                            className: "font-semibold disabled:opacity-40",
+                            style: { color: MENU.selectedInk },
+                            children: "All"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
+                        /* @__PURE__ */ jsx(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: () => commit([]),
+                            disabled: selectedArr.length === 0,
+                            className: "font-semibold disabled:opacity-40",
+                            style: { color: INPUT_COLORS.message },
+                            children: "None"
+                          }
+                        )
+                      ] })
                     ]
-                  },
-                  option.value
-                );
-              })
-            ] })
-          ] })
+                  }
+                ),
+                /* @__PURE__ */ jsx(
+                  CommandList,
+                  {
+                    ref: listRef,
+                    style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
+                    children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                      groups.map((group, gi) => /* @__PURE__ */ jsxs(
+                        "div",
+                        {
+                          style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
+                          children: [
+                            group.name && /* @__PURE__ */ jsx(
+                              "div",
+                              {
+                                className: "sticky top-0 z-[5] font-semibold uppercase",
+                                style: {
+                                  padding: "6px 10px 4px",
+                                  background: MENU.background,
+                                  fontSize: 10,
+                                  letterSpacing: "0.09em",
+                                  color: MENU.groupInk
+                                },
+                                children: group.name
+                              }
+                            ),
+                            group.options.map(renderOption)
+                          ]
+                        },
+                        group.name ?? `__ungrouped_${gi}`
+                      )),
+                      showCreate && /* @__PURE__ */ jsxs(
+                        CommandItem,
+                        {
+                          value: CREATE_VALUE,
+                          onSelect: () => {
+                            onCreate?.(query);
+                            setOpen(false);
+                          },
+                          className: "cursor-pointer",
+                          style: {
+                            minHeight: spec.option,
+                            gap: SELECT_GAP,
+                            padding: "0 10px",
+                            marginTop: 4,
+                            borderTop: `1px solid ${MENU.groupRule}`,
+                            borderRadius: MENU.optionRadius,
+                            fontSize: spec.font,
+                            fontWeight: 600,
+                            color: MENU.selectedInk
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
+                            /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
+                              "Create \u201C",
+                              query,
+                              "\u201D"
+                            ] })
+                          ]
+                        }
+                      ),
+                      showEmpty && /* @__PURE__ */ jsx(
+                        "div",
+                        {
+                          className: "flex flex-col items-start gap-1",
+                          style: { padding: "14px 10px", fontSize: spec.font },
+                          children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
+                        }
+                      )
+                    ] })
+                  }
+                )
+              ] })
+            }
+          )
         }
       )
     ] }),
     /* @__PURE__ */ jsx(
       InputHelper,
       {
-        size: size === "xs" ? "sm" : size,
-        helperText,
+        size,
+        state: state === "open" ? "focused" : state,
+        helperText: error ?? (status && statusMessage) ?? helperText,
         error
       }
     )

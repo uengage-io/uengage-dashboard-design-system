@@ -75,6 +75,7 @@ export {
   type TriggerVariants,
   type SelectOption,
   type SelectMode,
+  type SelectStatus,
   type SelectProps,
 } from "./components/custom/Select";
 
