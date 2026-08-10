@@ -41,7 +41,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <TogglePreview/> */}
     {/* <TabsPreview/> */}
     {/* <TablePreview /> */}
-    <SectionPreview />
+    {/* <ButtonPreview /> */}
+    <InputPreview />
     {/* <FilterGroupDatePickerPreview /> */}
   </React.StrictMode>,
 );

@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
 import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Separator$1, Dialog, Slot, Popover as Popover$1, RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Accordion as Accordion$1, Collapsible, Tabs as Tabs$1 } from 'radix-ui';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { X, Search, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, ChevronDown, EyeOff, Eye, Minus, ChevronLeft, ChevronRight, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Plus, Upload, File, Video, Play, Clock, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
+import { X, Search, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, ChevronDown, EyeOff, Eye, Lock, Minus, ChevronLeft, ChevronRight, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Plus, Upload, File, Video, Play, Clock, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
@@ -1128,26 +1128,259 @@ function Label({
     }
   );
 }
+var INPUT_SIZES = {
+  xs: { height: 28, padX: 9, font: 12, icon: 13, radius: 6, label: 11, message: 10 },
+  sm: { height: 32, padX: 11, font: 12, icon: 14, radius: 8, label: 12, message: 11 },
+  md: { height: 40, padX: 13, font: 13, icon: 16, radius: 8, label: 12, message: 11 },
+  lg: { height: 48, padX: 15, font: 14, icon: 18, radius: 8, label: 13, message: 11 }
+};
+var AFFIX_GAP = 9;
+var INPUT_TRANSITION = "border-color 120ms linear, box-shadow 120ms linear, background-color 120ms linear";
+var INPUT_COLORS = {
+  surface: "#FFFFFF",
+  subtle: "#F3F5F9",
+  border: "#E2E2E2",
+  borderHover: "#C6C6C6",
+  borderFocus: "#1F5E2C",
+  /** 3px lime halo that pairs with `borderFocus`. */
+  ring: "0 0 0 3px rgba(140,196,42,.28)",
+  value: "#161616",
+  placeholder: "#9C9C9C",
+  message: "#9C9C9C",
+  icon: "#1F5E2C",
+  successBorder: "#00A86B",
+  successInk: "#00A86B",
+  warningBg: "#FFF6D6",
+  warningBorder: "#EFD98A",
+  warningInk: "#6A5300",
+  errorBg: "#FBE9EA",
+  errorBorder: "#A8000F",
+  errorInk: "#7A0009",
+  errorLabel: "#A8000F",
+  readOnlyBg: "#FAFFF7",
+  disabledBg: "#F3F5F9",
+  disabledInk: "#9C9C9C",
+  validatingInk: "#595959"
+};
+function resolveInputState(args) {
+  const { disabled, readOnly, loading, error, status, focused, hovered } = args;
+  if (disabled) return "disabled";
+  if (loading) return "loading";
+  if (readOnly) return "readonly";
+  if (error) return "error";
+  if (status === "validating") return "validating";
+  if (focused) return "focused";
+  if (status === "success") return "success";
+  if (status === "warning") return "warning";
+  if (hovered) return "hover";
+  return "default";
+}
+function getInputBoxStyle(state) {
+  const c = INPUT_COLORS;
+  const hairline = `1px solid ${c.border}`;
+  switch (state) {
+    case "hover":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderHover}`,
+        boxShadow: "none",
+        color: c.value
+      };
+    case "focused":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderFocus}`,
+        boxShadow: c.ring,
+        color: c.value
+      };
+    case "validating":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderFocus}`,
+        boxShadow: "none",
+        color: c.value
+      };
+    case "success":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.successBorder}`,
+        boxShadow: "none",
+        color: c.value
+      };
+    case "warning":
+      return {
+        background: c.warningBg,
+        border: `1px solid ${c.warningBorder}`,
+        boxShadow: "none",
+        color: c.value
+      };
+    case "error":
+      return {
+        background: c.errorBg,
+        border: `1px solid ${c.errorBorder}`,
+        boxShadow: "none",
+        color: c.errorInk
+      };
+    case "readonly":
+      return {
+        background: c.readOnlyBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value,
+        cursor: "default"
+      };
+    case "loading":
+      return {
+        background: c.disabledBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.disabledInk,
+        cursor: "progress"
+      };
+    case "disabled":
+      return {
+        background: c.disabledBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.disabledInk,
+        cursor: "not-allowed"
+      };
+    default:
+      return {
+        background: c.surface,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value
+      };
+  }
+}
+function getLabelColor(state) {
+  if (state === "error") return INPUT_COLORS.errorLabel;
+  if (state === "disabled") return INPUT_COLORS.disabledInk;
+  return INPUT_COLORS.value;
+}
+function getMessageColor(state, hasError) {
+  if (hasError) return INPUT_COLORS.errorInk;
+  switch (state) {
+    case "success":
+      return INPUT_COLORS.successInk;
+    case "warning":
+      return INPUT_COLORS.warningInk;
+    case "validating":
+      return INPUT_COLORS.validatingInk;
+    default:
+      return INPUT_COLORS.message;
+  }
+}
+var INERT_SIZE = { xs: "", sm: "", md: "", lg: "" };
+var INERT_STATE = {
+  default: "",
+  hover: "",
+  focused: "",
+  error: "",
+  success: "",
+  warning: "",
+  validating: "",
+  loading: "",
+  disabled: "",
+  readonly: ""
+};
+var inputWrapperVariants = cva(
+  "relative flex w-full min-w-0",
+  {
+    variants: {
+      multiline: {
+        false: "items-center",
+        true: "items-start"
+      },
+      appearance: {
+        default: "",
+        underline: "bg-transparent"
+      },
+      /** @deprecated Inert — sizing is applied inline. */
+      size: INERT_SIZE,
+      /** @deprecated Inert — state colours are applied inline. */
+      state: INERT_STATE
+    },
+    defaultVariants: { multiline: false, appearance: "default" }
+  }
+);
+var inputFieldVariants = cva(
+  "w-full min-w-0 flex-1 border-0 bg-transparent p-0 shadow-none outline-none focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-100",
+  {
+    variants: {
+      multiline: {
+        false: "h-full",
+        true: "block"
+      },
+      align: {
+        left: "text-left",
+        right: "text-right"
+      },
+      /** @deprecated Inert — sizing is applied inline. */
+      size: INERT_SIZE,
+      /** @deprecated Inert — the field no longer carries appearance classes. */
+      appearance: { default: "", underline: "" },
+      /** @deprecated Inert — affixes are laid out with flexbox, not padding. */
+      hasLeftIcon: { true: "", false: "" },
+      /** @deprecated Inert — affixes are laid out with flexbox, not padding. */
+      hasRightIcon: { true: "", false: "" }
+    },
+    defaultVariants: { multiline: false, align: "left" }
+  }
+);
+var RESIZE_CLASS = {
+  none: "resize-none",
+  vertical: "resize-y",
+  horizontal: "resize-x",
+  both: "resize"
+};
+var inputIconSlotVariants = cva("absolute inset-y-0 flex items-center", {
+  variants: {
+    side: { left: "left-0", right: "right-0" },
+    /** @deprecated Inert — kept so existing calls keep type-checking. */
+    size: INERT_SIZE,
+    /** @deprecated Inert — kept so existing calls keep type-checking. */
+    multiline: { true: "", false: "" }
+  },
+  defaultVariants: { side: "left" }
+});
+var PATTERN_REGEX = {
+  alphanumeric: "[^a-zA-Z0-9]",
+  alpha: "[^a-zA-Z ]",
+  numeric: "[^0-9]",
+  decimal: "[^0-9.]",
+  phone: "[^0-9]",
+  none: "(?!)"
+};
 var SIZE_TEXT = {
-  sm: "text-[10px]",
-  md: "text-xs",
-  lg: "text-sm"
+  xs: "text-[11px]",
+  sm: "text-[12px]",
+  md: "text-[12px]",
+  lg: "text-[13px]"
 };
 function InputLabel({
   size = "md",
   required = false,
+  tone,
   className,
+  style,
   children,
   ...props
 }) {
   return /* @__PURE__ */ jsx(
     Label,
     {
-      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
+      className: cn(
+        "font-semibold leading-[1.3] text-[#161616]",
+        SIZE_TEXT[size],
+        className
+      ),
+      style: tone ? { color: tone, ...style } : style,
       ...props,
-      children: /* @__PURE__ */ jsxs("span", { className: "inline", children: [
+      children: /* @__PURE__ */ jsxs("span", { className: "inline text-pretty", children: [
         children,
-        required && /* @__PURE__ */ jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
+        required && /* @__PURE__ */ jsx("span", { "aria-hidden": "true", style: { color: INPUT_COLORS.errorLabel }, children: "*" })
       ] })
     }
   );
@@ -1445,39 +1678,43 @@ function PopoverContent({
     }
   ) });
 }
-var SIZE_TEXT2 = {
-  sm: "text-[11px]",
-  md: "text-xs",
-  lg: "text-sm"
-};
-var ICON_SIZE = {
-  sm: "size-3",
-  md: "size-3.5",
-  lg: "size-4"
-};
 function InputHelper({
   size = "md",
   helperText,
   error,
+  state = "default",
+  reserveSpace = false,
   className,
+  style,
   ...props
 }) {
-  if (!error && !helperText) return null;
   const showError = Boolean(error);
+  const text = showError ? error : helperText;
+  if (!text && !reserveSpace) return null;
+  const fontSize = INPUT_SIZES[size].message;
   return /* @__PURE__ */ jsxs(
     "p",
     {
       role: showError ? "alert" : void 0,
-      className: cn(
-        "inline-flex items-center gap-1",
-        SIZE_TEXT2[size],
-        showError ? "text-red-500" : "text-slate-500",
-        className
-      ),
+      className: cn("inline-flex items-start gap-[5px] leading-[1.4]", className),
+      style: {
+        fontSize,
+        minHeight: Math.round(fontSize * 1.45),
+        color: getMessageColor(state, showError),
+        ...style
+      },
       ...props,
       children: [
-        showError && /* @__PURE__ */ jsx(CircleAlert, { "aria-hidden": "true", className: cn(ICON_SIZE[size], "shrink-0") }),
-        /* @__PURE__ */ jsx("span", { children: showError ? error : helperText })
+        showError && /* @__PURE__ */ jsx(
+          CircleAlert,
+          {
+            "aria-hidden": "true",
+            strokeWidth: 2.2,
+            className: "shrink-0",
+            style: { width: fontSize + 1, height: fontSize + 1, marginTop: 1 }
+          }
+        ),
+        text && /* @__PURE__ */ jsx("span", { children: text })
       ]
     }
   );
@@ -2772,154 +3009,43 @@ function TertiaryTabs({
   );
 }
 Tabs2.displayName = "Tabs";
-var inputWrapperVariants = cva(
-  "relative flex w-full transition-colors",
-  {
-    variants: {
-      size: {
-        sm: TEXT_SIZE.sm,
-        md: TEXT_SIZE.md,
-        lg: TEXT_SIZE.lg
-      },
-      multiline: {
-        false: "items-center",
-        true: "items-start h-auto"
-      },
-      appearance: {
-        default: "rounded-[4px] border bg-white",
-        underline: "rounded-none border-0 border-b-2 bg-transparent"
-      },
-      state: {
-        default: "",
-        focused: "",
-        error: "",
-        disabled: "",
-        readonly: ""
+var COUNT_WARN_RATIO = 0.83;
+function Spinner({ size }) {
+  return /* @__PURE__ */ jsx(
+    "span",
+    {
+      "aria-hidden": "true",
+      className: "shrink-0 animate-spin rounded-full",
+      style: {
+        width: size,
+        height: size,
+        border: `2px solid ${INPUT_COLORS.border}`,
+        borderTopColor: INPUT_COLORS.borderFocus
       }
-    },
-    compoundVariants: [
-      { multiline: false, size: "sm", className: COMPONENT_HEIGHT.sm },
-      { multiline: false, size: "md", className: COMPONENT_HEIGHT.md },
-      { multiline: false, size: "lg", className: COMPONENT_HEIGHT.lg },
-      { appearance: "default", state: "default", className: "border-gray-400 hover:border-gray-500 hover:shadow-sm" },
-      { appearance: "default", state: "focused", className: "border-gray-500 ring-1 ring-gray-200" },
-      { appearance: "default", state: "error", className: "border-red-500" },
-      {
-        appearance: "default",
-        state: "disabled",
-        className: "bg-gray-50 border-gray-300 text-gray-400 cursor-not-allowed opacity-60"
-      },
-      {
-        appearance: "default",
-        state: "readonly",
-        className: "bg-gray-50 border-gray-300 text-gray-700 cursor-default"
-      },
-      { appearance: "underline", state: "default", className: "border-b-gray-300 hover:border-b-gray-400" },
-      { appearance: "underline", state: "focused", className: "border-b-gray-900" },
-      { appearance: "underline", state: "error", className: "border-b-red-500" },
-      {
-        appearance: "underline",
-        state: "disabled",
-        className: "border-b-gray-200 text-gray-400 cursor-not-allowed opacity-60"
-      },
-      {
-        appearance: "underline",
-        state: "readonly",
-        className: "border-b-gray-200 text-gray-700 cursor-default"
-      }
-    ],
-    defaultVariants: {
-      size: "md",
-      multiline: false,
-      state: "default",
-      appearance: "default"
     }
-  }
-);
-var inputFieldVariants = cva(
-  `h-full w-full bg-transparent border-0 shadow-none outline-none text-inherit placeholder:text-[#C4C9D2] disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-0 focus-visible:border-transparent focus-visible:outline-none`,
-  {
-    variants: {
-      size: {
-        sm: `px-2.5 ${PLACEHOLDER_SIZE.sm}`,
-        md: `px-3 ${PLACEHOLDER_SIZE.md}`,
-        lg: `px-3.5 ${PLACEHOLDER_SIZE.lg}`
+  );
+}
+function Affix({
+  children,
+  side,
+  padX,
+  fontSize
+}) {
+  return /* @__PURE__ */ jsx(
+    "span",
+    {
+      className: "flex shrink-0 items-center self-stretch font-semibold",
+      style: {
+        padding: `0 ${padX}px`,
+        background: INPUT_COLORS.subtle,
+        color: side === "left" ? INPUT_COLORS.value : INPUT_COLORS.message,
+        fontSize: side === "left" ? fontSize : fontSize - 1,
+        [side === "left" ? "borderRight" : "borderLeft"]: `1px solid ${INPUT_COLORS.border}`
       },
-      multiline: {
-        false: "py-0",
-        true: "py-2"
-      },
-      appearance: {
-        default: "",
-        underline: ""
-      },
-      hasLeftIcon: {
-        true: "",
-        false: ""
-      },
-      hasRightIcon: {
-        true: "",
-        false: ""
-      }
-    },
-    compoundVariants: [
-      { size: "sm", hasLeftIcon: true, className: "pl-8" },
-      { size: "md", hasLeftIcon: true, className: "pl-9" },
-      { size: "lg", hasLeftIcon: true, className: "pl-10" },
-      { size: "sm", hasRightIcon: true, className: "pr-8" },
-      { size: "md", hasRightIcon: true, className: "pr-9" },
-      { size: "lg", hasRightIcon: true, className: "pr-10" },
-      { appearance: "underline", hasLeftIcon: false, className: "pl-0" },
-      { appearance: "underline", hasRightIcon: false, className: "pr-0" }
-    ],
-    defaultVariants: {
-      size: "md",
-      multiline: false,
-      appearance: "default",
-      hasLeftIcon: false,
-      hasRightIcon: false
+      children
     }
-  }
-);
-var RESIZE_CLASS = {
-  none: "resize-none",
-  vertical: "resize-y",
-  horizontal: "resize-x",
-  both: "resize"
-};
-var inputIconSlotVariants = cva(
-  "absolute inset-y-0 flex text-gray-400",
-  {
-    variants: {
-      size: {
-        sm: "px-2.5 [&_svg]:size-3.5",
-        md: "px-3 [&_svg]:size-4",
-        lg: "px-3.5 [&_svg]:size-5"
-      },
-      side: {
-        left: "left-0",
-        right: "right-0"
-      },
-      multiline: {
-        false: "items-center",
-        true: "items-start pt-2"
-      }
-    },
-    defaultVariants: {
-      size: "md",
-      side: "left",
-      multiline: false
-    }
-  }
-);
-var PATTERN_REGEX = {
-  alphanumeric: "[^a-zA-Z0-9]",
-  alpha: "[^a-zA-Z ]",
-  numeric: "[^0-9]",
-  decimal: "[^0-9.]",
-  phone: "[^0-9]",
-  none: "(?!)"
-};
+  );
+}
 function Input2({
   size = "md",
   variant = "default",
@@ -2928,6 +3054,15 @@ function Input2({
   label,
   helperText,
   error,
+  status,
+  statusMessage,
+  prefix,
+  suffix,
+  loading = false,
+  showCount,
+  align = "left",
+  boxStyle,
+  reserveMessageSpace = false,
   leftIcon,
   rightIcon,
   required,
@@ -2954,7 +3089,9 @@ function Input2({
 }) {
   const reactId = React9.useId();
   const inputId = id ?? reactId;
+  const spec = INPUT_SIZES[size];
   const [focused, setFocused] = React9.useState(false);
+  const [hovered, setHovered] = React9.useState(false);
   const [showPassword, setShowPassword] = React9.useState(false);
   const [internalError, setInternalError] = React9.useState(void 0);
   const touchedRef = React9.useRef(false);
@@ -2962,9 +3099,9 @@ function Input2({
   const [uncontrolledQuery, setUncontrolledQuery] = React9.useState(
     String(rest.defaultValue ?? "")
   );
-  const suggestionQuery = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
-  const fuseResults = useFuzzySearch(suggestions ?? [], suggestionQuery);
-  const showSuggestions = !multiline && !!suggestions?.length && focused && fuseResults.length > 0 && suggestionQuery.trim().length > 0;
+  const currentValue = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
+  const fuseResults = useFuzzySearch(suggestions ?? [], currentValue);
+  const showSuggestions = !multiline && !!suggestions?.length && focused && fuseResults.length > 0 && currentValue.trim().length > 0;
   const wrapperRef = React9.useRef(null);
   const inputRef = React9.useRef(null);
   const textareaRef = React9.useRef(null);
@@ -2981,25 +3118,21 @@ function Input2({
     return void 0;
   };
   const effectiveError = error ?? internalError;
+  const interactionBlocked = Boolean(disabled) || loading;
+  const state = resolveInputState({
+    disabled,
+    readOnly,
+    loading,
+    error: effectiveError,
+    status,
+    focused,
+    hovered
+  });
+  const box = getInputBoxStyle(state);
+  const isUnderline = variant === "underline";
   const isPassword = !multiline && inputType === "password";
   const effectiveType = isPassword && showPassword ? "text" : inputType;
-  const resolvedRightIcon = React9.useMemo(() => {
-    if (rightIcon !== void 0) return rightIcon;
-    if (!isPassword) return null;
-    return /* @__PURE__ */ jsx(
-      "button",
-      {
-        type: "button",
-        tabIndex: -1,
-        "aria-label": showPassword ? "Hide password" : "Show password",
-        onClick: () => setShowPassword((s) => !s),
-        className: "pointer-events-auto inline-flex items-center justify-center text-gray-400 hover:text-gray-600",
-        children: showPassword ? /* @__PURE__ */ jsx(EyeOff, { strokeWidth: 2 }) : /* @__PURE__ */ jsx(Eye, { strokeWidth: 2 })
-      }
-    );
-  }, [rightIcon, isPassword, showPassword]);
-  const state = disabled ? "disabled" : readOnly ? "readonly" : effectiveError ? "error" : focused ? "focused" : "default";
-  const showClear = Boolean(clearable) && !disabled && !readOnly && suggestionQuery.length > 0;
+  const showClear = Boolean(clearable) && !interactionBlocked && !readOnly && currentValue.length > 0;
   const handleClear = () => {
     if (!isControlled) {
       setUncontrolledQuery("");
@@ -3009,11 +3142,6 @@ function Input2({
     onChange?.({ target: { value: "" } });
     onClear?.();
   };
-  const hasLeftIcon = Boolean(leftIcon);
-  const hasOriginalRightIcon = Boolean(resolvedRightIcon);
-  const hasRightIcon = hasOriginalRightIcon || showClear;
-  const hasDoubleRightIcon = hasOriginalRightIcon && showClear;
-  const doubleRightPadding = hasDoubleRightIcon ? { sm: "pr-14", md: "pr-16", lg: "pr-20" }[size] : void 0;
   const handleChange = (e) => {
     if (allowPattern && allowPattern !== "none") {
       const raw = e.target.value;
@@ -3030,121 +3158,275 @@ function Input2({
     if (!isControlled) setUncontrolledQuery(item.label);
     onSuggestionSelect?.(item.value);
   };
-  const describedById = effectiveError ? `${inputId}-error` : helperText ? `${inputId}-helper` : void 0;
-  const fieldClass = cn(
-    inputFieldVariants({ size, multiline, appearance: variant, hasLeftIcon, hasRightIcon }),
-    doubleRightPadding
+  const handleFocus = (e) => {
+    setFocused(true);
+    onFocus?.(e);
+  };
+  const handleBlur = (e) => {
+    setTimeout(() => {
+      if (!wrapperRef.current?.contains(document.activeElement)) setFocused(false);
+    }, 100);
+    setInternalError(runValidation(e.target));
+    if (!touchedRef.current) {
+      touchedRef.current = true;
+      onTouch?.();
+    }
+    onBlur?.(e);
+  };
+  const maxLength = rest.maxLength;
+  const counterEnabled = showCount ?? maxLength !== void 0;
+  const showCounter = counterEnabled && maxLength !== void 0;
+  const count = currentValue.length;
+  const counterColor = count > maxLength * COUNT_WARN_RATIO ? INPUT_COLORS.warningInk : INPUT_COLORS.message;
+  const counterNode = showCounter ? /* @__PURE__ */ jsxs(
+    "span",
+    {
+      className: "shrink-0 font-medium tabular-nums",
+      style: { fontSize: spec.message, color: counterColor },
+      children: [
+        count,
+        "/",
+        maxLength
+      ]
+    }
+  ) : null;
+  const passwordToggle = isPassword && rightIcon === void 0 && !interactionBlocked && !readOnly && /* @__PURE__ */ jsx(
+    "button",
+    {
+      type: "button",
+      tabIndex: -1,
+      "aria-label": showPassword ? "Hide password" : "Show password",
+      onClick: () => setShowPassword((s) => !s),
+      className: "flex shrink-0 items-center justify-center rounded-[4px] transition-colors hover:bg-[#F5FFF0]",
+      style: { width: spec.icon + 8, height: spec.icon + 8, color: INPUT_COLORS.icon },
+      children: showPassword ? /* @__PURE__ */ jsx(EyeOff, { strokeWidth: 2, size: spec.icon - 1 }) : /* @__PURE__ */ jsx(Eye, { strokeWidth: 2, size: spec.icon - 1 })
+    }
   );
-  return /* @__PURE__ */ jsxs("div", { className: cn("flex flex-col gap-1.5 min-w-0", width, className), children: [
-    label && /* @__PURE__ */ jsx(InputLabel, { htmlFor: inputId, size, required, children: label }),
+  const statusAdornment = (() => {
+    if (state === "loading" || state === "validating") return /* @__PURE__ */ jsx(Spinner, { size: spec.icon - 2 });
+    if (state === "readonly")
+      return /* @__PURE__ */ jsx(Lock, { "aria-hidden": "true", strokeWidth: 2, size: spec.icon - 2, color: INPUT_COLORS.placeholder });
+    if (effectiveError)
+      return /* @__PURE__ */ jsx(
+        CircleAlert,
+        {
+          "aria-hidden": "true",
+          strokeWidth: 2.2,
+          size: spec.icon - 1,
+          color: INPUT_COLORS.errorInk
+        }
+      );
+    if (status === "warning")
+      return /* @__PURE__ */ jsx(
+        CircleAlert,
+        {
+          "aria-hidden": "true",
+          strokeWidth: 2.2,
+          size: spec.icon - 1,
+          color: INPUT_COLORS.warningInk
+        }
+      );
+    if (status === "success")
+      return /* @__PURE__ */ jsx(
+        Check,
+        {
+          "aria-hidden": "true",
+          strokeWidth: 2.6,
+          size: spec.icon - 1,
+          color: INPUT_COLORS.successInk
+        }
+      );
+    return null;
+  })();
+  const clearButton = showClear && /* @__PURE__ */ jsx(
+    "button",
+    {
+      type: "button",
+      tabIndex: -1,
+      "aria-label": "Clear",
+      onClick: handleClear,
+      className: "flex shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[#DCF3CE]",
+      style: {
+        width: spec.icon + 4,
+        height: spec.icon + 4,
+        background: INPUT_COLORS.subtle,
+        color: INPUT_COLORS.message
+      },
+      children: /* @__PURE__ */ jsx(X, { strokeWidth: 3, size: spec.icon - 6 })
+    }
+  );
+  const glyph = (node) => /* @__PURE__ */ jsx(
+    "span",
+    {
+      className: "flex shrink-0 items-center justify-center [&>svg]:size-full",
+      style: { width: spec.icon, height: spec.icon, color: INPUT_COLORS.icon },
+      children: node
+    }
+  );
+  const hasTrailing = Boolean(
+    counterNode || clearButton || statusAdornment || passwordToggle || rightIcon
+  );
+  const message = effectiveError ?? (status && statusMessage) ?? helperText;
+  const describedById = effectiveError ? `${inputId}-error` : message ? `${inputId}-helper` : void 0;
+  const resolvedBoxStyle = isUnderline ? {
+    background: "transparent",
+    borderBottom: box.border,
+    borderRadius: 0,
+    color: box.color,
+    cursor: box.cursor,
+    transition: INPUT_TRANSITION,
+    height: multiline ? void 0 : spec.height
+  } : {
+    background: box.background,
+    border: box.border,
+    borderRadius: spec.radius,
+    boxShadow: box.boxShadow,
+    color: box.color,
+    cursor: box.cursor,
+    transition: INPUT_TRANSITION,
+    height: multiline ? void 0 : spec.height
+  };
+  const fieldStyle = {
+    fontSize: spec.font,
+    color: box.color,
+    lineHeight: multiline ? 1.5 : 1,
+    cursor: box.cursor
+  };
+  const innerPadding = isUnderline ? { paddingLeft: 0, paddingRight: 0 } : {
+    paddingLeft: prefix ? spec.padX - 2 : spec.padX,
+    paddingRight: suffix ? spec.padX - 2 : spec.padX
+  };
+  const sharedFieldProps = {
+    "data-slot": "input",
+    id: inputId,
+    disabled,
+    readOnly: readOnly || loading,
+    spellCheck,
+    "aria-invalid": Boolean(effectiveError) || void 0,
+    "aria-describedby": describedById,
+    "aria-busy": loading || status === "validating" || void 0,
+    onChange: handleChange,
+    onBlur: handleBlur
+  };
+  return /* @__PURE__ */ jsxs("div", { className: cn("flex min-w-0 flex-col gap-1.5", width, className), children: [
+    (label || counterNode && multiline) && /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
+      label && /* @__PURE__ */ jsx(
+        InputLabel,
+        {
+          htmlFor: inputId,
+          size,
+          required,
+          tone: getLabelColor(state),
+          children: label
+        }
+      ),
+      counterNode && multiline && /* @__PURE__ */ jsx("span", { className: "ml-auto", children: counterNode })
+    ] }),
     /* @__PURE__ */ jsxs("div", { ref: wrapperRef, className: "relative", children: [
-      /* @__PURE__ */ jsxs("div", { className: cn(inputWrapperVariants({ size, multiline, appearance: variant, state })), children: [
-        hasLeftIcon && /* @__PURE__ */ jsx(
-          "span",
-          {
-            className: cn(
-              inputIconSlotVariants({ size, side: "left", multiline }),
-              "pointer-events-none"
-            ),
-            children: leftIcon
-          }
-        ),
-        multiline ? /* @__PURE__ */ jsx(
-          "textarea",
-          {
-            ...rest,
-            ref: textareaRef,
-            id: inputId,
-            rows,
-            disabled,
-            readOnly,
-            spellCheck,
-            "aria-invalid": Boolean(effectiveError) || void 0,
-            "aria-describedby": describedById,
-            onChange: handleChange,
-            onFocus: (e) => {
-              setFocused(true);
-              onFocus?.(e);
-            },
-            onBlur: (e) => {
-              setTimeout(() => {
-                if (!wrapperRef.current?.contains(document.activeElement)) {
-                  setFocused(false);
-                }
-              }, 100);
-              setInternalError(runValidation(e.target));
-              if (!touchedRef.current) {
-                touchedRef.current = true;
-                onTouch?.();
-              }
-              onBlur?.(e);
-            },
-            className: cn(fieldClass, RESIZE_CLASS[resize], "min-h-[80px]")
-          }
-        ) : /* @__PURE__ */ jsx(
-          Input,
-          {
-            ...rest,
-            ref: inputRef,
-            id: inputId,
-            type: effectiveType,
-            disabled,
-            readOnly,
-            spellCheck,
-            "aria-autocomplete": suggestions ? "list" : void 0,
-            "aria-invalid": Boolean(effectiveError) || void 0,
-            "aria-describedby": describedById,
-            onChange: handleChange,
-            onWheel: (e) => {
-              if (e.currentTarget.type === "number") e.currentTarget.blur();
-            },
-            onFocus: (e) => {
-              setFocused(true);
-              onFocus?.(e);
-            },
-            onBlur: (e) => {
-              setTimeout(() => {
-                if (!wrapperRef.current?.contains(document.activeElement)) {
-                  setFocused(false);
-                }
-              }, 100);
-              setInternalError(runValidation(e.target));
-              if (!touchedRef.current) {
-                touchedRef.current = true;
-                onTouch?.();
-              }
-              onBlur?.(e);
-            },
-            className: fieldClass
-          }
-        ),
-        hasRightIcon && /* @__PURE__ */ jsx("span", { className: cn(inputIconSlotVariants({ size, side: "right", multiline })), children: /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-1", children: [
-          showClear && /* @__PURE__ */ jsx(
-            "button",
-            {
-              type: "button",
-              tabIndex: -1,
-              "aria-label": "Clear",
-              onClick: handleClear,
-              className: "pointer-events-auto inline-flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors",
-              children: /* @__PURE__ */ jsx(X, { strokeWidth: 2 })
-            }
+      /* @__PURE__ */ jsxs(
+        "div",
+        {
+          "data-slot": "input-box",
+          "data-size": size,
+          "data-state": state,
+          "data-variant": variant,
+          className: cn(
+            "flex w-full min-w-0",
+            multiline ? "items-start" : "items-center",
+            !isUnderline && "overflow-hidden",
+            interactionBlocked && "pointer-events-none"
           ),
-          resolvedRightIcon
-        ] }) })
-      ] }),
+          style: { ...resolvedBoxStyle, ...boxStyle },
+          onPointerEnter: () => setHovered(true),
+          onPointerLeave: () => setHovered(false),
+          children: [
+            prefix && !isUnderline && /* @__PURE__ */ jsx(Affix, { side: "left", padX: spec.padX - 2, fontSize: spec.font, children: prefix }),
+            /* @__PURE__ */ jsxs(
+              "span",
+              {
+                className: cn(
+                  "flex min-w-0 flex-1",
+                  multiline ? "items-start" : "items-center",
+                  multiline && "self-stretch"
+                ),
+                style: {
+                  gap: AFFIX_GAP,
+                  ...innerPadding,
+                  paddingTop: multiline ? spec.padX - 2 : void 0,
+                  paddingBottom: multiline ? spec.padX - 2 : void 0
+                },
+                children: [
+                  leftIcon && glyph(leftIcon),
+                  multiline ? /* @__PURE__ */ jsx(
+                    "textarea",
+                    {
+                      ...rest,
+                      ...sharedFieldProps,
+                      ref: textareaRef,
+                      rows,
+                      onFocus: (e) => handleFocus(e),
+                      className: cn(
+                        inputFieldVariants({ multiline: true, align }),
+                        RESIZE_CLASS[resize]
+                      ),
+                      style: { ...fieldStyle, minHeight: 76 }
+                    }
+                  ) : /* @__PURE__ */ jsx(
+                    "input",
+                    {
+                      ...rest,
+                      ...sharedFieldProps,
+                      ref: inputRef,
+                      type: effectiveType,
+                      "aria-autocomplete": suggestions ? "list" : void 0,
+                      onWheel: (e) => {
+                        if (e.currentTarget.type === "number") e.currentTarget.blur();
+                      },
+                      onFocus: handleFocus,
+                      className: inputFieldVariants({ multiline: false, align }),
+                      style: fieldStyle
+                    }
+                  ),
+                  hasTrailing && /* @__PURE__ */ jsxs(
+                    "span",
+                    {
+                      className: cn("flex shrink-0 items-center", multiline && "self-start"),
+                      style: { gap: 6 },
+                      children: [
+                        counterNode && !multiline && counterNode,
+                        clearButton,
+                        statusAdornment,
+                        passwordToggle,
+                        rightIcon && glyph(rightIcon)
+                      ]
+                    }
+                  )
+                ]
+              }
+            ),
+            suffix && !isUnderline && /* @__PURE__ */ jsx(Affix, { side: "right", padX: spec.padX - 2, fontSize: spec.font, children: suffix })
+          ]
+        }
+      ),
       showSuggestions && /* @__PURE__ */ jsx(
         "ul",
         {
           role: "listbox",
-          className: "absolute left-0 top-full z-50 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg",
+          className: "absolute left-0 top-full z-50 mt-1 max-h-48 w-full overflow-y-auto p-1",
+          style: {
+            borderRadius: spec.radius,
+            border: `1px solid ${INPUT_COLORS.border}`,
+            background: INPUT_COLORS.surface,
+            boxShadow: "2px 2px 4px rgba(0,0,0,.12)"
+          },
           children: fuseResults.map((item) => /* @__PURE__ */ jsx("li", { role: "option", "aria-selected": false, children: /* @__PURE__ */ jsx(
             "button",
             {
               type: "button",
               onMouseDown: (e) => e.preventDefault(),
               onClick: () => handleSuggestionSelect(item),
-              className: "w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors",
+              className: "w-full rounded-[6px] px-2.5 py-2 text-left font-medium transition-colors hover:bg-[#FAFFF7]",
+              style: { fontSize: spec.font, color: INPUT_COLORS.value },
               children: item.label
             }
           ) }, item.value))
@@ -3156,8 +3438,10 @@ function Input2({
       {
         id: describedById,
         size,
-        helperText,
-        error: effectiveError
+        state,
+        helperText: message,
+        error: effectiveError,
+        reserveSpace: reserveMessageSpace
       }
     )
   ] });
@@ -3472,7 +3756,7 @@ var checkboxLabelVariants = cva("select-none transition-colors", {
     state: "default"
   }
 });
-var ICON_SIZE2 = {
+var ICON_SIZE = {
   sm: "size-3",
   md: "size-4",
   lg: "size-5"
@@ -3564,7 +3848,7 @@ function Checkbox({
                 forceMount: true,
                 "data-slot": "checkbox-indicator",
                 className: "grid h-full w-full place-content-center text-current transition-none data-[state=unchecked]:opacity-0",
-                children: indeterminate ? /* @__PURE__ */ jsx(Minus, { className: cn(ICON_SIZE2[size], "stroke-[3]") }) : /* @__PURE__ */ jsx(Check, { className: cn(ICON_SIZE2[size], "stroke-[3]") })
+                children: indeterminate ? /* @__PURE__ */ jsx(Minus, { className: cn(ICON_SIZE[size], "stroke-[3]") }) : /* @__PURE__ */ jsx(Check, { className: cn(ICON_SIZE[size], "stroke-[3]") })
               }
             )
           }

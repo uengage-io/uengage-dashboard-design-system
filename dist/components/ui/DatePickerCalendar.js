@@ -8,8 +8,8 @@ import { twMerge } from 'tailwind-merge';
 import Fuse from 'fuse.js';
 import { Popover as Popover$1, Label as Label$1 } from 'radix-ui';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
-import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandItem as CommandItem$1 } from 'cmdk';
 import { cva } from 'class-variance-authority';
+import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandItem as CommandItem$1 } from 'cmdk';
 
 // src/components/ui/DatePickerCalendar.tsx
 function cn(...inputs) {
@@ -90,64 +90,170 @@ function Label({
     }
   );
 }
+var INPUT_SIZES = {
+  xs: { height: 28, padX: 9, font: 12, icon: 13, radius: 6, label: 11, message: 10 },
+  sm: { height: 32, padX: 11, font: 12, icon: 14, radius: 8, label: 12, message: 11 },
+  md: { height: 40, padX: 13, font: 13, icon: 16, radius: 8, label: 12, message: 11 },
+  lg: { height: 48, padX: 15, font: 14, icon: 18, radius: 8, label: 13, message: 11 }
+};
+var INPUT_COLORS = {
+  message: "#9C9C9C",
+  successInk: "#00A86B",
+  warningInk: "#6A5300",
+  errorInk: "#7A0009",
+  errorLabel: "#A8000F",
+  validatingInk: "#595959"
+};
+function getMessageColor(state, hasError) {
+  if (hasError) return INPUT_COLORS.errorInk;
+  switch (state) {
+    case "success":
+      return INPUT_COLORS.successInk;
+    case "warning":
+      return INPUT_COLORS.warningInk;
+    case "validating":
+      return INPUT_COLORS.validatingInk;
+    default:
+      return INPUT_COLORS.message;
+  }
+}
+var INERT_SIZE = { xs: "", sm: "", md: "", lg: "" };
+var INERT_STATE = {
+  default: "",
+  hover: "",
+  focused: "",
+  error: "",
+  success: "",
+  warning: "",
+  validating: "",
+  loading: "",
+  disabled: "",
+  readonly: ""
+};
+cva(
+  "relative flex w-full min-w-0",
+  {
+    variants: {
+      multiline: {
+        false: "items-center",
+        true: "items-start"
+      },
+      appearance: {
+        default: "",
+        underline: "bg-transparent"
+      },
+      /** @deprecated Inert — sizing is applied inline. */
+      size: INERT_SIZE,
+      /** @deprecated Inert — state colours are applied inline. */
+      state: INERT_STATE
+    },
+    defaultVariants: { multiline: false, appearance: "default" }
+  }
+);
+cva(
+  "w-full min-w-0 flex-1 border-0 bg-transparent p-0 shadow-none outline-none focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-100",
+  {
+    variants: {
+      multiline: {
+        false: "h-full",
+        true: "block"
+      },
+      align: {
+        left: "text-left",
+        right: "text-right"
+      },
+      /** @deprecated Inert — sizing is applied inline. */
+      size: INERT_SIZE,
+      /** @deprecated Inert — the field no longer carries appearance classes. */
+      appearance: { default: "", underline: "" },
+      /** @deprecated Inert — affixes are laid out with flexbox, not padding. */
+      hasLeftIcon: { true: "", false: "" },
+      /** @deprecated Inert — affixes are laid out with flexbox, not padding. */
+      hasRightIcon: { true: "", false: "" }
+    },
+    defaultVariants: { multiline: false, align: "left" }
+  }
+);
+cva("absolute inset-y-0 flex items-center", {
+  variants: {
+    side: { left: "left-0", right: "right-0" },
+    /** @deprecated Inert — kept so existing calls keep type-checking. */
+    size: INERT_SIZE,
+    /** @deprecated Inert — kept so existing calls keep type-checking. */
+    multiline: { true: "", false: "" }
+  },
+  defaultVariants: { side: "left" }
+});
 var SIZE_TEXT = {
-  sm: "text-[10px]",
-  md: "text-xs",
-  lg: "text-sm"
+  xs: "text-[11px]",
+  sm: "text-[12px]",
+  md: "text-[12px]",
+  lg: "text-[13px]"
 };
 function InputLabel({
   size = "md",
   required = false,
+  tone,
   className,
+  style,
   children,
   ...props
 }) {
   return /* @__PURE__ */ jsx(
     Label,
     {
-      className: cn(SIZE_TEXT[size], "font-medium text-slate-700", className),
+      className: cn(
+        "font-semibold leading-[1.3] text-[#161616]",
+        SIZE_TEXT[size],
+        className
+      ),
+      style: tone ? { color: tone, ...style } : style,
       ...props,
-      children: /* @__PURE__ */ jsxs("span", { className: "inline", children: [
+      children: /* @__PURE__ */ jsxs("span", { className: "inline text-pretty", children: [
         children,
-        required && /* @__PURE__ */ jsx("span", { "aria-hidden": "true", className: "ml-0.5 text-red-500", children: "*" })
+        required && /* @__PURE__ */ jsx("span", { "aria-hidden": "true", style: { color: INPUT_COLORS.errorLabel }, children: "*" })
       ] })
     }
   );
 }
 InputLabel.displayName = "InputLabel";
-var SIZE_TEXT2 = {
-  sm: "text-[11px]",
-  md: "text-xs",
-  lg: "text-sm"
-};
-var ICON_SIZE = {
-  sm: "size-3",
-  md: "size-3.5",
-  lg: "size-4"
-};
 function InputHelper({
   size = "md",
   helperText,
   error,
+  state = "default",
+  reserveSpace = false,
   className,
+  style,
   ...props
 }) {
-  if (!error && !helperText) return null;
   const showError = Boolean(error);
+  const text = showError ? error : helperText;
+  if (!text && !reserveSpace) return null;
+  const fontSize = INPUT_SIZES[size].message;
   return /* @__PURE__ */ jsxs(
     "p",
     {
       role: showError ? "alert" : void 0,
-      className: cn(
-        "inline-flex items-center gap-1",
-        SIZE_TEXT2[size],
-        showError ? "text-red-500" : "text-slate-500",
-        className
-      ),
+      className: cn("inline-flex items-start gap-[5px] leading-[1.4]", className),
+      style: {
+        fontSize,
+        minHeight: Math.round(fontSize * 1.45),
+        color: getMessageColor(state, showError),
+        ...style
+      },
       ...props,
       children: [
-        showError && /* @__PURE__ */ jsx(CircleAlert, { "aria-hidden": "true", className: cn(ICON_SIZE[size], "shrink-0") }),
-        /* @__PURE__ */ jsx("span", { children: showError ? error : helperText })
+        showError && /* @__PURE__ */ jsx(
+          CircleAlert,
+          {
+            "aria-hidden": "true",
+            strokeWidth: 2.2,
+            className: "shrink-0",
+            style: { width: fontSize + 1, height: fontSize + 1, marginTop: 1 }
+          }
+        ),
+        text && /* @__PURE__ */ jsx("span", { children: text })
       ]
     }
   );
