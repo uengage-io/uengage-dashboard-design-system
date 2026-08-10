@@ -13,7 +13,6 @@ All components live under `src/components/custom/`. They wrap or extend shadcn/u
 5. [Radio](#radio)
 6. [Tabs](#tabs)
 7. [Toggle](#toggle)
-
 8. [Table](#table)
 9. [Layout](#layout)
 10. [Card](#card)

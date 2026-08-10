@@ -15,52 +15,44 @@ type ButtonState = "default" | "hover" | "pressed" | "focused" | "disabled";
 type ButtonSize = "xs" | "sm" | "md" | "lg";
 
 type StateColors = {
-  readonly background: readonly string[] | string;
-  readonly border: readonly string[] | string;
+  readonly background: string;
+  /** Optional gradient layered on top of `background` — kept out of the
+   * transition so it can't leave the solid `background` colour exposed
+   * mid-animation (the cause of a white flash on hover/press). */
+  readonly backgroundImage?: string;
+  readonly border: string;
   readonly borderWidth: number;
   readonly text: string;
-  readonly opacity?: number;
-  readonly gradientDirection?: string;
-  /** Exact CSS gradient string from Figma — overrides `background` + `gradientDirection` when provided. */
-  readonly backgroundGradient?: string;
+  readonly boxShadow?: string;
 };
 
 const BASE_CLASSES = [
   "inline-flex flex-row shrink-0 items-center justify-center leading-none",
   "font-['Figtree'] font-medium not-italic",
-  "whitespace-nowrap transition-all duration-150 select-none cursor-pointer",
-  "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-  "disabled:pointer-events-none",
+  "whitespace-nowrap select-none cursor-pointer",
+  "transition-[background-color,box-shadow,transform,border-color,color] duration-[140ms] ease-[cubic-bezier(0.2,0.8,0.3,1)]",
+  "outline-none",
+  "disabled:pointer-events-none disabled:cursor-not-allowed",
   "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:inline-block",
 ].join(" ");
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  xs: "pt-[6px] pr-[10px] pb-[6px] pl-[8px] gap-[4px] text-[10px] [&_svg]:size-[10px]",
-  sm: "pt-[8px] pr-[12px] pb-[8px] pl-[10px] gap-[4px] text-xs [&_svg]:size-[14px]",
-  md: "pt-[10px] pr-[14px] pb-[10px] pl-[14px] sm:pt-[12px] sm:pr-[16px] sm:pb-[12px] sm:pl-[16px] gap-[6px] text-sm sm:text-base [&_svg]:size-[15px] sm:[&_svg]:size-[16px]",
-  lg: "pt-[14px] pr-[18px] pb-[14px] pl-[18px] sm:pt-[20px] sm:pr-[24px] sm:pb-[20px] sm:pl-[24px] gap-[6px] sm:gap-[8px] text-base sm:text-lg [&_svg]:size-[16px]",
+  xs: "h-[28px] px-[10px] gap-[4px] text-[11px] [&_svg]:size-[14px]",
+  sm: "h-[32px] px-[12px] gap-[4px] text-[12px] [&_svg]:size-[15px]",
+  md: "h-[40px] px-[16px] gap-[6px] text-[13px] [&_svg]:size-[16px]",
+  lg: "h-[48px] px-[20px] gap-[8px] text-[15px] [&_svg]:size-[20px]",
 };
 
+/** Tertiary uses a tighter horizontal padding than the other variants — every
+ * other size property (height, font, gap, icon) matches SIZE_CLASSES. */
 const VARIANT_SIZE_OVERRIDES: Partial<
   Record<ColorVariant, Partial<Record<ButtonSize, string>>>
 > = {
-  alertPrimary: {
-    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
-    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[12px] [&_svg]:size-[14px]",
-    md: "pt-[6px] pr-[12px] pb-[6px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
-    lg: "pt-[10px] pr-[16px] pb-[10px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]",
-  },
-  alertSecondary: {
-    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
-    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[12px] [&_svg]:size-[14px]",
-    md: "pt-[6px] pr-[12px] pb-[6px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
-    lg: "pt-[10px] pr-[16px] pb-[10px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]",
-  },
-  warningPrimary: {
-    xs: "pt-[4px] pr-[8px] pb-[4px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
-    sm: "pt-[8px] pr-[12px] pb-[8px] pl-[10px] gap-[4px] text-[12px] [&_svg]:size-[14px]",
-    md: "pt-[10px] pr-[14px] pb-[10px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
-    lg: "pt-[14px] pr-[18px] pb-[14px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]",
+  tertiary: {
+    xs: "h-[28px] px-[8px] gap-[4px] text-[11px] [&_svg]:size-[14px]",
+    sm: "h-[32px] px-[10px] gap-[4px] text-[12px] [&_svg]:size-[15px]",
+    md: "h-[40px] px-[13px] gap-[6px] text-[13px] [&_svg]:size-[16px]",
+    lg: "h-[48px] px-[16px] gap-[8px] text-[15px] [&_svg]:size-[20px]",
   },
 };
 
@@ -77,16 +69,6 @@ const buttonVariants = cva(BASE_CLASSES, {
   defaultVariants: { size: "md" },
 });
 
-function toGradientCSS(value: readonly string[] | string, direction = "to bottom"): string {
-  if (typeof value === "string") {
-    return `linear-gradient(${value}, ${value})`;
-  }
-  if (value.length === 1) {
-    return `linear-gradient(${value[0]}, ${value[0]})`;
-  }
-  return `linear-gradient(${direction}, ${value[0]}, ${value[1]})`;
-}
-
 function resolveStateColors(
   variant: ColorVariant,
   state: ButtonState,
@@ -100,97 +82,39 @@ function resolveStateColors(
     | undefined;
 }
 
-const VARIANT_BORDER_WIDTH: Partial<Record<ColorVariant, number>> = {
-  alertPrimary: 1,
-  alertSecondary: 1,
-  warningPrimary: 1,
-};
-
-const VARIANT_BORDER_RADIUS: Partial<Record<ColorVariant, number>> = {
-  alertPrimary: 20,
-  alertSecondary: 20,
+const RADIUS_BY_SIZE: Record<ButtonSize, number> = {
+  xs: 8,
+  sm: 9,
+  md: 10,
+  lg: 12,
 };
 
 function getButtonStyle(
   variant: ColorVariant,
   state: ButtonState,
+  size: ButtonSize,
+  loading: boolean,
 ): React.CSSProperties {
   const colors = resolveStateColors(variant, state);
   if (!colors) return {};
 
-  const borderWidth = VARIANT_BORDER_WIDTH[variant] ?? colors.borderWidth;
-  const borderRadius = VARIANT_BORDER_RADIUS[variant] ?? 30;
-
-  // Tertiary uses plain solid borders — no gradient padding-box/border-box trick.
-  // This keeps the background genuinely transparent in every state that declares it.
-  if (variant === "tertiary") {
-    const bg = colors.backgroundGradient
-      ? colors.backgroundGradient
-      : colors.background === "transparent"
-        ? "transparent"
-        : Array.isArray(colors.background)
-          ? colors.background[0]
-          : colors.background;
-
-    const borderColor =
-      colors.border === "transparent"
-        ? "transparent"
-        : Array.isArray(colors.border)
-          ? colors.border[0]
-          : colors.border;
-
-    const style: React.CSSProperties = {
-      background: bg,
-      border: `${borderWidth}px solid ${borderColor}`,
-      borderRadius,
-      color: colors.text,
-      boxShadow: "none",
-    };
-
-    if (colors.opacity !== undefined) {
-      style.opacity = colors.opacity;
-    }
-
-    return style;
-  }
-
-  const dir = colors.gradientDirection ?? "to bottom"
-  const borderCSS = toGradientCSS(colors.border, dir);
-  const innerCSS = colors.backgroundGradient
-    ? colors.backgroundGradient
-    : colors.background === "transparent"
-      ? "linear-gradient(var(--btn-stroke-bg, #fff), var(--btn-stroke-bg, #fff))"
-      : toGradientCSS(colors.background, dir);
-
-  const insetShadow = "0px 2px 4px 0px #0000000A inset";
-  const liftShadow = "2px 2px 4px 0px #0000001F";
-  const noLiftVariants: ColorVariant[] = ["secondary"];
-  const boxShadow =
-    state === "disabled"
-      ? "none"
-      : state === "hover" || state === "pressed"
-        ? noLiftVariants.includes(variant)
-          ? insetShadow
-          : `${insetShadow}, ${liftShadow}`
-        : insetShadow;
-
-  // When backgroundGradient contains rgba transparency a solid white backing is
-  // needed so the border-box layer doesn't bleed through the transparent stop.
-  // Must use linear-gradient() — plain color values are invalid as bg-image layers.
-  const backgroundValue = colors.backgroundGradient
-    ? `${innerCSS} padding-box, linear-gradient(#FFFFFF, #FFFFFF) padding-box, ${borderCSS} border-box`
-    : `${innerCSS} padding-box, ${borderCSS} border-box`
+  const borderRadius = RADIUS_BY_SIZE[size];
+  const boxShadow = loading ? "none" : (colors.boxShadow ?? "none");
 
   const style: React.CSSProperties = {
-    background: backgroundValue,
-    border: `${borderWidth}px solid transparent`,
+    backgroundColor: colors.background,
+    backgroundImage: colors.backgroundImage ?? "none",
+    border:
+      colors.borderWidth > 0
+        ? `${colors.borderWidth}px solid ${colors.border}`
+        : "none",
     borderRadius,
     color: colors.text,
     boxShadow,
   };
 
-  if (colors.opacity !== undefined) {
-    style.opacity = colors.opacity;
+  if (state === "pressed") {
+    style.transform = "scale(0.985)";
   }
 
   return style;
@@ -249,11 +173,10 @@ function Button({
           ? "focused"
           : "default";
 
-  const gradientStyle = getButtonStyle(variant, state);
+  const gradientStyle = getButtonStyle(variant, state, size, loading);
   const sizeClass =
     VARIANT_SIZE_OVERRIDES[variant]?.[size] ?? SIZE_CLASSES[size];
   const Comp = asChild ? Slot.Root : "button";
-  const tertiaryClass = variant === "tertiary" ? "underline" : "";
 
   const spinner = loadingIcon ?? (
     <Loader2 className="animate-spin" aria-hidden="true" />
@@ -268,7 +191,7 @@ function Button({
       data-state={state}
       data-loading={loading || undefined}
       aria-busy={loading || undefined}
-      className={`uengage-ui ${BASE_CLASSES} ${sizeClass}${tertiaryClass ? ` ${tertiaryClass}` : ""}${className ? ` ${className}` : ""}`}
+      className={`uengage-ui ${BASE_CLASSES} ${sizeClass}${className ? ` ${className}` : ""}`}
       style={{ ...gradientStyle, ...style }}
       disabled={interactionBlocked}
       onPointerEnter={(e: React.PointerEvent<HTMLButtonElement>) => {

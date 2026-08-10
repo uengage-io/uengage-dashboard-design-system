@@ -37,13 +37,9 @@ function DrawerOverlay({
         data-slot="drawer-overlay"
         className={cn(
           "uengage-ui",
-<<<<<<< HEAD
-          "fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:duration-300 data-[state=closed]:duration-300",
-=======
           "fixed inset-0 z-40 bg-black/50 transition-opacity opacity-0",
           "data-[state=open]:opacity-100 data-[state=open]:duration-300 data-[state=open]:ease-out",
           "data-[state=closed]:opacity-0 data-[state=closed]:duration-200 data-[state=closed]:ease-in",
->>>>>>> 9c7803ce5ba4bee90f16b1b0e973d6a41c67ddf7
           className
         )}
         {...props}

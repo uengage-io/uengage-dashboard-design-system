@@ -36,12 +36,13 @@ import SectionPreview from "./components/Section";
 import BadgePreview from "./components/Badge";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <ButtonPreview/>
     {/* <TabsPreview /> */}
     {/* <TablePreview/> */}
     {/* <TogglePreview/> */}
     {/* <TabsPreview/> */}
     {/* <TablePreview /> */}
-    <SectionPreview />
+    {/* <SectionPreview /> */}
     {/* <FilterGroupDatePickerPreview /> */}
   </React.StrictMode>,
 );
