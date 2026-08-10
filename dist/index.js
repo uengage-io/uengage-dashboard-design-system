@@ -354,231 +354,212 @@ function DrawerDescription({
   );
 }
 
-// src/utils/colors.ts
-var brand = {
-  green: {
-    paleGreen: "#C8E7B8",
-    lightGreen: "#A5C993",
-    softGreen: "#7AB368",
-    mintGreen: "#2ACB8D",
-    green: "#00A86B",
-    darkGreen: "#006F42",
-    forestGreen: "#1F5E2C",
-    deepGreen: "#003C1B",
-    darkerGreen: "#002310",
-    darkestGreen: "#001E00"
-  }
-};
-({
-  /** Primary brand color — canonical green for checked, active, focused states. */
-  primary: brand.green.darkGreen,
-  /** Darker primary for focus outlines on light surfaces. */
-  primaryDark: brand.green.forestGreen,
-  /** Lightest checked/active green for indicators (radio dot, toggle thumb). */
-  primaryDeep: brand.green.deepGreen});
-
 // src/components/custom/Button/buttonColors.ts
-var g = brand.green;
 var button = {
   primary: {
     default: {
-      background: [g.green, g.deepGreen],
-      border: [g.mintGreen, g.darkerGreen],
-      borderWidth: 2,
+      background: "#003C1B",
+      backgroundImage: "linear-gradient(180deg, #0A5A2C 0%, #003C1B 100%)",
+      border: "transparent",
+      borderWidth: 0,
       text: "#FFFFFF",
-      backgroundGradient: "linear-gradient(128.73deg, #00A86B -0.83%, #003C1B 95.78%)"
+      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14), 2px 2px 4px rgba(0,60,27,0.2)"
     },
     hover: {
-      background: [g.darkGreen, g.darkestGreen],
-      border: [g.mintGreen, g.darkerGreen],
-      borderWidth: 2,
+      background: "#00331A",
+      border: "transparent",
+      borderWidth: 0,
       text: "#FFFFFF",
-      backgroundGradient: "linear-gradient(92.3deg, #006F42 -11.82%, #001E00 101.34%)"
+      boxShadow: "0 4px 12px rgba(0,60,27,0.26)"
     },
     pressed: {
-      background: [g.darkGreen, g.darkestGreen],
-      border: [g.mintGreen, g.darkerGreen],
-      borderWidth: 2,
+      background: "#002813",
+      border: "transparent",
+      borderWidth: 0,
       text: "#FFFFFF",
-      backgroundGradient: "linear-gradient(92.3deg, #006F42 -11.82%, #001E00 101.34%)"
+      boxShadow: "none"
     },
     focused: {
-      background: [g.green, g.deepGreen],
-      border: [g.mintGreen],
-      borderWidth: 2,
+      background: "#003C1B",
+      backgroundImage: "linear-gradient(180deg, #0A5A2C 0%, #003C1B 100%)",
+      border: "transparent",
+      borderWidth: 0,
       text: "#FFFFFF",
-      backgroundGradient: "linear-gradient(128.73deg, #00A86B -0.83%, #003C1B 95.78%)"
+      boxShadow: "0 0 0 3px rgba(140,196,42,0.45)"
     },
     disabled: {
-      background: ["#DDDDDD"],
-      border: ["#E9E9E9"],
-      borderWidth: 2,
-      text: "#595959",
-      opacity: 0.4
+      background: "#F3F5F9",
+      border: "#E2E2E2",
+      borderWidth: 1,
+      text: "#9C9C9C",
+      boxShadow: "none"
     }
   },
   secondary: {
     default: {
-      background: ["#FFFFFF"],
-      border: ["#E4E4E4", "#9C9C9C"],
-      borderWidth: 2,
-      text: g.forestGreen
+      background: "#FFFFFF",
+      border: "#BFD6C6",
+      borderWidth: 1,
+      text: "#003C1B",
+      boxShadow: "2px 2px 4px rgba(0,0,0,0.04)"
     },
     hover: {
-      background: ["#EDEDED", "#FFFFFF"],
-      border: ["#E4E4E4", "#9C9C9C"],
-      borderWidth: 2,
-      text: g.forestGreen,
-      backgroundGradient: "linear-gradient(0deg, #EDEDED 0%, rgba(255, 255, 255, 0.6) 100%)"
+      background: "#F5FFF0",
+      border: "#1F5E2C",
+      borderWidth: 1,
+      text: "#003C1B",
+      boxShadow: "none"
     },
     pressed: {
-      background: ["#EDEDED"],
-      border: ["#E4E4E4", "#9C9C9C"],
-      borderWidth: 2,
-      text: g.forestGreen
+      background: "#E8F5DE",
+      border: "#1F5E2C",
+      borderWidth: 1,
+      text: "#003C1B",
+      boxShadow: "none"
     },
     focused: {
-      background: ["#FFFFFF"],
-      border: [g.lightGreen],
-      borderWidth: 2,
-      text: g.forestGreen
+      background: "#FFFFFF",
+      border: "#1F5E2C",
+      borderWidth: 1,
+      text: "#003C1B",
+      boxShadow: "0 0 0 3px rgba(140,196,42,0.45)"
     },
     disabled: {
-      background: ["#EDEDED"],
-      border: ["#FEFEFE", "#B0B0B0"],
-      borderWidth: 2,
-      text: "#595959",
-      opacity: 0.4
+      background: "#EEEEEE",
+      border: "#E2E2E2",
+      borderWidth: 1,
+      text: "#9C9C9C",
+      boxShadow: "none"
     }
   },
   tertiary: {
     default: {
       background: "transparent",
       border: "transparent",
-      borderWidth: 2,
-      text: g.forestGreen,
-      backgroundGradient: "linear-gradient(180deg, rgba(200, 231, 184, 0.01) 0%, rgba(200, 231, 184, 0.07) 100%)"
+      borderWidth: 0,
+      text: "#1F5E2C",
+      boxShadow: "none"
     },
     hover: {
-      background: [g.paleGreen],
-      border: [g.paleGreen],
-      borderWidth: 2,
-      text: g.forestGreen,
-      backgroundGradient: "linear-gradient(180deg, rgba(200, 231, 184, 0.01) 0%, rgba(200, 231, 184, 0.07) 100%)"
+      background: "#E6F5DC",
+      border: "transparent",
+      borderWidth: 0,
+      text: "#1F5E2C",
+      boxShadow: "none"
     },
     pressed: {
-      background: [g.paleGreen],
-      border: [g.lightGreen],
-      borderWidth: 2,
-      text: g.forestGreen
+      background: "#DCF3CE",
+      border: "transparent",
+      borderWidth: 0,
+      text: "#003C1B",
+      boxShadow: "none"
     },
     focused: {
-      background: [g.paleGreen],
-      border: [g.mintGreen],
-      borderWidth: 2,
-      text: g.forestGreen
+      background: "transparent",
+      border: "transparent",
+      borderWidth: 0,
+      text: "#1F5E2C",
+      boxShadow: "0 0 0 3px rgba(140,196,42,0.45)"
     },
     disabled: {
       background: "transparent",
       border: "transparent",
-      borderWidth: 2,
-      text: "#595959",
-      opacity: 0.4
+      borderWidth: 0,
+      text: "#9C9C9C",
+      boxShadow: "none"
     }
   },
   alertPrimary: {
     default: {
-      background: ["#D01D1D"],
-      border: ["#FF8181", "#802828"],
-      borderWidth: 2,
-      text: "#FFFFFF"
+      background: "#A8000F",
+      border: "transparent",
+      borderWidth: 0,
+      text: "#FFFFFF",
+      boxShadow: "2px 2px 4px rgba(168,0,15,0.2)"
     },
     hover: {
-      background: ["#B21E1E"],
-      border: ["#FF8181", "#802828"],
-      borderWidth: 2,
-      text: "#FFFFFF"
+      background: "#8E000D",
+      border: "transparent",
+      borderWidth: 0,
+      text: "#FFFFFF",
+      boxShadow: "0 4px 12px rgba(168,0,15,0.24)"
     },
     pressed: {
-      background: ["#940000"],
-      border: ["#FF8181", "#802828"],
-      borderWidth: 2,
-      text: "#FFFFFF"
+      background: "#760009",
+      border: "transparent",
+      borderWidth: 0,
+      text: "#FFFFFF",
+      boxShadow: "none"
     }
   },
   warningPrimary: {
     default: {
-      background: ["#FEF8CD"],
-      border: ["#FFE47A", "#D4B020"],
-      borderWidth: 2,
-      text: "#595959"
+      background: "#FFF6D6",
+      border: "#EFD98A",
+      borderWidth: 1,
+      text: "#6A5300",
+      boxShadow: "none"
     },
     hover: {
-      background: ["#FCDB04"],
-      border: ["#FFE47A", "#D4B020"],
-      borderWidth: 2,
-      text: "#595959"
+      background: "#FFEFB8",
+      border: "#E0C866",
+      borderWidth: 1,
+      text: "#6A5300",
+      boxShadow: "none"
     },
     pressed: {
-      background: ["#F2D100"],
-      border: ["#FFE47A", "#D4B020"],
-      borderWidth: 2,
-      text: "#595959"
+      background: "#FBE7A0",
+      border: "#E0C866",
+      borderWidth: 1,
+      text: "#4A3B00",
+      boxShadow: "none"
     }
   },
   alertSecondary: {
     default: {
-      background: ["#FFF7F6"],
-      border: ["#FF8181", "#802828"],
-      borderWidth: 2,
-      text: "#DC2626"
+      background: "#FFF7F6",
+      border: "#E4A6AC",
+      borderWidth: 1,
+      text: "#A8000F",
+      boxShadow: "none"
     },
     hover: {
-      background: ["#D01D1D"],
-      border: ["#FF8181", "#802828"],
-      borderWidth: 2,
-      text: "#FFFFFF"
+      background: "#A8000F",
+      border: "transparent",
+      borderWidth: 0,
+      text: "#FFFFFF",
+      boxShadow: "2px 2px 4px rgba(168,0,15,0.2)"
     },
     pressed: {
-      background: ["#B21E1E"],
-      border: ["#FF8181", "#802828"],
-      borderWidth: 2,
-      text: "#FFFFFF"
+      background: "#760009",
+      border: "transparent",
+      borderWidth: 0,
+      text: "#FFFFFF",
+      boxShadow: "none"
     }
   }
 };
 var BASE_CLASSES = [
   "inline-flex flex-row shrink-0 items-center justify-center leading-none",
   "font-['Figtree'] font-medium not-italic",
-  "whitespace-nowrap transition-all duration-150 select-none cursor-pointer",
-  "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-  "disabled:pointer-events-none",
+  "whitespace-nowrap select-none cursor-pointer",
+  "transition-[background-color,box-shadow,transform,border-color,color] duration-[140ms] ease-[cubic-bezier(0.2,0.8,0.3,1)]",
+  "outline-none",
+  "disabled:pointer-events-none disabled:cursor-not-allowed",
   "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:inline-block"
 ].join(" ");
 var SIZE_CLASSES = {
-  xs: "pt-[6px] pr-[10px] pb-[6px] pl-[8px] gap-[4px] text-[10px] [&_svg]:size-[10px]",
-  sm: "pt-[8px] pr-[12px] pb-[8px] pl-[10px] gap-[4px] text-xs [&_svg]:size-[14px]",
-  md: "pt-[10px] pr-[14px] pb-[10px] pl-[14px] sm:pt-[12px] sm:pr-[16px] sm:pb-[12px] sm:pl-[16px] gap-[6px] text-sm sm:text-base [&_svg]:size-[15px] sm:[&_svg]:size-[16px]",
-  lg: "pt-[14px] pr-[18px] pb-[14px] pl-[18px] sm:pt-[20px] sm:pr-[24px] sm:pb-[20px] sm:pl-[24px] gap-[6px] sm:gap-[8px] text-base sm:text-lg [&_svg]:size-[16px]"
+  xs: "h-[28px] px-[10px] gap-[4px] text-[11px] [&_svg]:size-[14px]",
+  sm: "h-[32px] px-[12px] gap-[4px] text-[12px] [&_svg]:size-[15px]",
+  md: "h-[40px] px-[16px] gap-[6px] text-[13px] [&_svg]:size-[16px]",
+  lg: "h-[48px] px-[20px] gap-[8px] text-[15px] [&_svg]:size-[20px]"
 };
 var VARIANT_SIZE_OVERRIDES = {
-  alertPrimary: {
-    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
-    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[12px] [&_svg]:size-[14px]",
-    md: "pt-[6px] pr-[12px] pb-[6px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
-    lg: "pt-[10px] pr-[16px] pb-[10px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]"
-  },
-  alertSecondary: {
-    xs: "pt-[2px] pr-[6px] pb-[2px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
-    sm: "pt-[4px] pr-[8px] pb-[4px] pl-[8px] gap-[2px] text-[12px] [&_svg]:size-[14px]",
-    md: "pt-[6px] pr-[12px] pb-[6px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
-    lg: "pt-[10px] pr-[16px] pb-[10px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]"
-  },
-  warningPrimary: {
-    xs: "pt-[4px] pr-[8px] pb-[4px] pl-[6px] gap-[2px] text-[10px] [&_svg]:size-[12px]",
-    sm: "pt-[8px] pr-[12px] pb-[8px] pl-[10px] gap-[4px] text-[12px] [&_svg]:size-[14px]",
-    md: "pt-[10px] pr-[14px] pb-[10px] pl-[12px] gap-[4px] text-[14px] [&_svg]:size-[14px]",
-    lg: "pt-[14px] pr-[18px] pb-[14px] pl-[16px] gap-[6px] text-[16px] [&_svg]:size-[16px]"
+  tertiary: {
+    xs: "h-[28px] px-[8px] gap-[4px] text-[11px] [&_svg]:size-[14px]",
+    sm: "h-[32px] px-[10px] gap-[4px] text-[12px] [&_svg]:size-[15px]",
+    md: "h-[40px] px-[13px] gap-[6px] text-[13px] [&_svg]:size-[16px]",
+    lg: "h-[48px] px-[16px] gap-[8px] text-[15px] [&_svg]:size-[20px]"
   }
 };
 var buttonVariants2 = cva(BASE_CLASSES, {
@@ -592,66 +573,32 @@ var buttonVariants2 = cva(BASE_CLASSES, {
   },
   defaultVariants: { size: "md" }
 });
-function toGradientCSS(value, direction = "to bottom") {
-  if (typeof value === "string") {
-    return `linear-gradient(${value}, ${value})`;
-  }
-  if (value.length === 1) {
-    return `linear-gradient(${value[0]}, ${value[0]})`;
-  }
-  return `linear-gradient(${direction}, ${value[0]}, ${value[1]})`;
-}
 function resolveStateColors(variant, state) {
   const variantColors = button[variant];
   if (!variantColors) return void 0;
   return variantColors[state] ?? variantColors.default;
 }
-var VARIANT_BORDER_WIDTH = {
-  alertPrimary: 1,
-  alertSecondary: 1,
-  warningPrimary: 1
+var RADIUS_BY_SIZE = {
+  xs: 8,
+  sm: 9,
+  md: 10,
+  lg: 12
 };
-var VARIANT_BORDER_RADIUS = {
-  alertPrimary: 20,
-  alertSecondary: 20
-};
-function getButtonStyle(variant, state) {
+function getButtonStyle(variant, state, size, loading) {
   const colors = resolveStateColors(variant, state);
   if (!colors) return {};
-  const borderWidth = VARIANT_BORDER_WIDTH[variant] ?? colors.borderWidth;
-  const borderRadius = VARIANT_BORDER_RADIUS[variant] ?? 30;
-  if (variant === "tertiary") {
-    const bg = colors.backgroundGradient ? colors.backgroundGradient : colors.background === "transparent" ? "transparent" : Array.isArray(colors.background) ? colors.background[0] : colors.background;
-    const borderColor = colors.border === "transparent" ? "transparent" : Array.isArray(colors.border) ? colors.border[0] : colors.border;
-    const style2 = {
-      background: bg,
-      border: `${borderWidth}px solid ${borderColor}`,
-      borderRadius,
-      color: colors.text,
-      boxShadow: "none"
-    };
-    if (colors.opacity !== void 0) {
-      style2.opacity = colors.opacity;
-    }
-    return style2;
-  }
-  const dir = colors.gradientDirection ?? "to bottom";
-  const borderCSS = toGradientCSS(colors.border, dir);
-  const innerCSS = colors.backgroundGradient ? colors.backgroundGradient : colors.background === "transparent" ? "linear-gradient(var(--btn-stroke-bg, #fff), var(--btn-stroke-bg, #fff))" : toGradientCSS(colors.background, dir);
-  const insetShadow = "0px 2px 4px 0px #0000000A inset";
-  const liftShadow = "2px 2px 4px 0px #0000001F";
-  const noLiftVariants = ["secondary"];
-  const boxShadow = state === "disabled" ? "none" : state === "hover" || state === "pressed" ? noLiftVariants.includes(variant) ? insetShadow : `${insetShadow}, ${liftShadow}` : insetShadow;
-  const backgroundValue = colors.backgroundGradient ? `${innerCSS} padding-box, linear-gradient(#FFFFFF, #FFFFFF) padding-box, ${borderCSS} border-box` : `${innerCSS} padding-box, ${borderCSS} border-box`;
+  const borderRadius = RADIUS_BY_SIZE[size];
+  const boxShadow = loading ? "none" : colors.boxShadow ?? "none";
   const style = {
-    background: backgroundValue,
-    border: `${borderWidth}px solid transparent`,
+    backgroundColor: colors.background,
+    backgroundImage: colors.backgroundImage ?? "none",
+    border: colors.borderWidth > 0 ? `${colors.borderWidth}px solid ${colors.border}` : "none",
     borderRadius,
     color: colors.text,
     boxShadow
   };
-  if (colors.opacity !== void 0) {
-    style.opacity = colors.opacity;
+  if (state === "pressed") {
+    style.transform = "scale(0.985)";
   }
   return style;
 }
@@ -681,10 +628,9 @@ function Button2({
   const [focused, setFocused] = React9.useState(false);
   const interactionBlocked = disabled || loading;
   const state = disabled ? "disabled" : pressed ? "pressed" : hovered ? "hover" : focused ? "focused" : "default";
-  const gradientStyle = getButtonStyle(variant, state);
+  const gradientStyle = getButtonStyle(variant, state, size, loading);
   const sizeClass = VARIANT_SIZE_OVERRIDES[variant]?.[size] ?? SIZE_CLASSES[size];
   const Comp = asChild ? Slot.Root : "button";
-  const tertiaryClass = variant === "tertiary" ? "underline" : "";
   const spinner = loadingIcon ?? /* @__PURE__ */ jsx(Loader2, { className: "animate-spin", "aria-hidden": "true" });
   const content = children ?? title;
   return /* @__PURE__ */ jsx(
@@ -696,7 +642,7 @@ function Button2({
       "data-state": state,
       "data-loading": loading || void 0,
       "aria-busy": loading || void 0,
-      className: `uengage-ui ${BASE_CLASSES} ${sizeClass}${tertiaryClass ? ` ${tertiaryClass}` : ""}${className ? ` ${className}` : ""}`,
+      className: `uengage-ui ${BASE_CLASSES} ${sizeClass}${className ? ` ${className}` : ""}`,
       style: { ...gradientStyle, ...style },
       disabled: interactionBlocked,
       onPointerEnter: (e) => {
@@ -5914,6 +5860,29 @@ function SweetAlertInstance({
     }
   );
 }
+
+// src/utils/colors.ts
+var brand = {
+  green: {
+    paleGreen: "#C8E7B8",
+    lightGreen: "#A5C993",
+    softGreen: "#7AB368",
+    mintGreen: "#2ACB8D",
+    green: "#00A86B",
+    darkGreen: "#006F42",
+    forestGreen: "#1F5E2C",
+    deepGreen: "#003C1B",
+    darkerGreen: "#002310",
+    darkestGreen: "#001E00"
+  }
+};
+({
+  /** Primary brand color — canonical green for checked, active, focused states. */
+  primary: brand.green.darkGreen,
+  /** Darker primary for focus outlines on light surfaces. */
+  primaryDark: brand.green.forestGreen,
+  /** Lightest checked/active green for indicators (radio dot, toggle thumb). */
+  primaryDeep: brand.green.deepGreen});
 var modalSizeVariants = cva("bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-hidden flex flex-col w-full", {
   variants: {
     size: {
