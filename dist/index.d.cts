@@ -863,11 +863,11 @@ interface SidebarProps {
 declare function Sidebar({ open, defaultOpen, onOpenChange, side, size, sizePercent, overlay, closeOnOutsideClick, persistentOnDesktop, trigger, heading, closeIcon, divider, className, contentClassName, children, }: SidebarProps): react_jsx_runtime.JSX.Element | null;
 
 declare const sidebarContentVariants: (props?: ({
-    side?: "bottom" | "left" | "right" | "top" | "right-slide" | null | undefined;
+    side?: "left" | "right" | "bottom" | "top" | "right-slide" | null | undefined;
     size?: "sm" | "lg" | "md" | "full" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const sidebarPersistentVariants: (props?: ({
-    side?: "bottom" | "left" | "right" | "top" | "right-slide" | null | undefined;
+    side?: "left" | "right" | "bottom" | "top" | "right-slide" | null | undefined;
     size?: "sm" | "lg" | "md" | "full" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type SidebarContentVariants = VariantProps<typeof sidebarContentVariants>;
