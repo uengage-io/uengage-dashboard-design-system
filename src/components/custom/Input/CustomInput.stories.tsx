@@ -12,12 +12,45 @@ const meta = {
     docs: {
       description: {
         component:
-          "Shadcn-backed input wrapper with sized CVA variants, optional label / helper / error, absolute-positioned left & right icon slots, an auto eye-toggle for `inputType='password'`, an `allowPattern` that strips disallowed characters inside `onChange` before the event reaches the caller, and a `multiline` prop that swaps the `<input>` for a `<textarea>` with configurable `rows` and `resize` behaviour.",
+          "Form field built to the uEngage Input design spec: four sizes (28 / 32 / 40 / 48px), twelve states, and a message row that is reserved up front so validation never shifts the form. Colour, radius and metrics ride on inline styles so the control keeps its exact look in apps whose Tailwind build does not scan this package. Includes an optional label / helper / error, inline left & right glyphs, boxed `prefix` / `suffix` affixes, a non-error `status` (validating / success / warning), a `loading` state, a `maxLength` character counter, an auto eye-toggle for `inputType='password'`, an `allowPattern` that strips disallowed characters inside `onChange` before the event reaches the caller, and a `multiline` prop that swaps the `<input>` for a `<textarea>`.",
       },
     },
   },
   argTypes: {
-    size: { control: "radio", options: ["sm", "md", "lg"] },
+    size: {
+      control: "radio",
+      options: ["xs", "sm", "md", "lg"],
+      description:
+        "28 / 32 / 40 / 48px. `xs` is for inline table editing, `lg` for standalone forms and mobile.",
+    },
+    status: {
+      control: "select",
+      options: [undefined, "validating", "success", "warning"],
+      description:
+        "Non-error validation state. `validating` shows a spinner, `success` a green border and tick, `warning` an amber fill. Ignored while `error` is set.",
+    },
+    statusMessage: {
+      control: "text",
+      description: "Message shown under the control for the active `status`.",
+    },
+    prefix: {
+      control: "text",
+      description: "Boxed affix ahead of the value (e.g. `₹`, `+91`), inside the same 1px box.",
+    },
+    suffix: { control: "text", description: "Trailing counterpart to `prefix` (e.g. `INR`)." },
+    loading: {
+      control: "boolean",
+      description: "Value still being fetched — muted box with a spinner, interaction blocked.",
+    },
+    showCount: {
+      control: "boolean",
+      description: "Show a `count/maxLength` counter. Defaults on whenever `maxLength` is set.",
+    },
+    align: {
+      control: "radio",
+      options: ["left", "right"],
+      description: "Right-align the value for amounts and other numerics.",
+    },
     variant: {
       control: "radio",
       options: ["default", "underline"],
@@ -859,5 +892,145 @@ export const Controlled: Story = {
         </code>
       </div>
     );
+  },
+};
+
+/* ── Size scale ─────────────────────────────────────────────── */
+
+/** 28 / 32 / 40 / 48. XS is for inline table editing, LG for standalone forms and mobile. */
+export const SizeScale: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="flex w-[420px] flex-col gap-4">
+      {(
+        [
+          ["xs", "28 · r6 · 12px"],
+          ["sm", "32 · r8 · 12px"],
+          ["md", "40 · r8 · 13px"],
+          ["lg", "48 · r8 · 14px"],
+        ] as const
+      ).map(([size, spec]) => (
+        <Input
+          key={size}
+          size={size}
+          label={size.toUpperCase()}
+          defaultValue="Sector 17 Flagship"
+          leftIcon={<Search />}
+          helperText={spec}
+        />
+      ))}
+    </div>
+  ),
+};
+
+export const XSmall: Story = {
+  args: {
+    size: "xs",
+    label: "Price",
+    defaultValue: "60",
+    align: "right",
+    helperText: "Inline table editing.",
+  },
+};
+
+/* ── States ─────────────────────────────────────────────────── */
+
+/** Every state the design specifies, rendered at Medium so they compare side by side. */
+export const AllStates: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(252px,1fr))] gap-5">
+      <Input label="Outlet Email" defaultValue="ops@chaipoint.in" leftIcon={<Mail />} helperText="Used for order receipts." />
+      <Input label="Outlet Email" placeholder="name@business.com" leftIcon={<Mail />} helperText="Empty and untouched." />
+      <Input label="GSTIN" defaultValue="22AAAAA0000A1Z5" status="validating" statusMessage="Checking with the GST portal…" />
+      <Input label="GSTIN" defaultValue="22AAAAA0000A1Z5" status="success" statusMessage="Verified with the GST portal." />
+      <Input label="Delivery Radius" defaultValue="14 km" status="warning" statusMessage="Beyond 12 km, TAT breaches rise." />
+      <Input label="Contact Number" defaultValue="9501174" error="Must be a 10-digit mobile number." />
+      <Input label="Business ID" defaultValue="UE-4471-DEL" readOnly helperText="Set at onboarding, cannot change." />
+      <Input label="Parent Wallet" defaultValue="₹1,24,500" disabled helperText="Ask an admin to unlock." />
+      <Input label="Account Manager" loading helperText="Fetching from the CRM…" />
+    </div>
+  ),
+};
+
+export const Validating: Story = {
+  args: {
+    label: "GSTIN",
+    defaultValue: "22AAAAA0000A1Z5",
+    status: "validating",
+    statusMessage: "Checking with the GST portal…",
+  },
+};
+
+export const Success: Story = {
+  args: {
+    label: "GSTIN",
+    defaultValue: "22AAAAA0000A1Z5",
+    status: "success",
+    statusMessage: "Verified with the GST portal.",
+  },
+};
+
+export const Warning: Story = {
+  args: {
+    label: "Delivery Radius",
+    defaultValue: "14 km",
+    status: "warning",
+    statusMessage: "Beyond 12 km, TAT breaches rise.",
+  },
+};
+
+export const Loading: Story = {
+  args: { label: "Account Manager", loading: true, helperText: "Fetching from the CRM…" },
+};
+
+/* ── Affixes ────────────────────────────────────────────────── */
+
+/** `prefix` and `suffix` sit inside the same 1px box, on a subtle fill. */
+export const PrefixAndSuffix: Story = {
+  args: {
+    label: "Order Value",
+    prefix: "₹",
+    suffix: "INR",
+    defaultValue: "4,500",
+    align: "right",
+    allowPattern: "decimal",
+    helperText: "Affixes sit inside the same 1px box.",
+  },
+};
+
+export const PhoneWithCountryCode: Story = {
+  args: {
+    label: "Contact Number",
+    prefix: "+91",
+    inputType: "tel",
+    allowPattern: "phone",
+    defaultValue: "9501174711",
+    helperText: "Digits only, capped at 10.",
+  },
+};
+
+/* ── Counter ────────────────────────────────────────────────── */
+
+/** `maxLength` drives the counter; it turns amber past ~83% of the limit. */
+export const CharacterCounter: Story = {
+  args: {
+    label: "Internal Note",
+    multiline: true,
+    rows: 3,
+    maxLength: 240,
+    defaultValue:
+      "Kitchen closes 30 minutes before the storefront so late orders do not breach TAT.",
+    helperText: "Resizes vertically only; the counter turns amber near the limit.",
+  },
+};
+
+export const CounterInline: Story = {
+  args: {
+    label: "Outlet Name",
+    maxLength: 40,
+    defaultValue: "Sector 17 Flagship",
+    required: true,
+    helperText: "Shown to customers on the storefront.",
   },
 };

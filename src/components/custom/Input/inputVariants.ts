@@ -1,117 +1,300 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { COMPONENT_HEIGHT, TEXT_SIZE, PLACEHOLDER_SIZE } from "@/utils/tokens";
-import type { AllowPattern } from "@/types/input";
+import type { AllowPattern, InputSize, InputStatus } from "@/types/input";
 
+/**
+ * Pixel spec lifted from the Input design page (Design Console
+ * `Input.dc.html`, "Size scale" section): 28 / 32 / 40 / 48.
+ * XS is for inline table editing, LG for standalone forms and mobile.
+ *
+ * These are applied as inline styles rather than Tailwind utilities so the
+ * control keeps its exact metrics in consuming apps whose Tailwind build does
+ * not scan this package for arbitrary-value classes.
+ */
+export const INPUT_SIZES: Record<
+  InputSize,
+  {
+    /** Control height in px. */
+    height: number;
+    /** Horizontal padding in px. */
+    padX: number;
+    /** Value/placeholder font size in px. */
+    font: number;
+    /** Affix glyph size in px, drawn at 2px stroke. */
+    icon: number;
+    /** Corner radius in px — XS tightens to 6 so it sits inside table rows. */
+    radius: number;
+    /** Label font size in px. */
+    label: number;
+    /** Helper/message font size in px. */
+    message: number;
+  }
+> = {
+  xs: { height: 28, padX: 9, font: 12, icon: 13, radius: 6, label: 11, message: 10 },
+  sm: { height: 32, padX: 11, font: 12, icon: 14, radius: 8, label: 12, message: 11 },
+  md: { height: 40, padX: 13, font: 13, icon: 16, radius: 8, label: 12, message: 11 },
+  lg: { height: 48, padX: 15, font: 14, icon: 18, radius: 8, label: 13, message: 11 },
+};
+
+/** Gap between an affix glyph and the value. Constant across the scale. */
+export const AFFIX_GAP = 9;
+
+/** Every state transition on the control runs at this curve. */
+export const INPUT_TRANSITION =
+  "border-color 120ms linear, box-shadow 120ms linear, background-color 120ms linear";
+
+export const INPUT_COLORS = {
+  surface: "#FFFFFF",
+  subtle: "#F3F5F9",
+  border: "#E2E2E2",
+  borderHover: "#C6C6C6",
+  borderFocus: "#1F5E2C",
+  /** 3px lime halo that pairs with `borderFocus`. */
+  ring: "0 0 0 3px rgba(140,196,42,.28)",
+  value: "#161616",
+  placeholder: "#9C9C9C",
+  message: "#9C9C9C",
+  icon: "#1F5E2C",
+
+  successBorder: "#00A86B",
+  successInk: "#00A86B",
+
+  warningBg: "#FFF6D6",
+  warningBorder: "#EFD98A",
+  warningInk: "#6A5300",
+
+  errorBg: "#FBE9EA",
+  errorBorder: "#A8000F",
+  errorInk: "#7A0009",
+  errorLabel: "#A8000F",
+
+  readOnlyBg: "#FAFFF7",
+
+  disabledBg: "#F3F5F9",
+  disabledInk: "#9C9C9C",
+
+  validatingInk: "#595959",
+} as const;
+
+/**
+ * Resolved visual state of the control. Ordering is deliberate — `disabled`
+ * and `readOnly` outrank validation, and an `error` outranks a `status`.
+ */
+export type InputVisualState =
+  | "default"
+  | "hover"
+  | "focused"
+  | "error"
+  | "success"
+  | "warning"
+  | "validating"
+  | "loading"
+  | "readonly"
+  | "disabled";
+
+export function resolveInputState(args: {
+  disabled?: boolean;
+  readOnly?: boolean;
+  loading?: boolean;
+  error?: string;
+  status?: InputStatus;
+  focused?: boolean;
+  hovered?: boolean;
+}): InputVisualState {
+  const { disabled, readOnly, loading, error, status, focused, hovered } = args;
+  if (disabled) return "disabled";
+  if (loading) return "loading";
+  if (readOnly) return "readonly";
+  if (error) return "error";
+  if (status === "validating") return "validating";
+  if (focused) return "focused";
+  if (status === "success") return "success";
+  if (status === "warning") return "warning";
+  if (hovered) return "hover";
+  return "default";
+}
+
+export interface InputBoxStyle {
+  background: string;
+  border: string;
+  boxShadow: string;
+  /** Colour of the value text. */
+  color: string;
+  cursor?: string;
+}
+
+/** Box colours for a resolved state, straight off the design's state table. */
+export function getInputBoxStyle(state: InputVisualState): InputBoxStyle {
+  const c = INPUT_COLORS;
+  const hairline = `1px solid ${c.border}`;
+
+  switch (state) {
+    case "hover":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderHover}`,
+        boxShadow: "none",
+        color: c.value,
+      };
+    case "focused":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderFocus}`,
+        boxShadow: c.ring,
+        color: c.value,
+      };
+    case "validating":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderFocus}`,
+        boxShadow: "none",
+        color: c.value,
+      };
+    case "success":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.successBorder}`,
+        boxShadow: "none",
+        color: c.value,
+      };
+    case "warning":
+      return {
+        background: c.warningBg,
+        border: `1px solid ${c.warningBorder}`,
+        boxShadow: "none",
+        color: c.value,
+      };
+    case "error":
+      return {
+        background: c.errorBg,
+        border: `1px solid ${c.errorBorder}`,
+        boxShadow: "none",
+        color: c.errorInk,
+      };
+    case "readonly":
+      return {
+        background: c.readOnlyBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value,
+        cursor: "default",
+      };
+    case "loading":
+      return {
+        background: c.disabledBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.disabledInk,
+        cursor: "progress",
+      };
+    case "disabled":
+      return {
+        background: c.disabledBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.disabledInk,
+        cursor: "not-allowed",
+      };
+    default:
+      return {
+        background: c.surface,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value,
+      };
+  }
+}
+
+/** Label colour follows the control's state so the pair always reads together. */
+export function getLabelColor(state: InputVisualState): string {
+  if (state === "error") return INPUT_COLORS.errorLabel;
+  if (state === "disabled") return INPUT_COLORS.disabledInk;
+  return INPUT_COLORS.value;
+}
+
+/** Message colour — validation always pairs a colour with a message and an icon. */
+export function getMessageColor(
+  state: InputVisualState,
+  hasError: boolean,
+): string {
+  if (hasError) return INPUT_COLORS.errorInk;
+  switch (state) {
+    case "success":
+      return INPUT_COLORS.successInk;
+    case "warning":
+      return INPUT_COLORS.warningInk;
+    case "validating":
+      return INPUT_COLORS.validatingInk;
+    default:
+      return INPUT_COLORS.message;
+  }
+}
+
+/**
+ * Inert variant keys kept so existing calls such as
+ * `inputWrapperVariants({ size: "md", state: "error" })` keep type-checking.
+ * The metrics and colours they used to carry now ride on inline styles.
+ */
+const INERT_SIZE = { xs: "", sm: "", md: "", lg: "" } as const;
+const INERT_STATE = {
+  default: "",
+  hover: "",
+  focused: "",
+  error: "",
+  success: "",
+  warning: "",
+  validating: "",
+  loading: "",
+  disabled: "",
+  readonly: "",
+} as const;
+
+/**
+ * Structural classes only — the pixel metrics and colours ride on inline
+ * styles. `underline` keeps its historic box-less treatment.
+ */
 export const inputWrapperVariants = cva(
-  "relative flex w-full transition-colors",
+  "relative flex w-full min-w-0",
   {
     variants: {
-      size: {
-        sm: TEXT_SIZE.sm,
-        md: TEXT_SIZE.md,
-        lg: TEXT_SIZE.lg,
-      },
       multiline: {
         false: "items-center",
-        true: "items-start h-auto",
+        true: "items-start",
       },
       appearance: {
-        default: "rounded-[4px] border bg-white",
-        underline: "rounded-none border-0 border-b-2 bg-transparent",
-      },
-      state: {
         default: "",
-        focused: "",
-        error: "",
-        disabled: "",
-        readonly: "",
+        underline: "bg-transparent",
       },
+      /** @deprecated Inert — sizing is applied inline. */
+      size: INERT_SIZE,
+      /** @deprecated Inert — state colours are applied inline. */
+      state: INERT_STATE,
     },
-    compoundVariants: [
-      { multiline: false, size: "sm", className: COMPONENT_HEIGHT.sm },
-      { multiline: false, size: "md", className: COMPONENT_HEIGHT.md },
-      { multiline: false, size: "lg", className: COMPONENT_HEIGHT.lg },
-
-      { appearance: "default", state: "default", className: "border-gray-400 hover:border-gray-500 hover:shadow-sm" },
-      { appearance: "default", state: "focused", className: "border-gray-500 ring-1 ring-gray-200" },
-      { appearance: "default", state: "error", className: "border-red-500" },
-      {
-        appearance: "default",
-        state: "disabled",
-        className: "bg-gray-50 border-gray-300 text-gray-400 cursor-not-allowed opacity-60",
-      },
-      {
-        appearance: "default",
-        state: "readonly",
-        className: "bg-gray-50 border-gray-300 text-gray-700 cursor-default",
-      },
-
-      { appearance: "underline", state: "default", className: "border-b-gray-300 hover:border-b-gray-400" },
-      { appearance: "underline", state: "focused", className: "border-b-gray-900" },
-      { appearance: "underline", state: "error", className: "border-b-red-500" },
-      {
-        appearance: "underline",
-        state: "disabled",
-        className: "border-b-gray-200 text-gray-400 cursor-not-allowed opacity-60",
-      },
-      {
-        appearance: "underline",
-        state: "readonly",
-        className: "border-b-gray-200 text-gray-700 cursor-default",
-      },
-    ],
-    defaultVariants: {
-      size: "md",
-      multiline: false,
-      state: "default",
-      appearance: "default",
-    },
+    defaultVariants: { multiline: false, appearance: "default" },
   },
 );
 
 export const inputFieldVariants = cva(
-  `h-full w-full bg-transparent border-0 shadow-none outline-none text-inherit placeholder:text-[#C4C9D2] disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-0 focus-visible:border-transparent focus-visible:outline-none`,
+  "w-full min-w-0 flex-1 border-0 bg-transparent p-0 shadow-none outline-none focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-100",
   {
     variants: {
-      size: {
-        sm: `px-2.5 ${PLACEHOLDER_SIZE.sm}`,
-        md: `px-3 ${PLACEHOLDER_SIZE.md}`,
-        lg: `px-3.5 ${PLACEHOLDER_SIZE.lg}`,
-      },
       multiline: {
-        false: "py-0",
-        true: "py-2",
+        false: "h-full",
+        true: "block",
       },
-      appearance: {
-        default: "",
-        underline: "",
+      align: {
+        left: "text-left",
+        right: "text-right",
       },
-      hasLeftIcon: {
-        true: "",
-        false: "",
-      },
-      hasRightIcon: {
-        true: "",
-        false: "",
-      },
+      /** @deprecated Inert — sizing is applied inline. */
+      size: INERT_SIZE,
+      /** @deprecated Inert — the field no longer carries appearance classes. */
+      appearance: { default: "", underline: "" },
+      /** @deprecated Inert — affixes are laid out with flexbox, not padding. */
+      hasLeftIcon: { true: "", false: "" },
+      /** @deprecated Inert — affixes are laid out with flexbox, not padding. */
+      hasRightIcon: { true: "", false: "" },
     },
-    compoundVariants: [
-      { size: "sm", hasLeftIcon: true, className: "pl-8" },
-      { size: "md", hasLeftIcon: true, className: "pl-9" },
-      { size: "lg", hasLeftIcon: true, className: "pl-10" },
-      { size: "sm", hasRightIcon: true, className: "pr-8" },
-      { size: "md", hasRightIcon: true, className: "pr-9" },
-      { size: "lg", hasRightIcon: true, className: "pr-10" },
-      { appearance: "underline", hasLeftIcon: false, className: "pl-0" },
-      { appearance: "underline", hasRightIcon: false, className: "pr-0" },
-    ],
-    defaultVariants: {
-      size: "md",
-      multiline: false,
-      appearance: "default",
-      hasLeftIcon: false,
-      hasRightIcon: false,
-    },
+    defaultVariants: { multiline: false, align: "left" },
   },
 );
 
@@ -122,31 +305,22 @@ export const RESIZE_CLASS: Record<"none" | "vertical" | "horizontal" | "both", s
   both: "resize",
 };
 
-export const inputIconSlotVariants = cva(
-  "absolute inset-y-0 flex text-gray-400",
-  {
-    variants: {
-      size: {
-        sm: "px-2.5 [&_svg]:size-3.5",
-        md: "px-3 [&_svg]:size-4",
-        lg: "px-3.5 [&_svg]:size-5",
-      },
-      side: {
-        left: "left-0",
-        right: "right-0",
-      },
-      multiline: {
-        false: "items-center",
-        true: "items-start pt-2",
-      },
-    },
-    defaultVariants: {
-      size: "md",
-      side: "left",
-      multiline: false,
-    },
+/**
+ * Retained for backward compatibility — the control now lays affixes out with
+ * flexbox rather than absolute positioning, so nothing internal uses this.
+ *
+ * @deprecated Affixes are laid out inline; this will be removed in a future major.
+ */
+export const inputIconSlotVariants = cva("absolute inset-y-0 flex items-center", {
+  variants: {
+    side: { left: "left-0", right: "right-0" },
+    /** @deprecated Inert — kept so existing calls keep type-checking. */
+    size: INERT_SIZE,
+    /** @deprecated Inert — kept so existing calls keep type-checking. */
+    multiline: { true: "", false: "" },
   },
-);
+  defaultVariants: { side: "left" },
+});
 
 export type InputWrapperVariants = VariantProps<typeof inputWrapperVariants>;
 export type InputFieldVariants = VariantProps<typeof inputFieldVariants>;

@@ -339,8 +339,15 @@ type TabTriggerVariants = VariantProps<typeof tabTriggerVariants>;
 
 type InputType = "text" | "email" | "password" | "number" | "tel" | "url" | "search";
 type AllowPattern = "alphanumeric" | "alpha" | "numeric" | "decimal" | "phone" | "none";
-interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "width" | "height" | "onChange"> {
-    size?: "sm" | "md" | "lg";
+/** 28 / 32 / 40 / 48px. `xs` is for inline table editing, `lg` for standalone forms and mobile. */
+type InputSize = "xs" | "sm" | "md" | "lg";
+/**
+ * Non-error validation states. `error` still wins over any of these — a field
+ * that is both `status="success"` and in error renders as an error.
+ */
+type InputStatus = "validating" | "success" | "warning";
+interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "width" | "height" | "onChange" | "prefix"> {
+    size?: InputSize;
     /**
      * `"default"` renders the usual bordered box. `"underline"` drops the box
      * entirely — transparent background, no side/top border, just a bottom
@@ -356,6 +363,50 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
     error?: string;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
+    /**
+     * Async/advisory state that is not an error:
+     * - `"validating"` — a check is in flight; renders a spinner and keeps the
+     *   focus border without the halo.
+     * - `"success"` — green border and tick, distinct from merely "no error".
+     * - `"warning"` — amber fill, advisory but not blocking.
+     *
+     * Pair with `statusMessage` to explain it. Ignored while `error` is set.
+     */
+    status?: InputStatus;
+    /** Message shown under the control for the active `status`. Falls back to `helperText`. */
+    statusMessage?: string;
+    /**
+     * Rendered inside the box, ahead of the value, on a subtle fill separated by
+     * a hairline (e.g. `"₹"`, `"+91"`). Unlike `leftIcon` it is a boxed affix,
+     * not a glyph floating on the field background.
+     */
+    prefix?: React.ReactNode;
+    /** Trailing counterpart to `prefix` (e.g. `"INR"`, `".00"`). */
+    suffix?: React.ReactNode;
+    /**
+     * The value is still being fetched. Renders a muted box with a spinner and
+     * blocks interaction, without marking the field disabled for the form.
+     */
+    loading?: boolean;
+    /**
+     * Show a `count/maxLength` counter. Defaults to `true` whenever `maxLength`
+     * is set. The counter turns amber once the value passes ~83% of the limit.
+     */
+    showCount?: boolean;
+    /** Right-aligns the value — for amounts and other numerics. */
+    align?: "left" | "right";
+    /**
+     * Keep the message row in the layout even when there is nothing to say, so a
+     * late validation error never shifts the form. Off by default — turning it on
+     * adds roughly one line of height under the control.
+     */
+    reserveMessageSpace?: boolean;
+    /**
+     * Style overrides merged onto the control box itself (the bordered element),
+     * not the `<input>`. Use for composition — e.g. squaring off one side so a
+     * button can attach flush to the field. `style` still lands on the `<input>`.
+     */
+    boxStyle?: React.CSSProperties;
     /**
      * Tailwind width class(es) applied to the outer wrapper. Use any responsive
      * utility (e.g. `"w-full md:w-96 lg:w-[400px]"`). Defaults to `w-full` when
@@ -378,7 +429,7 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
     }>;
     /** Fires when the user picks a suggestion. Receives the item's `value` field. */
     onSuggestionSelect?: (value: string) => void;
-    /** Shows an X button to clear the input value. Turns red on hover. */
+    /** Shows an X button to clear the input value. */
     clearable?: boolean;
     /** Fires when the clear button is clicked. */
     onClear?: () => void;
@@ -394,54 +445,89 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
 interface CustomInputComposedProps extends CustomInputProps {
     required?: boolean;
 }
-declare function Input({ size, variant, inputType, allowPattern, label, helperText, error, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, multiline, rows, resize, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
+declare function Input({ size, variant, inputType, allowPattern, label, helperText, error, status, statusMessage, prefix, suffix, loading, showCount, align, boxStyle, reserveMessageSpace, leftIcon, rightIcon, required, width, className, disabled, readOnly, validationRegex, validationMessage, onTouch, spellCheck, id, onChange, onFocus, onBlur, suggestions, onSuggestionSelect, clearable, onClear, multiline, rows, resize, ...rest }: CustomInputComposedProps): react_jsx_runtime.JSX.Element;
 declare namespace Input {
     var displayName: string;
 }
 
-type InputLabelSize = "sm" | "md" | "lg";
+type InputLabelSize = InputSize;
 interface InputLabelProps extends React.ComponentProps<typeof Label> {
     size?: InputLabelSize;
     required?: boolean;
+    /**
+     * Overrides the label colour for a signalling state (error / disabled). Left
+     * undefined the colour comes from a class, so a caller's `className` can
+     * still override it.
+     */
+    tone?: string;
 }
-declare function InputLabel({ size, required, className, children, ...props }: InputLabelProps): react_jsx_runtime.JSX.Element;
+/** Figtree 600 / 12px, Title Case, red asterisk when required. */
+declare function InputLabel({ size, required, tone, className, style, children, ...props }: InputLabelProps): react_jsx_runtime.JSX.Element;
 declare namespace InputLabel {
     var displayName: string;
 }
 
-type InputHelperSize = "sm" | "md" | "lg";
-interface InputHelperProps extends React.HTMLAttributes<HTMLParagraphElement> {
-    size?: InputHelperSize;
-    helperText?: string;
-    error?: string;
-}
-declare function InputHelper({ size, helperText, error, className, ...props }: InputHelperProps): react_jsx_runtime.JSX.Element | null;
-declare namespace InputHelper {
-    var displayName: string;
-}
-
+/**
+ * Resolved visual state of the control. Ordering is deliberate — `disabled`
+ * and `readOnly` outrank validation, and an `error` outranks a `status`.
+ */
+type InputVisualState = "default" | "hover" | "focused" | "error" | "success" | "warning" | "validating" | "loading" | "readonly" | "disabled";
+/**
+ * Structural classes only — the pixel metrics and colours ride on inline
+ * styles. `underline` keeps its historic box-less treatment.
+ */
 declare const inputWrapperVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
     multiline?: boolean | null | undefined;
     appearance?: "default" | "underline" | null | undefined;
-    state?: "default" | "disabled" | "focused" | "error" | "readonly" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
+    state?: "default" | "disabled" | "hover" | "focused" | "loading" | "validating" | "success" | "warning" | "error" | "readonly" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const inputFieldVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
     multiline?: boolean | null | undefined;
+    align?: "left" | "right" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
     appearance?: "default" | "underline" | null | undefined;
     hasLeftIcon?: boolean | null | undefined;
     hasRightIcon?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
+/**
+ * Retained for backward compatibility — the control now lays affixes out with
+ * flexbox rather than absolute positioning, so nothing internal uses this.
+ *
+ * @deprecated Affixes are laid out inline; this will be removed in a future major.
+ */
 declare const inputIconSlotVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
     side?: "left" | "right" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
     multiline?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type InputWrapperVariants = VariantProps<typeof inputWrapperVariants>;
 type InputFieldVariants = VariantProps<typeof inputFieldVariants>;
 type InputIconSlotVariants = VariantProps<typeof inputIconSlotVariants>;
 declare const PATTERN_REGEX: Record<AllowPattern, string>;
+
+type InputHelperSize = InputSize;
+interface InputHelperProps extends React.HTMLAttributes<HTMLParagraphElement> {
+    size?: InputHelperSize;
+    helperText?: string;
+    error?: string;
+    /** Resolved control state — drives the message colour. */
+    state?: InputVisualState;
+    /**
+     * Keep the row in the layout even with nothing to say, so validation never
+     * shifts the form. The field enables this only for fields that can actually
+     * produce a message.
+     */
+    reserveSpace?: boolean;
+}
+/**
+ * The message row. Validation always pairs a colour with a message and an
+ * icon; advisory statuses carry the colour alone.
+ */
+declare function InputHelper({ size, helperText, error, state, reserveSpace, className, style, ...props }: InputHelperProps): react_jsx_runtime.JSX.Element | null;
+declare namespace InputHelper {
+    var displayName: string;
+}
 
 type Size = "sm" | "md" | "lg";
 interface CustomRadioItemProps extends Omit<React.ComponentProps<typeof RadioGroup$1.Item>, "children"> {
@@ -734,7 +820,7 @@ declare const tableBodyRowVariants: (props?: ({
     hover?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const statusBadgeVariants: (props?: ({
-    variant?: "error" | "success" | "warning" | null | undefined;
+    variant?: "success" | "warning" | "error" | null | undefined;
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type TableWrapperVariants = VariantProps<typeof tableWrapperVariants>;
@@ -873,7 +959,7 @@ declare const sidebarPersistentVariants: (props?: ({
 type SidebarContentVariants = VariantProps<typeof sidebarContentVariants>;
 
 declare const iconBadgeVariants: (props?: ({
-    variant?: "error" | "success" | "warning" | "info" | "question" | null | undefined;
+    variant?: "success" | "warning" | "error" | "info" | "question" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 
 /** Badge colour variants exposed to consumers (question is icon-only, not a colour override). */
@@ -1549,7 +1635,7 @@ declare const avatarContainerVariants: (props?: ({
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 
 declare const chipVariants: (props?: ({
-    variant?: "error" | "success" | "warning" | "info" | "common" | null | undefined;
+    variant?: "success" | "warning" | "error" | "info" | "common" | null | undefined;
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type ChipVariants = VariantProps<typeof chipVariants>;
