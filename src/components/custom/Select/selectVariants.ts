@@ -1,46 +1,122 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { COMPONENT_HEIGHT, TEXT_SIZE, PLACEHOLDER_SIZE } from "@/utils/tokens";
+import {
+  INPUT_COLORS,
+  INPUT_TRANSITION,
+  getInputBoxStyle,
+  type InputVisualState,
+} from "@/components/custom/Input/inputVariants";
 
 export type TriggerState = "default" | "open" | "disabled" | "readonly";
 export type TriggerSize = "xs" | "sm" | "md" | "lg";
 
+/**
+ * Pixel spec from the Select design page ("Size scale"). Trigger heights match
+ * Input exactly — 28 / 32 / 40 / 48 — so a select and a field can sit in the
+ * same row. Radius is 8 at every size (unlike Input, whose XS tightens to 6).
+ */
+export const SELECT_SIZES: Record<
+  TriggerSize,
+  {
+    /** Trigger height in px. */
+    height: number;
+    /** Leading padding in px (before the value or leftIcon). */
+    padLeft: number;
+    /** Trailing padding in px (after the chevron). */
+    padRight: number;
+    /** Vertical padding when chips wrap the trigger onto its own box. */
+    padMultiY: number;
+    /** Value font size in px. */
+    font: number;
+    /** Chevron / affix glyph size in px. */
+    icon: number;
+    /** Menu option row height in px. */
+    option: number;
+    radius: number;
+    label: number;
+  }
+> = {
+  xs: { height: 28, padLeft: 9, padRight: 8, padMultiY: 3, font: 12, icon: 13, option: 28, radius: 8, label: 11 },
+  sm: { height: 32, padLeft: 11, padRight: 9, padMultiY: 4, font: 12, icon: 14, option: 30, radius: 8, label: 12 },
+  md: { height: 40, padLeft: 13, padRight: 11, padMultiY: 6, font: 13, icon: 15, option: 34, radius: 8, label: 12 },
+  lg: { height: 48, padLeft: 15, padRight: 13, padMultiY: 8, font: 14, icon: 17, option: 38, radius: 8, label: 13 },
+};
+
+/** Gap between the value and its adornments. Matches Input. */
+export const SELECT_GAP = 9;
+
+/** Menu shell + row tokens, straight off the design's "Anatomy" notes. */
+export const MENU = {
+  /** 4px inset padding around the option list. */
+  padding: 4,
+  radius: 8,
+  optionRadius: 6,
+  border: `1px solid ${INPUT_COLORS.border}`,
+  background: INPUT_COLORS.surface,
+  shadow: "2px 2px 4px rgba(0,0,0,.12)",
+  /** Menu fades and lifts 4px, 140ms ease-out. */
+  motion: "140ms ease-out",
+  /** Hover wash on an option row. */
+  optionHover: "#FAFFF7",
+  /** Selected row: mint fill with a check, never a blue bar. */
+  selectedBg: "#DCF3CE",
+  selectedInk: "#003C1B",
+  /** A checked row in a multi select gets the lighter wash, not the mint fill. */
+  multiSelectedBg: "#FAFFF7",
+  checkboxOn: "#003C1B",
+  checkboxOff: INPUT_COLORS.borderHover,
+  /** Group eyebrow + the hairline that separates groups. */
+  groupInk: INPUT_COLORS.message,
+  groupRule: "#EEEEEE",
+  metaInk: INPUT_COLORS.message,
+  /** Long lists cap at 8 rows and scroll. */
+  maxRows: 8,
+} as const;
+
+export { INPUT_COLORS as SELECT_COLORS, INPUT_TRANSITION as SELECT_TRANSITION };
+
+/**
+ * The trigger mirrors Input's state model so a form reads as one surface.
+ * `open` renders exactly like `focused` — forest border plus the lime halo.
+ */
+export type SelectVisualState = InputVisualState | "open";
+
+export function getTriggerStyle(state: SelectVisualState) {
+  return getInputBoxStyle(state === "open" ? "focused" : state);
+}
+
+/**
+ * Structural classes for the trigger. Metrics and colours ride on inline
+ * styles, so the control keeps its exact look in apps whose Tailwind build does
+ * not scan this package.
+ *
+ * The `state` and `size` variant keys are preserved from the pre-refresh API —
+ * existing calls such as `triggerVariants({ state: "open", size: "md" })` keep
+ * type-checking, they simply no longer carry the colours.
+ */
 export const triggerVariants = cva(
   [
     "flex min-w-0 items-center justify-between",
-    "rounded-[4px] border border-gray-400 bg-white",
-    "transition-colors duration-150 cursor-pointer select-none",
+    "cursor-pointer select-none",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
   ].join(" "),
   {
     variants: {
       state: {
-        default: [
-          "text-[#374151]",
-          "hover:border-gray-500 hover:text-[#111827] hover:shadow-sm",
-        ].join(" "),
-        open: ["border-gray-500 text-[#111827]", "ring-1 ring-gray-200"].join(
-          " ",
-        ),
-        disabled: [
-          "border-gray-300 text-gray-400",
-          "opacity-50 pointer-events-none",
-        ].join(" "),
-        readonly: [
-          "bg-gray-50 border-gray-300 text-gray-700",
-          "cursor-default pointer-events-none",
-        ].join(" "),
+        default: "",
+        open: "",
+        disabled: "pointer-events-none",
+        readonly: "cursor-default pointer-events-none",
+        hover: "",
+        focused: "",
+        error: "",
+        success: "",
+        warning: "",
+        validating: "",
+        loading: "pointer-events-none",
       },
-      size: {
-        xs: `h-6 gap-1 px-1.5 ${TEXT_SIZE.xs} ${PLACEHOLDER_SIZE.xs}`,
-        sm: `${COMPONENT_HEIGHT.sm} gap-1 px-2 ${TEXT_SIZE.sm} ${PLACEHOLDER_SIZE.sm}`,
-        md: `${COMPONENT_HEIGHT.md} gap-1.5 px-3 ${TEXT_SIZE.md} ${PLACEHOLDER_SIZE.md}`,
-        lg: `${COMPONENT_HEIGHT.lg} gap-2 px-3.5 ${TEXT_SIZE.lg} ${PLACEHOLDER_SIZE.lg}`,
-      },
+      size: { xs: "", sm: "", md: "", lg: "" },
     },
-    defaultVariants: {
-      state: "default",
-      size: "md",
-    },
+    defaultVariants: { state: "default", size: "md" },
   },
 );
 

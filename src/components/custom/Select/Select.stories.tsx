@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Popover + command-menu backed select. Supports `single` and `multi` modes, a built-in search, and either pre-shaped `options` or structured `items` + `getLabel` / `getValue`. In multi mode, selections render as overflow-aware pills. Pass `sorting` to enable an A→Z / Z→A toggle icon on the trigger.",
+          "Popover + command-menu backed select, built to the uEngage Select design spec. The trigger borrows the Input box exactly — same 28 / 32 / 40 / 48 heights, hairline and focus ring — so a select and a field can sit in the same row; only the trailing chevron marks it as a select. Supports `single` and `multi` modes, grouped options, rich rows with `meta` / `description` / `icon`, a built-in search, async `loading` shimmer rows, a `creatable` row, a custom `emptyState`, and either pre-shaped `options` or structured `items` + `getLabel` / `getValue`.",
       },
     },
   },
@@ -30,7 +30,20 @@ const meta = {
     sorting: { control: "boolean" },
     indexing: { control: "boolean" },
     search: { control: "boolean" },
+    status: {
+      control: "select",
+      options: [undefined, "success", "warning"],
+      description: "Non-error validation state. Ignored while `error` is set.",
+    },
+    statusMessage: { control: "text" },
+    loading: { control: "boolean", description: "Shimmer rows in the menu, spinner on the trigger." },
+    clearable: { control: "boolean" },
+    maxChips: { control: "number", description: "Hard cap on chips before a +N counter." },
+    creatable: { control: "boolean" },
+    placement: { control: "radio", options: ["auto", "top", "bottom"] },
     onChange: { action: "changed" },
+    onCreate: { action: "created" },
+    onSearch: { action: "searched" },
   },
   args: {
     mode: "single",
@@ -239,4 +252,164 @@ export const SizeMd: Story = {
 export const SizeLg: Story = {
   name: "size=lg",
   args: { mode: "single", size: "lg", options: CITY_OPTIONS, placeholder: "lg" },
+};
+
+/* ── Design refresh ─────────────────────────────────────────── */
+
+const CHANNELS: SelectOption[] = [
+  { value: "zomato", label: "Zomato", meta: "412 items", group: "Aggregators" },
+  { value: "swiggy", label: "Swiggy", meta: "388 items", group: "Aggregators" },
+  { value: "ondc", label: "ONDC", meta: "412 items", group: "Aggregators" },
+  { value: "website", label: "Website", meta: "412 items", group: "Direct" },
+  { value: "dinein", label: "Dine-in", meta: "96 items", group: "Direct" },
+];
+
+/** Uppercase eyebrows, a hairline between groups, and the header pins while scrolling. */
+export const Grouped: Story = {
+  args: {
+    label: "Channel",
+    options: CHANNELS,
+    placeholder: "Pick a channel…",
+    helperText: "Grouped by fulfilment type.",
+  },
+};
+
+/** Rich rows: leading glyph, a description line, and trailing meta. */
+export const RichRows: Story = {
+  args: {
+    label: "Outlet",
+    placeholder: "Select an outlet…",
+    options: [
+      { value: "s17", label: "Sector 17 Flagship", description: "Chandigarh", meta: "412 items" },
+      { value: "elante", label: "Elante Mall", description: "Chandigarh", meta: "388 items" },
+      { value: "s35", label: "Sector 35 Express", description: "Chandigarh", meta: "210 items" },
+      { value: "pkl", label: "Panchkula Hub", description: "Panchkula", meta: "174 items" },
+    ],
+  },
+};
+
+/** A disabled option always says why it is disabled. */
+export const DisabledOptionWithReason: Story = {
+  args: {
+    label: "Dine-in Layout",
+    placeholder: "Select a layout…",
+    options: [
+      { value: "grid", label: "Grid" },
+      { value: "floor", label: "Floor plan", disabled: true, description: "Requires the Dine-in module" },
+      { value: "list", label: "List" },
+    ],
+  },
+};
+
+/** Options are being fetched — shimmer rows, never a centred spinner. */
+export const Loading: Story = {
+  args: { label: "Outlet", loading: true, options: [], helperText: "Options are being fetched." },
+};
+
+export const Success: Story = {
+  args: {
+    label: "GST State Code",
+    options: [{ value: "03", label: "Punjab (03)" }],
+    defaultValue: "03",
+    status: "success",
+    statusMessage: "Matches the GSTIN on file.",
+  },
+};
+
+export const Warning: Story = {
+  args: {
+    label: "Payout Cycle",
+    options: [
+      { value: "m", label: "Monthly" },
+      { value: "w", label: "Weekly" },
+    ],
+    defaultValue: "m",
+    status: "warning",
+    statusMessage: "Weekly is recommended above ₹5L GMV.",
+  },
+};
+
+/** An empty menu always offers the way out. */
+export const EmptyWithCallToAction: Story = {
+  args: {
+    label: "Outlet",
+    options: [],
+    placeholder: "Select an outlet…",
+    emptyState: (
+      <span>
+        <b>Add your first outlet</b> to pick a fulfilment mode for it.
+      </span>
+    ),
+  },
+};
+
+/** Pinned last, quoted with what the user typed. */
+export const Creatable: Story = {
+  args: {
+    label: "Menu name",
+    options: [
+      { value: "breakfast", label: "Breakfast" },
+      { value: "lunch", label: "Lunch" },
+    ],
+    creatable: true,
+    placeholder: "Search or create…",
+    helperText: "Type something that does not exist to see the create row.",
+  },
+};
+
+/** Two chips then a counter — the trigger stays one line. */
+export const MultiWithChipCap: Story = {
+  args: {
+    label: "Channels",
+    mode: "multi",
+    options: CHANNELS,
+    defaultValue: ["zomato", "swiggy", "ondc", "website"],
+    maxChips: 2,
+    clearable: true,
+    helperText: "maxChips={2}.",
+  },
+};
+
+/** Flips above the trigger when there is no room below. */
+export const OpensUpward: Story = {
+  args: { label: "Fulfilment Mode", options: CHANNELS, placement: "top" },
+};
+
+export const WithLeftIcon: Story = {
+  args: {
+    label: "Fulfilment Mode",
+    options: CHANNELS,
+    leftIcon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+        <path d="M5 18V7l7-4 7 4v11" />
+        <path d="M3 18h18" />
+      </svg>
+    ),
+  },
+};
+
+/** Trigger heights match Input exactly so the two can share a row. */
+export const SizeScale: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="flex w-[420px] flex-col gap-4">
+      {(
+        [
+          ["xs", "28 · r8 · 12px · opt 28"],
+          ["sm", "32 · r8 · 12px · opt 30"],
+          ["md", "40 · r8 · 13px · opt 34"],
+          ["lg", "48 · r8 · 14px · opt 38"],
+        ] as const
+      ).map(([size, spec]) => (
+        <Select
+          key={size}
+          size={size}
+          label={size.toUpperCase()}
+          options={CHANNELS}
+          defaultValue="zomato"
+          helperText={spec}
+        />
+      ))}
+    </div>
+  ),
 };
