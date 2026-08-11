@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
 import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Separator$1, Dialog, Slot, Popover as Popover$1, RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Accordion as Accordion$1, Collapsible, Tabs as Tabs$1 } from 'radix-ui';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { X, Search, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, Lock, ChevronDown, Plus, EyeOff, Eye, Minus, ChevronLeft, ChevronRight, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, File, Video, Play, Clock, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
+import { X, Search, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, Lock, ChevronDown, Plus, EyeOff, Eye, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, File, Video, Play, Clock, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
@@ -1826,8 +1826,34 @@ var MENU = {
   groupRule: "#EEEEEE",
   metaInk: INPUT_COLORS.message,
   /** Long lists cap at 8 rows and scroll. */
-  maxRows: 8
+  maxRows: 8,
+  /** Thin green scrollbar on the option list — never the system default. */
+  scrollThumb: "#16914E",
+  scrollThumbHover: "#A8D5B5",
+  scrollWidth: 4
 };
+var MENU_SCROLLBAR_CSS = `
+[data-slot="select-menu-list"] {
+  scrollbar-width: thin;
+  scrollbar-color: ${MENU.scrollThumb} transparent;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar {
+  width: ${MENU.scrollWidth}px;
+  height: ${MENU.scrollWidth}px;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: ${MENU.padding}px;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-thumb {
+  background-color: ${MENU.scrollThumb};
+  border-radius: 9999px;
+  transition: background-color 160ms ease;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-thumb:hover {
+  background-color: ${MENU.scrollThumbHover};
+}
+`;
 function getTriggerStyle(state) {
   return getInputBoxStyle(state === "open" ? "focused" : state);
 }
@@ -2368,7 +2394,7 @@ function Select({
           className: "max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
           collisionPadding: { top: 64 },
           style: { width: "var(--radix-popover-trigger-width)" },
-          children: /* @__PURE__ */ jsx(
+          children: /* @__PURE__ */ jsxs(
             "div",
             {
               style: {
@@ -2378,133 +2404,137 @@ function Select({
                 background: MENU.background,
                 boxShadow: MENU.shadow
               },
-              children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
-                searchEnabled && !loading && /* @__PURE__ */ jsx(
-                  CommandInput,
-                  {
-                    placeholder: "Search...",
-                    value: searchQuery,
-                    onValueChange: handleSearchChange,
-                    spellCheck,
-                    style: { fontSize: spec.font }
-                  }
-                ),
-                resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
-                  "div",
-                  {
-                    className: "sticky top-0 z-10 flex items-center justify-between",
-                    style: {
-                      padding: "6px 10px",
-                      background: MENU.background,
-                      borderBottom: `1px solid ${MENU.groupRule}`,
-                      fontSize: spec.font - 2,
-                      color: INPUT_COLORS.message
-                    },
-                    children: [
-                      /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
-                        selectedArr.length,
-                        " selected"
-                      ] }),
-                      /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
-                        /* @__PURE__ */ jsx(
-                          "button",
+              children: [
+                /* @__PURE__ */ jsx("style", { children: MENU_SCROLLBAR_CSS }),
+                /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
+                  searchEnabled && !loading && /* @__PURE__ */ jsx(
+                    CommandInput,
+                    {
+                      placeholder: "Search...",
+                      value: searchQuery,
+                      onValueChange: handleSearchChange,
+                      spellCheck,
+                      style: { fontSize: spec.font }
+                    }
+                  ),
+                  resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
+                    "div",
+                    {
+                      className: "sticky top-0 z-10 flex items-center justify-between",
+                      style: {
+                        padding: "6px 10px",
+                        background: MENU.background,
+                        borderBottom: `1px solid ${MENU.groupRule}`,
+                        fontSize: spec.font - 2,
+                        color: INPUT_COLORS.message
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
+                          selectedArr.length,
+                          " selected"
+                        ] }),
+                        /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
+                          /* @__PURE__ */ jsx(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: () => commit(enabledOptions.map((o) => o.value)),
+                              disabled: allSelected,
+                              className: "font-semibold disabled:opacity-40",
+                              style: { color: MENU.selectedInk },
+                              children: "All"
+                            }
+                          ),
+                          /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
+                          /* @__PURE__ */ jsx(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: () => commit([]),
+                              disabled: selectedArr.length === 0,
+                              className: "font-semibold disabled:opacity-40",
+                              style: { color: INPUT_COLORS.message },
+                              children: "None"
+                            }
+                          )
+                        ] })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsx(
+                    CommandList,
+                    {
+                      ref: listRef,
+                      "data-slot": "select-menu-list",
+                      style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
+                      children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                        groups.map((group, gi) => /* @__PURE__ */ jsxs(
+                          "div",
                           {
-                            type: "button",
-                            onClick: () => commit(enabledOptions.map((o) => o.value)),
-                            disabled: allSelected,
-                            className: "font-semibold disabled:opacity-40",
-                            style: { color: MENU.selectedInk },
-                            children: "All"
+                            style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
+                            children: [
+                              group.name && /* @__PURE__ */ jsx(
+                                "div",
+                                {
+                                  className: "sticky top-0 z-[5] font-semibold uppercase",
+                                  style: {
+                                    padding: "6px 10px 4px",
+                                    background: MENU.background,
+                                    fontSize: 10,
+                                    letterSpacing: "0.09em",
+                                    color: MENU.groupInk
+                                  },
+                                  children: group.name
+                                }
+                              ),
+                              group.options.map(renderOption)
+                            ]
+                          },
+                          group.name ?? `__ungrouped_${gi}`
+                        )),
+                        showCreate && /* @__PURE__ */ jsxs(
+                          CommandItem,
+                          {
+                            value: CREATE_VALUE,
+                            onSelect: () => {
+                              onCreate?.(query);
+                              setOpen(false);
+                            },
+                            className: "cursor-pointer",
+                            style: {
+                              minHeight: spec.option,
+                              gap: SELECT_GAP,
+                              padding: "0 10px",
+                              marginTop: 4,
+                              borderTop: `1px solid ${MENU.groupRule}`,
+                              borderRadius: MENU.optionRadius,
+                              fontSize: spec.font,
+                              fontWeight: 600,
+                              color: MENU.selectedInk
+                            },
+                            children: [
+                              /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
+                              /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
+                                "Create \u201C",
+                                query,
+                                "\u201D"
+                              ] })
+                            ]
                           }
                         ),
-                        /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
-                        /* @__PURE__ */ jsx(
-                          "button",
+                        showEmpty && /* @__PURE__ */ jsx(
+                          "div",
                           {
-                            type: "button",
-                            onClick: () => commit([]),
-                            disabled: selectedArr.length === 0,
-                            className: "font-semibold disabled:opacity-40",
-                            style: { color: INPUT_COLORS.message },
-                            children: "None"
+                            className: "flex flex-col items-start gap-1",
+                            style: { padding: "14px 10px", fontSize: spec.font },
+                            children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
                           }
                         )
                       ] })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsx(
-                  CommandList,
-                  {
-                    ref: listRef,
-                    style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
-                    children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-                      groups.map((group, gi) => /* @__PURE__ */ jsxs(
-                        "div",
-                        {
-                          style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
-                          children: [
-                            group.name && /* @__PURE__ */ jsx(
-                              "div",
-                              {
-                                className: "sticky top-0 z-[5] font-semibold uppercase",
-                                style: {
-                                  padding: "6px 10px 4px",
-                                  background: MENU.background,
-                                  fontSize: 10,
-                                  letterSpacing: "0.09em",
-                                  color: MENU.groupInk
-                                },
-                                children: group.name
-                              }
-                            ),
-                            group.options.map(renderOption)
-                          ]
-                        },
-                        group.name ?? `__ungrouped_${gi}`
-                      )),
-                      showCreate && /* @__PURE__ */ jsxs(
-                        CommandItem,
-                        {
-                          value: CREATE_VALUE,
-                          onSelect: () => {
-                            onCreate?.(query);
-                            setOpen(false);
-                          },
-                          className: "cursor-pointer",
-                          style: {
-                            minHeight: spec.option,
-                            gap: SELECT_GAP,
-                            padding: "0 10px",
-                            marginTop: 4,
-                            borderTop: `1px solid ${MENU.groupRule}`,
-                            borderRadius: MENU.optionRadius,
-                            fontSize: spec.font,
-                            fontWeight: 600,
-                            color: MENU.selectedInk
-                          },
-                          children: [
-                            /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
-                            /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
-                              "Create \u201C",
-                              query,
-                              "\u201D"
-                            ] })
-                          ]
-                        }
-                      ),
-                      showEmpty && /* @__PURE__ */ jsx(
-                        "div",
-                        {
-                          className: "flex flex-col items-start gap-1",
-                          style: { padding: "14px 10px", fontSize: spec.font },
-                          children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
-                        }
-                      )
-                    ] })
-                  }
-                )
-              ] })
+                    }
+                  )
+                ] })
+              ]
             }
           )
         }
@@ -2594,16 +2624,7 @@ function TabsTrigger({
 
 // src/utils/tokens.ts
 var FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006F42]";
-var COMPONENT_HEIGHT = {
-  sm: "h-8",
-  md: "h-10",
-  lg: "h-12"
-};
-var TEXT_SIZE = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base"
-};
+var SELECTION_FOCUS_RING = "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,0.38)]";
 var tabTriggerVariants = cva(
   [
     "relative flex items-center gap-2 cursor-pointer select-none whitespace-nowrap",
@@ -3708,18 +3729,31 @@ function Input2({
 }
 Input2.displayName = "Input";
 var radioCircleVariants = cva(
-  `aspect-square shrink-0 rounded-full border-2 bg-white transition-colors outline-none ${FOCUS_RING}`,
+  [
+    "relative inline-flex aspect-square shrink-0 items-center justify-center",
+    "rounded-full border-2 bg-transparent outline-none",
+    "transition-colors duration-[120ms] ease-linear",
+    SELECTION_FOCUS_RING
+  ].join(" "),
   {
     variants: {
       size: {
-        sm: "size-3.5",
-        md: "size-[18px]",
-        lg: "size-[22px]"
+        xs: "size-[14px]",
+        sm: "size-[16px]",
+        md: "size-[20px]",
+        lg: "size-[24px]"
       },
       state: {
-        default: "border-gray-300 data-[state=checked]:border-[#007A4D]",
-        disabled: "border-gray-200 opacity-60 cursor-not-allowed",
-        error: "border-red-500"
+        default: [
+          "border-[#C6C6C6] hover:border-[#1F5E2C]",
+          "data-[state=checked]:bg-[#003C1B] data-[state=checked]:border-[#003C1B]",
+          "data-[state=checked]:hover:border-[#003C1B]"
+        ].join(" "),
+        error: "border-[#A8000F] data-[state=checked]:bg-[#A8000F] data-[state=checked]:border-[#A8000F]",
+        disabled: [
+          "bg-[#F3F5F9] border-[#E2E2E2] cursor-not-allowed",
+          "data-[state=checked]:bg-[#C6D6CB] data-[state=checked]:border-[#C6D6CB]"
+        ].join(" ")
       }
     },
     defaultVariants: {
@@ -3728,39 +3762,42 @@ var radioCircleVariants = cva(
     }
   }
 );
-var radioDotVariants = cva(
-  "rounded-full bg-[#007A4D] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-  {
-    variants: {
-      size: {
-        sm: "size-[5px]",
-        md: "size-[7px]",
-        lg: "size-[10px]"
-      }
-    },
-    defaultVariants: {
-      size: "md"
-    }
-  }
-);
-var radioLabelVariants = cva("select-none transition-colors", {
+var radioDotVariants = cva("rounded-full bg-white", {
   variants: {
     size: {
-      sm: "text-xs",
-      md: "text-sm",
-      lg: "text-base"
-    },
-    state: {
-      default: "text-gray-700",
-      checked: "text-gray-900",
-      disabled: "text-gray-400 cursor-not-allowed"
+      xs: "size-[5px]",
+      sm: "size-[6px]",
+      md: "size-[7px]",
+      lg: "size-[9px]"
     }
   },
   defaultVariants: {
-    size: "md",
-    state: "default"
+    size: "md"
   }
 });
+var radioLabelVariants = cva(
+  "select-none transition-colors duration-[120ms] ease-linear",
+  {
+    variants: {
+      size: {
+        xs: "text-[12px]",
+        sm: "text-[12px]",
+        md: "text-[13px]",
+        lg: "text-[14px]"
+      },
+      state: {
+        default: "text-[#202020]",
+        checked: "text-[#202020]",
+        disabled: "text-[#9C9C9C] cursor-not-allowed",
+        error: "text-[#A8000F]"
+      }
+    },
+    defaultVariants: {
+      size: "md",
+      state: "default"
+    }
+  }
+);
 
 // src/utils/labelValidation.ts
 var MAX_LABEL_WORDS = 10;
@@ -3784,14 +3821,22 @@ function validateLabelWordLimit(label, component, max = MAX_LABEL_WORDS) {
   }
 }
 var PILL_PADDING = {
-  sm: "gap-1.5 px-2.5 py-1.5",
-  md: "gap-2 px-3 py-2",
-  lg: "gap-2.5 px-4 py-2.5"
+  xs: "gap-2 px-2 py-1",
+  sm: "gap-2.5 px-2.5 py-1.5",
+  md: "gap-[11px] px-3 py-2",
+  lg: "gap-3 px-4 py-2.5"
 };
 var GAP_ONLY = {
-  sm: "gap-1.5",
-  md: "gap-2",
-  lg: "gap-2.5"
+  xs: "gap-2",
+  sm: "gap-2.5",
+  md: "gap-[11px]",
+  lg: "gap-3"
+};
+var CIRCLE_FIRST_LINE_OFFSET = {
+  xs: "mt-[2px]",
+  sm: "mt-[1px]",
+  md: "mt-0",
+  lg: "mt-0"
 };
 function Radio({
   id,
@@ -3825,7 +3870,7 @@ function Radio({
     return () => observer.disconnect();
   }, []);
   const state = disabled ? "disabled" : error ? "error" : "default";
-  const labelState = disabled ? "disabled" : "default";
+  const labelState = disabled ? "disabled" : error ? "error" : isChecked ? "checked" : "default";
   const effectiveBorderColor = borderColor;
   const effectiveBgColor = bgColor;
   const effectiveTextColor = textColor;
@@ -3840,13 +3885,13 @@ function Radio({
       htmlFor: itemId,
       style: labelStyle,
       className: cn(
-        "group inline-flex cursor-pointer items-center transition-colors",
+        "group inline-flex cursor-pointer items-start transition-colors duration-[120ms] ease-linear",
         hasCustomColors2 ? cn(
-          "rounded-xl border",
+          "rounded-[10px] border",
           PILL_PADDING[size],
-          error ? "border-red-500" : "border-gray-200"
+          error ? "border-[#A8000F]" : "border-[#E2E2E2]"
         ) : GAP_ONLY[size],
-        disabled && "cursor-not-allowed opacity-60",
+        disabled && "cursor-not-allowed",
         readOnly && "pointer-events-none cursor-default",
         className
       ),
@@ -3860,18 +3905,27 @@ function Radio({
             value,
             disabled,
             "data-slot": "radio-group-item",
-            style: isChecked && effectiveBorderColor ? { borderColor: effectiveBorderColor } : void 0,
-            className: cn(radioCircleVariants({ size, state })),
+            style: isChecked && effectiveBorderColor ? {
+              backgroundColor: effectiveBorderColor,
+              borderColor: effectiveBorderColor
+            } : void 0,
+            className: cn(
+              radioCircleVariants({ size, state }),
+              CIRCLE_FIRST_LINE_OFFSET[size]
+            ),
             children: /* @__PURE__ */ jsx(
               RadioGroup$1.Indicator,
               {
+                forceMount: true,
                 "data-slot": "radio-group-indicator",
-                className: "relative flex items-center justify-center",
+                className: cn(
+                  "flex items-center justify-center transition-transform duration-[120ms] ease-linear",
+                  "data-[state=unchecked]:scale-0 data-[state=checked]:scale-100"
+                ),
                 children: /* @__PURE__ */ jsx(
                   "span",
                   {
-                    className: cn(radioDotVariants({ size })),
-                    style: effectiveBorderColor ? { backgroundColor: effectiveBorderColor } : void 0
+                    className: cn(radioDotVariants({ size }), disabled && "bg-white/75")
                   }
                 )
               }
@@ -3885,7 +3939,7 @@ function Radio({
             style: effectiveTextColor && isChecked ? { color: effectiveTextColor } : void 0,
             className: cn(
               radioLabelVariants({ size, state: labelState }),
-              "whitespace-normal break-words"
+              "whitespace-normal break-words leading-[1.5]"
             ),
             children: truncateLabelToWordLimit(label)
           }
@@ -3976,20 +4030,30 @@ function RadioGroup({
 }
 RadioGroup.displayName = "CustomRadioGroup";
 var checkboxBoxVariants = cva(
-  `relative inline-flex shrink-0 items-center justify-center rounded-[4px] border transition-colors outline-none ${FOCUS_RING}`,
+  [
+    "relative inline-flex shrink-0 items-center justify-center border-2 outline-none",
+    "transition-colors duration-[120ms] ease-linear",
+    SELECTION_FOCUS_RING
+  ].join(" "),
   {
     variants: {
       size: {
-        sm: "h-[14px] w-[14px]",
-        md: "h-[20px] w-[20px]",
-        lg: "h-[26px] w-[26px]"
+        xs: "h-[14px] w-[14px] rounded-[4px]",
+        sm: "h-[16px] w-[16px] rounded-[4px]",
+        md: "h-[20px] w-[20px] rounded-[5px]",
+        lg: "h-[24px] w-[24px] rounded-[6px]"
       },
       state: {
-        unchecked: "bg-white border-gray-300",
-        checked: "bg-[#007A4D] border-[#007A4D] text-white",
-        indeterminate: "bg-[#007A4D] border-[#007A4D] text-white",
-        disabled: "bg-gray-100 border-gray-200 opacity-60 cursor-not-allowed",
-        error: "bg-white border-red-500"
+        unchecked: "bg-white border-[#C6C6C6] hover:bg-[#F5FFF0] hover:border-[#1F5E2C]",
+        checked: "bg-[#003C1B] border-[#003C1B] text-white",
+        indeterminate: "bg-[#003C1B] border-[#003C1B] text-white",
+        // Error keeps the box readable in either value: red outline when empty,
+        // red fill once it is ticked.
+        error: "bg-white border-[#A8000F] text-white data-[state=checked]:bg-[#A8000F] data-[state=indeterminate]:bg-[#A8000F]",
+        disabled: "bg-[#F3F5F9] border-[#E2E2E2] cursor-not-allowed",
+        // Disabled-checked keeps the mark at 40% so the operator can still read
+        // what was chosen for them.
+        disabledChecked: "bg-[#C6D6CB] border-[#C6D6CB] text-white/75 cursor-not-allowed"
       }
     },
     defaultVariants: {
@@ -3998,38 +4062,59 @@ var checkboxBoxVariants = cva(
     }
   }
 );
-var checkboxLabelVariants = cva("select-none transition-colors", {
-  variants: {
-    size: {
-      sm: "text-xs",
-      md: "text-sm",
-      lg: "text-base"
+var checkboxLabelVariants = cva(
+  "select-none transition-colors duration-[120ms] ease-linear",
+  {
+    variants: {
+      size: {
+        xs: "text-[12px]",
+        sm: "text-[12px]",
+        md: "text-[13px]",
+        lg: "text-[14px]"
+      },
+      state: {
+        // The fill carries the selection; the label text does not change colour.
+        default: "text-[#202020]",
+        checked: "text-[#202020]",
+        disabled: "text-[#9C9C9C] cursor-not-allowed",
+        error: "text-[#A8000F]"
+      }
     },
-    state: {
-      default: "text-gray-700",
-      checked: "text-[#0F8055]",
-      disabled: "text-gray-400 cursor-not-allowed"
+    defaultVariants: {
+      size: "md",
+      state: "default"
     }
-  },
-  defaultVariants: {
-    size: "md",
-    state: "default"
   }
-});
+);
 var ICON_SIZE = {
-  sm: "size-3",
-  md: "size-4",
-  lg: "size-5"
+  xs: "size-[9px]",
+  sm: "size-[10px]",
+  md: "size-[12px]",
+  lg: "size-[14px]"
+};
+var DASH_SIZE = {
+  xs: "h-[2px] w-[7px]",
+  sm: "h-[2px] w-[8px]",
+  md: "h-[2.5px] w-[9px]",
+  lg: "h-[3px] w-[11px]"
 };
 var PILL_PADDING2 = {
-  sm: "gap-1.5 px-2.5 py-1.5",
-  md: "gap-2 px-3 py-2",
-  lg: "gap-2.5 px-4 py-2.5"
+  xs: "gap-2 px-2 py-1",
+  sm: "gap-2.5 px-2.5 py-1.5",
+  md: "gap-[11px] px-3 py-2",
+  lg: "gap-3 px-4 py-2.5"
 };
 var GAP_ONLY2 = {
-  sm: "gap-1.5",
-  md: "gap-2",
-  lg: "gap-2.5"
+  xs: "gap-2",
+  sm: "gap-2.5",
+  md: "gap-[11px]",
+  lg: "gap-3"
+};
+var BOX_FIRST_LINE_OFFSET = {
+  xs: "mt-[2px]",
+  sm: "mt-[1px]",
+  md: "mt-0",
+  lg: "mt-0"
 };
 function Checkbox({
   checked,
@@ -4064,8 +4149,9 @@ function Checkbox({
     if (!isControlled) setInternalChecked(nextBool);
     onCheckedChange?.(nextBool);
   };
-  const boxState = disabled ? "disabled" : error ? "error" : indeterminate ? "indeterminate" : visualChecked ? "checked" : "unchecked";
-  const labelState = disabled ? "disabled" : visualChecked || indeterminate ? "checked" : "default";
+  const isOn = visualChecked || Boolean(indeterminate);
+  const boxState = disabled ? isOn ? "disabledChecked" : "disabled" : error ? "error" : indeterminate ? "indeterminate" : visualChecked ? "checked" : "unchecked";
+  const labelState = disabled ? "disabled" : error ? "error" : isOn ? "checked" : "default";
   const effectiveBorderColor = borderColor;
   const effectiveBgColor = bgColor;
   const effectiveTextColor = textColor;
@@ -4080,11 +4166,13 @@ function Checkbox({
         ...effectiveBgColor ? { backgroundColor: effectiveBgColor } : {}
       } : void 0,
       className: cn(
-        "group inline-flex cursor-pointer items-center transition-colors",
+        // The box aligns to the first line of the label, not the centre of it,
+        // so multi-line labels stay tidy.
+        "group inline-flex cursor-pointer items-start transition-colors duration-[120ms] ease-linear",
         hasCustomColors2 ? cn(
-          "rounded-xl border",
+          "rounded-[10px] border",
           PILL_PADDING2[size],
-          error ? "border-red-500" : disabled ? "border-gray-200" : "border-gray-200"
+          error ? "border-[#A8000F]" : disabled ? "border-[#E2E2E2]" : "border-[#E2E2E2]"
         ) : GAP_ONLY2[size],
         disabled && "cursor-not-allowed",
         readOnly && "pointer-events-none cursor-default",
@@ -4101,14 +4189,25 @@ function Checkbox({
             disabled,
             "data-slot": "checkbox",
             style: isActive && effectiveBorderColor ? { backgroundColor: effectiveBorderColor, borderColor: effectiveBorderColor } : void 0,
-            className: cn(checkboxBoxVariants({ size, state: boxState })),
+            className: cn(
+              checkboxBoxVariants({ size, state: boxState }),
+              BOX_FIRST_LINE_OFFSET[size]
+            ),
             children: /* @__PURE__ */ jsx(
               Checkbox$1.Indicator,
               {
                 forceMount: true,
                 "data-slot": "checkbox-indicator",
                 className: "grid h-full w-full place-content-center text-current transition-none data-[state=unchecked]:opacity-0",
-                children: indeterminate ? /* @__PURE__ */ jsx(Minus, { className: cn(ICON_SIZE[size], "stroke-[3]") }) : /* @__PURE__ */ jsx(Check, { className: cn(ICON_SIZE[size], "stroke-[3]") })
+                children: indeterminate ? /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    className: cn(
+                      DASH_SIZE[size],
+                      "rounded-[2px] bg-current"
+                    )
+                  }
+                ) : /* @__PURE__ */ jsx(Check, { className: cn(ICON_SIZE[size], "stroke-[3.2]") })
               }
             )
           }
@@ -4120,7 +4219,7 @@ function Checkbox({
             style: effectiveTextColor && isActive ? { color: effectiveTextColor } : void 0,
             className: cn(
               checkboxLabelVariants({ size, state: labelState }),
-              "whitespace-normal break-words"
+              "whitespace-normal break-words leading-[1.5]"
             ),
             children: truncateLabelToWordLimit(label)
           }
@@ -4232,6 +4331,155 @@ function CheckboxGroup({
   ] });
 }
 CheckboxGroup.displayName = "CheckboxGroup";
+var DATEPICKER_SIZES = {
+  xs: { height: 28, padLeft: 9, padRight: 8, font: 12, icon: 13, cell: 24, cellFont: 9, radius: 8 },
+  sm: { height: 32, padLeft: 11, padRight: 9, font: 12, icon: 14, cell: 26, cellFont: 9, radius: 8 },
+  md: { height: 40, padLeft: 13, padRight: 11, font: 13, icon: 16, cell: 30, cellFont: 10, radius: 8 },
+  lg: { height: 48, padLeft: 15, padRight: 13, font: 14, icon: 17, cell: 34, cellFont: 11, radius: 8 }
+};
+var DATEPICKER_GAP = 9;
+var PANEL = {
+  radius: 12,
+  padding: 12,
+  border: `1px solid ${INPUT_COLORS.border}`,
+  background: INPUT_COLORS.surface,
+  shadow: "2px 2px 4px rgba(0,0,0,.12)",
+  /** Hairline between the grid and the footer / between two months. */
+  rule: "#EEEEEE",
+  /** Wash used by every hover in the panel. */
+  hover: "#FAFFF7",
+  /** 2px gutter between day cells. */
+  cellGap: 2,
+  cellRadius: 6,
+  /** Radius on the outer corners of a range, and on a lone selected day. */
+  cellRadiusSelected: 8,
+  /** Forest fill means chosen. */
+  selectedBg: "#003C1B",
+  selectedInk: "#FFFFFF",
+  /** Mint band means between — square, so the run reads as one shape. */
+  rangeBg: "#DCF3CE",
+  rangeInk: "#003C1B",
+  /** Lighter mint used for the drag preview. */
+  rangePreviewBg: "#EEF8E4",
+  /** A ring means today — never a fill, so it cannot compete with the selection. */
+  todayRing: "inset 0 0 0 1.5px #8CC42A",
+  todayInk: "#1F5E2C",
+  /** Keyboard cursor. */
+  focusRing: "0 0 0 2px rgba(140,196,42,.55)",
+  dayInk: INPUT_COLORS.value,
+  /** Weekend days stay selectable, just muted. */
+  weekendInk: INPUT_COLORS.placeholder,
+  /** Adjacent-month days. */
+  outsideInk: "#C6C6C6",
+  /** Before min / after max — greyed, still visible so the grid never shifts. */
+  outOfBoundsBg: INPUT_COLORS.subtle,
+  outOfBoundsInk: "#C6C6C6",
+  weekHeadInk: "#787878",
+  weekHeadHeight: 22,
+  navInk: "#595959",
+  footerInk: "#787878"
+};
+function getTriggerStyle2(state) {
+  return getInputBoxStyle(state === "open" ? "focused" : state);
+}
+function getDayCellStyle(flags) {
+  const {
+    selected,
+    rangeStart,
+    rangeEnd,
+    inRange,
+    rangePreview,
+    today,
+    outside,
+    disabled,
+    weekend,
+    focused
+  } = flags;
+  const r = `${PANEL.cellRadius}px`;
+  const rSel = `${PANEL.cellRadiusSelected}px`;
+  let background = "transparent";
+  let color = PANEL.dayInk;
+  let fontWeight = 500;
+  let borderRadius = r;
+  let boxShadow = "none";
+  if (weekend) color = PANEL.weekendInk;
+  if (outside) {
+    color = PANEL.outsideInk;
+    fontWeight = 400;
+  }
+  if (rangePreview) {
+    background = PANEL.rangePreviewBg;
+    color = PANEL.rangeInk;
+    borderRadius = "0";
+  }
+  if (inRange) {
+    background = PANEL.rangeBg;
+    color = PANEL.rangeInk;
+    borderRadius = "0";
+  }
+  if (rangeStart || rangeEnd) {
+    background = PANEL.selectedBg;
+    color = PANEL.selectedInk;
+    fontWeight = 600;
+    borderRadius = rangeStart && rangeEnd ? rSel : rangeStart ? `${rSel} 0 0 ${rSel}` : `0 ${rSel} ${rSel} 0`;
+  } else if (selected) {
+    background = PANEL.selectedBg;
+    color = PANEL.selectedInk;
+    fontWeight = 600;
+    borderRadius = rSel;
+  } else if (today) {
+    color = PANEL.todayInk;
+    fontWeight = 700;
+    boxShadow = PANEL.todayRing;
+  }
+  if (focused) boxShadow = PANEL.focusRing;
+  if (disabled) {
+    return {
+      background: PANEL.outOfBoundsBg,
+      color: PANEL.outOfBoundsInk,
+      fontWeight: 400,
+      borderRadius: r,
+      boxShadow: "none"
+    };
+  }
+  return { background, color, fontWeight, borderRadius, boxShadow };
+}
+var triggerVariants2 = cva(
+  [
+    "flex min-w-0 items-center",
+    "cursor-pointer select-none",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0"
+  ].join(" "),
+  {
+    variants: {
+      state: {
+        default: "",
+        open: "",
+        disabled: "pointer-events-none",
+        readonly: "cursor-default pointer-events-none"
+      },
+      size: { xs: "", sm: "", md: "", lg: "" }
+    },
+    defaultVariants: { state: "default", size: "md" }
+  }
+);
+var dayCellVariants = cva(
+  "flex items-center justify-center cursor-pointer select-none transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "",
+        today: "",
+        selected: "",
+        inRange: "rounded-none",
+        rangeStart: "",
+        rangeEnd: "",
+        outsideMonth: "cursor-default"
+      }
+    },
+    defaultVariants: { variant: "default" }
+  }
+);
 var MONTH_LABELS = [
   "Jan",
   "Feb",
@@ -4269,47 +4517,97 @@ function buildYearOptions(center, minYear, maxYear) {
   }
   return opts;
 }
-function StyledDayButton({
-  day,
-  modifiers,
-  className,
-  ...props
+var WEEK_HEADS = ["S", "M", "T", "W", "T", "F", "S"];
+function JumpCell({
+  label,
+  selected,
+  ring,
+  disabled,
+  height,
+  onClick
 }) {
-  const ref = React9.useRef(null);
-  React9.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus();
-  }, [modifiers.focused]);
-  const isEdge = modifiers.range_start || modifiers.range_end;
-  const isSingleSelected = modifiers.selected && !isEdge && !modifiers.range_middle;
-  const isGreenFilled = isSingleSelected || isEdge;
+  const [hovered, setHovered] = React9.useState(false);
   return /* @__PURE__ */ jsx(
     "button",
     {
-      ref,
       type: "button",
-      disabled: modifiers.disabled,
-      className: cn(
-        // base circle
-        "relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors select-none",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006F42] focus-visible:ring-offset-1",
-        // green filled circle — single selected or range edge
-        isGreenFilled && "bg-[#006F42] text-white font-medium",
-        // range middle — transparent, cell bg (#006F42) shows through
-        modifiers.range_middle && !isEdge && "w-full rounded-none text-white",
-        // today underline — always render; color depends on context
-        modifiers.today && (isGreenFilled || modifiers.range_middle && !isEdge) && "underline decoration-white underline-offset-2 decoration-2",
-        modifiers.today && !isGreenFilled && !modifiers.range_middle && "underline decoration-[#006F42] underline-offset-2 decoration-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
-        // default
-        !isGreenFilled && !modifiers.today && !modifiers.range_middle && !modifiers.outside && !modifiers.disabled && "text-[#374151] hover:bg-[#F3F4F6]",
-        // outside month
-        modifiers.outside && "text-[#D1D5DB] hover:bg-transparent",
-        // disabled
-        modifiers.disabled && "text-[#D1D5DB] opacity-50 cursor-not-allowed pointer-events-none",
-        className
-      ),
-      ...props
+      onClick,
+      disabled,
+      onPointerEnter: () => setHovered(true),
+      onPointerLeave: () => setHovered(false),
+      className: "ue-tabular border-0 transition-[background] duration-[120ms] disabled:cursor-not-allowed disabled:opacity-40",
+      style: {
+        height,
+        borderRadius: PANEL.cellRadius,
+        fontVariantNumeric: "tabular-nums",
+        fontSize: 11,
+        fontWeight: selected ? 600 : 500,
+        cursor: disabled ? "not-allowed" : "pointer",
+        background: selected ? PANEL.selectedBg : hovered && !disabled ? PANEL.hover : "transparent",
+        color: selected ? PANEL.selectedInk : PANEL.dayInk,
+        boxShadow: ring && !selected ? PANEL.todayRing : "none"
+      },
+      children: label
     }
   );
+}
+function makeDayButton({ size }) {
+  const spec = DATEPICKER_SIZES[size];
+  return function StyledDayButton({
+    day: _day,
+    modifiers,
+    className,
+    ...props
+  }) {
+    const ref = React9.useRef(null);
+    const [hovered, setHovered] = React9.useState(false);
+    React9.useEffect(() => {
+      if (modifiers.focused) ref.current?.focus();
+    }, [modifiers.focused]);
+    const isEdge = !!(modifiers.range_start || modifiers.range_end);
+    const style = getDayCellStyle({
+      selected: !!modifiers.selected && !isEdge && !modifiers.range_middle,
+      rangeStart: !!modifiers.range_start,
+      rangeEnd: !!modifiers.range_end,
+      inRange: !!modifiers.range_middle && !isEdge,
+      today: !!modifiers.today,
+      outside: !!modifiers.outside,
+      disabled: !!modifiers.disabled
+    });
+    const plain = style.background === "transparent";
+    return (
+      // `props` is spread first so react-day-picker can never clobber the
+      // cell's own metrics — a `style` coming through the spread would replace
+      // the whole inline style object, not merge into it.
+      /* @__PURE__ */ jsx(
+        "button",
+        {
+          ...props,
+          ref,
+          type: "button",
+          disabled: modifiers.disabled,
+          onPointerEnter: () => setHovered(true),
+          onPointerLeave: () => setHovered(false),
+          className: cn(
+            "ue-tabular relative z-10 flex items-center justify-center border-0 transition-[background-color] duration-[120ms] select-none",
+            "focus-visible:outline-none",
+            modifiers.disabled && "cursor-not-allowed",
+            className
+          ),
+          style: {
+            width: spec.cell,
+            height: spec.cell,
+            fontVariantNumeric: "tabular-nums",
+            fontSize: spec.cellFont,
+            lineHeight: 1,
+            cursor: modifiers.disabled ? "not-allowed" : "pointer",
+            ...style,
+            background: plain && hovered && !modifiers.disabled ? PANEL.hover : style.background
+          }
+        }
+      )
+    );
+  };
 }
 function DatePickerCalendar({
   mode = "single",
@@ -4320,14 +4618,23 @@ function DatePickerCalendar({
   minDate,
   maxDate,
   className,
+  size = "md",
+  focusDate,
+  footer,
   onDayClick,
   onDayMouseEnter,
   onDayMouseLeave
 }) {
   const today = React9.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const spec = DATEPICKER_SIZES[size];
   const clampedToday = maxDate && today > maxDate ? maxDate : minDate && today < minDate ? minDate : today;
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? clampedToday;
   const [viewMonth, setViewMonth] = React9.useState(initialMonth);
+  const focusKey = focusDate ? focusDate.getFullYear() * 100 + focusDate.getMonth() : null;
+  React9.useEffect(() => {
+    if (focusKey === null) return;
+    setViewMonth(new Date(Math.floor(focusKey / 100), focusKey % 100, 1));
+  }, [focusKey]);
   const yearOptions = React9.useMemo(
     () => buildYearOptions(
       today.getFullYear(),
@@ -4344,120 +4651,119 @@ function DatePickerCalendar({
       return isDisabled ? { ...opt, disabled: true } : opt;
     });
   }, [viewMonth, minDate, maxDate]);
-  const handlePrev = () => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1));
-  const handleNext = () => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1));
-  const handleMonthSelect = (val) => setViewMonth(
-    (prev) => new Date(prev.getFullYear(), Number(val), 1)
-  );
+  const handleMonthSelect = (val) => setViewMonth((prev) => new Date(prev.getFullYear(), Number(val), 1));
   const handleYearSelect = (val) => setViewMonth((prev) => new Date(Number(val), prev.getMonth(), 1));
-  const isPrevDisabled = !!minDate && new Date(viewMonth.getFullYear(), viewMonth.getMonth()) <= new Date(minDate.getFullYear(), minDate.getMonth());
-  const isNextDisabled = !!maxDate && new Date(viewMonth.getFullYear(), viewMonth.getMonth()) >= new Date(maxDate.getFullYear(), maxDate.getMonth());
-  return /* @__PURE__ */ jsxs("div", { className: cn("w-[360px] max-w-full bg-white", className), children: [
-    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-1 px-3 py-2", children: [
-      /* @__PURE__ */ jsx(
-        "button",
-        {
-          type: "button",
-          onClick: handlePrev,
-          disabled: isPrevDisabled,
-          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
-          "aria-label": "Previous month",
-          children: /* @__PURE__ */ jsx(ChevronLeft, { size: 14, strokeWidth: 2.5 })
-        }
-      ),
-      /* @__PURE__ */ jsxs("div", { className: "flex flex-1 items-center justify-center gap-1.5", children: [
-        /* @__PURE__ */ jsx(
-          Select,
-          {
-            options: monthOptions,
-            value: String(viewMonth.getMonth()),
-            onChange: handleMonthSelect,
-            size: "sm",
-            className: "w-36"
-          }
-        ),
-        /* @__PURE__ */ jsx(
-          Select,
-          {
-            options: yearOptions,
-            value: String(viewMonth.getFullYear()),
-            onChange: handleYearSelect,
-            size: "sm",
-            className: "w-24"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsx(
-        "button",
-        {
-          type: "button",
-          onClick: handleNext,
-          disabled: isNextDisabled,
-          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
-          "aria-label": "Next month",
-          children: /* @__PURE__ */ jsx(ChevronRight, { size: 14, strokeWidth: 2.5 })
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxs("div", { className: "px-3 pb-3", children: [
-      /* @__PURE__ */ jsx("div", { className: "grid grid-cols-7 mb-1", children: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => /* @__PURE__ */ jsx(
-        "div",
-        {
-          className: "flex h-7 items-center justify-center text-[11px] font-medium text-[#9CA3AF] select-none",
-          children: d
-        },
-        d
-      )) }),
-      /* @__PURE__ */ jsx(
-        DayPicker,
-        {
-          mode,
-          selected: selected ?? void 0,
-          onSelect: onSelect ?? (() => {
-          }),
-          month: viewMonth,
-          onMonthChange: setViewMonth,
-          hideNavigation: true,
-          hideWeekdays: true,
-          showOutsideDays: true,
-          disabled,
-          onDayClick,
-          onDayMouseEnter,
-          onDayMouseLeave,
-          startMonth: minDate ? new Date(minDate.getFullYear(), minDate.getMonth()) : void 0,
-          endMonth: maxDate ? new Date(maxDate.getFullYear(), maxDate.getMonth()) : void 0,
-          classNames: {
-            months: "flex flex-col w-full",
-            month: "flex flex-col gap-1 w-full",
-            month_caption: "hidden",
-            weeks: "flex flex-col gap-0.5 w-full",
-            week: "grid grid-cols-7 w-full",
-            day: "flex items-center justify-center p-0 relative",
-            day_button: "",
-            range_start: "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",
-            range_middle: "bg-[#006F42]",
-            range_end: "bg-[linear-gradient(to_right,#006F42_50%,transparent_50%)]",
-            selected: "",
-            today: "",
-            outside: "",
-            disabled: "",
-            hidden: "invisible"
-          },
-          components: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            MonthGrid: ({ children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Weeks: ({ children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Week: ({ week: _week, children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Day: ({ day: _day, modifiers: _modifiers, children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
-            DayButton: StyledDayButton
-          }
-        }
-      )
-    ] })
-  ] });
+  const DayButtonComponent = React9.useMemo(() => makeDayButton({ size }), [size]);
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: `repeat(7, ${spec.cell}px)`,
+    gap: PANEL.cellGap
+  };
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: cn("flex flex-col bg-white", className),
+      style: { padding: PANEL.padding, gap: 10 },
+      children: [
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center gap-1.5", children: [
+          /* @__PURE__ */ jsx(
+            Select,
+            {
+              options: monthOptions,
+              value: String(viewMonth.getMonth()),
+              onChange: handleMonthSelect,
+              size: "xs",
+              className: "w-[88px]"
+            }
+          ),
+          /* @__PURE__ */ jsx(
+            Select,
+            {
+              options: yearOptions,
+              value: String(viewMonth.getFullYear()),
+              onChange: handleYearSelect,
+              size: "xs",
+              className: "w-[70px]"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("div", { style: gridStyle, children: WEEK_HEADS.map((d, i) => /* @__PURE__ */ jsx(
+            "div",
+            {
+              className: "flex select-none items-center justify-center",
+              style: {
+                height: PANEL.weekHeadHeight,
+                fontSize: 10,
+                fontWeight: 600,
+                lineHeight: 1,
+                color: PANEL.weekHeadInk
+              },
+              children: d
+            },
+            `${d}-${i}`
+          )) }),
+          /* @__PURE__ */ jsx(
+            DayPicker,
+            {
+              mode,
+              selected: selected ?? void 0,
+              onSelect: onSelect ?? (() => {
+              }),
+              month: viewMonth,
+              onMonthChange: setViewMonth,
+              hideNavigation: true,
+              hideWeekdays: true,
+              showOutsideDays: true,
+              disabled,
+              onDayClick,
+              onDayMouseEnter,
+              onDayMouseLeave,
+              startMonth: minDate ? new Date(minDate.getFullYear(), minDate.getMonth()) : void 0,
+              endMonth: maxDate ? new Date(maxDate.getFullYear(), maxDate.getMonth()) : void 0,
+              classNames: {
+                months: "flex flex-col",
+                month: "flex flex-col",
+                month_caption: "hidden",
+                weeks: "flex flex-col",
+                week: "",
+                day: "flex items-center justify-center p-0 relative",
+                day_button: "",
+                range_start: "",
+                range_middle: "",
+                range_end: "",
+                selected: "",
+                today: "",
+                outside: "",
+                disabled: "",
+                hidden: "invisible"
+              },
+              components: {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                MonthGrid: ({ children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
+                // The rows carry the same 2px gutter as the columns.
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                Weeks: ({ children, ...props }) => /* @__PURE__ */ jsx(
+                  "div",
+                  {
+                    ...props,
+                    style: { display: "flex", flexDirection: "column", gap: PANEL.cellGap },
+                    children
+                  }
+                ),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                Week: ({ week: _week, children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, style: gridStyle, children }),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                Day: ({ day: _day, modifiers: _modifiers, children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
+                DayButton: DayButtonComponent
+              }
+            }
+          )
+        ] }),
+        footer
+      ]
+    }
+  );
 }
 function MonthPickerCalendar({
   selected,
@@ -4470,87 +4776,51 @@ function MonthPickerCalendar({
   const [viewYear, setViewYear] = React9.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React9.useMemo(() => {
-    const center = today.getFullYear();
-    const minYear = minDate ? minDate.getFullYear() : center - 10;
-    const maxYear = maxDate ? maxDate.getFullYear() : center + 10;
-    const opts = [];
-    for (let y = minYear; y <= maxYear; y++) {
-      opts.push({ label: String(y), value: String(y) });
+  const yearOptions = React9.useMemo(
+    () => buildYearOptions(
+      today.getFullYear(),
+      minDate?.getFullYear(),
+      maxDate?.getFullYear()
+    ),
+    [today, minDate, maxDate]
+  );
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: cn("w-[246px] max-w-full bg-white", className),
+      style: { padding: PANEL.padding },
+      children: [
+        /* @__PURE__ */ jsx("div", { className: "mb-2.5 flex items-center justify-center", children: /* @__PURE__ */ jsx(
+          Select,
+          {
+            options: yearOptions,
+            value: String(viewYear),
+            onChange: (val) => setViewYear(Number(val)),
+            size: "xs",
+            className: "w-[104px]"
+          }
+        ) }),
+        /* @__PURE__ */ jsx("div", { className: "grid grid-cols-3 gap-[5px]", children: MONTH_LABELS.map((label, i) => {
+          const isSelected = !!selected && selected.getFullYear() === viewYear && selected.getMonth() === i;
+          const isToday = today.getFullYear() === viewYear && today.getMonth() === i;
+          const isDisabled = !!minDate && new Date(viewYear, i) < new Date(minDate.getFullYear(), minDate.getMonth()) || !!maxDate && new Date(viewYear, i) > new Date(maxDate.getFullYear(), maxDate.getMonth());
+          return /* @__PURE__ */ jsx(
+            JumpCell,
+            {
+              label,
+              height: 32,
+              selected: isSelected,
+              ring: isToday,
+              disabled: isDisabled,
+              onClick: () => onSelect(new Date(viewYear, i, 1))
+            },
+            label
+          );
+        }) })
+      ]
     }
-    return opts;
-  }, [today, minDate, maxDate]);
-  return /* @__PURE__ */ jsxs("div", { className: cn("w-[280px] max-w-full bg-white", className), children: [
-    /* @__PURE__ */ jsx("div", { className: "flex items-center justify-center px-3 py-2", children: /* @__PURE__ */ jsx(
-      Select,
-      {
-        options: yearOptions,
-        value: String(viewYear),
-        onChange: (val) => setViewYear(Number(val)),
-        size: "sm",
-        className: "w-28"
-      }
-    ) }),
-    /* @__PURE__ */ jsx("div", { className: "grid grid-cols-3 gap-1.5 px-3 pb-3", children: MONTH_LABELS.map((label, i) => {
-      const isSelected = !!selected && selected.getFullYear() === viewYear && selected.getMonth() === i;
-      const isToday = today.getFullYear() === viewYear && today.getMonth() === i;
-      const isDisabled = !!minDate && new Date(viewYear, i) < new Date(minDate.getFullYear(), minDate.getMonth()) || !!maxDate && new Date(viewYear, i) > new Date(maxDate.getFullYear(), maxDate.getMonth());
-      return /* @__PURE__ */ jsx(
-        "button",
-        {
-          type: "button",
-          disabled: isDisabled,
-          onClick: () => onSelect(new Date(viewYear, i, 1)),
-          className: cn(
-            "h-9 rounded-lg text-sm font-medium transition-colors select-none",
-            isSelected && "bg-[#006F42] text-white",
-            isToday && !isSelected && "underline decoration-[#006F42] decoration-2 underline-offset-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
-            !isSelected && !isToday && !isDisabled && "text-[#374151] hover:bg-[#F3F4F6]",
-            isDisabled && "text-[#D1D5DB] opacity-50 cursor-not-allowed"
-          ),
-          children: label
-        },
-        label
-      );
-    }) })
-  ] });
+  );
 }
-var triggerVariants2 = cva(
-  "flex items-center min-w-0 rounded-[4px] border border-gray-400 bg-white transition-colors",
-  {
-    variants: {
-      state: {
-        default: "text-[#374151] hover:border-gray-500 hover:shadow-sm",
-        open: "border-gray-500 ring-1 ring-gray-200 text-[#374151]",
-        disabled: "border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60 pointer-events-none",
-        readonly: "bg-gray-50 border-gray-300 text-gray-700 cursor-default pointer-events-none"
-      },
-      size: {
-        sm: `${COMPONENT_HEIGHT.sm} ${TEXT_SIZE.sm}`,
-        md: `${COMPONENT_HEIGHT.md} ${TEXT_SIZE.md}`,
-        lg: `${COMPONENT_HEIGHT.lg} ${TEXT_SIZE.lg}`
-      }
-    },
-    defaultVariants: { state: "default", size: "md" }
-  }
-);
-var dayCellVariants = cva(
-  "flex items-center justify-center text-sm rounded-[4px] cursor-pointer select-none transition-colors w-8 h-8",
-  {
-    variants: {
-      variant: {
-        default: "text-[#374151] hover:bg-[#F3F4F6]",
-        today: "text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
-        selected: "bg-[#006F42] text-white",
-        inRange: "bg-[#E6F4EA] text-[#374151] rounded-none",
-        rangeStart: "bg-[#006F42] text-white rounded-r-none",
-        rangeEnd: "bg-[#006F42] text-white rounded-l-none",
-        outsideMonth: "text-[#D1D5DB] cursor-default hover:bg-transparent"
-      }
-    },
-    defaultVariants: { variant: "default" }
-  }
-);
 
 // src/components/custom/DatePicker/dateHelpers.ts
 var MONTHS = [
@@ -4653,7 +4923,7 @@ function TimeColumn({
               style: { height: ITEM_HEIGHT, scrollSnapAlign: "center" },
               className: cn(
                 "flex w-full shrink-0 items-center justify-center text-sm tabular-nums transition-all duration-150",
-                isSelected ? "scale-105 font-semibold text-[#006F42]" : "text-[#9CA3AF] hover:text-[#374151]"
+                isSelected ? "scale-105 font-semibold text-[#003C1B]" : "text-[#9C9C9C] hover:text-[#161616]"
               ),
               children: item.label
             },
@@ -4697,19 +4967,19 @@ function TimePicker({
     "div",
     {
       className: cn(
-        "flex w-[176px] flex-col border-l border-[#F3F4F6]",
+        "flex w-[176px] flex-col border-l border-[#EEEEEE]",
         className
       ),
       children: [
-        /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center gap-1.5 border-b border-[#F3F4F6] py-2.5 text-xs font-medium text-[#374151]", children: [
-          /* @__PURE__ */ jsx(Clock, { size: 13, strokeWidth: 2, className: "text-[#006F42]" }),
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center gap-1.5 border-b border-[#EEEEEE] py-2.5 text-xs font-medium text-[#161616]", children: [
+          /* @__PURE__ */ jsx(Clock, { size: 13, strokeWidth: 2, className: "text-[#003C1B]" }),
           "Select time"
         ] }),
         /* @__PURE__ */ jsxs("div", { className: "relative flex justify-center px-2", children: [
           /* @__PURE__ */ jsx(
             "div",
             {
-              className: "pointer-events-none absolute inset-x-2 z-0 rounded-md bg-[#F0FBF5]",
+              className: "pointer-events-none absolute inset-x-2 z-0 rounded-md bg-[#DCF3CE]",
               style: {
                 top: (COLUMN_HEIGHT - ITEM_HEIGHT) / 2,
                 height: ITEM_HEIGHT
@@ -4741,19 +5011,28 @@ function isDateRange(v) {
 function orderedRange(a, b) {
   return a <= b ? { from: a, to: b } : { from: b, to: a };
 }
-function DateBox({
-  label,
-  active
-}) {
+function Spinner3({ size }) {
   return /* @__PURE__ */ jsx(
-    "div",
+    "span",
     {
-      className: cn(
-        "flex h-9 flex-1 items-center justify-center rounded-lg border text-sm transition-colors",
-        active ? "border-[#006F42] text-[#111827]" : "border-[#D1D5DB] text-[#9CA3AF]",
-        !label && "text-[#C4C9D2]"
-      ),
-      children: label ?? "\u2014"
+      "aria-hidden": "true",
+      className: "shrink-0 animate-spin rounded-full",
+      style: {
+        width: size,
+        height: size,
+        border: `2px solid ${INPUT_COLORS.border}`,
+        borderTopColor: INPUT_COLORS.borderFocus
+      }
+    }
+  );
+}
+function LoadingBar() {
+  return /* @__PURE__ */ jsx(
+    "span",
+    {
+      "aria-hidden": "true",
+      className: "h-[11px] flex-1 animate-pulse rounded-md",
+      style: { background: INPUT_COLORS.subtle }
     }
   );
 }
@@ -4777,9 +5056,14 @@ function DatePicker({
   readOnly = false,
   open: controlledOpen,
   onOpenChange: onOpenChangeProp,
-  showTime = false
+  showTime = false,
+  status,
+  statusMessage,
+  loading = false
 }) {
   const isSingleWithTime = mode === "single" && showTime;
+  const spec = DATEPICKER_SIZES[size];
+  const [hovered, setHovered] = React9.useState(false);
   const [internalOpen, setInternalOpen] = React9.useState(false);
   const open = controlledOpen !== void 0 ? controlledOpen : internalOpen;
   const setOpen = React9.useCallback(
@@ -4841,6 +5125,8 @@ function DatePicker({
     if (!open && prevOpen.current) {
       setPendingFrom(null);
       setHoverDate(null);
+      setDraftRange(null);
+      setDraftSingleDate(null);
     }
     prevOpen.current = open;
   }, [open, committed, mode, isSingleWithTime]);
@@ -4877,14 +5163,17 @@ function DatePicker({
     }
     return effectiveDisplayRange ?? void 0;
   }, [mode, committed, effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
-  const fromLabel = React9.useMemo(() => {
-    if (!effectiveDisplayRange) return null;
-    return formatDate(effectiveDisplayRange.from);
-  }, [effectiveDisplayRange]);
-  const toLabel = React9.useMemo(() => {
-    if (!effectiveDisplayRange?.to) return null;
-    return formatDate(effectiveDisplayRange.to);
-  }, [effectiveDisplayRange]);
+  const footerHint = React9.useMemo(() => {
+    if (isSingleWithTime) {
+      return draftSingleDate ? formatDate(draftSingleDate) ?? "" : "No date";
+    }
+    const range = effectiveDisplayRange;
+    if (!range) return "No range";
+    if (!range.to) return "Pick an end date";
+    const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const days = Math.round((startOfDay(range.to) - startOfDay(range.from)) / 864e5) + 1;
+    return `${days} ${days === 1 ? "day" : "days"}`;
+  }, [effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
   const handleDayClick = (date, modifiers) => {
     if (modifiers.disabled) return;
     if (mode === "single") {
@@ -4933,11 +5222,10 @@ function DatePicker({
     onChange?.(toCommit);
     setOpen(false);
   };
-  const handleCancel = () => {
+  const handleClearDraftRange = () => {
     setPendingFrom(null);
     setHoverDate(null);
     setDraftRange(null);
-    setOpen(false);
   };
   const handleApplySingleTime = () => {
     if (!draftSingleDate) return;
@@ -4948,9 +5236,8 @@ function DatePicker({
     onChange?.(combined);
     setOpen(false);
   };
-  const handleCancelSingleTime = () => {
+  const handleClearDraftTime = () => {
     setDraftSingleDate(null);
-    setOpen(false);
   };
   const handleClearTrigger = (e) => {
     e.preventDefault();
@@ -4963,7 +5250,7 @@ function DatePicker({
     onChange?.(null);
   };
   const handleOpenChange = (next) => {
-    if (disabled || readOnly) return;
+    if (disabled || readOnly || loading) return;
     setOpen(next);
     if (next) {
       interactedRef.current = true;
@@ -4981,42 +5268,108 @@ function DatePicker({
     onTouch?.();
   };
   const canApply = draftRange !== null || pendingFrom !== null;
+  const state = disabled ? "disabled" : loading ? "loading" : readOnly ? "readonly" : error ? "error" : open ? "open" : status === "success" ? "success" : status === "warning" ? "warning" : hovered ? "hover" : "default";
+  const box = getTriggerStyle2(state);
   const triggerState = disabled ? "disabled" : readOnly ? "readonly" : open ? "open" : "default";
+  const glyphColor = state === "error" ? INPUT_COLORS.errorInk : state === "warning" ? INPUT_COLORS.warningInk : state === "disabled" || state === "loading" ? INPUT_COLORS.disabledInk : INPUT_COLORS.icon;
+  const triggerBoxStyle = {
+    minHeight: spec.height,
+    paddingLeft: spec.padLeft,
+    paddingRight: spec.padRight,
+    gap: DATEPICKER_GAP,
+    borderRadius: spec.radius,
+    fontSize: spec.font,
+    background: box.background,
+    border: box.border,
+    boxShadow: box.boxShadow,
+    color: box.color,
+    cursor: box.cursor ?? "pointer",
+    transition: INPUT_TRANSITION
+  };
+  const valueNode = /* @__PURE__ */ jsx(
+    "span",
+    {
+      className: "ue-tabular min-w-0 flex-1 truncate",
+      style: {
+        fontVariantNumeric: "tabular-nums",
+        fontWeight: 500,
+        color: triggerLabel ? box.color : INPUT_COLORS.placeholder
+      },
+      children: triggerLabel ?? placeholder
+    }
+  );
+  const adornments = /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center", style: { gap: 6 }, children: [
+    clearable && committed && !readOnly && !disabled && !loading && /* @__PURE__ */ jsx(
+      "button",
+      {
+        type: "button",
+        tabIndex: -1,
+        onClick: handleClearTrigger,
+        "aria-label": "Clear",
+        className: "flex shrink-0 items-center justify-center rounded-full transition-colors",
+        style: {
+          width: 18,
+          height: 18,
+          background: INPUT_COLORS.subtle,
+          color: INPUT_COLORS.message
+        },
+        children: /* @__PURE__ */ jsx(X, { size: 9, strokeWidth: 3.2 })
+      }
+    ),
+    loading && /* @__PURE__ */ jsx(Spinner3, { size: 14 }),
+    state === "readonly" && /* @__PURE__ */ jsx(Lock, { size: 14, strokeWidth: 2, color: INPUT_COLORS.placeholder }),
+    state === "error" && /* @__PURE__ */ jsx(CircleAlert, { size: 15, strokeWidth: 2.2, color: INPUT_COLORS.errorInk }),
+    state === "warning" && /* @__PURE__ */ jsx(CircleAlert, { size: 15, strokeWidth: 2.2, color: INPUT_COLORS.warningInk }),
+    state === "success" && /* @__PURE__ */ jsx(Check, { size: 15, strokeWidth: 2.6, color: INPUT_COLORS.successInk })
+  ] });
   if (isMobileDrawer && isControlled && registerDrawerCalendar) {
     return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1.5", children: [
-      label && /* @__PURE__ */ jsx(InputLabel, { size, required, children: label }),
+      label && /* @__PURE__ */ jsx(
+        InputLabel,
+        {
+          size,
+          required,
+          tone: state === "error" || state === "disabled" ? getLabelColor(state) : void 0,
+          children: label
+        }
+      ),
       /* @__PURE__ */ jsxs(
         "div",
         {
           className: cn(
             triggerVariants2({ state: triggerState, size }),
-            "gap-2 px-3 cursor-pointer select-none",
             width,
             className
           ),
+          style: triggerBoxStyle,
           children: [
-            /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: cn(
-                  "flex-1 truncate",
-                  triggerLabel ? "text-[#111827]" : cn(
-                    "text-[#C4C9D2]",
-                    size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]"
-                  )
-                ),
-                children: triggerLabel ?? placeholder
-              }
-            ),
-            /* @__PURE__ */ jsx(CalendarIcon, { size: 15, strokeWidth: 2, className: "text-gray-600" })
+            /* @__PURE__ */ jsx(CalendarIcon, { size: spec.icon, strokeWidth: 2, color: glyphColor }),
+            loading ? /* @__PURE__ */ jsx(LoadingBar, {}) : valueNode,
+            adornments
           ]
         }
       ),
-      /* @__PURE__ */ jsx(InputHelper, { size, helperText, error })
+      /* @__PURE__ */ jsx(
+        InputHelper,
+        {
+          size,
+          state: state === "open" ? "focused" : state,
+          helperText: error ?? (status && statusMessage) ?? helperText,
+          error
+        }
+      )
     ] });
   }
   return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1.5", children: [
-    label && /* @__PURE__ */ jsx(InputLabel, { size, required, children: label }),
+    label && /* @__PURE__ */ jsx(
+      InputLabel,
+      {
+        size,
+        required,
+        tone: state === "error" || state === "disabled" ? getLabelColor(state) : void 0,
+        children: label
+      }
+    ),
     /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
       /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
         "div",
@@ -5026,6 +5379,9 @@ function DatePicker({
           "aria-disabled": disabled,
           "aria-haspopup": "dialog",
           "aria-expanded": open,
+          "aria-busy": loading || void 0,
+          onPointerEnter: () => setHovered(true),
+          onPointerLeave: () => setHovered(false),
           onFocus: () => {
             interactedRef.current = true;
           },
@@ -5033,52 +5389,21 @@ function DatePicker({
           onKeyDown: (e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              if (!disabled && !readOnly) setOpen(!open);
+              if (!disabled && !readOnly && !loading) setOpen(!open);
             } else if (e.key === "Escape") {
               setOpen(false);
             }
           },
           className: cn(
             triggerVariants2({ state: triggerState, size }),
-            "gap-2 px-3 cursor-pointer select-none",
             width,
             className
           ),
+          style: triggerBoxStyle,
           children: [
-            /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: cn(
-                  "flex-1 truncate",
-                  triggerLabel ? "text-[#111827]" : cn(
-                    "text-[#C4C9D2]",
-                    size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[11px]"
-                  )
-                ),
-                children: triggerLabel ?? placeholder
-              }
-            ),
-            /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center gap-1", children: [
-              clearable && committed && /* @__PURE__ */ jsx(
-                "button",
-                {
-                  type: "button",
-                  tabIndex: -1,
-                  onClick: handleClearTrigger,
-                  className: "flex items-center text-gray-400 transition-colors hover:text-gray-600",
-                  "aria-label": "Clear",
-                  children: /* @__PURE__ */ jsx(X, { size: 13, strokeWidth: 2, className: "hover:text-red-500" })
-                }
-              ),
-              /* @__PURE__ */ jsx(
-                CalendarIcon,
-                {
-                  size: 15,
-                  strokeWidth: 2,
-                  className: "text-gray-600"
-                }
-              )
-            ] })
+            /* @__PURE__ */ jsx(CalendarIcon, { size: spec.icon, strokeWidth: 2, color: glyphColor }),
+            loading ? /* @__PURE__ */ jsx(LoadingBar, {}) : valueNode,
+            adornments
           ]
         }
       ) }),
@@ -5086,71 +5411,138 @@ function DatePicker({
         PopoverContent,
         {
           align: "center",
-          className: "w-auto max-w-[calc(100vw-1rem)] p-0",
+          className: "w-auto max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
           collisionPadding: { top: 64 },
-          children: /* @__PURE__ */ jsxs("div", { className: "overflow-hidden rounded-lg bg-white shadow-md", children: [
-            mode === "range" && /* @__PURE__ */ jsxs("div", { className: "flex gap-2 px-3 pt-3", children: [
-              /* @__PURE__ */ jsx(DateBox, { label: fromLabel, active: !!fromLabel }),
-              /* @__PURE__ */ jsx(DateBox, { label: toLabel, active: false })
-            ] }),
-            mode === "month" && /* @__PURE__ */ jsx(
-              MonthPickerCalendar,
-              {
-                selected: committed instanceof Date ? committed : null,
-                minDate,
-                maxDate,
-                onSelect: (date) => {
-                  setCommitted(date);
-                  onChange?.(date);
-                  setOpen(false);
-                }
-              }
-            ),
-            mode !== "month" && /* @__PURE__ */ jsxs("div", { className: "flex", children: [
-              /* @__PURE__ */ jsx(
-                DatePickerCalendar,
-                {
-                  mode,
-                  selected: calendarSelected,
-                  disabled: calendarDisabled,
-                  minDate,
-                  maxDate,
-                  onDayClick: (date, modifiers) => handleDayClick(date, modifiers),
-                  onDayMouseEnter: (date) => handleDayMouseEnter(date),
-                  onDayMouseLeave: () => handleDayMouseLeave()
-                }
-              ),
-              isSingleWithTime && /* @__PURE__ */ jsx(TimePicker, { value: draftTime, onChange: setDraftTime })
-            ] }),
-            (mode === "range" || isSingleWithTime) && /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-end gap-2 border-t border-[#F3F4F6] px-3 py-2.5", children: [
-              /* @__PURE__ */ jsx(
-                "button",
-                {
-                  type: "button",
-                  onClick: isSingleWithTime ? handleCancelSingleTime : handleCancel,
-                  className: "rounded-full bg-[#F1F3F4] px-5 py-1.5 text-sm font-medium text-[#374151] transition-colors hover:bg-[#E8EAED]",
-                  children: "Cancel"
-                }
-              ),
-              /* @__PURE__ */ jsx(
-                "button",
-                {
-                  type: "button",
-                  onClick: isSingleWithTime ? handleApplySingleTime : handleApply,
-                  disabled: isSingleWithTime ? !draftSingleDate : !canApply,
-                  className: cn(
-                    "rounded-full border px-5 py-1.5 text-sm font-medium transition-colors",
-                    (isSingleWithTime ? draftSingleDate : canApply) ? "border-[#006F42] text-[#006F42]" : "border-gray-300 text-gray-400 cursor-not-allowed"
+          children: /* @__PURE__ */ jsxs(
+            "div",
+            {
+              className: "overflow-hidden",
+              style: {
+                borderRadius: PANEL.radius,
+                border: PANEL.border,
+                background: PANEL.background,
+                boxShadow: PANEL.shadow
+              },
+              children: [
+                mode === "month" && /* @__PURE__ */ jsx(
+                  MonthPickerCalendar,
+                  {
+                    selected: committed instanceof Date ? committed : null,
+                    minDate,
+                    maxDate,
+                    onSelect: (date) => {
+                      setCommitted(date);
+                      onChange?.(date);
+                      setOpen(false);
+                    }
+                  }
+                ),
+                mode !== "month" && /* @__PURE__ */ jsxs("div", { className: "flex", children: [
+                  /* @__PURE__ */ jsx(
+                    DatePickerCalendar,
+                    {
+                      mode,
+                      size,
+                      selected: calendarSelected,
+                      disabled: calendarDisabled,
+                      minDate,
+                      maxDate,
+                      onDayClick: (date, modifiers) => handleDayClick(date, modifiers),
+                      onDayMouseEnter: (date) => handleDayMouseEnter(date),
+                      onDayMouseLeave: () => handleDayMouseLeave(),
+                      footer: (
+                        // Plain single mode commits on click, so it needs no
+                        // footer — only range and single+time have a draft to
+                        // clear or apply.
+                        !(mode === "range" || isSingleWithTime) ? null : /* @__PURE__ */ jsxs(
+                          "div",
+                          {
+                            className: "flex items-center",
+                            style: {
+                              gap: 9,
+                              paddingTop: 9,
+                              borderTop: `1px solid ${PANEL.rule}`
+                            },
+                            children: [
+                              /* @__PURE__ */ jsx(
+                                "span",
+                                {
+                                  className: "ue-tabular flex-1",
+                                  style: {
+                                    fontVariantNumeric: "tabular-nums",
+                                    fontSize: 11,
+                                    fontWeight: 500,
+                                    lineHeight: 1.4,
+                                    color: PANEL.footerInk
+                                  },
+                                  children: footerHint
+                                }
+                              ),
+                              /* @__PURE__ */ jsx(
+                                "button",
+                                {
+                                  type: "button",
+                                  onClick: isSingleWithTime ? handleClearDraftTime : handleClearDraftRange,
+                                  className: "transition-all duration-[120ms]",
+                                  style: {
+                                    height: 28,
+                                    padding: "0 10px",
+                                    border: `1px solid ${INPUT_COLORS.border}`,
+                                    borderRadius: PANEL.cellRadius,
+                                    background: INPUT_COLORS.surface,
+                                    color: PANEL.navInk,
+                                    fontSize: 11,
+                                    fontWeight: 600,
+                                    cursor: "pointer"
+                                  },
+                                  children: "Clear"
+                                }
+                              ),
+                              /* @__PURE__ */ jsx(
+                                "button",
+                                {
+                                  type: "button",
+                                  onClick: isSingleWithTime ? handleApplySingleTime : handleApply,
+                                  disabled: isSingleWithTime ? !draftSingleDate : !canApply,
+                                  className: "transition-all duration-[120ms] disabled:cursor-not-allowed disabled:opacity-40",
+                                  style: {
+                                    height: 28,
+                                    padding: "0 12px",
+                                    border: 0,
+                                    borderRadius: PANEL.cellRadius,
+                                    color: "#FFFFFF",
+                                    backgroundColor: PANEL.selectedBg,
+                                    backgroundImage: "linear-gradient(180deg,#0A5A2C,#003C1B)",
+                                    fontSize: 11,
+                                    fontWeight: 600,
+                                    cursor: "pointer"
+                                  },
+                                  children: "Apply"
+                                }
+                              )
+                            ]
+                          }
+                        )
+                      )
+                    }
                   ),
-                  children: "Apply"
-                }
-              )
-            ] })
-          ] })
+                  isSingleWithTime && /* @__PURE__ */ jsx(TimePicker, { value: draftTime, onChange: setDraftTime })
+                ] })
+              ]
+            }
+          )
         }
       )
     ] }),
-    /* @__PURE__ */ jsx(InputHelper, { size, helperText, error })
+    /* @__PURE__ */ jsx(
+      InputHelper,
+      {
+        size,
+        state: state === "open" ? "focused" : state,
+        helperText: error ?? (status && statusMessage) ?? helperText,
+        error
+      }
+    )
   ] });
 }
 DatePicker.displayName = "DatePicker";
@@ -5682,23 +6074,26 @@ function StatusBadge({
 }
 var trackVariants = cva(
   [
-    "group/uengage-toggle relative inline-flex items-center rounded-full border-2",
-    "transition-all duration-200 cursor-pointer select-none shadow-[0_2px_6px_rgba(15,23,42,0.12)]",
-    `outline-none ${FOCUS_RING}`,
-    "disabled:cursor-not-allowed disabled:opacity-50",
-    "data-[state=checked]:bg-[#C8D8B6] data-[state=checked]:border-[#1F6B32]"
+    "group/uengage-toggle relative inline-flex shrink-0 items-center rounded-full",
+    "cursor-pointer select-none",
+    "transition-[background-color,box-shadow] duration-[180ms] ease-[cubic-bezier(.2,.8,.3,1)]",
+    `outline-none ${SELECTION_FOCUS_RING}`,
+    "data-[state=checked]:bg-[#003C1B]",
+    "disabled:cursor-not-allowed",
+    "disabled:data-[state=unchecked]:bg-[#E2E2E2]",
+    "disabled:data-[state=checked]:bg-[#C6D6CB]"
   ].join(" "),
   {
     variants: {
       size: {
-        xs: "h-5 w-9",
-        sm: "h-7 w-12",
-        md: "h-8 w-[4.2rem]",
-        lg: "h-9 w-[4.75rem]"
+        xs: "h-[16px] w-[28px]",
+        sm: "h-[18px] w-[32px]",
+        md: "h-[22px] w-[38px]",
+        lg: "h-[26px] w-[46px]"
       },
       type: {
-        default: "data-[state=unchecked]:bg-[#F7FAF7] data-[state=unchecked]:border-[#9FB49F]",
-        danger: "data-[state=unchecked]:bg-[#F5C6C6] data-[state=unchecked]:border-[#991B1B]"
+        default: "data-[state=unchecked]:bg-[#C6C6C6] hover:data-[state=unchecked]:bg-[#AFAFAF]",
+        danger: "data-[state=unchecked]:bg-[#A8000F]"
       }
     },
     defaultVariants: {
@@ -5709,22 +6104,25 @@ var trackVariants = cva(
 );
 var thumbVariants = cva(
   [
-    "pointer-events-none absolute left-0.5 top-1/2 block rounded-full border border-transparent",
-    "-translate-y-1/2 transition-transform duration-200",
+    "pointer-events-none absolute top-1/2 left-[2px] flex items-center justify-center",
+    "rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.28)]",
+    "-translate-y-1/2 transition-transform duration-[180ms] ease-[cubic-bezier(.2,.8,.3,1)]",
     "data-[state=unchecked]:translate-x-0",
-    "data-[state=checked]:bg-[#1F6B32] data-[state=checked]:border-[#165126]"
+    "group-disabled/uengage-toggle:data-[state=unchecked]:bg-[#F3F5F9]",
+    "group-disabled/uengage-toggle:data-[state=checked]:bg-[#EEF3EF]"
   ].join(" "),
   {
     variants: {
       size: {
-        xs: "h-3.5 w-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-4",
-        sm: "h-5 w-5 shadow-[0_1px_2px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-5",
-        md: "h-6 w-6 shadow-[0_2px_3px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-8",
-        lg: "h-7 w-7 shadow-[0_2px_4px_rgba(15,23,42,0.18)] data-[state=checked]:translate-x-9"
+        xs: "size-[12px] data-[state=checked]:translate-x-[12px]",
+        sm: "size-[14px] data-[state=checked]:translate-x-[14px]",
+        md: "size-[18px] data-[state=checked]:translate-x-[16px]",
+        lg: "size-[22px] data-[state=checked]:translate-x-[20px]"
       },
+      // The knob is always white; `type` is kept so callers can keep passing it.
       type: {
-        default: "data-[state=unchecked]:bg-[#A8B8A2]",
-        danger: "data-[state=unchecked]:bg-[#991B1B]"
+        default: "",
+        danger: ""
       }
     },
     defaultVariants: {
@@ -5733,17 +6131,35 @@ var thumbVariants = cva(
     }
   }
 );
+var THUMB_PENDING_TRANSLATE = {
+  xs: "data-[state=unchecked]:translate-x-[6px] data-[state=checked]:translate-x-[6px]",
+  sm: "data-[state=unchecked]:translate-x-[7px] data-[state=checked]:translate-x-[7px]",
+  md: "data-[state=unchecked]:translate-x-[8px] data-[state=checked]:translate-x-[8px]",
+  lg: "data-[state=unchecked]:translate-x-[10px] data-[state=checked]:translate-x-[10px]"
+};
+var PENDING_SPINNER_SIZE = {
+  xs: "size-[6px]",
+  sm: "size-[7px]",
+  md: "size-[9px]",
+  lg: "size-[11px]"
+};
 var PILL_PADDING3 = {
-  xs: "gap-1 px-2 py-1",
-  sm: "gap-1.5 px-2.5 py-1.5",
-  md: "gap-2 px-3 py-2",
-  lg: "gap-2.5 px-4 py-2.5"
+  xs: "gap-2 px-2 py-1",
+  sm: "gap-2.5 px-2.5 py-1.5",
+  md: "gap-3 px-3 py-2",
+  lg: "gap-3.5 px-4 py-2.5"
 };
 var GAP_ONLY3 = {
-  xs: "gap-1",
-  sm: "gap-1.5",
-  md: "gap-2",
-  lg: "gap-2.5"
+  xs: "gap-2",
+  sm: "gap-2.5",
+  md: "gap-3",
+  lg: "gap-3.5"
+};
+var TITLE_TEXT = {
+  xs: "text-[12px]",
+  sm: "text-[12px]",
+  md: "text-[13px]",
+  lg: "text-[14px]"
 };
 var Toggle = React9.forwardRef(
   ({
@@ -5758,48 +6174,57 @@ var Toggle = React9.forwardRef(
     onChange,
     disabled,
     readOnly,
+    pending,
     wrapperClassName,
     borderColor,
     bgColor,
-    offBorderColor,
-    offBgColor,
     ...props
   }, ref) => {
     const [internalChecked, setInternalChecked] = React9.useState(defaultChecked ?? false);
     const isChecked = checked !== void 0 ? checked : internalChecked;
-    const hasOffColors = !!(offBorderColor || offBgColor);
     const hasCustomColors2 = !!(borderColor || bgColor);
-    const applyOffColors = !isChecked && hasOffColors;
     const pillStyle = hasCustomColors2 ? {
       ...borderColor ? { borderColor } : {},
-      ...isChecked && bgColor ? { backgroundColor: bgColor } : {},
-      ...applyOffColors && offBorderColor ? { borderColor: offBorderColor } : {},
-      ...applyOffColors && offBgColor ? { backgroundColor: offBgColor } : {}
+      ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
     } : void 0;
-    const trackStyle = applyOffColors ? {
-      ...offBorderColor ? { borderColor: offBorderColor } : {},
-      ...offBgColor ? { backgroundColor: offBgColor } : {}
-    } : void 0;
-    const thumbStyle = applyOffColors && offBorderColor ? { backgroundColor: offBorderColor } : void 0;
     const switchEl = /* @__PURE__ */ jsx(
       Switch.Root,
       {
         ref,
         checked: checked !== void 0 ? checked : void 0,
         defaultChecked: checked !== void 0 ? void 0 : defaultChecked,
-        onCheckedChange: readOnly ? void 0 : (val) => {
+        onCheckedChange: readOnly || pending ? void 0 : (val) => {
           setInternalChecked(val);
           onChange?.(val);
         },
         disabled,
-        style: trackStyle,
+        "aria-busy": pending || void 0,
         className: cn(
           trackVariants({ size, type }),
           readOnly && "pointer-events-none cursor-default",
-          applyOffColors && "disabled:opacity-100"
+          pending && "pointer-events-none cursor-progress bg-[#8CA695] data-[state=checked]:bg-[#8CA695] data-[state=unchecked]:bg-[#8CA695]"
         ),
         ...props,
-        children: /* @__PURE__ */ jsx(Switch.Thumb, { className: thumbVariants({ size, type }), style: thumbStyle })
+        children: /* @__PURE__ */ jsx(
+          Switch.Thumb,
+          {
+            className: cn(
+              thumbVariants({ size, type }),
+              pending && THUMB_PENDING_TRANSLATE[size]
+            ),
+            children: pending && /* @__PURE__ */ jsx(
+              "span",
+              {
+                "aria-hidden": "true",
+                className: cn(
+                  PENDING_SPINNER_SIZE[size],
+                  "rounded-full border-[1.6px] border-[rgba(0,60,27,0.25)] border-t-[#003C1B]",
+                  "animate-[spin_0.7s_linear_infinite]"
+                )
+              }
+            )
+          }
+        )
       }
     );
     const inlineEl = title ? /* @__PURE__ */ jsxs(
@@ -5807,15 +6232,35 @@ var Toggle = React9.forwardRef(
       {
         style: pillStyle,
         className: cn(
-          "inline-flex cursor-pointer items-center transition-colors",
-          hasCustomColors2 ? cn("rounded-xl border", PILL_PADDING3[size], "border-gray-200") : GAP_ONLY3[size],
-          disabled && (applyOffColors ? "cursor-not-allowed" : "cursor-not-allowed opacity-60"),
+          "inline-flex cursor-pointer items-center transition-colors duration-[120ms] ease-linear",
+          hasCustomColors2 ? cn("rounded-[10px] border", PILL_PADDING3[size], "border-[#E2E2E2]") : GAP_ONLY3[size],
+          disabled && "cursor-not-allowed",
           readOnly && "pointer-events-none cursor-default"
         ),
         children: [
-          titlePosition === "left" && /* @__PURE__ */ jsx("span", { className: "text-sm font-medium text-[#1F2937]", children: title }),
+          titlePosition === "left" && /* @__PURE__ */ jsx(
+            "span",
+            {
+              className: cn(
+                TITLE_TEXT[size],
+                "font-medium text-[#202020]",
+                disabled && "text-[#9C9C9C]"
+              ),
+              children: title
+            }
+          ),
           switchEl,
-          titlePosition === "right" && /* @__PURE__ */ jsx("span", { className: "text-sm font-medium text-[#1F2937]", children: title })
+          titlePosition === "right" && /* @__PURE__ */ jsx(
+            "span",
+            {
+              className: cn(
+                TITLE_TEXT[size],
+                "font-medium text-[#202020]",
+                disabled && "text-[#9C9C9C]"
+              ),
+              children: title
+            }
+          )
         ]
       }
     ) : hasCustomColors2 ? /* @__PURE__ */ jsx(
@@ -5823,10 +6268,9 @@ var Toggle = React9.forwardRef(
       {
         style: pillStyle,
         className: cn(
-          "inline-flex items-center transition-colors rounded-xl border",
+          "inline-flex items-center transition-colors duration-[120ms] ease-linear rounded-[10px] border",
           PILL_PADDING3[size],
-          "border-gray-200",
-          disabled && !applyOffColors && "opacity-60",
+          "border-[#E2E2E2]",
           readOnly && "pointer-events-none cursor-default"
         ),
         children: switchEl

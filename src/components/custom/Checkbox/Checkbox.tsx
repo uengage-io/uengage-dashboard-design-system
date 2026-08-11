@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check, Minus } from "lucide-react";
+import { Check } from "lucide-react";
 import { Checkbox as CheckboxPrimitive } from "radix-ui";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -13,22 +13,48 @@ import {
 } from "@/utils/labelValidation";
 import type { CustomCheckboxProps } from "@/types/checkbox";
 
-const ICON_SIZE: Record<"sm" | "md" | "lg", string> = {
-  sm: "size-3",
-  md: "size-4",
-  lg: "size-5",
+type Size = "xs" | "sm" | "md" | "lg";
+
+/** Tick mark 9 / 10 / 12 / 14, drawn at stroke 3.2 like the design. */
+const ICON_SIZE: Record<Size, string> = {
+  xs: "size-[9px]",
+  sm: "size-[10px]",
+  md: "size-[12px]",
+  lg: "size-[14px]",
 };
 
-const PILL_PADDING: Record<"sm" | "md" | "lg", string> = {
-  sm: "gap-1.5 px-2.5 py-1.5",
-  md: "gap-2 px-3 py-2",
-  lg: "gap-2.5 px-4 py-2.5",
+/** Indeterminate is a bar, not a minus glyph — 9×2.5 at Medium. */
+const DASH_SIZE: Record<Size, string> = {
+  xs: "h-[2px] w-[7px]",
+  sm: "h-[2px] w-[8px]",
+  md: "h-[2.5px] w-[9px]",
+  lg: "h-[3px] w-[11px]",
 };
 
-const GAP_ONLY: Record<"sm" | "md" | "lg", string> = {
-  sm: "gap-1.5",
-  md: "gap-2",
-  lg: "gap-2.5",
+const PILL_PADDING: Record<Size, string> = {
+  xs: "gap-2 px-2 py-1",
+  sm: "gap-2.5 px-2.5 py-1.5",
+  md: "gap-[11px] px-3 py-2",
+  lg: "gap-3 px-4 py-2.5",
+};
+
+/** 11px between the box and its label at every size, per the design. */
+const GAP_ONLY: Record<Size, string> = {
+  xs: "gap-2",
+  sm: "gap-2.5",
+  md: "gap-[11px]",
+  lg: "gap-3",
+};
+
+/**
+ * Nudges the box down to sit on the first line of the label — half the
+ * difference between the 1.5 line box and the control, where that is positive.
+ */
+const BOX_FIRST_LINE_OFFSET: Record<Size, string> = {
+  xs: "mt-[2px]",
+  sm: "mt-[1px]",
+  md: "mt-0",
+  lg: "mt-0",
 };
 
 function Checkbox({
@@ -81,13 +107,18 @@ function Checkbox({
     onCheckedChange?.(nextBool);
   };
 
+  const isOn = visualChecked || Boolean(indeterminate);
+
   const boxState:
     | "unchecked"
     | "checked"
     | "indeterminate"
     | "disabled"
+    | "disabledChecked"
     | "error" = disabled
-    ? "disabled"
+    ? isOn
+      ? "disabledChecked"
+      : "disabled"
     : error
       ? "error"
       : indeterminate
@@ -96,11 +127,13 @@ function Checkbox({
           ? "checked"
           : "unchecked";
 
-  const labelState: "default" | "checked" | "disabled" = disabled
+  const labelState: "default" | "checked" | "disabled" | "error" = disabled
     ? "disabled"
-    : visualChecked || indeterminate
-      ? "checked"
-      : "default";
+    : error
+      ? "error"
+      : isOn
+        ? "checked"
+        : "default";
 
   const effectiveBorderColor = borderColor;
   const effectiveBgColor = bgColor;
@@ -122,16 +155,18 @@ function Checkbox({
       }
 
       className={cn(
-        "group inline-flex cursor-pointer items-center transition-colors",
+        // The box aligns to the first line of the label, not the centre of it,
+        // so multi-line labels stay tidy.
+        "group inline-flex cursor-pointer items-start transition-colors duration-[120ms] ease-linear",
         hasCustomColors
           ? cn(
-              "rounded-xl border",
+              "rounded-[10px] border",
               PILL_PADDING[size],
               error
-                ? "border-red-500"
+                ? "border-[#A8000F]"
                 : disabled
-                  ? "border-gray-200"
-                  : "border-gray-200",
+                  ? "border-[#E2E2E2]"
+                  : "border-[#E2E2E2]",
             )
           : GAP_ONLY[size],
         disabled && "cursor-not-allowed",
@@ -151,7 +186,10 @@ function Checkbox({
             ? { backgroundColor: effectiveBorderColor, borderColor: effectiveBorderColor }
             : undefined
         }
-        className={cn(checkboxBoxVariants({ size, state: boxState }))}
+        className={cn(
+          checkboxBoxVariants({ size, state: boxState }),
+          BOX_FIRST_LINE_OFFSET[size],
+        )}
       >
         <CheckboxPrimitive.Indicator
           forceMount
@@ -159,9 +197,14 @@ function Checkbox({
           className="grid h-full w-full place-content-center text-current transition-none data-[state=unchecked]:opacity-0"
         >
           {indeterminate ? (
-            <Minus className={cn(ICON_SIZE[size], "stroke-[3]")} />
+            <span
+              className={cn(
+                DASH_SIZE[size],
+                "rounded-[2px] bg-current",
+              )}
+            />
           ) : (
-            <Check className={cn(ICON_SIZE[size], "stroke-[3]")} />
+            <Check className={cn(ICON_SIZE[size], "stroke-[3.2]")} />
           )}
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
@@ -172,7 +215,7 @@ function Checkbox({
           style={effectiveTextColor && isActive ? { color: effectiveTextColor } : undefined}
           className={cn(
             checkboxLabelVariants({ size, state: labelState }),
-            "whitespace-normal break-words",
+            "whitespace-normal break-words leading-[1.5]",
           )}
         >
           {truncateLabelToWordLimit(label)}

@@ -1,9 +1,14 @@
 import * as React from "react";
 import { DayPicker, type DayButton, type Modifiers } from "react-day-picker";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Select } from "@/components/custom/Select/Select";
 import type { SelectOption } from "@/components/custom/Select/Select.types";
+import {
+  DATEPICKER_SIZES,
+  PANEL,
+  getDayCellStyle,
+  type DatePickerSize,
+} from "@/components/custom/DatePicker/datepickerVariants";
 
 /* ── Static data ──────────────────────────────────────────────────────── */
 
@@ -37,66 +42,128 @@ function buildYearOptions(center: number, minYear?: number, maxYear?: number): S
   return opts;
 }
 
-/* ── Styled day button ────────────────────────────────────────────────── */
+/** Single-letter heads, the way the design draws them. */
+const WEEK_HEADS = ["S", "M", "T", "W", "T", "F", "S"];
 
-function StyledDayButton({
-  day,
-  modifiers,
-  className,
-  ...props
-}: React.ComponentProps<typeof DayButton>) {
-  const ref = React.useRef<HTMLButtonElement>(null);
+/* ── Small controls ───────────────────────────────────────────────────── */
 
-  React.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus();
-  }, [modifiers.focused]);
-
-  const isEdge = modifiers.range_start || modifiers.range_end;
-  const isSingleSelected =
-    modifiers.selected && !isEdge && !modifiers.range_middle;
-  const isGreenFilled = isSingleSelected || isEdge;
+/** A month chip in the month-mode grid. */
+function JumpCell({
+  label,
+  selected,
+  ring,
+  disabled,
+  height,
+  onClick,
+}: {
+  label: string;
+  selected: boolean;
+  ring?: boolean;
+  disabled?: boolean;
+  height: number;
+  onClick: () => void;
+}) {
+  const [hovered, setHovered] = React.useState(false);
 
   return (
     <button
-      ref={ref}
       type="button"
-      disabled={modifiers.disabled}
-      className={cn(
-        // base circle
-        "relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors select-none",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006F42] focus-visible:ring-offset-1",
-        // green filled circle — single selected or range edge
-        isGreenFilled &&
-          "bg-[#006F42] text-white font-medium",
-        // range middle — transparent, cell bg (#006F42) shows through
-        modifiers.range_middle &&
-          !isEdge &&
-          "w-full rounded-none text-white",
-        // today underline — always render; color depends on context
-        modifiers.today &&
-          (isGreenFilled || (modifiers.range_middle && !isEdge)) &&
-          "underline decoration-white underline-offset-2 decoration-2",
-        modifiers.today &&
-          !isGreenFilled &&
-          !modifiers.range_middle &&
-          "underline decoration-[#006F42] underline-offset-2 decoration-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
-        // default
-        !isGreenFilled &&
-          !modifiers.today &&
-          !modifiers.range_middle &&
-          !modifiers.outside &&
-          !modifiers.disabled &&
-          "text-[#374151] hover:bg-[#F3F4F6]",
-        // outside month
-        modifiers.outside && "text-[#D1D5DB] hover:bg-transparent",
-        // disabled
-        modifiers.disabled &&
-          "text-[#D1D5DB] opacity-50 cursor-not-allowed pointer-events-none",
-        className,
-      )}
-      {...props}
-    />
+      onClick={onClick}
+      disabled={disabled}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      className="ue-tabular border-0 transition-[background] duration-[120ms] disabled:cursor-not-allowed disabled:opacity-40"
+      style={{
+        height,
+        borderRadius: PANEL.cellRadius,
+        fontVariantNumeric: "tabular-nums",
+        fontSize: 11,
+        fontWeight: selected ? 600 : 500,
+        cursor: disabled ? "not-allowed" : "pointer",
+        background: selected
+          ? PANEL.selectedBg
+          : hovered && !disabled
+            ? PANEL.hover
+            : "transparent",
+        color: selected ? PANEL.selectedInk : PANEL.dayInk,
+        boxShadow: ring && !selected ? PANEL.todayRing : "none",
+      }}
+    >
+      {label}
+    </button>
   );
+}
+
+/* ── Styled day button ────────────────────────────────────────────────── */
+
+interface DayButtonExtras {
+  size: DatePickerSize;
+}
+
+function makeDayButton({ size }: DayButtonExtras) {
+  const spec = DATEPICKER_SIZES[size];
+
+  return function StyledDayButton({
+    day: _day,
+    modifiers,
+    className,
+    ...props
+  }: React.ComponentProps<typeof DayButton>) {
+    const ref = React.useRef<HTMLButtonElement>(null);
+    const [hovered, setHovered] = React.useState(false);
+
+    React.useEffect(() => {
+      if (modifiers.focused) ref.current?.focus();
+    }, [modifiers.focused]);
+
+    const isEdge = !!(modifiers.range_start || modifiers.range_end);
+
+    const style = getDayCellStyle({
+      selected: !!modifiers.selected && !isEdge && !modifiers.range_middle,
+      rangeStart: !!modifiers.range_start,
+      rangeEnd: !!modifiers.range_end,
+      inRange: !!modifiers.range_middle && !isEdge,
+      today: !!modifiers.today,
+      outside: !!modifiers.outside,
+      disabled: !!modifiers.disabled,
+    });
+
+    // The wash only applies to a cell that has no fill of its own.
+    const plain = style.background === "transparent";
+
+    return (
+      // `props` is spread first so react-day-picker can never clobber the
+      // cell's own metrics — a `style` coming through the spread would replace
+      // the whole inline style object, not merge into it.
+      <button
+        {...props}
+        ref={ref}
+        type="button"
+        disabled={modifiers.disabled}
+        onPointerEnter={() => setHovered(true)}
+        onPointerLeave={() => setHovered(false)}
+        className={cn(
+          "ue-tabular relative z-10 flex items-center justify-center border-0 transition-[background-color] duration-[120ms] select-none",
+          "focus-visible:outline-none",
+          modifiers.disabled && "cursor-not-allowed",
+          className,
+        )}
+        style={{
+          width: spec.cell,
+          height: spec.cell,
+          fontVariantNumeric: "tabular-nums",
+          fontSize: spec.cellFont,
+          lineHeight: 1,
+          cursor: modifiers.disabled ? "not-allowed" : "pointer",
+          ...style,
+          background:
+            plain && hovered && !modifiers.disabled
+              ? PANEL.hover
+              : style.background,
+        }}
+      />
+    );
+  };
 }
 
 /* ── Component ────────────────────────────────────────────────────────── */
@@ -118,6 +185,16 @@ interface DatePickerCalendarProps {
   minDate?: Date;
   maxDate?: Date;
   className?: string;
+  /** Scales the day grid with the trigger. Defaults to `md` (30px cells). */
+  size?: DatePickerSize;
+  /** Pulls the view to this month whenever it changes. */
+  focusDate?: Date | null;
+  /**
+   * Rendered as the last row of the panel column, under the grid's hairline.
+   * The design keeps the hint / Clear / Apply row inside the same 12px column
+   * as the header and the grid.
+   */
+  footer?: React.ReactNode;
   onDayClick?: DayHandler;
   onDayMouseEnter?: DayHandler;
   onDayMouseLeave?: DayHandler;
@@ -132,11 +209,15 @@ export function DatePickerCalendar({
   minDate,
   maxDate,
   className,
+  size = "md",
+  focusDate,
+  footer,
   onDayClick,
   onDayMouseEnter,
   onDayMouseLeave,
 }: DatePickerCalendarProps) {
   const today = React.useMemo(() => new Date(), []);
+  const spec = DATEPICKER_SIZES[size];
 
   const clampedToday = maxDate && today > maxDate ? maxDate : minDate && today < minDate ? minDate : today;
 
@@ -149,6 +230,15 @@ export function DatePickerCalendar({
 
   const [viewMonth, setViewMonth] = React.useState<Date>(initialMonth);
 
+  const focusKey = focusDate ? focusDate.getFullYear() * 100 + focusDate.getMonth() : null;
+  React.useEffect(() => {
+    if (focusKey === null) return;
+    setViewMonth(new Date(Math.floor(focusKey / 100), focusKey % 100, 1));
+  }, [focusKey]);
+
+  // ── Month & year jump panel ─────────────────────────────────────────────
+  // Two independent selects, so a jump is one click on each rather than an
+  // overlay that hides the grid.
   const yearOptions = React.useMemo(
     () => buildYearOptions(
       today.getFullYear(),
@@ -169,80 +259,59 @@ export function DatePickerCalendar({
     });
   }, [viewMonth, minDate, maxDate]);
 
-  const handlePrev = () =>
-    setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1));
-
-  const handleNext = () =>
-    setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1));
-
   const handleMonthSelect = (val: string | string[]) =>
-    setViewMonth(
-      (prev) => new Date(prev.getFullYear(), Number(val as string), 1),
-    );
+    setViewMonth((prev) => new Date(prev.getFullYear(), Number(val as string), 1));
 
   const handleYearSelect = (val: string | string[]) =>
     setViewMonth((prev) => new Date(Number(val as string), prev.getMonth(), 1));
 
-  const isPrevDisabled =
-    !!minDate &&
-    new Date(viewMonth.getFullYear(), viewMonth.getMonth()) <=
-      new Date(minDate.getFullYear(), minDate.getMonth());
+  const DayButtonComponent = React.useMemo(() => makeDayButton({ size }), [size]);
 
-  const isNextDisabled =
-    !!maxDate &&
-    new Date(viewMonth.getFullYear(), viewMonth.getMonth()) >=
-      new Date(maxDate.getFullYear(), maxDate.getMonth());
+  /** 7 fixed columns with the design's 2px gutter — heads and days share it. */
+  const gridStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: `repeat(7, ${spec.cell}px)`,
+    gap: PANEL.cellGap,
+  };
 
   return (
-    <div className={cn("w-[360px] max-w-full bg-white", className)}>
-      {/* ── Navigation header ── */}
-      <div className="flex items-center gap-1 px-3 py-2">
-        <button
-          type="button"
-          onClick={handlePrev}
-          disabled={isPrevDisabled}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30"
-          aria-label="Previous month"
-        >
-          <ChevronLeft size={14} strokeWidth={2.5} />
-        </button>
-
-        <div className="flex flex-1 items-center justify-center gap-1.5">
-          <Select
-            options={monthOptions}
-            value={String(viewMonth.getMonth())}
-            onChange={handleMonthSelect}
-            size="sm"
-            className="w-36"
-          />
-          <Select
-            options={yearOptions}
-            value={String(viewMonth.getFullYear())}
-            onChange={handleYearSelect}
-            size="sm"
-            className="w-24"
-          />
-        </div>
-
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={isNextDisabled}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30"
-          aria-label="Next month"
-        >
-          <ChevronRight size={14} strokeWidth={2.5} />
-        </button>
+    <div
+      className={cn("flex flex-col bg-white", className)}
+      style={{ padding: PANEL.padding, gap: 10 }}
+    >
+      {/* Navigation header — the two dropdowns are the only way to move */}
+      <div className="flex items-center justify-center gap-1.5">
+        <Select
+          options={monthOptions}
+          value={String(viewMonth.getMonth())}
+          onChange={handleMonthSelect}
+          size="xs"
+          className="w-[88px]"
+        />
+        <Select
+          options={yearOptions}
+          value={String(viewMonth.getFullYear())}
+          onChange={handleYearSelect}
+          size="xs"
+          className="w-[70px]"
+        />
       </div>
 
       {/* ── Day grid ── */}
-      <div className="px-3 pb-3">
+      <div>
         {/* Weekday header as plain divs — avoids <thead> table-context issues */}
-        <div className="grid grid-cols-7 mb-1">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+        <div style={gridStyle}>
+          {WEEK_HEADS.map((d, i) => (
             <div
-              key={d}
-              className="flex h-7 items-center justify-center text-[11px] font-medium text-[#9CA3AF] select-none"
+              key={`${d}-${i}`}
+              className="flex select-none items-center justify-center"
+              style={{
+                height: PANEL.weekHeadHeight,
+                fontSize: 10,
+                fontWeight: 600,
+                lineHeight: 1,
+                color: PANEL.weekHeadInk,
+              }}
             >
               {d}
             </div>
@@ -275,18 +344,16 @@ export function DatePickerCalendar({
               : undefined
           }
           classNames={{
-            months: "flex flex-col w-full",
-            month: "flex flex-col gap-1 w-full",
+            months: "flex flex-col",
+            month: "flex flex-col",
             month_caption: "hidden",
-            weeks: "flex flex-col gap-0.5 w-full",
-            week: "grid grid-cols-7 w-full",
+            weeks: "flex flex-col",
+            week: "",
             day: "flex items-center justify-center p-0 relative",
             day_button: "",
-            range_start:
-              "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",
-            range_middle: "bg-[#006F42]",
-            range_end:
-              "bg-[linear-gradient(to_right,#006F42_50%,transparent_50%)]",
+            range_start: "",
+            range_middle: "",
+            range_end: "",
             selected: "",
             today: "",
             outside: "",
@@ -296,16 +363,32 @@ export function DatePickerCalendar({
           components={{
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             MonthGrid: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+            // The rows carry the same 2px gutter as the columns.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Weeks: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+            Weeks: ({ children, ...props }: any) => (
+              <div
+                {...props}
+                style={{ display: "flex", flexDirection: "column", gap: PANEL.cellGap }}
+              >
+                {children}
+              </div>
+            ),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Week: ({ week: _week, children, ...props }: any) => <div {...props}>{children}</div>,
+            Week: ({ week: _week, children, ...props }: any) => (
+              <div {...props} style={gridStyle}>
+                {children}
+              </div>
+            ),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Day: ({ day: _day, modifiers: _modifiers, children, ...props }: any) => <div {...props}>{children}</div>,
-            DayButton: StyledDayButton,
+            Day: ({ day: _day, modifiers: _modifiers, children, ...props }: any) => (
+              <div {...props}>{children}</div>
+            ),
+            DayButton: DayButtonComponent,
           }}
         />
       </div>
+
+      {footer}
     </div>
   );
 }
@@ -332,32 +415,34 @@ export function MonthPickerCalendar({
     selected?.getFullYear() ?? today.getFullYear(),
   );
 
-  const yearOptions = React.useMemo((): SelectOption[] => {
-    const center = today.getFullYear();
-    const minYear = minDate ? minDate.getFullYear() : center - 10;
-    const maxYear = maxDate ? maxDate.getFullYear() : center + 10;
-    const opts: SelectOption[] = [];
-    for (let y = minYear; y <= maxYear; y++) {
-      opts.push({ label: String(y), value: String(y) });
-    }
-    return opts;
-  }, [today, minDate, maxDate]);
+  const yearOptions = React.useMemo(
+    () =>
+      buildYearOptions(
+        today.getFullYear(),
+        minDate?.getFullYear(),
+        maxDate?.getFullYear(),
+      ),
+    [today, minDate, maxDate],
+  );
 
   return (
-    <div className={cn("w-[280px] max-w-full bg-white", className)}>
-      {/* Year select */}
-      <div className="flex items-center justify-center px-3 py-2">
+    <div
+      className={cn("w-[246px] max-w-full bg-white", className)}
+      style={{ padding: PANEL.padding }}
+    >
+      {/* Year dropdown */}
+      <div className="mb-2.5 flex items-center justify-center">
         <Select
           options={yearOptions}
           value={String(viewYear)}
           onChange={(val) => setViewYear(Number(val as string))}
-          size="sm"
-          className="w-28"
+          size="xs"
+          className="w-[104px]"
         />
       </div>
 
       {/* Month grid */}
-      <div className="grid grid-cols-3 gap-1.5 px-3 pb-3">
+      <div className="grid grid-cols-3 gap-[5px]">
         {MONTH_LABELS.map((label, i) => {
           const isSelected =
             !!selected &&
@@ -374,26 +459,15 @@ export function MonthPickerCalendar({
                 new Date(maxDate.getFullYear(), maxDate.getMonth()));
 
           return (
-            <button
+            <JumpCell
               key={label}
-              type="button"
+              label={label}
+              height={32}
+              selected={isSelected}
+              ring={isToday}
               disabled={isDisabled}
               onClick={() => onSelect(new Date(viewYear, i, 1))}
-              className={cn(
-                "h-9 rounded-lg text-sm font-medium transition-colors select-none",
-                isSelected && "bg-[#006F42] text-white",
-                isToday &&
-                  !isSelected &&
-                  "underline decoration-[#006F42] decoration-2 underline-offset-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
-                !isSelected &&
-                  !isToday &&
-                  !isDisabled &&
-                  "text-[#374151] hover:bg-[#F3F4F6]",
-                isDisabled && "text-[#D1D5DB] opacity-50 cursor-not-allowed",
-              )}
-            >
-              {label}
-            </button>
+            />
           );
         })}
       </div>

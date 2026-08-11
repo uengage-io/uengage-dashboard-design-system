@@ -41,6 +41,11 @@ const meta: Meta<typeof Toggle> = {
       control: { type: "boolean" },
       description: "Shows the current state but prevents toggling.",
     },
+    pending: {
+      control: { type: "boolean" },
+      description:
+        "Parks the knob mid-track with a spinner until the server confirms the flip.",
+    },
     bgColor: {
       control: { type: "color" },
       description: "Custom background color of the toggle pill.",
@@ -48,14 +53,6 @@ const meta: Meta<typeof Toggle> = {
     borderColor: {
       control: { type: "color" },
       description: "Custom border color of the toggle pill.",
-    },
-    offBgColor: {
-      control: { type: "color" },
-      description: "Background color applied to the track (and pill, if used) when the toggle is off (unchecked).",
-    },
-    offBorderColor: {
-      control: { type: "color" },
-      description: "Border color applied to the track (and pill, if used) when the toggle is off (unchecked).",
     },
   },
   args: {
@@ -65,6 +62,7 @@ const meta: Meta<typeof Toggle> = {
     disabled: false,
     required: false,
     readOnly: false,
+    pending: false,
   },
 };
 
@@ -182,29 +180,6 @@ export const ReadOnly: Story = {
   },
 };
 
-export const OffCustomColors: Story = {
-  name: "Off · Custom colors",
-  args: {
-    title: "Notifications",
-    titlePosition: "right",
-    defaultChecked: false,
-    offBorderColor: "#D1D5DB",
-    offBgColor: "#F3F4F6",
-  },
-};
-
-export const DisabledOffCustomColors: Story = {
-  name: "Disabled · Off · Custom colors",
-  args: {
-    title: "Notifications",
-    titlePosition: "right",
-    disabled: true,
-    defaultChecked: false,
-    offBorderColor: "#D1D5DB",
-    offBgColor: "#F3F4F6",
-  },
-};
-
 export const ReadOnlyOff: Story = {
   name: "Read only (off)",
   args: {
@@ -237,20 +212,6 @@ export const PillCustomColors: Story = {
   },
 };
 
-export const PillOffCustomColors: Story = {
-  name: "Pill · Off · Custom colors",
-  args: {
-    title: "Enable notifications",
-    titlePosition: "right",
-    borderColor: "#1F6B32",
-    bgColor: "#F0F7F0",
-    defaultChecked: false,
-    offBorderColor: "#D1D5DB",
-    offBgColor: "#F3F4F6",
-    size: "md",
-  },
-};
-
 export const PillSizes: Story = {
   name: "Pill · All sizes",
   render: () => (
@@ -261,6 +222,58 @@ export const PillSizes: Story = {
       <Toggle size="lg" title="Large" titlePosition="right" borderColor="#1F6B32" bgColor="#F0F7F0" />
     </div>
   ),
+};
+
+/* ── Every state ────────────────────────────────────────────────── */
+
+export const EveryState: Story = {
+  name: "Every state",
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <Toggle title="Off" />
+      <Toggle title="On" defaultChecked />
+      <Toggle title="Error (off)" type="danger" />
+      <Toggle title="Pending" pending defaultChecked />
+      <Toggle title="Disabled (off)" disabled />
+      <Toggle title="Disabled (on)" disabled defaultChecked />
+      <Toggle title="Read only (on)" readOnly defaultChecked />
+    </div>
+  ),
+};
+
+/* ── Settings rows ──────────────────────────────────────────────── */
+
+export const SettingsRows: Story = {
+  name: "Settings rows",
+  render: function SettingsRowsStory() {
+    const rows = [
+      ["Accept online orders", "Storefront and aggregators.", true],
+      ["Print receipts", "Sends to the counter printer.", false],
+      ["Downtime alerts", "Pings ops when a channel drops.", true],
+    ] as const;
+    return (
+      <div className="w-[320px] overflow-hidden rounded-[10px] border border-[#E2E2E2]">
+        {rows.map(([label, note, on], i) => (
+          <div
+            key={label}
+            className={`flex items-center gap-3 px-[13px] py-3 ${
+              i < rows.length - 1 ? "border-b border-[#EEEEEE]" : ""
+            }`}
+          >
+            <span className="flex flex-1 flex-col gap-0.5">
+              <span className="text-[12px] font-semibold leading-[1.3] text-[#202020]">
+                {label}
+              </span>
+              <span className="text-[11px] leading-[1.4] text-[#787878]">
+                {note}
+              </span>
+            </span>
+            <Toggle defaultChecked={on} />
+          </div>
+        ))}
+      </div>
+    );
+  },
 };
 
 /* ── Controlled ─────────────────────────────────────────────────── */

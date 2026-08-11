@@ -2,9 +2,9 @@
 import * as React4 from 'react';
 import { useMemo } from 'react';
 import { DayPicker } from 'react-day-picker';
-import { ChevronLeft, ChevronRight, Check, X, ArrowUpAZ, ArrowDownAZ, Lock, CircleAlert, ChevronDown, Plus } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Check, X, ArrowUpAZ, ArrowDownAZ, Lock, CircleAlert, ChevronDown, Plus } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Popover as Popover$1, Label as Label$1 } from 'radix-ui';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
@@ -438,8 +438,34 @@ var MENU = {
   groupRule: "#EEEEEE",
   metaInk: INPUT_COLORS.message,
   /** Long lists cap at 8 rows and scroll. */
-  maxRows: 8
+  maxRows: 8,
+  /** Thin green scrollbar on the option list — never the system default. */
+  scrollThumb: "#16914E",
+  scrollThumbHover: "#A8D5B5",
+  scrollWidth: 4
 };
+var MENU_SCROLLBAR_CSS = `
+[data-slot="select-menu-list"] {
+  scrollbar-width: thin;
+  scrollbar-color: ${MENU.scrollThumb} transparent;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar {
+  width: ${MENU.scrollWidth}px;
+  height: ${MENU.scrollWidth}px;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: ${MENU.padding}px;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-thumb {
+  background-color: ${MENU.scrollThumb};
+  border-radius: 9999px;
+  transition: background-color 160ms ease;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-thumb:hover {
+  background-color: ${MENU.scrollThumbHover};
+}
+`;
 function getTriggerStyle(state) {
   return getInputBoxStyle(state === "open" ? "focused" : state);
 }
@@ -980,7 +1006,7 @@ function Select({
           className: "max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
           collisionPadding: { top: 64 },
           style: { width: "var(--radix-popover-trigger-width)" },
-          children: /* @__PURE__ */ jsx(
+          children: /* @__PURE__ */ jsxs(
             "div",
             {
               style: {
@@ -990,133 +1016,137 @@ function Select({
                 background: MENU.background,
                 boxShadow: MENU.shadow
               },
-              children: /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
-                searchEnabled && !loading && /* @__PURE__ */ jsx(
-                  CommandInput,
-                  {
-                    placeholder: "Search...",
-                    value: searchQuery,
-                    onValueChange: handleSearchChange,
-                    spellCheck,
-                    style: { fontSize: spec.font }
-                  }
-                ),
-                resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
-                  "div",
-                  {
-                    className: "sticky top-0 z-10 flex items-center justify-between",
-                    style: {
-                      padding: "6px 10px",
-                      background: MENU.background,
-                      borderBottom: `1px solid ${MENU.groupRule}`,
-                      fontSize: spec.font - 2,
-                      color: INPUT_COLORS.message
-                    },
-                    children: [
-                      /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
-                        selectedArr.length,
-                        " selected"
-                      ] }),
-                      /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
-                        /* @__PURE__ */ jsx(
-                          "button",
+              children: [
+                /* @__PURE__ */ jsx("style", { children: MENU_SCROLLBAR_CSS }),
+                /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
+                  searchEnabled && !loading && /* @__PURE__ */ jsx(
+                    CommandInput,
+                    {
+                      placeholder: "Search...",
+                      value: searchQuery,
+                      onValueChange: handleSearchChange,
+                      spellCheck,
+                      style: { fontSize: spec.font }
+                    }
+                  ),
+                  resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
+                    "div",
+                    {
+                      className: "sticky top-0 z-10 flex items-center justify-between",
+                      style: {
+                        padding: "6px 10px",
+                        background: MENU.background,
+                        borderBottom: `1px solid ${MENU.groupRule}`,
+                        fontSize: spec.font - 2,
+                        color: INPUT_COLORS.message
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
+                          selectedArr.length,
+                          " selected"
+                        ] }),
+                        /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
+                          /* @__PURE__ */ jsx(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: () => commit(enabledOptions.map((o) => o.value)),
+                              disabled: allSelected,
+                              className: "font-semibold disabled:opacity-40",
+                              style: { color: MENU.selectedInk },
+                              children: "All"
+                            }
+                          ),
+                          /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
+                          /* @__PURE__ */ jsx(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: () => commit([]),
+                              disabled: selectedArr.length === 0,
+                              className: "font-semibold disabled:opacity-40",
+                              style: { color: INPUT_COLORS.message },
+                              children: "None"
+                            }
+                          )
+                        ] })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsx(
+                    CommandList,
+                    {
+                      ref: listRef,
+                      "data-slot": "select-menu-list",
+                      style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
+                      children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                        groups.map((group, gi) => /* @__PURE__ */ jsxs(
+                          "div",
                           {
-                            type: "button",
-                            onClick: () => commit(enabledOptions.map((o) => o.value)),
-                            disabled: allSelected,
-                            className: "font-semibold disabled:opacity-40",
-                            style: { color: MENU.selectedInk },
-                            children: "All"
+                            style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
+                            children: [
+                              group.name && /* @__PURE__ */ jsx(
+                                "div",
+                                {
+                                  className: "sticky top-0 z-[5] font-semibold uppercase",
+                                  style: {
+                                    padding: "6px 10px 4px",
+                                    background: MENU.background,
+                                    fontSize: 10,
+                                    letterSpacing: "0.09em",
+                                    color: MENU.groupInk
+                                  },
+                                  children: group.name
+                                }
+                              ),
+                              group.options.map(renderOption)
+                            ]
+                          },
+                          group.name ?? `__ungrouped_${gi}`
+                        )),
+                        showCreate && /* @__PURE__ */ jsxs(
+                          CommandItem,
+                          {
+                            value: CREATE_VALUE,
+                            onSelect: () => {
+                              onCreate?.(query);
+                              setOpen(false);
+                            },
+                            className: "cursor-pointer",
+                            style: {
+                              minHeight: spec.option,
+                              gap: SELECT_GAP,
+                              padding: "0 10px",
+                              marginTop: 4,
+                              borderTop: `1px solid ${MENU.groupRule}`,
+                              borderRadius: MENU.optionRadius,
+                              fontSize: spec.font,
+                              fontWeight: 600,
+                              color: MENU.selectedInk
+                            },
+                            children: [
+                              /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
+                              /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
+                                "Create \u201C",
+                                query,
+                                "\u201D"
+                              ] })
+                            ]
                           }
                         ),
-                        /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
-                        /* @__PURE__ */ jsx(
-                          "button",
+                        showEmpty && /* @__PURE__ */ jsx(
+                          "div",
                           {
-                            type: "button",
-                            onClick: () => commit([]),
-                            disabled: selectedArr.length === 0,
-                            className: "font-semibold disabled:opacity-40",
-                            style: { color: INPUT_COLORS.message },
-                            children: "None"
+                            className: "flex flex-col items-start gap-1",
+                            style: { padding: "14px 10px", fontSize: spec.font },
+                            children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
                           }
                         )
                       ] })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsx(
-                  CommandList,
-                  {
-                    ref: listRef,
-                    style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
-                    children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-                      groups.map((group, gi) => /* @__PURE__ */ jsxs(
-                        "div",
-                        {
-                          style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
-                          children: [
-                            group.name && /* @__PURE__ */ jsx(
-                              "div",
-                              {
-                                className: "sticky top-0 z-[5] font-semibold uppercase",
-                                style: {
-                                  padding: "6px 10px 4px",
-                                  background: MENU.background,
-                                  fontSize: 10,
-                                  letterSpacing: "0.09em",
-                                  color: MENU.groupInk
-                                },
-                                children: group.name
-                              }
-                            ),
-                            group.options.map(renderOption)
-                          ]
-                        },
-                        group.name ?? `__ungrouped_${gi}`
-                      )),
-                      showCreate && /* @__PURE__ */ jsxs(
-                        CommandItem,
-                        {
-                          value: CREATE_VALUE,
-                          onSelect: () => {
-                            onCreate?.(query);
-                            setOpen(false);
-                          },
-                          className: "cursor-pointer",
-                          style: {
-                            minHeight: spec.option,
-                            gap: SELECT_GAP,
-                            padding: "0 10px",
-                            marginTop: 4,
-                            borderTop: `1px solid ${MENU.groupRule}`,
-                            borderRadius: MENU.optionRadius,
-                            fontSize: spec.font,
-                            fontWeight: 600,
-                            color: MENU.selectedInk
-                          },
-                          children: [
-                            /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
-                            /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
-                              "Create \u201C",
-                              query,
-                              "\u201D"
-                            ] })
-                          ]
-                        }
-                      ),
-                      showEmpty && /* @__PURE__ */ jsx(
-                        "div",
-                        {
-                          className: "flex flex-col items-start gap-1",
-                          style: { padding: "14px 10px", fontSize: spec.font },
-                          children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
-                        }
-                      )
-                    ] })
-                  }
-                )
-              ] })
+                    }
+                  )
+                ] })
+              ]
             }
           )
         }
@@ -1134,6 +1164,142 @@ function Select({
   ] });
 }
 Select.displayName = "Select";
+var DATEPICKER_SIZES = {
+  xs: { height: 28, padLeft: 9, padRight: 8, font: 12, icon: 13, cell: 24, cellFont: 9, radius: 8 },
+  sm: { height: 32, padLeft: 11, padRight: 9, font: 12, icon: 14, cell: 26, cellFont: 9, radius: 8 },
+  md: { height: 40, padLeft: 13, padRight: 11, font: 13, icon: 16, cell: 30, cellFont: 10, radius: 8 },
+  lg: { height: 48, padLeft: 15, padRight: 13, font: 14, icon: 17, cell: 34, cellFont: 11, radius: 8 }
+};
+var PANEL = {
+  padding: 12,
+  /** Wash used by every hover in the panel. */
+  hover: "#FAFFF7",
+  /** 2px gutter between day cells. */
+  cellGap: 2,
+  cellRadius: 6,
+  /** Radius on the outer corners of a range, and on a lone selected day. */
+  cellRadiusSelected: 8,
+  /** Forest fill means chosen. */
+  selectedBg: "#003C1B",
+  selectedInk: "#FFFFFF",
+  /** Mint band means between — square, so the run reads as one shape. */
+  rangeBg: "#DCF3CE",
+  rangeInk: "#003C1B",
+  /** Lighter mint used for the drag preview. */
+  rangePreviewBg: "#EEF8E4",
+  /** A ring means today — never a fill, so it cannot compete with the selection. */
+  todayRing: "inset 0 0 0 1.5px #8CC42A",
+  todayInk: "#1F5E2C",
+  /** Keyboard cursor. */
+  focusRing: "0 0 0 2px rgba(140,196,42,.55)",
+  dayInk: INPUT_COLORS.value,
+  /** Weekend days stay selectable, just muted. */
+  weekendInk: INPUT_COLORS.placeholder,
+  /** Adjacent-month days. */
+  outsideInk: "#C6C6C6",
+  /** Before min / after max — greyed, still visible so the grid never shifts. */
+  outOfBoundsBg: INPUT_COLORS.subtle,
+  outOfBoundsInk: "#C6C6C6",
+  weekHeadInk: "#787878",
+  weekHeadHeight: 22};
+function getDayCellStyle(flags) {
+  const {
+    selected,
+    rangeStart,
+    rangeEnd,
+    inRange,
+    rangePreview,
+    today,
+    outside,
+    disabled,
+    weekend,
+    focused
+  } = flags;
+  const r = `${PANEL.cellRadius}px`;
+  const rSel = `${PANEL.cellRadiusSelected}px`;
+  let background = "transparent";
+  let color = PANEL.dayInk;
+  let fontWeight = 500;
+  let borderRadius = r;
+  let boxShadow = "none";
+  if (weekend) color = PANEL.weekendInk;
+  if (outside) {
+    color = PANEL.outsideInk;
+    fontWeight = 400;
+  }
+  if (rangePreview) {
+    background = PANEL.rangePreviewBg;
+    color = PANEL.rangeInk;
+    borderRadius = "0";
+  }
+  if (inRange) {
+    background = PANEL.rangeBg;
+    color = PANEL.rangeInk;
+    borderRadius = "0";
+  }
+  if (rangeStart || rangeEnd) {
+    background = PANEL.selectedBg;
+    color = PANEL.selectedInk;
+    fontWeight = 600;
+    borderRadius = rangeStart && rangeEnd ? rSel : rangeStart ? `${rSel} 0 0 ${rSel}` : `0 ${rSel} ${rSel} 0`;
+  } else if (selected) {
+    background = PANEL.selectedBg;
+    color = PANEL.selectedInk;
+    fontWeight = 600;
+    borderRadius = rSel;
+  } else if (today) {
+    color = PANEL.todayInk;
+    fontWeight = 700;
+    boxShadow = PANEL.todayRing;
+  }
+  if (focused) boxShadow = PANEL.focusRing;
+  if (disabled) {
+    return {
+      background: PANEL.outOfBoundsBg,
+      color: PANEL.outOfBoundsInk,
+      fontWeight: 400,
+      borderRadius: r,
+      boxShadow: "none"
+    };
+  }
+  return { background, color, fontWeight, borderRadius, boxShadow };
+}
+cva(
+  [
+    "flex min-w-0 items-center",
+    "cursor-pointer select-none",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0"
+  ].join(" "),
+  {
+    variants: {
+      state: {
+        default: "",
+        open: "",
+        disabled: "pointer-events-none",
+        readonly: "cursor-default pointer-events-none"
+      },
+      size: { xs: "", sm: "", md: "", lg: "" }
+    },
+    defaultVariants: { state: "default", size: "md" }
+  }
+);
+cva(
+  "flex items-center justify-center cursor-pointer select-none transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "",
+        today: "",
+        selected: "",
+        inRange: "rounded-none",
+        rangeStart: "",
+        rangeEnd: "",
+        outsideMonth: "cursor-default"
+      }
+    },
+    defaultVariants: { variant: "default" }
+  }
+);
 var MONTH_LABELS = [
   "Jan",
   "Feb",
@@ -1171,47 +1337,97 @@ function buildYearOptions(center, minYear, maxYear) {
   }
   return opts;
 }
-function StyledDayButton({
-  day,
-  modifiers,
-  className,
-  ...props
+var WEEK_HEADS = ["S", "M", "T", "W", "T", "F", "S"];
+function JumpCell({
+  label,
+  selected,
+  ring,
+  disabled,
+  height,
+  onClick
 }) {
-  const ref = React4.useRef(null);
-  React4.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus();
-  }, [modifiers.focused]);
-  const isEdge = modifiers.range_start || modifiers.range_end;
-  const isSingleSelected = modifiers.selected && !isEdge && !modifiers.range_middle;
-  const isGreenFilled = isSingleSelected || isEdge;
+  const [hovered, setHovered] = React4.useState(false);
   return /* @__PURE__ */ jsx(
     "button",
     {
-      ref,
       type: "button",
-      disabled: modifiers.disabled,
-      className: cn(
-        // base circle
-        "relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors select-none",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006F42] focus-visible:ring-offset-1",
-        // green filled circle — single selected or range edge
-        isGreenFilled && "bg-[#006F42] text-white font-medium",
-        // range middle — transparent, cell bg (#006F42) shows through
-        modifiers.range_middle && !isEdge && "w-full rounded-none text-white",
-        // today underline — always render; color depends on context
-        modifiers.today && (isGreenFilled || modifiers.range_middle && !isEdge) && "underline decoration-white underline-offset-2 decoration-2",
-        modifiers.today && !isGreenFilled && !modifiers.range_middle && "underline decoration-[#006F42] underline-offset-2 decoration-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
-        // default
-        !isGreenFilled && !modifiers.today && !modifiers.range_middle && !modifiers.outside && !modifiers.disabled && "text-[#374151] hover:bg-[#F3F4F6]",
-        // outside month
-        modifiers.outside && "text-[#D1D5DB] hover:bg-transparent",
-        // disabled
-        modifiers.disabled && "text-[#D1D5DB] opacity-50 cursor-not-allowed pointer-events-none",
-        className
-      ),
-      ...props
+      onClick,
+      disabled,
+      onPointerEnter: () => setHovered(true),
+      onPointerLeave: () => setHovered(false),
+      className: "ue-tabular border-0 transition-[background] duration-[120ms] disabled:cursor-not-allowed disabled:opacity-40",
+      style: {
+        height,
+        borderRadius: PANEL.cellRadius,
+        fontVariantNumeric: "tabular-nums",
+        fontSize: 11,
+        fontWeight: selected ? 600 : 500,
+        cursor: disabled ? "not-allowed" : "pointer",
+        background: selected ? PANEL.selectedBg : hovered && !disabled ? PANEL.hover : "transparent",
+        color: selected ? PANEL.selectedInk : PANEL.dayInk,
+        boxShadow: ring && !selected ? PANEL.todayRing : "none"
+      },
+      children: label
     }
   );
+}
+function makeDayButton({ size }) {
+  const spec = DATEPICKER_SIZES[size];
+  return function StyledDayButton({
+    day: _day,
+    modifiers,
+    className,
+    ...props
+  }) {
+    const ref = React4.useRef(null);
+    const [hovered, setHovered] = React4.useState(false);
+    React4.useEffect(() => {
+      if (modifiers.focused) ref.current?.focus();
+    }, [modifiers.focused]);
+    const isEdge = !!(modifiers.range_start || modifiers.range_end);
+    const style = getDayCellStyle({
+      selected: !!modifiers.selected && !isEdge && !modifiers.range_middle,
+      rangeStart: !!modifiers.range_start,
+      rangeEnd: !!modifiers.range_end,
+      inRange: !!modifiers.range_middle && !isEdge,
+      today: !!modifiers.today,
+      outside: !!modifiers.outside,
+      disabled: !!modifiers.disabled
+    });
+    const plain = style.background === "transparent";
+    return (
+      // `props` is spread first so react-day-picker can never clobber the
+      // cell's own metrics — a `style` coming through the spread would replace
+      // the whole inline style object, not merge into it.
+      /* @__PURE__ */ jsx(
+        "button",
+        {
+          ...props,
+          ref,
+          type: "button",
+          disabled: modifiers.disabled,
+          onPointerEnter: () => setHovered(true),
+          onPointerLeave: () => setHovered(false),
+          className: cn(
+            "ue-tabular relative z-10 flex items-center justify-center border-0 transition-[background-color] duration-[120ms] select-none",
+            "focus-visible:outline-none",
+            modifiers.disabled && "cursor-not-allowed",
+            className
+          ),
+          style: {
+            width: spec.cell,
+            height: spec.cell,
+            fontVariantNumeric: "tabular-nums",
+            fontSize: spec.cellFont,
+            lineHeight: 1,
+            cursor: modifiers.disabled ? "not-allowed" : "pointer",
+            ...style,
+            background: plain && hovered && !modifiers.disabled ? PANEL.hover : style.background
+          }
+        }
+      )
+    );
+  };
 }
 function DatePickerCalendar({
   mode = "single",
@@ -1222,14 +1438,23 @@ function DatePickerCalendar({
   minDate,
   maxDate,
   className,
+  size = "md",
+  focusDate,
+  footer,
   onDayClick,
   onDayMouseEnter,
   onDayMouseLeave
 }) {
   const today = React4.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const spec = DATEPICKER_SIZES[size];
   const clampedToday = maxDate && today > maxDate ? maxDate : minDate && today < minDate ? minDate : today;
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? clampedToday;
   const [viewMonth, setViewMonth] = React4.useState(initialMonth);
+  const focusKey = focusDate ? focusDate.getFullYear() * 100 + focusDate.getMonth() : null;
+  React4.useEffect(() => {
+    if (focusKey === null) return;
+    setViewMonth(new Date(Math.floor(focusKey / 100), focusKey % 100, 1));
+  }, [focusKey]);
   const yearOptions = React4.useMemo(
     () => buildYearOptions(
       today.getFullYear(),
@@ -1246,120 +1471,119 @@ function DatePickerCalendar({
       return isDisabled ? { ...opt, disabled: true } : opt;
     });
   }, [viewMonth, minDate, maxDate]);
-  const handlePrev = () => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1));
-  const handleNext = () => setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1));
-  const handleMonthSelect = (val) => setViewMonth(
-    (prev) => new Date(prev.getFullYear(), Number(val), 1)
-  );
+  const handleMonthSelect = (val) => setViewMonth((prev) => new Date(prev.getFullYear(), Number(val), 1));
   const handleYearSelect = (val) => setViewMonth((prev) => new Date(Number(val), prev.getMonth(), 1));
-  const isPrevDisabled = !!minDate && new Date(viewMonth.getFullYear(), viewMonth.getMonth()) <= new Date(minDate.getFullYear(), minDate.getMonth());
-  const isNextDisabled = !!maxDate && new Date(viewMonth.getFullYear(), viewMonth.getMonth()) >= new Date(maxDate.getFullYear(), maxDate.getMonth());
-  return /* @__PURE__ */ jsxs("div", { className: cn("w-[360px] max-w-full bg-white", className), children: [
-    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-1 px-3 py-2", children: [
-      /* @__PURE__ */ jsx(
-        "button",
-        {
-          type: "button",
-          onClick: handlePrev,
-          disabled: isPrevDisabled,
-          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
-          "aria-label": "Previous month",
-          children: /* @__PURE__ */ jsx(ChevronLeft, { size: 14, strokeWidth: 2.5 })
-        }
-      ),
-      /* @__PURE__ */ jsxs("div", { className: "flex flex-1 items-center justify-center gap-1.5", children: [
-        /* @__PURE__ */ jsx(
-          Select,
-          {
-            options: monthOptions,
-            value: String(viewMonth.getMonth()),
-            onChange: handleMonthSelect,
-            size: "sm",
-            className: "w-36"
-          }
-        ),
-        /* @__PURE__ */ jsx(
-          Select,
-          {
-            options: yearOptions,
-            value: String(viewMonth.getFullYear()),
-            onChange: handleYearSelect,
-            size: "sm",
-            className: "w-24"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsx(
-        "button",
-        {
-          type: "button",
-          onClick: handleNext,
-          disabled: isNextDisabled,
-          className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[#374151] transition-colors hover:bg-[#F3F4F6] disabled:cursor-not-allowed disabled:opacity-30",
-          "aria-label": "Next month",
-          children: /* @__PURE__ */ jsx(ChevronRight, { size: 14, strokeWidth: 2.5 })
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxs("div", { className: "px-3 pb-3", children: [
-      /* @__PURE__ */ jsx("div", { className: "grid grid-cols-7 mb-1", children: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => /* @__PURE__ */ jsx(
-        "div",
-        {
-          className: "flex h-7 items-center justify-center text-[11px] font-medium text-[#9CA3AF] select-none",
-          children: d
-        },
-        d
-      )) }),
-      /* @__PURE__ */ jsx(
-        DayPicker,
-        {
-          mode,
-          selected: selected ?? void 0,
-          onSelect: onSelect ?? (() => {
-          }),
-          month: viewMonth,
-          onMonthChange: setViewMonth,
-          hideNavigation: true,
-          hideWeekdays: true,
-          showOutsideDays: true,
-          disabled,
-          onDayClick,
-          onDayMouseEnter,
-          onDayMouseLeave,
-          startMonth: minDate ? new Date(minDate.getFullYear(), minDate.getMonth()) : void 0,
-          endMonth: maxDate ? new Date(maxDate.getFullYear(), maxDate.getMonth()) : void 0,
-          classNames: {
-            months: "flex flex-col w-full",
-            month: "flex flex-col gap-1 w-full",
-            month_caption: "hidden",
-            weeks: "flex flex-col gap-0.5 w-full",
-            week: "grid grid-cols-7 w-full",
-            day: "flex items-center justify-center p-0 relative",
-            day_button: "",
-            range_start: "bg-[linear-gradient(to_right,transparent_50%,#006F42_50%)]",
-            range_middle: "bg-[#006F42]",
-            range_end: "bg-[linear-gradient(to_right,#006F42_50%,transparent_50%)]",
-            selected: "",
-            today: "",
-            outside: "",
-            disabled: "",
-            hidden: "invisible"
-          },
-          components: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            MonthGrid: ({ children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Weeks: ({ children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Week: ({ week: _week, children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Day: ({ day: _day, modifiers: _modifiers, children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
-            DayButton: StyledDayButton
-          }
-        }
-      )
-    ] })
-  ] });
+  const DayButtonComponent = React4.useMemo(() => makeDayButton({ size }), [size]);
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: `repeat(7, ${spec.cell}px)`,
+    gap: PANEL.cellGap
+  };
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: cn("flex flex-col bg-white", className),
+      style: { padding: PANEL.padding, gap: 10 },
+      children: [
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center gap-1.5", children: [
+          /* @__PURE__ */ jsx(
+            Select,
+            {
+              options: monthOptions,
+              value: String(viewMonth.getMonth()),
+              onChange: handleMonthSelect,
+              size: "xs",
+              className: "w-[88px]"
+            }
+          ),
+          /* @__PURE__ */ jsx(
+            Select,
+            {
+              options: yearOptions,
+              value: String(viewMonth.getFullYear()),
+              onChange: handleYearSelect,
+              size: "xs",
+              className: "w-[70px]"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("div", { style: gridStyle, children: WEEK_HEADS.map((d, i) => /* @__PURE__ */ jsx(
+            "div",
+            {
+              className: "flex select-none items-center justify-center",
+              style: {
+                height: PANEL.weekHeadHeight,
+                fontSize: 10,
+                fontWeight: 600,
+                lineHeight: 1,
+                color: PANEL.weekHeadInk
+              },
+              children: d
+            },
+            `${d}-${i}`
+          )) }),
+          /* @__PURE__ */ jsx(
+            DayPicker,
+            {
+              mode,
+              selected: selected ?? void 0,
+              onSelect: onSelect ?? (() => {
+              }),
+              month: viewMonth,
+              onMonthChange: setViewMonth,
+              hideNavigation: true,
+              hideWeekdays: true,
+              showOutsideDays: true,
+              disabled,
+              onDayClick,
+              onDayMouseEnter,
+              onDayMouseLeave,
+              startMonth: minDate ? new Date(minDate.getFullYear(), minDate.getMonth()) : void 0,
+              endMonth: maxDate ? new Date(maxDate.getFullYear(), maxDate.getMonth()) : void 0,
+              classNames: {
+                months: "flex flex-col",
+                month: "flex flex-col",
+                month_caption: "hidden",
+                weeks: "flex flex-col",
+                week: "",
+                day: "flex items-center justify-center p-0 relative",
+                day_button: "",
+                range_start: "",
+                range_middle: "",
+                range_end: "",
+                selected: "",
+                today: "",
+                outside: "",
+                disabled: "",
+                hidden: "invisible"
+              },
+              components: {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                MonthGrid: ({ children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
+                // The rows carry the same 2px gutter as the columns.
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                Weeks: ({ children, ...props }) => /* @__PURE__ */ jsx(
+                  "div",
+                  {
+                    ...props,
+                    style: { display: "flex", flexDirection: "column", gap: PANEL.cellGap },
+                    children
+                  }
+                ),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                Week: ({ week: _week, children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, style: gridStyle, children }),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                Day: ({ day: _day, modifiers: _modifiers, children, ...props }) => /* @__PURE__ */ jsx("div", { ...props, children }),
+                DayButton: DayButtonComponent
+              }
+            }
+          )
+        ] }),
+        footer
+      ]
+    }
+  );
 }
 function MonthPickerCalendar({
   selected,
@@ -1372,50 +1596,50 @@ function MonthPickerCalendar({
   const [viewYear, setViewYear] = React4.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React4.useMemo(() => {
-    const center = today.getFullYear();
-    const minYear = minDate ? minDate.getFullYear() : center - 10;
-    const maxYear = maxDate ? maxDate.getFullYear() : center + 10;
-    const opts = [];
-    for (let y = minYear; y <= maxYear; y++) {
-      opts.push({ label: String(y), value: String(y) });
+  const yearOptions = React4.useMemo(
+    () => buildYearOptions(
+      today.getFullYear(),
+      minDate?.getFullYear(),
+      maxDate?.getFullYear()
+    ),
+    [today, minDate, maxDate]
+  );
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: cn("w-[246px] max-w-full bg-white", className),
+      style: { padding: PANEL.padding },
+      children: [
+        /* @__PURE__ */ jsx("div", { className: "mb-2.5 flex items-center justify-center", children: /* @__PURE__ */ jsx(
+          Select,
+          {
+            options: yearOptions,
+            value: String(viewYear),
+            onChange: (val) => setViewYear(Number(val)),
+            size: "xs",
+            className: "w-[104px]"
+          }
+        ) }),
+        /* @__PURE__ */ jsx("div", { className: "grid grid-cols-3 gap-[5px]", children: MONTH_LABELS.map((label, i) => {
+          const isSelected = !!selected && selected.getFullYear() === viewYear && selected.getMonth() === i;
+          const isToday = today.getFullYear() === viewYear && today.getMonth() === i;
+          const isDisabled = !!minDate && new Date(viewYear, i) < new Date(minDate.getFullYear(), minDate.getMonth()) || !!maxDate && new Date(viewYear, i) > new Date(maxDate.getFullYear(), maxDate.getMonth());
+          return /* @__PURE__ */ jsx(
+            JumpCell,
+            {
+              label,
+              height: 32,
+              selected: isSelected,
+              ring: isToday,
+              disabled: isDisabled,
+              onClick: () => onSelect(new Date(viewYear, i, 1))
+            },
+            label
+          );
+        }) })
+      ]
     }
-    return opts;
-  }, [today, minDate, maxDate]);
-  return /* @__PURE__ */ jsxs("div", { className: cn("w-[280px] max-w-full bg-white", className), children: [
-    /* @__PURE__ */ jsx("div", { className: "flex items-center justify-center px-3 py-2", children: /* @__PURE__ */ jsx(
-      Select,
-      {
-        options: yearOptions,
-        value: String(viewYear),
-        onChange: (val) => setViewYear(Number(val)),
-        size: "sm",
-        className: "w-28"
-      }
-    ) }),
-    /* @__PURE__ */ jsx("div", { className: "grid grid-cols-3 gap-1.5 px-3 pb-3", children: MONTH_LABELS.map((label, i) => {
-      const isSelected = !!selected && selected.getFullYear() === viewYear && selected.getMonth() === i;
-      const isToday = today.getFullYear() === viewYear && today.getMonth() === i;
-      const isDisabled = !!minDate && new Date(viewYear, i) < new Date(minDate.getFullYear(), minDate.getMonth()) || !!maxDate && new Date(viewYear, i) > new Date(maxDate.getFullYear(), maxDate.getMonth());
-      return /* @__PURE__ */ jsx(
-        "button",
-        {
-          type: "button",
-          disabled: isDisabled,
-          onClick: () => onSelect(new Date(viewYear, i, 1)),
-          className: cn(
-            "h-9 rounded-lg text-sm font-medium transition-colors select-none",
-            isSelected && "bg-[#006F42] text-white",
-            isToday && !isSelected && "underline decoration-[#006F42] decoration-2 underline-offset-2 text-[#006F42] font-semibold hover:bg-[#F3F4F6]",
-            !isSelected && !isToday && !isDisabled && "text-[#374151] hover:bg-[#F3F4F6]",
-            isDisabled && "text-[#D1D5DB] opacity-50 cursor-not-allowed"
-          ),
-          children: label
-        },
-        label
-      );
-    }) })
-  ] });
+  );
 }
 
 export { DatePickerCalendar, MonthPickerCalendar };

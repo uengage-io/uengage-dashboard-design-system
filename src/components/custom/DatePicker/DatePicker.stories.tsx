@@ -27,9 +27,17 @@ const meta = {
     },
     size: {
       control: "radio",
-      options: ["sm", "md", "lg"],
-      description: "Trigger height preset.",
+      options: ["xs", "sm", "md", "lg"],
+      description:
+        "Trigger height preset — 28 / 32 / 40 / 48, matching Input and Select. The day cell scales with it (24 / 26 / 30 / 34, digits 9 / 9 / 10 / 11).",
     },
+    status: {
+      control: "radio",
+      options: [undefined, "success", "warning"],
+      description: "Advisory state on the trigger. `error` outranks it.",
+    },
+    statusMessage: { control: "text" },
+    loading: { control: "boolean" },
     label: { control: "text" },
     required: { control: "boolean" },
     helperText: { control: "text" },
@@ -325,6 +333,59 @@ export const WithError: Story = {
 
 /* ── States ──────────────────────────────────────────────────────────── */
 
+/** Advisory green — the value is valid, the message says why it matters. */
+export const Success: Story = {
+  args: {
+    mode: "single",
+    label: "Go-live Date",
+    status: "success",
+    statusMessage: "Falls inside the contract term.",
+    placeholder: "dd/mm/yyyy",
+  },
+};
+
+/** Amber box — accepted, but the operator should know something. */
+export const Warning: Story = {
+  args: {
+    mode: "range",
+    label: "Report Window",
+    status: "warning",
+    statusMessage: "78 days — exports may be slow.",
+    placeholder: "dd/mm/yyyy – dd/mm/yyyy",
+  },
+};
+
+/** Shimmer row and a spinner; the panel cannot open while it loads. */
+export const Loading: Story = {
+  args: { mode: "single", label: "Payout Cycle", loading: true },
+};
+
+/** Trigger heights match Input and Select; the day cell scales with them. */
+export const SizeScale: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, width: 300 }}>
+      {(
+        [
+          ["xs", "28 · cell 24 · 9px"],
+          ["sm", "32 · cell 26 · 9px"],
+          ["md", "40 · cell 30 · 10px"],
+          ["lg", "48 · cell 34 · 11px"],
+        ] as const
+      ).map(([size, spec]) => (
+        <DatePicker
+          key={size}
+          size={size}
+          label={size.toUpperCase()}
+          mode="single"
+          clearable
+          helperText={spec}
+        />
+      ))}
+    </div>
+  ),
+};
+
 export const Disabled: Story = {
   args: { mode: "single", disabled: true, placeholder: "Disabled" },
 };
@@ -382,6 +443,10 @@ export const ReadOnlyMonth: Story = {
     />
   ),
   args: { mode: "month" },
+};
+
+export const XSmall: Story = {
+  args: { mode: "single", size: "xs", placeholder: "XSmall" },
 };
 
 export const Small: Story = {

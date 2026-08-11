@@ -49,7 +49,7 @@ const meta = {
     },
   },
   argTypes: {
-    size: { control: "radio", options: ["sm", "md", "lg"] },
+    size: { control: "radio", options: ["xs", "sm", "md", "lg"] },
     layout: {
       control: "radio",
       options: ["horizontal", "vertical", "grid"],
@@ -93,6 +93,15 @@ export const Default: Story = {
 };
 
 /* ── Sizes ──────────────────────────────────────────────────── */
+
+export const ExtraSmall: Story = {
+  args: { size: "xs", defaultValue: "one" },
+  render: (args) => (
+    <div className="w-96">
+      <RadioGroup {...args} />
+    </div>
+  ),
+};
 
 export const Small: Story = {
   args: { size: "sm", defaultValue: "one" },
@@ -477,6 +486,60 @@ export const GroupWithCustomColors: Story = {
       </div>
     );
   },
+};
+
+/* ── Every state ────────────────────────────────────────────── */
+
+/** Eight cells at Medium — the fill is the same forest as the checkbox. */
+export const EveryState: Story = {
+  name: "Every state",
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <RadioGroupPrimitive.Root
+        defaultValue="on"
+        className="flex flex-col gap-3"
+      >
+        <Radio value="off" label="Unselected" />
+        <Radio value="on" label="Selected" />
+      </RadioGroupPrimitive.Root>
+
+      <RadioGroupPrimitive.Root
+        defaultValue="err-on"
+        className="flex flex-col gap-3"
+      >
+        <Radio value="err-off" label="Error" error />
+        <Radio value="err-on" label="Error (selected)" error />
+      </RadioGroupPrimitive.Root>
+
+      <RadioGroupPrimitive.Root
+        defaultValue="dis-on"
+        className="flex flex-col gap-3"
+      >
+        <Radio value="dis-off" label="Disabled" disabled />
+        <Radio value="dis-on" label="Disabled (on)" disabled />
+      </RadioGroupPrimitive.Root>
+
+      <RadioGroupPrimitive.Root defaultValue="ro" className="flex">
+        <Radio value="ro" label="Read only (on)" readOnly />
+      </RadioGroupPrimitive.Root>
+    </div>
+  ),
+};
+
+/* ── Size scale ─────────────────────────────────────────────── */
+
+/** Circle 14 / 16 / 20 / 24 with a 5 / 6 / 7 / 9 white dot. */
+export const SizeScale: Story = {
+  name: "Size scale",
+  render: () => (
+    <div className="flex flex-col gap-3">
+      {(["xs", "sm", "md", "lg"] as const).map((size) => (
+        <RadioGroupPrimitive.Root key={size} defaultValue="on" className="flex">
+          <Radio value="on" size={size} label={`${size.toUpperCase()} · selected`} />
+        </RadioGroupPrimitive.Root>
+      ))}
+    </div>
+  ),
 };
 
 export const GroupWithCustomColorsBrandBlue: Story = {

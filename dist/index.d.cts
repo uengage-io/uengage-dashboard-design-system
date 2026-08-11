@@ -15,7 +15,7 @@ import { TabsTrigger } from './components/ui/tabs.cjs';
 export { Input as input } from './components/ui/input.cjs';
 import { Label } from './components/ui/label.cjs';
 import { RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Switch } from 'radix-ui';
-export { DatePickerCalendar, MonthPickerCalendar } from './components/ui/DatePickerCalendar.cjs';
+export { D as DatePickerCalendar, a as DatePickerTriggerState, b as DayCellVariant, M as MonthPickerCalendar, t as datePickerTriggerVariants, d as dayCellVariants } from './DatePickerCalendar-DDdnXtEU.cjs';
 import { LucideIcon } from 'lucide-react';
 export { BrandGreen, brand } from './utils/colors.cjs';
 export { cn } from './lib/utils.cjs';
@@ -501,11 +501,11 @@ type TriggerSize = "xs" | "sm" | "md" | "lg";
  * existing calls such as `triggerVariants({ state: "open", size: "md" })` keep
  * type-checking, they simply no longer carry the colours.
  */
-declare const triggerVariants$1: (props?: ({
+declare const triggerVariants: (props?: ({
     state?: "default" | "disabled" | "open" | "hover" | "focused" | "loading" | "validating" | "success" | "warning" | "error" | "readonly" | null | undefined;
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
-type TriggerVariants = VariantProps<typeof triggerVariants$1>;
+type TriggerVariants = VariantProps<typeof triggerVariants>;
 
 type TabItem = {
     value: string;
@@ -590,7 +590,7 @@ declare namespace InputHelper {
     var displayName: string;
 }
 
-type Size = "sm" | "md" | "lg";
+type Size = "xs" | "sm" | "md" | "lg";
 interface CustomRadioItemProps extends Omit<React.ComponentProps<typeof RadioGroup$1.Item>, "children"> {
     label: React.ReactNode;
     size?: Size;
@@ -626,7 +626,7 @@ interface CustomRadioGroupProps<T = RadioOption> {
     value?: string;
     defaultValue?: string;
     onChange?: (value: string) => void;
-    size?: "sm" | "md" | "lg";
+    size?: "xs" | "sm" | "md" | "lg";
     layout?: "horizontal" | "vertical" | "grid";
     /** Max columns at the largest breakpoint when `layout="grid"`. Smaller breakpoints scale down (mobile=1, sm=2). */
     columns?: 1 | 2 | 3 | 4;
@@ -652,15 +652,15 @@ declare namespace RadioGroup {
 }
 
 declare const radioCircleVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
     state?: "default" | "disabled" | "error" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const radioDotVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const radioLabelVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "default" | "disabled" | "checked" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
+    state?: "default" | "disabled" | "checked" | "error" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type RadioCircleVariants = VariantProps<typeof radioCircleVariants>;
 type RadioDotVariants = VariantProps<typeof radioDotVariants>;
@@ -675,7 +675,7 @@ interface CustomCheckboxProps {
     checked?: boolean;
     defaultChecked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
-    size?: "sm" | "md" | "lg";
+    size?: "xs" | "sm" | "md" | "lg";
     label?: React.ReactNode;
     disabled?: boolean;
     indeterminate?: boolean;
@@ -700,7 +700,7 @@ interface CustomCheckboxGroupProps<T = CheckboxOption> {
     getDisabled?: (item: T) => boolean | undefined;
     value?: string[];
     onChange?: (value: string[]) => void;
-    size?: "sm" | "md" | "lg";
+    size?: "xs" | "sm" | "md" | "lg";
     layout?: "horizontal" | "vertical" | "grid";
     columns?: number;
     disabled?: boolean;
@@ -730,12 +730,12 @@ declare namespace CheckboxGroup {
 }
 
 declare const checkboxBoxVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "disabled" | "checked" | "error" | "unchecked" | "indeterminate" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
+    state?: "disabled" | "checked" | "error" | "unchecked" | "indeterminate" | "disabledChecked" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare const checkboxLabelVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "default" | "disabled" | "checked" | null | undefined;
+    size?: "xs" | "sm" | "lg" | "md" | null | undefined;
+    state?: "default" | "disabled" | "checked" | "error" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 type CheckboxBoxVariants = VariantProps<typeof checkboxBoxVariants>;
 type CheckboxLabelVariants = VariantProps<typeof checkboxLabelVariants>;
@@ -750,8 +750,11 @@ interface DatePickerProps {
     value?: Date | DateRange | null;
     onChange?: (value: Date | DateRange | null) => void;
     placeholder?: string;
-    /** Controls the trigger height via a preset. */
-    size?: "sm" | "md" | "lg";
+    /**
+     * Controls the trigger height via a preset — 28 / 32 / 40 / 48, matching
+     * Input and Select so the three can share a row. The day cell scales with it.
+     */
+    size?: "xs" | "sm" | "md" | "lg";
     /**
      * Tailwind width class(es) applied to the trigger wrapper. Use any responsive
      * utility (e.g. `"w-full md:w-96 lg:w-[400px]"`). Defaults to `w-full` when
@@ -791,22 +794,21 @@ interface DatePickerProps {
      * via an Apply button (same pattern as range mode). Ignored for other modes.
      */
     showTime?: boolean;
+    /**
+     * Advisory state on the trigger, following the same model as Input and
+     * Select. `error` outranks it. Pair with `statusMessage`.
+     */
+    status?: "success" | "warning";
+    /** Message rendered below the trigger for the current `status`. */
+    statusMessage?: string;
+    /** Shows a shimmer row and a spinner in the trigger; the panel cannot open. */
+    loading?: boolean;
 }
 
-declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, readOnly, open: controlledOpen, onOpenChange: onOpenChangeProp, showTime, }: DatePickerProps): react_jsx_runtime.JSX.Element;
+declare function DatePicker({ mode, value: controlledValue, onChange, placeholder, size, width, className, disabled, minDate, maxDate, onTouch, clearable, label, required, helperText, error, readOnly, open: controlledOpen, onOpenChange: onOpenChangeProp, showTime, status, statusMessage, loading, }: DatePickerProps): react_jsx_runtime.JSX.Element;
 declare namespace DatePicker {
     var displayName: string;
 }
-
-type DatePickerTriggerState = "default" | "open" | "disabled" | "readonly";
-declare const triggerVariants: (props?: ({
-    state?: "default" | "disabled" | "open" | "readonly" | null | undefined;
-    size?: "sm" | "lg" | "md" | null | undefined;
-} & class_variance_authority_types.ClassProp) | undefined) => string;
-type DayCellVariant = "default" | "today" | "selected" | "inRange" | "rangeStart" | "rangeEnd" | "outsideMonth";
-declare const dayCellVariants: (props?: ({
-    variant?: "default" | "selected" | "today" | "inRange" | "rangeStart" | "rangeEnd" | "outsideMonth" | null | undefined;
-} & class_variance_authority_types.ClassProp) | undefined) => string;
 
 /** Returns e.g. "Apr 17, 2026" */
 declare function formatDate(date: Date | null | undefined): string | null;
@@ -973,14 +975,15 @@ interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "on
     wrapperClassName?: string;
     /** When true, the toggle shows its current state but cannot be changed. */
     readOnly?: boolean;
+    /**
+     * Parks the knob mid-track with a spinner until the server confirms the
+     * flip. The toggle cannot be changed while pending.
+     */
+    pending?: boolean;
     /** When provided together with bgColor, enables pill look. Border color applied when checked. */
     borderColor?: string;
     /** When provided together with borderColor, enables pill look. Background color applied when checked. */
     bgColor?: string;
-    /** Border color applied to the track (and pill, if used) when the toggle is off (unchecked). */
-    offBorderColor?: string;
-    /** Background color applied to the track (and pill, if used) when the toggle is off (unchecked). */
-    offBgColor?: string;
 }
 declare const Toggle: React.ForwardRefExoticComponent<Omit<ToggleProps, "ref"> & React.RefAttributes<HTMLButtonElement>>;
 
@@ -1716,4 +1719,4 @@ interface ChipProps extends ChipVariants {
 }
 declare function Chip({ label, variant, size, icon, iconPosition, bgColor, textColor, className, }: ChipProps): react_jsx_runtime.JSX.Element;
 
-export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerProps, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DatePickerTriggerState, type DateRange, type DayCellVariant, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, triggerVariants as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants$1 as triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
+export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerProps, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DateRange, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, type TabItem, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };

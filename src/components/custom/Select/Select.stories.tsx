@@ -388,6 +388,74 @@ export const WithLeftIcon: Story = {
   },
 };
 
+/* ── Scrollbar ──────────────────────────────────────────────── */
+
+const STATES: SelectOption[] = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+  "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Chandigarh",
+].map((label) => ({ value: label.toLowerCase().replace(/\s+/g, "-"), label }));
+
+/**
+ * Past 8 rows the menu scrolls on a 4px green rail — never the system
+ * scrollbar. `#DCF3CE` — the same mint as a selected row — at rest, deepening
+ * to `#A8D5B5` on hover, pill-shaped, over a transparent track inset by the
+ * menu's 4px padding. The story opens the menu on mount so the rail is visible
+ * without a click.
+ */
+export const CustomScrollbar: Story = {
+  parameters: { layout: "padded" },
+  args: {
+    label: "State",
+    options: STATES,
+    placeholder: "Select a state…",
+    helperText: "30 options — scroll the menu to see the green rail.",
+  },
+  render: function ScrollbarStory(args) {
+    const hostRef = React.useRef<HTMLDivElement>(null);
+
+    // Open on mount so the menu — and its scrollbar — render in the preview.
+    React.useEffect(() => {
+      hostRef.current
+        ?.querySelector<HTMLElement>('[data-slot="select-trigger"]')
+        ?.click();
+    }, []);
+
+    return (
+      <div className="flex w-[320px] flex-col gap-3 pb-[340px]">
+        <div ref={hostRef}>
+          <Select {...args} />
+        </div>
+        <p className="text-xs text-[#6B7280]">
+          Hover the rail to see it darken to <code>#A8D5B5</code>.
+        </p>
+      </div>
+    );
+  },
+};
+
+/** The same rail in a multi select, under the sticky “N selected” bar. */
+export const CustomScrollbarMulti: Story = {
+  parameters: { layout: "padded" },
+  args: {
+    label: "States",
+    mode: "multi",
+    options: STATES,
+    defaultValue: ["punjab", "haryana"],
+    clearable: true,
+    placeholder: "Select states…",
+    helperText: "The track is inset so it never runs under the count bar.",
+  },
+  render: (args) => (
+    <div className="w-[320px] pb-[340px]">
+      <Select {...args} />
+    </div>
+  ),
+};
+
 /** Trigger heights match Input exactly so the two can share a row. */
 export const SizeScale: Story = {
   parameters: { layout: "padded" },

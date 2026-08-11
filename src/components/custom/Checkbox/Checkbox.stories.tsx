@@ -39,12 +39,12 @@ const meta = {
     docs: {
       description: {
         component:
-          "Radix-backed checkbox. By default renders a plain checkbox + label (no wrapper). Pass `borderColor` and/or `bgColor` to opt into a pill wrapper that applies those colors when checked/indeterminate. Supports `sm` / `md` / `lg` sizes, optional `label`, `indeterminate`, `error`, `disabled`, controlled and uncontrolled modes.",
+          "Radix-backed checkbox. By default renders a plain checkbox + label (no wrapper). Pass `borderColor` and/or `bgColor` to opt into a pill wrapper that applies those colors when checked/indeterminate. Supports `xs` / `sm` / `md` / `lg` sizes (box 14 / 16 / 20 / 24), optional `label`, `indeterminate`, `error`, `disabled`, controlled and uncontrolled modes. Checked is always forest `#003C1B` with a white mark.",
       },
     },
   },
   argTypes: {
-    size: { control: "radio", options: ["sm", "md", "lg"] },
+    size: { control: "radio", options: ["xs", "sm", "md", "lg"] },
     label: { control: "text" },
     checked: { control: "boolean" },
     indeterminate: { control: "boolean" },
@@ -73,9 +73,23 @@ export const Default: Story = {};
 
 /* ── Sizes ────────────────────────────────────────────────────── */
 
+export const ExtraSmall: Story = { args: { size: "xs", label: "Extra small" } };
 export const Small: Story = { args: { size: "sm", label: "Small" } };
 export const Medium: Story = { args: { size: "md", label: "Medium" } };
 export const Large: Story = { args: { size: "lg", label: "Large" } };
+
+/** Box 14 / 16 / 20 / 24, aligned to the first line of the label. */
+export const SizeScale: Story = {
+  name: "Size scale",
+  render: () => (
+    <div className="flex flex-col gap-3">
+      <Checkbox size="xs" label="XSmall · box 14" defaultChecked />
+      <Checkbox size="sm" label="Small · box 16" defaultChecked />
+      <Checkbox size="md" label="Medium · box 20" defaultChecked />
+      <Checkbox size="lg" label="Large · box 24" defaultChecked />
+    </div>
+  ),
+};
 
 /* ── States ───────────────────────────────────────────────────── */
 
@@ -114,6 +128,23 @@ export const ErrorState: Story = {
 
 export const NoLabel: Story = {
   args: { label: undefined },
+};
+
+/** Every state side by side, rendered at Medium. */
+export const EveryState: Story = {
+  name: "Every state",
+  render: () => (
+    <div className="flex flex-col gap-3">
+      <Checkbox label="Unchecked" />
+      <Checkbox label="Checked" defaultChecked />
+      <Checkbox label="Indeterminate" indeterminate />
+      <Checkbox label="Error" error />
+      <Checkbox label="Error (checked)" error defaultChecked />
+      <Checkbox label="Disabled" disabled />
+      <Checkbox label="Disabled (on)" disabled defaultChecked />
+      <Checkbox label="Read only (on)" readOnly defaultChecked />
+    </div>
+  ),
 };
 
 /* ── Controlled ───────────────────────────────────────────────── */

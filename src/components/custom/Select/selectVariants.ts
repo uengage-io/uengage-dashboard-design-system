@@ -70,7 +70,39 @@ export const MENU = {
   metaInk: INPUT_COLORS.message,
   /** Long lists cap at 8 rows and scroll. */
   maxRows: 8,
+  /** Thin green scrollbar on the option list — never the system default. */
+  scrollThumb: "#16914E",
+  scrollThumbHover: "#A8D5B5",
+  scrollWidth: 4,
 } as const;
+
+/**
+ * Scrollbar chrome for the option list. Shipped as a `<style>` tag alongside the
+ * menu (not via globals.css) so the menu keeps its look in apps that do not
+ * build this package's stylesheet — same reasoning as the inline trigger styles.
+ */
+export const MENU_SCROLLBAR_CSS = `
+[data-slot="select-menu-list"] {
+  scrollbar-width: thin;
+  scrollbar-color: ${MENU.scrollThumb} transparent;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar {
+  width: ${MENU.scrollWidth}px;
+  height: ${MENU.scrollWidth}px;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: ${MENU.padding}px;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-thumb {
+  background-color: ${MENU.scrollThumb};
+  border-radius: 9999px;
+  transition: background-color 160ms ease;
+}
+[data-slot="select-menu-list"]::-webkit-scrollbar-thumb:hover {
+  background-color: ${MENU.scrollThumbHover};
+}
+`;
 
 export { INPUT_COLORS as SELECT_COLORS, INPUT_TRANSITION as SELECT_TRANSITION };
 

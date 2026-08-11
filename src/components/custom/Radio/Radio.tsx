@@ -12,7 +12,7 @@ import {
   validateLabelWordLimit,
 } from "@/utils/labelValidation";
 
-type Size = "sm" | "md" | "lg";
+type Size = "xs" | "sm" | "md" | "lg";
 
 export interface CustomRadioItemProps extends Omit<
   React.ComponentProps<typeof RadioGroupPrimitive.Item>,
@@ -33,15 +33,25 @@ export interface CustomRadioItemProps extends Omit<
 }
 
 const PILL_PADDING: Record<Size, string> = {
-  sm: "gap-1.5 px-2.5 py-1.5",
-  md: "gap-2 px-3 py-2",
-  lg: "gap-2.5 px-4 py-2.5",
+  xs: "gap-2 px-2 py-1",
+  sm: "gap-2.5 px-2.5 py-1.5",
+  md: "gap-[11px] px-3 py-2",
+  lg: "gap-3 px-4 py-2.5",
 };
 
 const GAP_ONLY: Record<Size, string> = {
-  sm: "gap-1.5",
-  md: "gap-2",
-  lg: "gap-2.5",
+  xs: "gap-2",
+  sm: "gap-2.5",
+  md: "gap-[11px]",
+  lg: "gap-3",
+};
+
+/** Aligns the circle to the first line of the label rather than its centre. */
+const CIRCLE_FIRST_LINE_OFFSET: Record<Size, string> = {
+  xs: "mt-[2px]",
+  sm: "mt-[1px]",
+  md: "mt-0",
+  lg: "mt-0",
 };
 
 function Radio({
@@ -86,9 +96,13 @@ function Radio({
       ? "error"
       : "default";
 
-  const labelState: "default" | "checked" | "disabled" = disabled
+  const labelState: "default" | "checked" | "disabled" | "error" = disabled
     ? "disabled"
-    : "default";
+    : error
+      ? "error"
+      : isChecked
+        ? "checked"
+        : "default";
 
   const effectiveBorderColor = borderColor;
   const effectiveBgColor = bgColor;
@@ -108,15 +122,15 @@ function Radio({
       htmlFor={itemId}
       style={labelStyle}
       className={cn(
-        "group inline-flex cursor-pointer items-center transition-colors",
+        "group inline-flex cursor-pointer items-start transition-colors duration-[120ms] ease-linear",
         hasCustomColors
           ? cn(
-              "rounded-xl border",
+              "rounded-[10px] border",
               PILL_PADDING[size],
-              error ? "border-red-500" : "border-gray-200",
+              error ? "border-[#A8000F]" : "border-[#E2E2E2]",
             )
           : GAP_ONLY[size],
-        disabled && "cursor-not-allowed opacity-60",
+        disabled && "cursor-not-allowed",
         readOnly && "pointer-events-none cursor-default",
         className,
       )}
@@ -130,18 +144,27 @@ function Radio({
         data-slot="radio-group-item"
         style={
           isChecked && effectiveBorderColor
-            ? { borderColor: effectiveBorderColor }
+            ? {
+                backgroundColor: effectiveBorderColor,
+                borderColor: effectiveBorderColor,
+              }
             : undefined
         }
-        className={cn(radioCircleVariants({ size, state }))}
+        className={cn(
+          radioCircleVariants({ size, state }),
+          CIRCLE_FIRST_LINE_OFFSET[size],
+        )}
       >
         <RadioGroupPrimitive.Indicator
+          forceMount
           data-slot="radio-group-indicator"
-          className="relative flex items-center justify-center"
+          className={cn(
+            "flex items-center justify-center transition-transform duration-[120ms] ease-linear",
+            "data-[state=unchecked]:scale-0 data-[state=checked]:scale-100",
+          )}
         >
           <span
-            className={cn(radioDotVariants({ size }))}
-            style={effectiveBorderColor ? { backgroundColor: effectiveBorderColor } : undefined}
+            className={cn(radioDotVariants({ size }), disabled && "bg-white/75")}
           />
         </RadioGroupPrimitive.Indicator>
       </RadioGroupPrimitive.Item>
@@ -151,7 +174,7 @@ function Radio({
         style={effectiveTextColor && isChecked ? { color: effectiveTextColor } : undefined}
         className={cn(
           radioLabelVariants({ size, state: labelState }),
-          "whitespace-normal break-words",
+          "whitespace-normal break-words leading-[1.5]",
         )}
       >
         {truncateLabelToWordLimit(label)}
