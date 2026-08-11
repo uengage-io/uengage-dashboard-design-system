@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/command";
 import {
   MENU,
+  MENU_SCROLLBAR_CSS,
   SELECT_COLORS,
   SELECT_GAP,
   SELECT_SIZES,
@@ -697,6 +698,7 @@ function Select<TItem = unknown>({
               boxShadow: MENU.shadow,
             }}
           >
+            <style>{MENU_SCROLLBAR_CSS}</style>
             {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
             <Command shouldFilter={false}>
               {searchEnabled && !loading && (
@@ -748,6 +750,7 @@ function Select<TItem = unknown>({
 
               <CommandList
                 ref={listRef}
+                data-slot="select-menu-list"
                 style={{ maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 }}
               >
                 {loading ? (

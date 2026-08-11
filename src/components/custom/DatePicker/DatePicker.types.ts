@@ -12,8 +12,11 @@ export interface DatePickerProps {
   value?: Date | DateRange  |null;
   onChange?: (value: Date | DateRange | null) => void;
   placeholder?: string;
-  /** Controls the trigger height via a preset. */
-  size?: "sm" | "md" | "lg";
+  /**
+   * Controls the trigger height via a preset — 28 / 32 / 40 / 48, matching
+   * Input and Select so the three can share a row. The day cell scales with it.
+   */
+  size?: "xs" | "sm" | "md" | "lg";
   /**
    * Tailwind width class(es) applied to the trigger wrapper. Use any responsive
    * utility (e.g. `"w-full md:w-96 lg:w-[400px]"`). Defaults to `w-full` when
@@ -53,4 +56,13 @@ export interface DatePickerProps {
    * via an Apply button (same pattern as range mode). Ignored for other modes.
    */
   showTime?: boolean;
+  /**
+   * Advisory state on the trigger, following the same model as Input and
+   * Select. `error` outranks it. Pair with `statusMessage`.
+   */
+  status?: "success" | "warning";
+  /** Message rendered below the trigger for the current `status`. */
+  statusMessage?: string;
+  /** Shows a shimmer row and a spinner in the trigger; the panel cannot open. */
+  loading?: boolean;
 }

@@ -10,7 +10,7 @@ export interface CustomCheckboxProps {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   label?: React.ReactNode;
   disabled?: boolean;
   indeterminate?: boolean;
@@ -36,7 +36,7 @@ export interface CustomCheckboxGroupProps<T = CheckboxOption> {
   getDisabled?: (item: T) => boolean | undefined;
   value?: string[];
   onChange?: (value: string[]) => void;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   layout?: "horizontal" | "vertical" | "grid";
   columns?: number;
   disabled?: boolean;

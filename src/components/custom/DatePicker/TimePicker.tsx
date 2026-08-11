@@ -85,8 +85,8 @@ function TimeColumn({
             className={cn(
               "flex w-full shrink-0 items-center justify-center text-sm tabular-nums transition-all duration-150",
               isSelected
-                ? "scale-105 font-semibold text-[#006F42]"
-                : "text-[#9CA3AF] hover:text-[#374151]",
+                ? "scale-105 font-semibold text-[#003C1B]"
+                : "text-[#9C9C9C] hover:text-[#161616]",
             )}
           >
             {item.label}
@@ -140,19 +140,19 @@ export function TimePicker({
   return (
     <div
       className={cn(
-        "flex w-[176px] flex-col border-l border-[#F3F4F6]",
+        "flex w-[176px] flex-col border-l border-[#EEEEEE]",
         className,
       )}
     >
-      <div className="flex items-center justify-center gap-1.5 border-b border-[#F3F4F6] py-2.5 text-xs font-medium text-[#374151]">
-        <Clock size={13} strokeWidth={2} className="text-[#006F42]" />
+      <div className="flex items-center justify-center gap-1.5 border-b border-[#EEEEEE] py-2.5 text-xs font-medium text-[#161616]">
+        <Clock size={13} strokeWidth={2} className="text-[#003C1B]" />
         Select time
       </div>
 
       <div className="relative flex justify-center px-2">
         {/* Selection band highlighting the centered row */}
         <div
-          className="pointer-events-none absolute inset-x-2 z-0 rounded-md bg-[#F0FBF5]"
+          className="pointer-events-none absolute inset-x-2 z-0 rounded-md bg-[#DCF3CE]"
           style={{
             top: (COLUMN_HEIGHT - ITEM_HEIGHT) / 2,
             height: ITEM_HEIGHT,
