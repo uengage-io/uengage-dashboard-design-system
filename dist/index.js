@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
 import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Separator$1, Dialog, Slot, Popover as Popover$1, RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Accordion as Accordion$1, Collapsible, Tabs as Tabs$1 } from 'radix-ui';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { X, Search, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, Lock, ChevronDown, Plus, EyeOff, Eye, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, File, Video, Play, Clock, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
+import { Search, X, Clock, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, Lock, ChevronDown, Plus, EyeOff, Eye, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, File, Video, Play, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
@@ -1386,36 +1386,172 @@ function InputLabel({
   );
 }
 InputLabel.displayName = "InputLabel";
-var SIZE_HEIGHT_CLASSES = {
-  sm: "h-8",
-  md: "h-10",
-  lg: "h-12"
+
+// src/components/custom/SearchBar/searchBarVariants.ts
+var SEARCHBAR_SIZES = {
+  sm: {
+    height: 32,
+    padLeft: 11,
+    padRight: 9,
+    font: 12,
+    icon: 14,
+    radius: 8,
+    clear: 17,
+    label: 12,
+    message: 11
+  },
+  md: {
+    height: 38,
+    padLeft: 12,
+    padRight: 10,
+    font: 13,
+    icon: 15,
+    radius: 8,
+    clear: 19,
+    label: 12,
+    message: 11
+  },
+  lg: {
+    height: 44,
+    padLeft: 14,
+    padRight: 12,
+    font: 14,
+    icon: 17,
+    radius: 8,
+    clear: 21,
+    label: 13,
+    message: 11
+  }
 };
-var SIZE_TEXT_CLASSES = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base"
+var SEARCHBAR_GAP = 9;
+var SEARCHBAR_TRANSITION = "border-color 120ms linear, box-shadow 120ms linear, background-color 120ms linear";
+var SEARCHBAR_COLORS = {
+  surface: "#FFFFFF",
+  subtle: "#F3F5F9",
+  border: "#E2E2E2",
+  borderHover: "#C6C6C6",
+  borderFocus: "#1F5E2C",
+  /** 3px lime halo that pairs with `borderFocus`. */
+  ring: "0 0 0 3px rgba(140,196,42,.28)",
+  value: "#161616",
+  placeholder: "#9C9C9C",
+  message: "#9C9C9C",
+  icon: "#1F5E2C",
+  accentTint: "#DCF3CE",
+  hoverTint: "#FAFFF7",
+  resultsInk: "#1F5E2C",
+  warningBorder: "#EFD98A",
+  warningInk: "#6A5300",
+  readOnlyBg: "#FAFFF7",
+  disabledBg: "#F3F5F9",
+  disabledInk: "#C6C6C6",
+  muted: "#787878"
 };
-var SIZE_PLACEHOLDER_CLASSES = {
-  sm: "placeholder:text-[11px]",
-  md: "placeholder:text-[12px]",
-  lg: "placeholder:text-[14px]"
-};
-var ICON_SIZES = {
-  sm: 14,
-  md: 16,
-  lg: 20
-};
-var DIVIDER_CLASSES = {
-  sm: "h-4",
-  md: "h-5",
-  lg: "h-6"
-};
+function resolveSearchBarState(args) {
+  const {
+    disabled,
+    readOnly,
+    searching,
+    noResults,
+    hasResults,
+    hasQuery,
+    focused,
+    hovered
+  } = args;
+  if (disabled) return "disabled";
+  if (readOnly) return "readonly";
+  if (noResults) return "noResults";
+  if (searching) return "searching";
+  if (focused) return hasQuery ? "typing" : "focused";
+  if (hasResults && hasQuery) return "results";
+  if (hovered) return "hover";
+  return "default";
+}
+function getSearchBarBoxStyle(state) {
+  const c = SEARCHBAR_COLORS;
+  const hairline = `1px solid ${c.border}`;
+  const focusRing = {
+    background: c.surface,
+    border: `1px solid ${c.borderFocus}`,
+    boxShadow: c.ring,
+    color: c.value,
+    cursor: "text"
+  };
+  switch (state) {
+    case "hover":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.borderHover}`,
+        boxShadow: "none",
+        color: c.value,
+        cursor: "text"
+      };
+    case "focused":
+    case "typing":
+    case "searching":
+      return focusRing;
+    case "results":
+      return {
+        background: c.surface,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value,
+        cursor: "text"
+      };
+    case "noResults":
+      return {
+        background: c.surface,
+        border: `1px solid ${c.warningBorder}`,
+        boxShadow: "none",
+        color: c.value,
+        cursor: "text"
+      };
+    case "readonly":
+      return {
+        background: c.readOnlyBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value,
+        cursor: "default"
+      };
+    case "disabled":
+      return {
+        background: c.disabledBg,
+        border: hairline,
+        boxShadow: "none",
+        color: c.disabledInk,
+        cursor: "not-allowed"
+      };
+    default:
+      return {
+        background: c.surface,
+        border: hairline,
+        boxShadow: "none",
+        color: c.value,
+        cursor: "text"
+      };
+  }
+}
+function getSearchBarIconColor(state) {
+  if (state === "disabled") return SEARCHBAR_COLORS.disabledInk;
+  if (state === "noResults") return SEARCHBAR_COLORS.warningInk;
+  return SEARCHBAR_COLORS.icon;
+}
+function getSearchBarMessageColor(state) {
+  if (state === "noResults") return SEARCHBAR_COLORS.warningInk;
+  if (state === "results") return SEARCHBAR_COLORS.resultsInk;
+  return SEARCHBAR_COLORS.message;
+}
 function filterValue(raw, valueType) {
   if (valueType === "number") return raw.replace(/[^0-9]/g, "");
   if (valueType === "alphanumeric") return raw.replace(/[^a-zA-Z0-9]/g, "");
   return raw;
 }
+var LABEL_SIZE = {
+  sm: "sm",
+  md: "md",
+  lg: "lg"
+};
 function SearchBar({
   value: controlledValue,
   defaultValue,
@@ -1440,17 +1576,35 @@ function SearchBar({
   getLabel,
   getValue,
   onSelect,
-  fallbackText = "No results found"
+  fallbackText = "No results found",
+  searching = false,
+  resultCount,
+  resultNoun = "result",
+  noResults = false,
+  suggestion,
+  message,
+  shortcut,
+  recents,
+  onRemoveRecent,
+  onSelectRecent,
+  debounce = 0,
+  onDebouncedChange
 }) {
   const [internal, setInternal] = React9.useState(
     String(controlledValue ?? defaultValue ?? "")
   );
   const [dropdownOpen, setDropdownOpen] = React9.useState(false);
+  const [focused, setFocused] = React9.useState(false);
+  const [hovered, setHovered] = React9.useState(false);
   const wrapperRef = React9.useRef(null);
   const touchedRef = React9.useRef(false);
+  const debounceRef = React9.useRef(
+    void 0
+  );
   React9.useEffect(() => {
     if (controlledValue !== void 0) setInternal(String(controlledValue));
   }, [controlledValue]);
+  React9.useEffect(() => () => clearTimeout(debounceRef.current), []);
   const displayValue = internal;
   const resolvedItems = React9.useMemo(() => {
     if (dropdownItems && getLabel) {
@@ -1471,11 +1625,24 @@ function SearchBar({
     onSelect?.(item.value, item.raw ?? void 0);
     setDropdownOpen(false);
   };
+  const scheduleDebounced = (next) => {
+    if (!onDebouncedChange) return;
+    clearTimeout(debounceRef.current);
+    if (!debounce) {
+      onDebouncedChange(castValue(next));
+      return;
+    }
+    debounceRef.current = setTimeout(
+      () => onDebouncedChange(castValue(next)),
+      debounce
+    );
+  };
   const handleChange = (e) => {
     if (readOnly) return;
     const filtered = filterValue(e.target.value, valueType);
     setInternal(filtered);
     onChange?.(castValue(filtered));
+    scheduleDebounced(filtered);
     if (hasDropdown) setDropdownOpen(true);
   };
   const hasQuery = displayValue.trim().length > 0;
@@ -1511,20 +1678,77 @@ function SearchBar({
     if (disabled || readOnly) return;
     setInternal("");
     onClear?.();
+    scheduleDebounced("");
     setDropdownOpen(false);
   };
   const handleBlur = (e) => {
     if (!wrapperRef.current?.contains(e.relatedTarget)) {
       setDropdownOpen(false);
+      setFocused(false);
       if (!touchedRef.current) {
         touchedRef.current = true;
         onTouch?.();
       }
     }
   };
+  const handleRecentPick = (entry) => {
+    setInternal(entry);
+    onChange?.(castValue(entry));
+    scheduleDebounced(entry);
+    if (onSelectRecent) onSelectRecent(entry);
+    else onSearch?.(castValue(entry));
+  };
   const showClear = clearable && displayValue.length > 0;
-  const iconSize = ICON_SIZES[size];
+  const metrics = SEARCHBAR_SIZES[size];
+  const state = resolveSearchBarState({
+    disabled,
+    readOnly,
+    searching,
+    noResults,
+    hasResults: resultCount != null && resultCount > 0,
+    hasQuery,
+    focused,
+    hovered
+  });
+  const box = getSearchBarBoxStyle(state);
+  const iconColor = getSearchBarIconColor(state);
+  const messageColor = getSearchBarMessageColor(state);
   const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
+  const isRecentsVisible = !isDropdownVisible && focused && !hasQuery && !disabled && !readOnly && (recents?.length ?? 0) > 0;
+  const showShortcut = Boolean(shortcut) && !hasQuery && !showClear;
+  const resolvedMessage = (() => {
+    if (message != null) return message;
+    if (noResults) {
+      if (suggestion) {
+        return /* @__PURE__ */ jsxs(Fragment, { children: [
+          "No match \u2014 did you mean",
+          " ",
+          /* @__PURE__ */ jsx(
+            "button",
+            {
+              type: "button",
+              onClick: suggestion.onApply,
+              className: "font-semibold underline-offset-2 hover:underline",
+              style: { color: SEARCHBAR_COLORS.borderFocus },
+              children: suggestion.label
+            }
+          ),
+          "?"
+        ] });
+      }
+      return "No match for this query.";
+    }
+    if (resultCount != null) {
+      return `${resultCount.toLocaleString("en-IN")} ${resultCount === 1 ? resultNoun : `${resultNoun}s`}`;
+    }
+    return null;
+  })();
+  const panelStyle = {
+    border: `1px solid ${SEARCHBAR_COLORS.border}`,
+    borderRadius: 11,
+    background: SEARCHBAR_COLORS.surface,
+    boxShadow: "2px 2px 4px rgba(0,0,0,.12)"
+  };
   return /* @__PURE__ */ jsxs(
     "div",
     {
@@ -1537,8 +1761,9 @@ function SearchBar({
         label && /* @__PURE__ */ jsx(
           InputLabel,
           {
-            size: size === "lg" ? "lg" : size === "sm" ? "sm" : "md",
+            size: LABEL_SIZE[size],
             required,
+            tone: state === "disabled" ? SEARCHBAR_COLORS.disabledInk : void 0,
             children: label
           }
         ),
@@ -1552,15 +1777,52 @@ function SearchBar({
               /* @__PURE__ */ jsxs(
                 "div",
                 {
-                  className: cn(
-                    "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
-                    !disabled && !readOnly && "hover:border-gray-500 hover:shadow-sm",
-                    SIZE_TEXT_CLASSES[size],
-                    SIZE_HEIGHT_CLASSES[size],
-                    disabled && "pointer-events-none opacity-50",
-                    readOnly && "bg-gray-50 border-gray-300 text-gray-700 cursor-default"
-                  ),
+                  className: "flex w-full items-center",
+                  onMouseEnter: () => setHovered(true),
+                  onMouseLeave: () => setHovered(false),
+                  style: {
+                    height: metrics.height,
+                    paddingLeft: metrics.padLeft,
+                    paddingRight: metrics.padRight,
+                    gap: SEARCHBAR_GAP,
+                    borderRadius: metrics.radius,
+                    fontSize: metrics.font,
+                    transition: SEARCHBAR_TRANSITION,
+                    background: box.background,
+                    border: box.border,
+                    boxShadow: box.boxShadow,
+                    color: box.color,
+                    cursor: box.cursor,
+                    ...disabled ? { pointerEvents: "none" } : null
+                  },
                   children: [
+                    searching ? /* @__PURE__ */ jsx(
+                      "span",
+                      {
+                        "aria-hidden": "true",
+                        className: "shrink-0 animate-spin rounded-full",
+                        style: {
+                          width: metrics.icon,
+                          height: metrics.icon,
+                          border: `2px solid ${SEARCHBAR_COLORS.border}`,
+                          borderTopColor: SEARCHBAR_COLORS.borderFocus
+                        }
+                      }
+                    ) : /* @__PURE__ */ jsx(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: handleSearchClick,
+                        disabled,
+                        className: "flex shrink-0 items-center justify-center transition-colors",
+                        style: {
+                          color: iconColor,
+                          cursor: disabled || readOnly ? box.cursor : "pointer"
+                        },
+                        "aria-label": "Search",
+                        children: /* @__PURE__ */ jsx(Search, { strokeWidth: 2, size: metrics.icon })
+                      }
+                    ),
                     /* @__PURE__ */ jsx(
                       Input,
                       {
@@ -1570,46 +1832,152 @@ function SearchBar({
                         readOnly,
                         spellCheck,
                         onChange: handleChange,
+                        onFocus: () => setFocused(true),
                         onKeyDown: handleKeyDown,
                         className: cn(
-                          "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[#C4C9D2]",
-                          SIZE_PLACEHOLDER_CLASSES[size],
+                          "h-full min-w-0 flex-1 border-0 bg-transparent p-0 shadow-none outline-none focus-visible:ring-0 disabled:opacity-100",
+                          // Placeholder greys further out once the control is disabled.
+                          state === "disabled" ? "placeholder:text-[#C6C6C6]" : "placeholder:text-[#9C9C9C]",
                           inputClassName
-                        )
+                        ),
+                        style: {
+                          fontSize: metrics.font,
+                          color: box.color,
+                          cursor: box.cursor
+                        }
                       }
                     ),
-                    /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center gap-1.5 pr-2.5", children: [
-                      showClear && /* @__PURE__ */ jsx(
-                        "button",
-                        {
-                          type: "button",
-                          onClick: handleClear,
-                          disabled,
-                          className: "flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors",
-                          "aria-label": "Clear search",
-                          children: /* @__PURE__ */ jsx(
-                            X,
+                    showClear && /* @__PURE__ */ jsx(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: handleClear,
+                        disabled,
+                        className: "flex shrink-0 items-center justify-center rounded-full transition-colors",
+                        style: {
+                          width: metrics.clear,
+                          height: metrics.clear,
+                          background: SEARCHBAR_COLORS.subtle,
+                          color: SEARCHBAR_COLORS.value,
+                          cursor: "pointer"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.background = SEARCHBAR_COLORS.accentTint;
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.background = SEARCHBAR_COLORS.subtle;
+                        },
+                        "aria-label": "Clear search",
+                        children: /* @__PURE__ */ jsx(X, { strokeWidth: 3.2, size: metrics.clear - 10 })
+                      }
+                    ),
+                    showShortcut && /* @__PURE__ */ jsx(
+                      "span",
+                      {
+                        "aria-hidden": "true",
+                        className: "shrink-0 font-semibold leading-none",
+                        style: {
+                          fontSize: 10,
+                          color: SEARCHBAR_COLORS.muted,
+                          border: `1px solid ${SEARCHBAR_COLORS.border}`,
+                          borderRadius: 5,
+                          padding: "3px 6px"
+                        },
+                        children: shortcut
+                      }
+                    )
+                  ]
+                }
+              ),
+              isRecentsVisible && /* @__PURE__ */ jsxs(
+                "div",
+                {
+                  className: cn(
+                    "absolute left-0 top-full z-50 mt-1.5 w-full overflow-hidden",
+                    dropdownClassName
+                  ),
+                  style: { ...panelStyle, padding: 5 },
+                  children: [
+                    /* @__PURE__ */ jsx(
+                      "span",
+                      {
+                        className: "block font-semibold uppercase",
+                        style: {
+                          fontSize: 9,
+                          lineHeight: 1.3,
+                          letterSpacing: ".08em",
+                          color: SEARCHBAR_COLORS.muted,
+                          padding: "8px 10px 5px"
+                        },
+                        children: "Recent"
+                      }
+                    ),
+                    recents.map((entry) => /* @__PURE__ */ jsxs(
+                      "div",
+                      {
+                        className: "flex items-center transition-colors",
+                        style: {
+                          gap: 9,
+                          padding: "7px 10px",
+                          borderRadius: 6
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.background = SEARCHBAR_COLORS.hoverTint;
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.background = "transparent";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxs(
+                            "button",
                             {
-                              className: "hover:text-red-500",
-                              strokeWidth: 2,
-                              size: iconSize
+                              type: "button",
+                              onClick: () => handleRecentPick(entry),
+                              className: "flex flex-1 items-center text-left",
+                              style: { gap: 9, cursor: "pointer" },
+                              children: [
+                                /* @__PURE__ */ jsx(
+                                  Clock,
+                                  {
+                                    size: 12,
+                                    strokeWidth: 2,
+                                    className: "shrink-0",
+                                    style: { color: SEARCHBAR_COLORS.placeholder }
+                                  }
+                                ),
+                                /* @__PURE__ */ jsx(
+                                  "span",
+                                  {
+                                    className: "flex-1 truncate font-medium",
+                                    style: {
+                                      fontSize: 11,
+                                      lineHeight: 1.3,
+                                      color: SEARCHBAR_COLORS.value
+                                    },
+                                    children: entry
+                                  }
+                                )
+                              ]
+                            }
+                          ),
+                          onRemoveRecent && /* @__PURE__ */ jsx(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: () => onRemoveRecent(entry),
+                              className: "flex shrink-0 items-center justify-center",
+                              style: {
+                                color: SEARCHBAR_COLORS.borderHover,
+                                cursor: "pointer"
+                              },
+                              "aria-label": `Remove ${entry} from recent searches`,
+                              children: /* @__PURE__ */ jsx(X, { size: 10, strokeWidth: 3 })
                             }
                           )
-                        }
-                      ),
-                      /* @__PURE__ */ jsx("div", { className: cn("w-px bg-gray-400", DIVIDER_CLASSES[size]) }),
-                      /* @__PURE__ */ jsx(
-                        "button",
-                        {
-                          type: "button",
-                          onClick: handleSearchClick,
-                          disabled,
-                          className: "flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer",
-                          "aria-label": "Search",
-                          children: /* @__PURE__ */ jsx(Search, { strokeWidth: 2, size: iconSize })
-                        }
-                      )
-                    ] })
+                        ]
+                      },
+                      entry
+                    ))
                   ]
                 }
               ),
@@ -1617,22 +1985,59 @@ function SearchBar({
                 "div",
                 {
                   className: cn(
-                    "absolute left-0 top-full z-50 mt-1 w-full overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg max-h-48",
+                    "absolute left-0 top-full z-50 mt-1.5 max-h-48 w-full overflow-y-auto",
                     dropdownClassName
                   ),
+                  style: { ...panelStyle, padding: 5 },
                   children: filteredItems.length > 0 ? filteredItems.map((item) => /* @__PURE__ */ jsx(
                     "button",
                     {
                       type: "button",
-                      className: "w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors",
+                      className: "flex w-full items-center text-left font-medium transition-colors",
+                      style: {
+                        padding: "7px 10px",
+                        borderRadius: 6,
+                        fontSize: 11,
+                        lineHeight: 1.3,
+                        color: SEARCHBAR_COLORS.value
+                      },
+                      onMouseEnter: (e) => {
+                        e.currentTarget.style.background = SEARCHBAR_COLORS.hoverTint;
+                      },
+                      onMouseLeave: (e) => {
+                        e.currentTarget.style.background = "transparent";
+                      },
                       onClick: () => handleSelect(item),
                       children: item.label
                     },
                     item.value
-                  )) : /* @__PURE__ */ jsx("div", { className: "px-3 py-2 text-sm text-[#9CA3AF]", children: fallbackText })
+                  )) : /* @__PURE__ */ jsx(
+                    "div",
+                    {
+                      style: {
+                        padding: "7px 10px",
+                        fontSize: 11,
+                        lineHeight: 1.3,
+                        color: SEARCHBAR_COLORS.placeholder
+                      },
+                      children: fallbackText
+                    }
+                  )
                 }
               )
             ]
+          }
+        ),
+        resolvedMessage != null && /* @__PURE__ */ jsx(
+          "span",
+          {
+            style: {
+              minHeight: 16,
+              fontSize: metrics.message,
+              lineHeight: 1.4,
+              color: messageColor
+            },
+            children: resolvedMessage
           }
         )
       ]
@@ -8411,7 +8816,7 @@ var avatarContainerVariants = cva(
     defaultVariants: { size: "md", state: "empty" }
   }
 );
-var ICON_SIZES2 = { sm: 14, md: 18, lg: 22 };
+var ICON_SIZES = { sm: 14, md: 18, lg: 22 };
 var AVATAR_ICON_SIZES = { sm: 16, md: 20, lg: 26 };
 var PLACEHOLDER_TEXT = {
   image: "Click or drag to upload image",
@@ -8685,7 +9090,7 @@ function FileUpload({
   };
   const dzState = disabled ? "disabled" : isDragOver ? "dragover" : error || validationErrors.length > 0 ? "error" : "idle";
   const combinedError = error ?? validationErrors[0];
-  const iconSize = ICON_SIZES2[size] ?? 18;
+  const iconSize = ICON_SIZES[size] ?? 18;
   const avatarIconSize = AVATAR_ICON_SIZES[size] ?? 20;
   const canAddMore = !disabled && !readOnly && (!maxFiles || displayItems.length < maxFiles);
   const dropzoneInteractionProps = {
