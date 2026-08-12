@@ -66,4 +66,52 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
 
   /** Text shown in dropdown when no items match the search. */
   fallbackText?: string;
+
+  // ── Design-console states (`Search and Filters.dc.html`) ───────
+  /**
+   * Swaps the leading magnifier for a spinner while a query is in flight. The
+   * field deliberately stays typeable — the design's rule is "the field never
+   * disables while a query is running".
+   */
+  searching?: boolean;
+  /**
+   * Live result count rendered under the field in brand green ("12 results").
+   * Set to `0` together with `noResults` for the empty case.
+   */
+  resultCount?: number;
+  /** Singular/plural noun used with `resultCount`. Defaults to `result(s)`. */
+  resultNoun?: string;
+  /**
+   * Puts the control into the amber "no results" state — warning border, amber
+   * glyph, amber message.
+   */
+  noResults?: boolean;
+  /**
+   * Did-you-mean correction shown in the message row when `noResults` is set.
+   * The label renders as a button so the operator can apply it in one click.
+   */
+  suggestion?: { label: string; onApply?: () => void };
+  /** Helper text under the field. Overrides the generated result message. */
+  message?: React.ReactNode;
+  /**
+   * Keyboard shortcut badge pinned to the right of an empty field (e.g. `"⌘K"`).
+   * Hidden as soon as the field has a value.
+   */
+  shortcut?: string;
+  /**
+   * Recent searches shown on focus, before anything is typed. Each entry is
+   * individually removable via `onRemoveRecent`.
+   */
+  recents?: string[];
+  /** Fires when a recent entry's ✕ is clicked. */
+  onRemoveRecent?: (value: string) => void;
+  /** Fires when a recent entry is picked. Falls back to `onSearch`. */
+  onSelectRecent?: (value: string) => void;
+  /**
+   * Debounce in ms before `onDebouncedChange` fires. The design debounces
+   * search at 300ms. `0` disables it.
+   */
+  debounce?: number;
+  /** Debounced companion to `onChange`, gated by `debounce`. */
+  onDebouncedChange?: (value: T) => void;
 }
