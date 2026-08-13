@@ -1637,8 +1637,54 @@ declare namespace Section {
     var displayName: string;
 }
 
-type FileUploadVariant = "image" | "file" | "avatar" | "video";
-type FileUploadSize = "sm" | "md" | "lg";
+/** Resolved lifecycle state of a single file row. */
+type FileUploadStatus = 
+/** Picked, nothing has happened to it yet. */
+"idle"
+/** Accepted but waiting behind other files. */
+ | "queued"
+/** Bytes are moving — pairs with `progress`. */
+ | "uploading"
+/** Bytes have landed, the server is still validating. */
+ | "processing"
+/** Finished successfully. */
+ | "done"
+/** The transfer broke mid-flight — retryable. */
+ | "failed"
+/** Refused before the transfer started (too large, wrong type) — not retryable. */
+ | "rejected"
+/** Landed, but only some of it was usable. */
+ | "partial"
+/** Connection dropped; the transfer resumes from where it stopped. */
+ | "paused"
+/** The same file already exists — the operator picks skip or replace. */
+ | "duplicate"
+/** An image whose pixel dimensions do not match the requirement — offer a crop. */
+ | "dimension";
+type FileUploadSizeKey = "sm" | "md" | "lg";
+type FileUploadTone = "light" | "dark";
+/** @deprecated Structural classes only — colours and metrics ride on inline styles. */
+declare const dropzoneVariants: (props?: ({
+    size?: "sm" | "lg" | "md" | null | undefined;
+    state?: "disabled" | "error" | "dragover" | "idle" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+/** @deprecated Structural classes only — metrics ride on inline styles. */
+declare const iconWrapperVariants: (props?: ({
+    size?: "sm" | "lg" | "md" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+/** @deprecated Structural classes only — metrics ride on inline styles. */
+declare const avatarContainerVariants: (props?: ({
+    size?: "sm" | "lg" | "md" | null | undefined;
+    state?: "disabled" | "filled" | "empty" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
+
+type FileUploadVariant = "image" | "file" | "avatar" | "video"
+/** Single-document row for long forms — a dropzone would dominate the page. */
+ | "compact"
+/** Reorderable image grid whose first tile is always the cover. */
+ | "gallery";
+type FileUploadSize = FileUploadSizeKey;
+
 /** Internal representation of a locally-selected file with a preview URL. */
 interface FileUploadLocalFile {
     file: File;
@@ -1647,11 +1693,35 @@ interface FileUploadLocalFile {
     /** Stable random ID for React key. */
     id: string;
 }
+/**
+ * A file row driven entirely by the caller. Pass these through `items` when the
+ * upload lifecycle lives in your own store — the component then renders the
+ * design's nine states rather than deriving `idle` / `done` from `value`.
+ */
+interface FileUploadItem {
+    /** Stable key. Falls back to the name when omitted. */
+    id?: string;
+    name: string;
+    /** Bytes, or a pre-formatted string such as `"1.2 MB"`. */
+    size?: number | string;
+    /** Tile label. Derived from the extension in `name` when omitted. */
+    ext?: string;
+    /** Lifecycle state. Defaults to `"idle"`. */
+    status?: FileUploadStatus;
+    /** 0–100. Drives the bar and the `{pct}` badge on in-flight rows. */
+    progress?: number;
+    /** Overrides the status's default note — name the rule that was broken. */
+    note?: string;
+    /** Preview URL, used by the image / gallery / video shapes. */
+    url?: string;
+}
 interface FileUploadProps {
     /** Controls layout and default accept type. Defaults to "file". */
     variant?: FileUploadVariant;
     /** Controls spacing and icon sizes. Defaults to "md". */
     size?: FileUploadSize;
+    /** Surface the control sits on. `"dark"` restyles the dropzone. Defaults to "light". */
+    tone?: FileUploadTone;
     /** Forwarded to the hidden <input type="file" accept="...">. Overrides variant default. */
     accept?: string;
     /** Allow selecting multiple files at once. */
@@ -1673,12 +1743,23 @@ interface FileUploadProps {
      */
     allowedFiles?: string[];
     /**
+     * Constraint chips shown inside the dropzone, before anything is picked.
+     * Auto-derived from `allowedFiles` and `maxSize` when omitted; pass `[]` to hide.
+     */
+    formats?: string[];
+    /**
      * Controlled URL(s) for showing already-uploaded content.
-     * - image / avatar: renders as <img> preview
-     * - file: renders as filename chip(s)
+     * - image / avatar / gallery: renders as <img> preview
+     * - file / compact: renders as a file row
      * Pass a string for single, string[] for multiple.
      */
     value?: string | string[];
+    /**
+     * Fully-controlled file rows with their own lifecycle state. When provided,
+     * the row list is rendered from these instead of being derived from `value`
+     * and the local selection.
+     */
+    items?: FileUploadItem[];
     /** Fired whenever the user selects valid files. Receives the raw File list. */
     onChange?: (files: File[]) => void;
     /**
@@ -1692,6 +1773,16 @@ interface FileUploadProps {
     onRemoveFile?: (index: number) => void;
     /** Fired when any files are rejected due to size/count validation. */
     onValidationError?: (errors: string[]) => void;
+    /** Retry a single failed row — one failure never restarts the batch. */
+    onRetry?: (item: FileUploadItem, index: number) => void;
+    /** Retry every failed row from the batch summary bar. */
+    onRetryAll?: () => void;
+    /** Keep the existing copy of a duplicate. */
+    onSkip?: (item: FileUploadItem, index: number) => void;
+    /** Overwrite the existing copy of a duplicate. */
+    onReplace?: (item: FileUploadItem, index: number) => void;
+    /** Open the crop tool for an image whose dimensions do not match. */
+    onCrop?: (item: FileUploadItem, index: number) => void;
     label?: React.ReactNode;
     required?: boolean;
     /** Shown below the field in red. Also shown for internal validation errors. */
@@ -1701,6 +1792,8 @@ interface FileUploadProps {
     placeholder?: string;
     /** Sub-line in the empty-state dropzone (e.g. "PNG, JPG up to 5 MB"). */
     description?: string;
+    /** Sub-line under the dropzone title. Defaults to "or click to browse". */
+    browseHint?: string;
     /** Enable drag-and-drop. Defaults to true. */
     dragAndDrop?: boolean;
     /**
@@ -1718,6 +1811,32 @@ interface FileUploadProps {
      */
     changeable?: boolean;
     /**
+     * Render the right-hand status pill on each row. Defaults to true. With it
+     * off, done rows fall back to the check disc and in-flight rows to a bare
+     * percentage, as in the design's live-upload list.
+     */
+    showStatusBadge?: boolean;
+    /** Render the "Nothing uploaded yet" placeholder when the row list is empty. */
+    showEmptyListHint?: boolean;
+    /**
+     * Render the dropzone above the row list. Defaults to true. Turn it off to
+     * show the rows on their own — e.g. when the picker lives elsewhere on the page.
+     */
+    showDropzone?: boolean;
+    /**
+     * Render the batch summary bar above the rows. It never blocks the page —
+     * uploading continues while the operator works.
+     */
+    batchSummary?: boolean;
+    /** Caption under the batch bar, e.g. "14.2 MB of 19.0 MB · about 40 seconds left". */
+    batchCaption?: string;
+    /** Initials fallback for the avatar — never a grey silhouette icon. */
+    initials?: string;
+    /** Tiles per row in the gallery shape. Defaults to 4. */
+    galleryColumns?: number;
+    /** Mark the first tile as the cover. Defaults to true. */
+    coverBadge?: boolean;
+    /**
      * Icon element rendered as a small badge in the bottom-right corner of the
      * image or avatar preview. Useful for camera, edit, or brand indicators.
      * Not rendered in the file variant or on empty-state dropzones.
@@ -1730,22 +1849,10 @@ interface FileUploadProps {
     /** Ref forwarded to the hidden <input type="file"> element. */
     inputRef?: React.Ref<HTMLInputElement>;
 }
-declare function FileUpload({ variant, size, accept, multiple, disabled, readOnly, name, id, maxSize, maxFiles, allowedFiles, value, onChange, onFilesChange, onRemove, onRemoveFile, onValidationError, label, required, error, helperText, placeholder, description, dragAndDrop, showLocalPreview, clearable, changeable, icon, className, dropzoneClassName, inputRef: externalInputRef, }: FileUploadProps): react_jsx_runtime.JSX.Element;
+declare function FileUpload({ variant, size, tone, accept, multiple, disabled, readOnly, name, id, maxSize, maxFiles, allowedFiles, formats, value, items, onChange, onFilesChange, onRemove, onRemoveFile, onValidationError, onRetry, onRetryAll, onSkip, onReplace, onCrop, label, required, error, helperText, placeholder, description, browseHint, dragAndDrop, showLocalPreview, clearable, changeable, showStatusBadge, showEmptyListHint, showDropzone, batchSummary, batchCaption, initials, galleryColumns, coverBadge, icon, className, dropzoneClassName, inputRef: externalInputRef, }: FileUploadProps): react_jsx_runtime.JSX.Element;
 declare namespace FileUpload {
     var displayName: string;
 }
-
-declare const dropzoneVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "disabled" | "error" | "dragover" | "idle" | null | undefined;
-} & class_variance_authority_types.ClassProp) | undefined) => string;
-declare const iconWrapperVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
-} & class_variance_authority_types.ClassProp) | undefined) => string;
-declare const avatarContainerVariants: (props?: ({
-    size?: "sm" | "lg" | "md" | null | undefined;
-    state?: "disabled" | "filled" | "empty" | null | undefined;
-} & class_variance_authority_types.ClassProp) | undefined) => string;
 
 declare const chipVariants: (props?: ({
     variant?: "success" | "warning" | "error" | "info" | "common" | null | undefined;

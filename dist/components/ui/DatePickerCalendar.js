@@ -496,6 +496,9 @@ var triggerVariants = cva(
   }
 );
 var CREATE_VALUE = "__create__";
+var PILL_MAX_WIDTH = 140;
+var PILL_MIN_WIDTH = 56;
+var PILL_GAP = 4;
 function CheckboxIcon({ checked }) {
   return /* @__PURE__ */ jsx(
     "span",
@@ -656,9 +659,26 @@ function Select({
   };
   const pillsContainerRef = React4.useRef(null);
   const [visibleCount, setVisibleCount] = React4.useState(null);
+  const [rowWidth, setRowWidth] = React4.useState(0);
+  React4.useLayoutEffect(() => {
+    const container = pillsContainerRef.current;
+    if (!container || resolvedMode !== "multi") return;
+    const measure = () => setRowWidth(container.getBoundingClientRect().width);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [resolvedMode]);
+  const badgeReserve = 20 + 7 * String(selectedArr.length).length + PILL_GAP;
+  const pillMaxWidth = React4.useMemo(() => {
+    if (rowWidth === 0) return PILL_MAX_WIDTH;
+    const budget = selectedArr.length <= 1 ? rowWidth : rowWidth - badgeReserve;
+    return Math.max(PILL_MIN_WIDTH, Math.min(PILL_MAX_WIDTH, Math.floor(budget)));
+  }, [rowWidth, selectedArr.length, badgeReserve]);
   React4.useLayoutEffect(() => {
     if (resolvedMode === "multi") setVisibleCount(null);
-  }, [selectedArr.join(","), resolvedMode]);
+  }, [selectedArr.join(","), resolvedMode, rowWidth]);
   React4.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     if (maxChips !== void 0) {
@@ -670,23 +690,23 @@ function Select({
       setVisibleCount(selectedArr.length);
       return;
     }
+    if (rowWidth === 0) return;
     const containerRight = container.getBoundingClientRect().right;
     const pills = Array.from(
       container.querySelectorAll("[data-pill]")
     );
-    const BADGE_RESERVE = 40;
     let count = pills.length;
     for (let i = 0; i < pills.length; i++) {
       const pillRight = pills[i].getBoundingClientRect().right;
       const hasMore = i < pills.length - 1;
-      const limit = hasMore ? containerRight - BADGE_RESERVE : containerRight;
+      const limit = hasMore ? containerRight - badgeReserve : containerRight;
       if (pillRight > limit) {
         count = i === 0 ? 1 : i;
         break;
       }
     }
     setVisibleCount(count);
-  }, [visibleCount, maxChips]);
+  }, [visibleCount, maxChips, badgeReserve, rowWidth]);
   const displayedPills = visibleCount === null ? selectedArr : selectedArr.slice(0, visibleCount);
   const overflowCount = visibleCount === null ? 0 : selectedArr.length - visibleCount;
   const hasSelection = resolvedMode === "multi" ? selectedArr.length > 0 : !!selected;
@@ -809,359 +829,367 @@ function Select({
       option.value
     );
   };
-  return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1.5", children: [
-    label && /* @__PURE__ */ jsx(
-      InputLabel,
-      {
-        size,
-        required,
-        tone: state === "error" || state === "disabled" ? getLabelColor(state) : void 0,
-        children: label
-      }
-    ),
-    /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
-      /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
-        "div",
+  return (
+    // `min-w-0` lets the field shrink inside a flex parent (a sidebar column
+    // otherwise refuses to go below the chips' intrinsic width) and
+    // `max-w-full` caps it when that parent sizes children to max-content.
+    // Without both, the trigger overflows the sidebar before the chip
+    // measurement below ever gets a say.
+    /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 max-w-full flex-col gap-1.5", children: [
+      label && /* @__PURE__ */ jsx(
+        InputLabel,
         {
-          role: "button",
-          "data-slot": "select-trigger",
-          "data-size": size,
-          "data-state": state,
-          tabIndex: disabled ? -1 : 0,
-          "aria-disabled": disabled,
-          "aria-haspopup": "listbox",
-          "aria-expanded": open,
-          "aria-busy": loading || void 0,
-          onPointerEnter: () => setHovered(true),
-          onPointerLeave: () => setHovered(false),
-          onFocus: () => {
-            interactedRef.current = true;
-          },
-          onBlur: handleTriggerBlur,
-          onKeyDown: (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              if (!disabled && !readOnly && !loading) setOpen((o) => !o);
-            } else if (e.key === "Escape") {
-              setOpen(false);
-            }
-          },
-          className: cn(
-            triggerVariants({ state: legacyState, size }),
-            width,
-            className
-          ),
-          style: {
-            minHeight: spec.height,
-            paddingLeft: spec.padLeft,
-            paddingRight: spec.padRight,
-            paddingTop: resolvedMode === "multi" ? spec.padMultiY : 0,
-            paddingBottom: resolvedMode === "multi" ? spec.padMultiY : 0,
-            gap: SELECT_GAP,
-            borderRadius: spec.radius,
-            fontSize: spec.font,
-            background: box.background,
-            border: box.border,
-            boxShadow: box.boxShadow,
-            color: box.color,
-            cursor: box.cursor ?? "pointer",
-            transition: INPUT_TRANSITION
-          },
-          children: [
-            leftIcon && /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: "flex shrink-0 items-center justify-center [&>svg]:size-full",
-                style: { width: spec.icon + 1, height: spec.icon + 1, color: INPUT_COLORS.icon },
-                children: leftIcon
+          size,
+          required,
+          tone: state === "error" || state === "disabled" ? getLabelColor(state) : void 0,
+          children: label
+        }
+      ),
+      /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
+        /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
+          "div",
+          {
+            role: "button",
+            "data-slot": "select-trigger",
+            "data-size": size,
+            "data-state": state,
+            tabIndex: disabled ? -1 : 0,
+            "aria-disabled": disabled,
+            "aria-haspopup": "listbox",
+            "aria-expanded": open,
+            "aria-busy": loading || void 0,
+            onPointerEnter: () => setHovered(true),
+            onPointerLeave: () => setHovered(false),
+            onFocus: () => {
+              interactedRef.current = true;
+            },
+            onBlur: handleTriggerBlur,
+            onKeyDown: (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!disabled && !readOnly && !loading) setOpen((o) => !o);
+              } else if (e.key === "Escape") {
+                setOpen(false);
               }
+            },
+            className: cn(
+              triggerVariants({ state: legacyState, size }),
+              width,
+              className
             ),
-            /* @__PURE__ */ jsx(
-              "div",
-              {
-                ref: resolvedMode === "multi" ? pillsContainerRef : void 0,
-                className: "flex min-w-0 flex-1 items-center gap-1 overflow-hidden",
-                children: resolvedMode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxs(Fragment, { children: [
-                  displayedPills.map((val) => {
-                    const opt = resolvedOptions.find((o) => o.value === val);
-                    if (!opt) return null;
-                    return /* @__PURE__ */ jsxs(
+            style: {
+              minHeight: spec.height,
+              paddingLeft: spec.padLeft,
+              paddingRight: spec.padRight,
+              paddingTop: resolvedMode === "multi" ? spec.padMultiY : 0,
+              paddingBottom: resolvedMode === "multi" ? spec.padMultiY : 0,
+              gap: SELECT_GAP,
+              borderRadius: spec.radius,
+              fontSize: spec.font,
+              background: box.background,
+              border: box.border,
+              boxShadow: box.boxShadow,
+              color: box.color,
+              cursor: box.cursor ?? "pointer",
+              transition: INPUT_TRANSITION
+            },
+            children: [
+              leftIcon && /* @__PURE__ */ jsx(
+                "span",
+                {
+                  className: "flex shrink-0 items-center justify-center [&>svg]:size-full",
+                  style: { width: spec.icon + 1, height: spec.icon + 1, color: INPUT_COLORS.icon },
+                  children: leftIcon
+                }
+              ),
+              /* @__PURE__ */ jsx(
+                "div",
+                {
+                  ref: resolvedMode === "multi" ? pillsContainerRef : void 0,
+                  className: "flex min-w-0 flex-1 items-center gap-1 overflow-hidden",
+                  children: resolvedMode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxs(Fragment, { children: [
+                    displayedPills.map((val) => {
+                      const opt = resolvedOptions.find((o) => o.value === val);
+                      if (!opt) return null;
+                      return /* @__PURE__ */ jsxs(
+                        "span",
+                        {
+                          "data-pill": true,
+                          className: "inline-flex shrink-0 items-center gap-1 rounded-full font-semibold",
+                          style: {
+                            maxWidth: pillMaxWidth,
+                            padding: clearable ? "4px 4px 4px 10px" : "4px 10px",
+                            background: MENU.selectedBg,
+                            color: MENU.selectedInk,
+                            fontSize: spec.font - 2
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx("span", { className: "truncate", children: opt.label }),
+                            clearable && /* @__PURE__ */ jsx(
+                              "button",
+                              {
+                                type: "button",
+                                tabIndex: -1,
+                                onClick: (e) => removePill(val, e),
+                                "aria-label": `Remove ${opt.label}`,
+                                className: "flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full transition-colors",
+                                style: { background: "rgba(0,60,27,.1)", color: MENU.selectedInk },
+                                children: /* @__PURE__ */ jsx(X, { size: 8, strokeWidth: 3.4 })
+                              }
+                            )
+                          ]
+                        },
+                        val
+                      );
+                    }),
+                    overflowCount > 0 && /* @__PURE__ */ jsxs(
                       "span",
                       {
-                        "data-pill": true,
-                        className: "inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-full font-semibold",
+                        className: "inline-flex shrink-0 items-center justify-center rounded-full font-semibold",
                         style: {
-                          padding: clearable ? "4px 4px 4px 10px" : "4px 10px",
-                          background: MENU.selectedBg,
-                          color: MENU.selectedInk,
+                          padding: "4px 8px",
+                          background: INPUT_COLORS.subtle,
+                          color: INPUT_COLORS.message,
                           fontSize: spec.font - 2
                         },
                         children: [
-                          /* @__PURE__ */ jsx("span", { className: "truncate", children: opt.label }),
-                          clearable && /* @__PURE__ */ jsx(
-                            "button",
-                            {
-                              type: "button",
-                              tabIndex: -1,
-                              onClick: (e) => removePill(val, e),
-                              "aria-label": `Remove ${opt.label}`,
-                              className: "flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full transition-colors",
-                              style: { background: "rgba(0,60,27,.1)", color: MENU.selectedInk },
-                              children: /* @__PURE__ */ jsx(X, { size: 8, strokeWidth: 3.4 })
-                            }
-                          )
+                          "+",
+                          overflowCount
                         ]
-                      },
-                      val
-                    );
-                  }),
-                  overflowCount > 0 && /* @__PURE__ */ jsxs(
+                      }
+                    )
+                  ] }) : /* @__PURE__ */ jsx("span", { className: "truncate", style: { color: INPUT_COLORS.placeholder }, children: placeholder }) : /* @__PURE__ */ jsx(
                     "span",
                     {
-                      className: "inline-flex shrink-0 items-center justify-center rounded-full font-semibold",
+                      className: "truncate",
                       style: {
-                        padding: "4px 8px",
-                        background: INPUT_COLORS.subtle,
-                        color: INPUT_COLORS.message,
-                        fontSize: spec.font - 2
+                        color: singleLabel ? box.color : INPUT_COLORS.placeholder
                       },
-                      children: [
-                        "+",
-                        overflowCount
-                      ]
+                      children: singleLabel ?? placeholder
                     }
                   )
-                ] }) : /* @__PURE__ */ jsx("span", { className: "truncate", style: { color: INPUT_COLORS.placeholder }, children: placeholder }) : /* @__PURE__ */ jsx(
-                  "span",
+                }
+              ),
+              /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center", style: { gap: 6 }, children: [
+                clearable && hasSelection && !readOnly && !disabled && /* @__PURE__ */ jsx(
+                  "button",
                   {
-                    className: "truncate",
+                    type: "button",
+                    tabIndex: -1,
+                    onClick: clearAll,
+                    "aria-label": "Clear selection",
+                    className: "flex shrink-0 items-center justify-center rounded-full transition-colors",
                     style: {
-                      color: singleLabel ? box.color : INPUT_COLORS.placeholder
+                      width: spec.icon + 4,
+                      height: spec.icon + 4,
+                      background: INPUT_COLORS.subtle,
+                      color: INPUT_COLORS.message
                     },
-                    children: singleLabel ?? placeholder
+                    children: /* @__PURE__ */ jsx(X, { size: spec.icon - 6, strokeWidth: 3 })
+                  }
+                ),
+                sorting && /* @__PURE__ */ jsx(
+                  "button",
+                  {
+                    type: "button",
+                    tabIndex: -1,
+                    onClick: (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSortOrder((o) => o === "asc" ? "desc" : "asc");
+                    },
+                    disabled,
+                    "aria-label": sortOrder === "asc" ? "Sorted A\u2192Z, click for Z\u2192A" : "Sorted Z\u2192A, click for A\u2192Z",
+                    className: "flex items-center transition-colors",
+                    style: { color: INPUT_COLORS.message },
+                    children: sortOrder === "asc" ? /* @__PURE__ */ jsx(ArrowUpAZ, { size: spec.icon - 1, strokeWidth: 2 }) : /* @__PURE__ */ jsx(ArrowDownAZ, { size: spec.icon - 1, strokeWidth: 2 })
+                  }
+                ),
+                loading && /* @__PURE__ */ jsx(Spinner, { size: spec.icon - 2 }),
+                state === "readonly" && /* @__PURE__ */ jsx(Lock, { size: spec.icon - 2, strokeWidth: 2, color: INPUT_COLORS.placeholder }),
+                state === "error" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.errorInk }),
+                state === "warning" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.warningInk }),
+                state === "success" && /* @__PURE__ */ jsx(Check, { size: spec.icon, strokeWidth: 2.6, color: INPUT_COLORS.successInk }),
+                showChevron && /* @__PURE__ */ jsx(
+                  ChevronDown,
+                  {
+                    size: spec.icon,
+                    strokeWidth: 2,
+                    className: "transition-transform duration-[120ms]",
+                    style: {
+                      color: disabled ? INPUT_COLORS.borderHover : INPUT_COLORS.placeholder,
+                      transform: open ? "rotate(180deg)" : "rotate(0deg)"
+                    }
                   }
                 )
-              }
-            ),
-            /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center", style: { gap: 6 }, children: [
-              clearable && hasSelection && !readOnly && !disabled && /* @__PURE__ */ jsx(
-                "button",
-                {
-                  type: "button",
-                  tabIndex: -1,
-                  onClick: clearAll,
-                  "aria-label": "Clear selection",
-                  className: "flex shrink-0 items-center justify-center rounded-full transition-colors",
-                  style: {
-                    width: spec.icon + 4,
-                    height: spec.icon + 4,
-                    background: INPUT_COLORS.subtle,
-                    color: INPUT_COLORS.message
-                  },
-                  children: /* @__PURE__ */ jsx(X, { size: spec.icon - 6, strokeWidth: 3 })
-                }
-              ),
-              sorting && /* @__PURE__ */ jsx(
-                "button",
-                {
-                  type: "button",
-                  tabIndex: -1,
-                  onClick: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSortOrder((o) => o === "asc" ? "desc" : "asc");
-                  },
-                  disabled,
-                  "aria-label": sortOrder === "asc" ? "Sorted A\u2192Z, click for Z\u2192A" : "Sorted Z\u2192A, click for A\u2192Z",
-                  className: "flex items-center transition-colors",
-                  style: { color: INPUT_COLORS.message },
-                  children: sortOrder === "asc" ? /* @__PURE__ */ jsx(ArrowUpAZ, { size: spec.icon - 1, strokeWidth: 2 }) : /* @__PURE__ */ jsx(ArrowDownAZ, { size: spec.icon - 1, strokeWidth: 2 })
-                }
-              ),
-              loading && /* @__PURE__ */ jsx(Spinner, { size: spec.icon - 2 }),
-              state === "readonly" && /* @__PURE__ */ jsx(Lock, { size: spec.icon - 2, strokeWidth: 2, color: INPUT_COLORS.placeholder }),
-              state === "error" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.errorInk }),
-              state === "warning" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.warningInk }),
-              state === "success" && /* @__PURE__ */ jsx(Check, { size: spec.icon, strokeWidth: 2.6, color: INPUT_COLORS.successInk }),
-              showChevron && /* @__PURE__ */ jsx(
-                ChevronDown,
-                {
-                  size: spec.icon,
-                  strokeWidth: 2,
-                  className: "transition-transform duration-[120ms]",
-                  style: {
-                    color: disabled ? INPUT_COLORS.borderHover : INPUT_COLORS.placeholder,
-                    transform: open ? "rotate(180deg)" : "rotate(0deg)"
-                  }
-                }
-              )
-            ] })
-          ]
-        }
-      ) }),
-      /* @__PURE__ */ jsx(
-        PopoverContent,
-        {
-          side: placement === "auto" ? "bottom" : placement,
-          className: "max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
-          collisionPadding: { top: 64 },
-          style: { width: "var(--radix-popover-trigger-width)" },
-          children: /* @__PURE__ */ jsxs(
-            "div",
-            {
-              style: {
-                padding: MENU.padding,
-                borderRadius: MENU.radius,
-                border: MENU.border,
-                background: MENU.background,
-                boxShadow: MENU.shadow
-              },
-              children: [
-                /* @__PURE__ */ jsx("style", { children: MENU_SCROLLBAR_CSS }),
-                /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
-                  searchEnabled && !loading && /* @__PURE__ */ jsx(
-                    CommandInput,
-                    {
-                      placeholder: "Search...",
-                      value: searchQuery,
-                      onValueChange: handleSearchChange,
-                      spellCheck,
-                      style: { fontSize: spec.font }
-                    }
-                  ),
-                  resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
-                    "div",
-                    {
-                      className: "sticky top-0 z-10 flex items-center justify-between",
-                      style: {
-                        padding: "6px 10px",
-                        background: MENU.background,
-                        borderBottom: `1px solid ${MENU.groupRule}`,
-                        fontSize: spec.font - 2,
-                        color: INPUT_COLORS.message
-                      },
-                      children: [
-                        /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
-                          selectedArr.length,
-                          " selected"
-                        ] }),
-                        /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
-                          /* @__PURE__ */ jsx(
-                            "button",
+              ] })
+            ]
+          }
+        ) }),
+        /* @__PURE__ */ jsx(
+          PopoverContent,
+          {
+            side: placement === "auto" ? "bottom" : placement,
+            className: "max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
+            collisionPadding: { top: 64 },
+            style: { width: "var(--radix-popover-trigger-width)" },
+            children: /* @__PURE__ */ jsxs(
+              "div",
+              {
+                style: {
+                  padding: MENU.padding,
+                  borderRadius: MENU.radius,
+                  border: MENU.border,
+                  background: MENU.background,
+                  boxShadow: MENU.shadow
+                },
+                children: [
+                  /* @__PURE__ */ jsx("style", { children: MENU_SCROLLBAR_CSS }),
+                  /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
+                    searchEnabled && !loading && /* @__PURE__ */ jsx(
+                      CommandInput,
+                      {
+                        placeholder: "Search...",
+                        value: searchQuery,
+                        onValueChange: handleSearchChange,
+                        spellCheck,
+                        style: { fontSize: spec.font }
+                      }
+                    ),
+                    resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
+                      "div",
+                      {
+                        className: "sticky top-0 z-10 flex items-center justify-between",
+                        style: {
+                          padding: "6px 10px",
+                          background: MENU.background,
+                          borderBottom: `1px solid ${MENU.groupRule}`,
+                          fontSize: spec.font - 2,
+                          color: INPUT_COLORS.message
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
+                            selectedArr.length,
+                            " selected"
+                          ] }),
+                          /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
+                            /* @__PURE__ */ jsx(
+                              "button",
+                              {
+                                type: "button",
+                                onClick: () => commit(enabledOptions.map((o) => o.value)),
+                                disabled: allSelected,
+                                className: "font-semibold disabled:opacity-40",
+                                style: { color: MENU.selectedInk },
+                                children: "All"
+                              }
+                            ),
+                            /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
+                            /* @__PURE__ */ jsx(
+                              "button",
+                              {
+                                type: "button",
+                                onClick: () => commit([]),
+                                disabled: selectedArr.length === 0,
+                                className: "font-semibold disabled:opacity-40",
+                                style: { color: INPUT_COLORS.message },
+                                children: "None"
+                              }
+                            )
+                          ] })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsx(
+                      CommandList,
+                      {
+                        ref: listRef,
+                        "data-slot": "select-menu-list",
+                        style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
+                        children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                          groups.map((group, gi) => /* @__PURE__ */ jsxs(
+                            "div",
                             {
-                              type: "button",
-                              onClick: () => commit(enabledOptions.map((o) => o.value)),
-                              disabled: allSelected,
-                              className: "font-semibold disabled:opacity-40",
-                              style: { color: MENU.selectedInk },
-                              children: "All"
+                              style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
+                              children: [
+                                group.name && /* @__PURE__ */ jsx(
+                                  "div",
+                                  {
+                                    className: "sticky top-0 z-[5] font-semibold uppercase",
+                                    style: {
+                                      padding: "6px 10px 4px",
+                                      background: MENU.background,
+                                      fontSize: 10,
+                                      letterSpacing: "0.09em",
+                                      color: MENU.groupInk
+                                    },
+                                    children: group.name
+                                  }
+                                ),
+                                group.options.map(renderOption)
+                              ]
+                            },
+                            group.name ?? `__ungrouped_${gi}`
+                          )),
+                          showCreate && /* @__PURE__ */ jsxs(
+                            CommandItem,
+                            {
+                              value: CREATE_VALUE,
+                              onSelect: () => {
+                                onCreate?.(query);
+                                setOpen(false);
+                              },
+                              className: "cursor-pointer",
+                              style: {
+                                minHeight: spec.option,
+                                gap: SELECT_GAP,
+                                padding: "0 10px",
+                                marginTop: 4,
+                                borderTop: `1px solid ${MENU.groupRule}`,
+                                borderRadius: MENU.optionRadius,
+                                fontSize: spec.font,
+                                fontWeight: 600,
+                                color: MENU.selectedInk
+                              },
+                              children: [
+                                /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
+                                /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
+                                  "Create \u201C",
+                                  query,
+                                  "\u201D"
+                                ] })
+                              ]
                             }
                           ),
-                          /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
-                          /* @__PURE__ */ jsx(
-                            "button",
+                          showEmpty && /* @__PURE__ */ jsx(
+                            "div",
                             {
-                              type: "button",
-                              onClick: () => commit([]),
-                              disabled: selectedArr.length === 0,
-                              className: "font-semibold disabled:opacity-40",
-                              style: { color: INPUT_COLORS.message },
-                              children: "None"
+                              className: "flex flex-col items-start gap-1",
+                              style: { padding: "14px 10px", fontSize: spec.font },
+                              children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
                             }
                           )
                         ] })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsx(
-                    CommandList,
-                    {
-                      ref: listRef,
-                      "data-slot": "select-menu-list",
-                      style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
-                      children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-                        groups.map((group, gi) => /* @__PURE__ */ jsxs(
-                          "div",
-                          {
-                            style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
-                            children: [
-                              group.name && /* @__PURE__ */ jsx(
-                                "div",
-                                {
-                                  className: "sticky top-0 z-[5] font-semibold uppercase",
-                                  style: {
-                                    padding: "6px 10px 4px",
-                                    background: MENU.background,
-                                    fontSize: 10,
-                                    letterSpacing: "0.09em",
-                                    color: MENU.groupInk
-                                  },
-                                  children: group.name
-                                }
-                              ),
-                              group.options.map(renderOption)
-                            ]
-                          },
-                          group.name ?? `__ungrouped_${gi}`
-                        )),
-                        showCreate && /* @__PURE__ */ jsxs(
-                          CommandItem,
-                          {
-                            value: CREATE_VALUE,
-                            onSelect: () => {
-                              onCreate?.(query);
-                              setOpen(false);
-                            },
-                            className: "cursor-pointer",
-                            style: {
-                              minHeight: spec.option,
-                              gap: SELECT_GAP,
-                              padding: "0 10px",
-                              marginTop: 4,
-                              borderTop: `1px solid ${MENU.groupRule}`,
-                              borderRadius: MENU.optionRadius,
-                              fontSize: spec.font,
-                              fontWeight: 600,
-                              color: MENU.selectedInk
-                            },
-                            children: [
-                              /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
-                              /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
-                                "Create \u201C",
-                                query,
-                                "\u201D"
-                              ] })
-                            ]
-                          }
-                        ),
-                        showEmpty && /* @__PURE__ */ jsx(
-                          "div",
-                          {
-                            className: "flex flex-col items-start gap-1",
-                            style: { padding: "14px 10px", fontSize: spec.font },
-                            children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
-                          }
-                        )
-                      ] })
-                    }
-                  )
-                ] })
-              ]
-            }
-          )
+                      }
+                    )
+                  ] })
+                ]
+              }
+            )
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsx(
+        InputHelper,
+        {
+          size,
+          state: state === "open" ? "focused" : state,
+          helperText: error ?? (status && statusMessage) ?? helperText,
+          error
         }
       )
-    ] }),
-    /* @__PURE__ */ jsx(
-      InputHelper,
-      {
-        size,
-        state: state === "open" ? "focused" : state,
-        helperText: error ?? (status && statusMessage) ?? helperText,
-        error
-      }
-    )
-  ] });
+    ] })
+  );
 }
 Select.displayName = "Select";
 var DATEPICKER_SIZES = {

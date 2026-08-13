@@ -44,6 +44,13 @@ import type {
 
 const CREATE_VALUE = "__create__";
 
+/** Widest a single chip may grow before its label truncates. */
+const PILL_MAX_WIDTH = 140;
+/** Narrowest a chip may be squeezed to before it simply clips. */
+const PILL_MIN_WIDTH = 56;
+/** `gap-1` between chips, in px. */
+const PILL_GAP = 4;
+
 /** 14px box, 1.5px hairline, filled forest when checked. */
 function CheckboxIcon({ checked }: { checked: boolean }) {
   return (
@@ -244,10 +251,43 @@ function Select<TItem = unknown>({
   // `maxChips` short-circuits the measurement with a hard cap.
   const pillsContainerRef = React.useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = React.useState<number | null>(null);
+  const [rowWidth, setRowWidth] = React.useState(0);
 
+  // The chip row is `flex-1 min-w-0`, so its width never depends on its own
+  // children. Measuring it on its own therefore gives a chip cap that is stable
+  // across both passes — the pills are already the right size when pass 1 runs.
+  React.useLayoutEffect(() => {
+    const container = pillsContainerRef.current;
+    if (!container || resolvedMode !== "multi") return;
+
+    const measure = () => setRowWidth(container.getBoundingClientRect().width);
+    measure();
+
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [resolvedMode]);
+
+  /** Width the `+N` counter needs, including the gap in front of it. */
+  const badgeReserve = 20 + 7 * String(selectedArr.length).length + PILL_GAP;
+
+  /**
+   * Cap a chip so it can never push the counter out of the box. A lone
+   * selection has no counter to make room for, so it gets the whole row.
+   */
+  const pillMaxWidth = React.useMemo(() => {
+    if (rowWidth === 0) return PILL_MAX_WIDTH;
+    const budget = selectedArr.length <= 1 ? rowWidth : rowWidth - badgeReserve;
+    return Math.max(PILL_MIN_WIDTH, Math.min(PILL_MAX_WIDTH, Math.floor(budget)));
+  }, [rowWidth, selectedArr.length, badgeReserve]);
+
+  // Any width change re-opens the measurement — a select that mounts inside a
+  // collapsed or animating sidebar is first laid out at zero width, and without
+  // this it would keep whatever count it guessed while it was hidden.
   React.useLayoutEffect(() => {
     if (resolvedMode === "multi") setVisibleCount(null);
-  }, [selectedArr.join(","), resolvedMode]);
+  }, [selectedArr.join(","), resolvedMode, rowWidth]);
 
   React.useLayoutEffect(() => {
     if (visibleCount !== null) return;
@@ -262,25 +302,30 @@ function Select<TItem = unknown>({
       return;
     }
 
+    // Not laid out yet (hidden panel, collapsed sidebar). Leave the count open
+    // and wait for the ResizeObserver to report a real width.
+    if (rowWidth === 0) return;
+
     const containerRight = container.getBoundingClientRect().right;
     const pills = Array.from(
       container.querySelectorAll<HTMLElement>("[data-pill]"),
     );
-    const BADGE_RESERVE = 40;
 
     let count = pills.length;
     for (let i = 0; i < pills.length; i++) {
       const pillRight = pills[i]!.getBoundingClientRect().right;
       const hasMore = i < pills.length - 1;
-      const limit = hasMore ? containerRight - BADGE_RESERVE : containerRight;
+      const limit = hasMore ? containerRight - badgeReserve : containerRight;
       if (pillRight > limit) {
+        // The first chip is already capped to leave room for the counter, so
+        // keeping it is always safe — below that the row would say nothing.
         count = i === 0 ? 1 : i;
         break;
       }
     }
 
     setVisibleCount(count);
-  }, [visibleCount, maxChips]);
+  }, [visibleCount, maxChips, badgeReserve, rowWidth]);
 
   const displayedPills =
     visibleCount === null ? selectedArr : selectedArr.slice(0, visibleCount);
@@ -473,7 +518,12 @@ function Select<TItem = unknown>({
   };
 
   return (
-    <div className="flex flex-col gap-1.5">
+    // `min-w-0` lets the field shrink inside a flex parent (a sidebar column
+    // otherwise refuses to go below the chips' intrinsic width) and
+    // `max-w-full` caps it when that parent sizes children to max-content.
+    // Without both, the trigger overflows the sidebar before the chip
+    // measurement below ever gets a say.
+    <div className="flex min-w-0 max-w-full flex-col gap-1.5">
       {label && (
         <InputLabel
           size={size}
@@ -556,8 +606,9 @@ function Select<TItem = unknown>({
                         <span
                           key={val}
                           data-pill
-                          className="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-full font-semibold"
+                          className="inline-flex shrink-0 items-center gap-1 rounded-full font-semibold"
                           style={{
+                            maxWidth: pillMaxWidth,
                             padding: clearable ? "4px 4px 4px 10px" : "4px 10px",
                             background: MENU.selectedBg,
                             color: MENU.selectedInk,
