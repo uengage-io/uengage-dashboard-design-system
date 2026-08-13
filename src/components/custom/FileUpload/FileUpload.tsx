@@ -1,7 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { Upload, X, ImageIcon, Plus, File as FileIcon, Video as VideoIcon, Play } from "lucide-react";
+import {
+  Upload,
+  X,
+  ImageIcon,
+  Plus,
+  Video as VideoIcon,
+  Play,
+  Camera,
+  Check,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InputLabel } from "@/components/custom/Input/InputLabel";
 import { InputHelper } from "@/components/custom/Input/InputHelper";
@@ -12,12 +21,35 @@ import {
   ICON_SIZES,
   AVATAR_ICON_SIZES,
   PLACEHOLDER_TEXT,
+  BROWSE_HINT,
+  FILE_UPLOAD_COLORS,
+  FILE_UPLOAD_SIZES,
+  FILE_UPLOAD_STATUS_STYLES,
+  FILE_UPLOAD_TRANSITION,
+  PROGRESS_TRANSITION,
+  getDropzoneStyle,
+  getFileExt,
+  truncateMiddle,
+  type FileUploadStatus,
+  type FileUploadTone,
+  type FileUploadSizeKey,
 } from "./fileUploadVariants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type FileUploadVariant = "image" | "file" | "avatar" | "video";
-export type FileUploadSize = "sm" | "md" | "lg";
+export type FileUploadVariant =
+  | "image"
+  | "file"
+  | "avatar"
+  | "video"
+  /** Single-document row for long forms — a dropzone would dominate the page. */
+  | "compact"
+  /** Reorderable image grid whose first tile is always the cover. */
+  | "gallery";
+
+export type FileUploadSize = FileUploadSizeKey;
+
+export type { FileUploadStatus, FileUploadTone } from "./fileUploadVariants";
 
 /** Internal representation of a locally-selected file with a preview URL. */
 export interface FileUploadLocalFile {
@@ -28,12 +60,37 @@ export interface FileUploadLocalFile {
   id: string;
 }
 
+/**
+ * A file row driven entirely by the caller. Pass these through `items` when the
+ * upload lifecycle lives in your own store — the component then renders the
+ * design's nine states rather than deriving `idle` / `done` from `value`.
+ */
+export interface FileUploadItem {
+  /** Stable key. Falls back to the name when omitted. */
+  id?: string;
+  name: string;
+  /** Bytes, or a pre-formatted string such as `"1.2 MB"`. */
+  size?: number | string;
+  /** Tile label. Derived from the extension in `name` when omitted. */
+  ext?: string;
+  /** Lifecycle state. Defaults to `"idle"`. */
+  status?: FileUploadStatus;
+  /** 0–100. Drives the bar and the `{pct}` badge on in-flight rows. */
+  progress?: number;
+  /** Overrides the status's default note — name the rule that was broken. */
+  note?: string;
+  /** Preview URL, used by the image / gallery / video shapes. */
+  url?: string;
+}
+
 export interface FileUploadProps {
   // ── Visual ──────────────────────────────────────────────────────────────────
   /** Controls layout and default accept type. Defaults to "file". */
   variant?: FileUploadVariant;
   /** Controls spacing and icon sizes. Defaults to "md". */
   size?: FileUploadSize;
+  /** Surface the control sits on. `"dark"` restyles the dropzone. Defaults to "light". */
+  tone?: FileUploadTone;
 
   // ── Native input ────────────────────────────────────────────────────────────
   /** Forwarded to the hidden <input type="file" accept="...">. Overrides variant default. */
@@ -58,15 +115,26 @@ export interface FileUploadProps {
    * Also sets the native `accept` attribute on the hidden input (overridden by `accept` prop).
    */
   allowedFiles?: string[];
+  /**
+   * Constraint chips shown inside the dropzone, before anything is picked.
+   * Auto-derived from `allowedFiles` and `maxSize` when omitted; pass `[]` to hide.
+   */
+  formats?: string[];
 
   // ── Controlled value (server/existing URLs) ─────────────────────────────────
   /**
    * Controlled URL(s) for showing already-uploaded content.
-   * - image / avatar: renders as <img> preview
-   * - file: renders as filename chip(s)
+   * - image / avatar / gallery: renders as <img> preview
+   * - file / compact: renders as a file row
    * Pass a string for single, string[] for multiple.
    */
   value?: string | string[];
+  /**
+   * Fully-controlled file rows with their own lifecycle state. When provided,
+   * the row list is rendered from these instead of being derived from `value`
+   * and the local selection.
+   */
+  items?: FileUploadItem[];
 
   // ── Callbacks ───────────────────────────────────────────────────────────────
   /** Fired whenever the user selects valid files. Receives the raw File list. */
@@ -82,6 +150,16 @@ export interface FileUploadProps {
   onRemoveFile?: (index: number) => void;
   /** Fired when any files are rejected due to size/count validation. */
   onValidationError?: (errors: string[]) => void;
+  /** Retry a single failed row — one failure never restarts the batch. */
+  onRetry?: (item: FileUploadItem, index: number) => void;
+  /** Retry every failed row from the batch summary bar. */
+  onRetryAll?: () => void;
+  /** Keep the existing copy of a duplicate. */
+  onSkip?: (item: FileUploadItem, index: number) => void;
+  /** Overwrite the existing copy of a duplicate. */
+  onReplace?: (item: FileUploadItem, index: number) => void;
+  /** Open the crop tool for an image whose dimensions do not match. */
+  onCrop?: (item: FileUploadItem, index: number) => void;
 
   // ── Field decoration ────────────────────────────────────────────────────────
   label?: React.ReactNode;
@@ -93,6 +171,8 @@ export interface FileUploadProps {
   placeholder?: string;
   /** Sub-line in the empty-state dropzone (e.g. "PNG, JPG up to 5 MB"). */
   description?: string;
+  /** Sub-line under the dropzone title. Defaults to "or click to browse". */
+  browseHint?: string;
 
   // ── Behaviour ───────────────────────────────────────────────────────────────
   /** Enable drag-and-drop. Defaults to true. */
@@ -111,6 +191,36 @@ export interface FileUploadProps {
    * When both changeable and clearable are false the overlay is hidden entirely.
    */
   changeable?: boolean;
+  /**
+   * Render the right-hand status pill on each row. Defaults to true. With it
+   * off, done rows fall back to the check disc and in-flight rows to a bare
+   * percentage, as in the design's live-upload list.
+   */
+  showStatusBadge?: boolean;
+  /** Render the "Nothing uploaded yet" placeholder when the row list is empty. */
+  showEmptyListHint?: boolean;
+  /**
+   * Render the dropzone above the row list. Defaults to true. Turn it off to
+   * show the rows on their own — e.g. when the picker lives elsewhere on the page.
+   */
+  showDropzone?: boolean;
+  /**
+   * Render the batch summary bar above the rows. It never blocks the page —
+   * uploading continues while the operator works.
+   */
+  batchSummary?: boolean;
+  /** Caption under the batch bar, e.g. "14.2 MB of 19.0 MB · about 40 seconds left". */
+  batchCaption?: string;
+
+  // ── Avatar shape ────────────────────────────────────────────────────────────
+  /** Initials fallback for the avatar — never a grey silhouette icon. */
+  initials?: string;
+
+  // ── Gallery shape ───────────────────────────────────────────────────────────
+  /** Tiles per row in the gallery shape. Defaults to 4. */
+  galleryColumns?: number;
+  /** Mark the first tile as the cover. Defaults to true. */
+  coverBadge?: boolean;
 
   // ── Icon badge ──────────────────────────────────────────────────────────────
   /**
@@ -133,6 +243,8 @@ export interface FileUploadProps {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+const C = FILE_UPLOAD_COLORS;
+
 function formatBytes(bytes: number, decimals = 1): string {
   if (bytes === 0) return "0 B";
   const k = 1024;
@@ -142,7 +254,7 @@ function formatBytes(bytes: number, decimals = 1): string {
 }
 
 function getDefaultAccept(variant: FileUploadVariant): string | undefined {
-  if (variant === "image" || variant === "avatar") return "image/*";
+  if (variant === "image" || variant === "avatar" || variant === "gallery") return "image/*";
   if (variant === "video") return "video/*";
   return undefined;
 }
@@ -151,11 +263,25 @@ function makeId(): string {
   return Math.random().toString(36).slice(2, 9);
 }
 
+function deriveInitials(source?: string): string | null {
+  if (!source) return null;
+  const parts = source.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return null;
+  return parts
+    .slice(0, 2)
+    .map((p) => p[0]!.toUpperCase())
+    .join("");
+}
+
+/** Tabular figures keep percentages and sizes from jittering as they tick. */
+const TABULAR: React.CSSProperties = { fontFeatureSettings: '"tnum" 1, "lnum" 1' };
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function FileUpload({
   variant = "file",
   size = "md",
+  tone = "light",
   accept,
   multiple = false,
   disabled = false,
@@ -165,22 +291,38 @@ function FileUpload({
   maxSize,
   maxFiles,
   allowedFiles,
+  formats,
   value,
+  items,
   onChange,
   onFilesChange,
   onRemove,
   onRemoveFile,
   onValidationError,
+  onRetry,
+  onRetryAll,
+  onSkip,
+  onReplace,
+  onCrop,
   label,
   required = false,
   error,
   helperText,
   placeholder,
   description,
+  browseHint = BROWSE_HINT,
   dragAndDrop = true,
   showLocalPreview = true,
   clearable = true,
   changeable = true,
+  showStatusBadge = true,
+  showEmptyListHint = false,
+  showDropzone = true,
+  batchSummary = false,
+  batchCaption,
+  initials,
+  galleryColumns = 4,
+  coverBadge = true,
   icon,
   className,
   dropzoneClassName,
@@ -188,6 +330,7 @@ function FileUpload({
 }: FileUploadProps) {
   const reactId = React.useId();
   const inputId = id ?? reactId;
+  const spec = FILE_UPLOAD_SIZES[size] ?? FILE_UPLOAD_SIZES.md;
 
   const internalInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -206,10 +349,11 @@ function FileUpload({
   );
 
   const [isDragOver, setIsDragOver] = React.useState(false);
+  const [isHover, setIsHover] = React.useState(false);
   const [localFiles, setLocalFiles] = React.useState<FileUploadLocalFile[]>([]);
   const [validationErrors, setValidationErrors] = React.useState<string[]>([]);
 
-  const isImageVariant = variant === "image" || variant === "avatar";
+  const isImageVariant = variant === "image" || variant === "avatar" || variant === "gallery";
   const isPreviewVariant = isImageVariant || variant === "video";
 
   // Normalise allowedFiles → ['.jpg', '.png', ...] (lowercase, leading dot)
@@ -222,6 +366,19 @@ function FileUpload({
   const effectiveAccept =
     accept ??
     (normalizedAllowedExts ? normalizedAllowedExts.join(",") : getDefaultAccept(variant));
+
+  /**
+   * Constraint chips. Every dropzone states its accepted formats and size cap
+   * before anything is selected — rejecting a file after a 40-second upload is
+   * a design failure, not a validation success.
+   */
+  const chips = React.useMemo<string[]>(() => {
+    if (formats) return formats;
+    const derived: string[] = [];
+    normalizedAllowedExts?.forEach((e) => derived.push(e.replace(".", "").toUpperCase()));
+    if (maxSize) derived.push(`Max ${formatBytes(maxSize, 0)}`);
+    return derived;
+  }, [formats, normalizedAllowedExts, maxSize]);
 
   // Derive controlled URLs
   const controlledUrls = React.useMemo<string[]>(() => {
@@ -237,17 +394,16 @@ function FileUpload({
     | { kind: "file"; localFile: FileUploadLocalFile; index: number };
 
   const displayItems = React.useMemo<DisplayItem[]>(() => {
-    const items: DisplayItem[] = [];
-    controlledUrls.forEach((url, i) => items.push({ kind: "url", url, index: i }));
+    const list: DisplayItem[] = [];
+    controlledUrls.forEach((url, i) => list.push({ kind: "url", url, index: i }));
     if (showLocalPreview) {
       localFiles.forEach((lf, i) =>
-        items.push({ kind: "file", localFile: lf, index: controlledUrls.length + i }),
+        list.push({ kind: "file", localFile: lf, index: controlledUrls.length + i }),
       );
     }
-    return items;
+    return list;
   }, [controlledUrls, localFiles, showLocalPreview]);
 
-  const hasContent = displayItems.length > 0;
 
   // Clear local previews when controlled value is set (upload completed)
   React.useEffect(() => {
@@ -461,23 +617,67 @@ function FileUpload({
 
   // ── Dropzone state ─────────────────────────────────────────────────────────
 
-  type DzState = "idle" | "dragover" | "error" | "disabled";
+  type DzState = "idle" | "hover" | "dragover" | "error" | "disabled";
   const dzState: DzState = disabled
     ? "disabled"
     : isDragOver
     ? "dragover"
     : error || validationErrors.length > 0
     ? "error"
+    : isHover && !readOnly
+    ? "hover"
     : "idle";
 
+  const dz = getDropzoneStyle(dzState, tone);
+
   const combinedError = error ?? validationErrors[0];
-  const iconSize = ICON_SIZES[size] ?? 18;
+  const iconSize = ICON_SIZES[size] ?? spec.tileIcon;
   const avatarIconSize = AVATAR_ICON_SIZES[size] ?? 20;
+
+  // ── Row list ───────────────────────────────────────────────────────────────
+
+  /**
+   * Rows come from `items` when the caller owns the lifecycle; otherwise they
+   * are derived from the controlled URLs (already uploaded → done) and the
+   * local selection (picked, nothing has happened yet → idle).
+   */
+  const rows = React.useMemo<FileUploadItem[]>(() => {
+    if (items) return items;
+    return displayItems.map((item) => {
+      if (item.kind === "url") {
+        const fileName = item.url.split("/").pop() || item.url;
+        return { id: `url-${item.index}`, name: fileName, url: item.url, status: "done" as const };
+      }
+      return {
+        id: item.localFile.id,
+        name: item.localFile.file.name,
+        size: item.localFile.file.size,
+        url: item.localFile.previewUrl || undefined,
+        status: "idle" as const,
+      };
+    });
+  }, [items, displayItems]);
+
+  /** Occupied slots — `items` wins when the caller owns the lifecycle. */
+  const filledCount = items ? rows.length : displayItems.length;
 
   const canAddMore =
     !disabled &&
     !readOnly &&
-    (!maxFiles || displayItems.length < maxFiles);
+    (!maxFiles || filledCount < maxFiles);
+
+  const removeRow = (index: number) => {
+    if (items) {
+      onRemoveFile?.(index);
+      return;
+    }
+    const target = displayItems[index];
+    if (!target) return;
+    handleRemoveItem(
+      { preventDefault() {}, stopPropagation() {} } as unknown as React.MouseEvent,
+      target,
+    );
+  };
 
   // ── Shared drag/click props for empty drop zones ──────────────────────────
 
@@ -489,7 +689,9 @@ function FileUpload({
     onDragLeave: handleDragLeave,
     onDrop: handleDrop,
     onKeyDown: handleKeyDown,
-    "aria-label": placeholder ?? PLACEHOLDER_TEXT[variant],
+    onMouseEnter: () => setIsHover(true),
+    onMouseLeave: () => setIsHover(false),
+    "aria-label": placeholder ?? PLACEHOLDER_TEXT[variant] ?? PLACEHOLDER_TEXT.file,
   };
 
   // Drag-only props for filled-state containers (no click — buttons handle that)
@@ -498,7 +700,394 @@ function FileUpload({
     : {};
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // RENDER: image / avatar variant
+  // RENDER: dropzone (shared by file / image / video / gallery empty states)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const renderDropzone = (glyph: React.ReactNode, title: string) => (
+    <div
+      {...dropzoneInteractionProps}
+      className={cn(dropzoneVariants({ size, state: disabled ? "disabled" : "idle" }), dropzoneClassName)}
+      style={{
+        gap: spec.dropGap,
+        padding: `${spec.dropPadY}px ${spec.dropPadX}px`,
+        borderRadius: spec.dropRadius,
+        background: dz.background,
+        border: dz.border,
+        boxShadow: dz.boxShadow,
+        cursor: dz.cursor,
+        opacity: dz.opacity,
+        transition: FILE_UPLOAD_TRANSITION,
+      }}
+    >
+      <span
+        className={iconWrapperVariants({ size })}
+        style={{
+          width: spec.tile,
+          height: spec.tile,
+          borderRadius: spec.tileRadius,
+          background: dz.tileBg,
+          border: dz.tileBorder,
+          color: dz.tileFg,
+        }}
+      >
+        {glyph}
+      </span>
+
+      <span
+        style={{
+          fontSize: spec.title,
+          fontWeight: 600,
+          lineHeight: 1.3,
+          color: dz.titleColor,
+        }}
+      >
+        {title}
+      </span>
+
+      {browseHint && (
+        <span style={{ fontSize: spec.sub, fontWeight: 400, lineHeight: 1.5, color: dz.subColor }}>
+          {browseHint}
+        </span>
+      )}
+
+      {description && (
+        <span style={{ fontSize: spec.sub, fontWeight: 400, lineHeight: 1.5, color: dz.subColor }}>
+          {description}
+        </span>
+      )}
+
+      {chips.length > 0 && (
+        <span className="flex flex-wrap items-center justify-center" style={{ gap: 6, marginTop: 2 }}>
+          {chips.map((chip) => (
+            <span
+              key={chip}
+              style={{
+                fontSize: spec.chip,
+                fontWeight: 600,
+                lineHeight: 1.4,
+                letterSpacing: ".05em",
+                textTransform: "uppercase",
+                background: dz.chipBg,
+                border: dz.chipBorder,
+                color: dz.chipFg,
+                padding: "3px 7px",
+                borderRadius: 999,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {chip}
+            </span>
+          ))}
+        </span>
+      )}
+    </div>
+  );
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER: one file row (the nine upload states)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const renderRow = (row: FileUploadItem, index: number) => {
+    const status: FileUploadStatus = row.status ?? "idle";
+    const st = FILE_UPLOAD_STATUS_STYLES[status];
+    const pct = Math.max(0, Math.min(100, Math.round(row.progress ?? 0)));
+    const pctLabel = `${pct}%`;
+
+    const sizeLabel =
+      typeof row.size === "number" ? formatBytes(row.size) : row.size ?? undefined;
+    const note = row.note ?? st.note;
+    const badgeText = showStatusBadge ? st.badgeText.replace("{pct}", pctLabel) : "";
+    const showBar = st.bar;
+
+    const actionPill = (
+      text: string,
+      onPress: (() => void) | undefined,
+      border: string,
+      color: string,
+      bg: string = C.surface,
+    ) => (
+      <button
+        key={text}
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onPress?.();
+        }}
+        disabled={disabled || readOnly}
+        style={{
+          height: spec.action,
+          padding: "0 9px",
+          border: `1px solid ${border}`,
+          borderRadius: 7,
+          background: bg,
+          color,
+          fontSize: spec.actionFont,
+          fontWeight: 600,
+          lineHeight: 1,
+          cursor: disabled || readOnly ? "not-allowed" : "pointer",
+          flex: "none",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {text}
+      </button>
+    );
+
+    return (
+      <div
+        key={row.id ?? `${row.name}-${index}`}
+        className="flex items-center"
+        style={{
+          gap: spec.rowGap,
+          padding: `${spec.rowPadY}px ${spec.rowPadX}px`,
+          borderRadius: spec.rowRadius,
+          minHeight: spec.rowMinHeight,
+          background: st.rowBg,
+          border: st.rowBorder,
+        }}
+      >
+        {/* Extension tile */}
+        <span
+          className="flex items-center justify-center flex-none"
+          style={{
+            width: spec.extTile,
+            height: spec.extTile,
+            borderRadius: spec.extRadius,
+            background: st.tileBg,
+            color: st.tileFg,
+            fontSize: spec.extFont,
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          {row.ext ?? getFileExt(row.name)}
+        </span>
+
+        {/* Name · size · bar · note */}
+        <span className="flex-1 min-w-0 flex flex-col" style={{ gap: 5 }}>
+          <span className="flex items-center" style={{ gap: 8 }}>
+            <span
+              className="flex-1 min-w-0 truncate"
+              title={row.name}
+              style={{
+                fontSize: spec.name,
+                fontWeight: 600,
+                lineHeight: 1.3,
+                color: st.nameColor,
+              }}
+            >
+              {truncateMiddle(row.name, 34)}
+            </span>
+            {sizeLabel && (
+              <span
+                className="flex-none"
+                style={{ ...TABULAR, fontSize: spec.meta, fontWeight: 500, lineHeight: 1, color: C.inkFg3 }}
+              >
+                {sizeLabel}
+              </span>
+            )}
+          </span>
+
+          {showBar && (
+            <span
+              className="block overflow-hidden"
+              style={{ height: spec.bar, borderRadius: 99, background: C.borderSoft }}
+            >
+              <span
+                className="block h-full"
+                style={{
+                  width: `${pct}%`,
+                  borderRadius: 99,
+                  background: st.barColor,
+                  transition: PROGRESS_TRANSITION,
+                }}
+              />
+            </span>
+          )}
+
+          {note && (
+            <span
+              style={{ ...TABULAR, fontSize: spec.meta, fontWeight: 500, lineHeight: 1.4, color: st.noteColor }}
+            >
+              {note}
+            </span>
+          )}
+        </span>
+
+        {/* Badge + actions */}
+        <span className="flex items-center flex-none" style={{ gap: 6 }}>
+          {badgeText && (
+            <span
+              className="flex-none"
+              style={{
+                ...TABULAR,
+                fontSize: spec.actionFont,
+                fontWeight: 600,
+                lineHeight: 1,
+                padding: "5px 9px",
+                borderRadius: 7,
+                background: st.badgeBg,
+                color: st.badgeFg,
+              }}
+            >
+              {badgeText}
+            </span>
+          )}
+
+          {/* Bare percentage / check disc when the badge is switched off */}
+          {!showStatusBadge && (status === "uploading" || status === "processing") && (
+            <span style={{ ...TABULAR, fontSize: spec.actionFont, fontWeight: 600, color: C.inkFg3 }}>
+              {pctLabel}
+            </span>
+          )}
+          {!showStatusBadge && status === "done" && (
+            <span
+              className="flex items-center justify-center"
+              style={{ width: 20, height: 20, borderRadius: "50%", background: C.mint }}
+            >
+              <Check size={11} strokeWidth={3.2} color={C.greenInk} />
+            </span>
+          )}
+
+          {st.action === "retry" &&
+            actionPill("Retry", () => onRetry?.(row, index), C.dangerOutline, C.dangerInk)}
+          {st.action === "crop" &&
+            actionPill("Crop it", () => onCrop?.(row, index), C.warnOutline, C.warnInk, C.onTint)}
+          {st.action === "duplicate" && (
+            <>
+              {actionPill("Skip", () => onSkip?.(row, index), C.border, C.inkFg2)}
+              {actionPill("Replace", () => onReplace?.(row, index), C.outlineBorder, C.deep)}
+            </>
+          )}
+
+          {clearable && !disabled && !readOnly && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                removeRow(index);
+              }}
+              className="flex items-center justify-center flex-none transition-colors hover:bg-[#FBE9EA] hover:text-[#A8000F]"
+              style={{ width: 24, height: 24, borderRadius: 6, background: "transparent", color: C.inkFg3 }}
+              aria-label={`Remove ${row.name}`}
+            >
+              <X size={11} strokeWidth={3} />
+            </button>
+          )}
+        </span>
+      </div>
+    );
+  };
+
+  const renderEmptyListHint = () => (
+    <div
+      className="flex flex-col items-center justify-center text-center"
+      style={{
+        gap: 6,
+        border: `1px solid ${C.borderSoft}`,
+        borderRadius: spec.rowRadius,
+        padding: `${spec.dropPadY}px ${spec.dropPadX}px`,
+      }}
+    >
+      <span style={{ fontSize: spec.name, fontWeight: 600, lineHeight: 1.3, color: C.inkFg2 }}>
+        Nothing uploaded yet
+      </span>
+      <span style={{ fontSize: spec.meta, fontWeight: 400, lineHeight: 1.4, color: C.inkFg3 }}>
+        Files appear here as a list with their own progress and errors.
+      </span>
+    </div>
+  );
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER: batch summary bar
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const renderBatchSummary = () => {
+    const total = rows.length;
+    const doneCount = rows.filter((r) => r.status === "done" || r.status === "partial").length;
+    const failedCount = rows.filter(
+      (r) => r.status === "failed" || r.status === "rejected",
+    ).length;
+    const pct = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+
+    return (
+      <div
+        className="overflow-hidden"
+        style={{ border: `1px solid ${C.border}`, borderRadius: spec.compactRadius }}
+      >
+        <div
+          className="flex items-center"
+          style={{
+            gap: 9,
+            padding: `${spec.compactPadY}px ${spec.compactPadX}px`,
+            background: C.subtle,
+            borderBottom: `1px solid ${C.borderSoft}`,
+          }}
+        >
+          <span
+            className="flex-1"
+            style={{ ...TABULAR, fontSize: spec.name, fontWeight: 600, lineHeight: 1.3, color: C.ink }}
+          >
+            {doneCount} of {total} uploaded
+          </span>
+          {failedCount > 0 && (
+            <span
+              style={{ ...TABULAR, fontSize: spec.meta, fontWeight: 500, lineHeight: 1.3, color: C.dangerInk }}
+            >
+              {failedCount} failed
+            </span>
+          )}
+          {failedCount > 0 && onRetryAll && (
+            <button
+              type="button"
+              onClick={onRetryAll}
+              disabled={disabled || readOnly}
+              style={{
+                fontSize: spec.name,
+                fontWeight: 600,
+                lineHeight: 1.3,
+                color: C.forest,
+                background: "transparent",
+                border: 0,
+                cursor: disabled || readOnly ? "not-allowed" : "pointer",
+              }}
+            >
+              Retry all
+            </button>
+          )}
+        </div>
+        <div
+          className="flex flex-col"
+          style={{ gap: 8, padding: `${spec.rowPadY}px ${spec.rowPadX}px` }}
+        >
+          <span
+            className="block overflow-hidden"
+            style={{ height: spec.bar + 1, borderRadius: 99, background: C.borderSoft }}
+          >
+            <span
+              className="block h-full"
+              style={{
+                width: `${pct}%`,
+                borderRadius: 99,
+                background: C.deep,
+                transition: PROGRESS_TRANSITION,
+              }}
+            />
+          </span>
+          {batchCaption && (
+            <span style={{ ...TABULAR, fontSize: spec.meta, fontWeight: 500, lineHeight: 1.4, color: C.inkFg3 }}>
+              {batchCaption}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER: image variant
   // ─────────────────────────────────────────────────────────────────────────────
 
   const renderImageVariant = () => {
@@ -515,13 +1104,13 @@ function FileUpload({
         return (
           <div
             {...filledDragProps}
-            className={cn(
-              "relative w-full overflow-hidden rounded-xl border group transition-colors duration-150",
-              isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
-              size === "sm" && "h-24",
-              size === "md" && "h-32",
-              size === "lg" && "h-44",
-            )}
+            className="relative w-full overflow-hidden group"
+            style={{
+              borderRadius: spec.dropRadius,
+              border: isDragOver ? `1.5px solid ${C.dropBorderActive}` : `1px solid ${C.border}`,
+              transition: FILE_UPLOAD_TRANSITION,
+              height: size === "sm" ? 96 : size === "lg" ? 176 : 128,
+            }}
           >
             <img
               src={previewUrl}
@@ -529,8 +1118,13 @@ function FileUpload({
               className="absolute inset-0 w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
             {isDragOver && !disabled && !readOnly && (
-              <div className="absolute inset-0 flex items-center justify-center bg-green-50/60 backdrop-blur-[1px] pointer-events-none">
-                <span className="text-xs font-semibold text-[#007a4d]">Drop to replace</span>
+              <div
+                className="absolute inset-0 flex items-center justify-center backdrop-blur-[1px] pointer-events-none"
+                style={{ background: "rgba(242,251,235,.7)" }}
+              >
+                <span style={{ fontSize: spec.name, fontWeight: 600, color: C.forest }}>
+                  Drop to replace
+                </span>
               </div>
             )}
             {icon && !disabled && !readOnly && (
@@ -538,7 +1132,15 @@ function FileUpload({
                 type="button"
                 onClick={openFilePicker}
                 onKeyDown={handleKeyDown}
-                className="absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#007a4d] hover:border-[#007a4d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]"
+                className="absolute bottom-2 right-2 z-10 flex items-center justify-center rounded-full"
+                style={{
+                  width: spec.avatarBadge,
+                  height: spec.avatarBadge,
+                  background: C.surface,
+                  border: `1px solid ${C.border}`,
+                  color: C.forest,
+                  boxShadow: "1px 1px 3px rgba(0,0,0,.12)",
+                }}
                 aria-label="Change image"
               >
                 {icon}
@@ -552,7 +1154,13 @@ function FileUpload({
                       type="button"
                       onClick={openFilePicker}
                       onKeyDown={handleKeyDown}
-                      className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 shadow transition-colors"
+                      style={{
+                        background: "rgba(255,255,255,.95)",
+                        color: C.deep,
+                        fontSize: spec.meta + 1,
+                        fontWeight: 600,
+                      }}
                       aria-label="Change image"
                     >
                       <ImageIcon size={12} />
@@ -563,7 +1171,13 @@ function FileUpload({
                     <button
                       type="button"
                       onClick={(e) => item && handleRemoveItem(e, item)}
-                      className="flex items-center gap-1.5 bg-red-500/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 shadow transition-colors"
+                      style={{
+                        background: C.dangerBar,
+                        color: "#FFFFFF",
+                        fontSize: spec.meta + 1,
+                        fontWeight: 600,
+                      }}
                       aria-label="Remove image"
                     >
                       <X size={12} />
@@ -577,134 +1191,80 @@ function FileUpload({
         );
       }
 
-      // Empty state
-      return (
-        <div
-          {...dropzoneInteractionProps}
-          className={cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName)}
-        >
-          <div className={iconWrapperVariants({ size })}>
-            <ImageIcon size={iconSize} className="text-gray-400" />
-          </div>
-          <div className="flex flex-col items-center gap-0.5 text-center">
-            <span
-              className={cn(
-                "font-medium text-gray-600",
-                size === "sm" && "text-xs",
-                size === "md" && "text-sm",
-                size === "lg" && "text-base",
-              )}
-            >
-              {placeholder ?? PLACEHOLDER_TEXT.image}
-            </span>
-            {description && (
-              <span
-                className={cn(
-                  "text-gray-400",
-                  size === "sm" && "text-[10px]",
-                  size === "md" && "text-xs",
-                  size === "lg" && "text-sm",
-                )}
-              >
-                {description}
-              </span>
-            )}
-          </div>
-          {dragAndDrop && (
-            <span className="text-[10px] text-gray-300">Drag &amp; drop supported</span>
-          )}
-        </div>
+      return renderDropzone(
+        <ImageIcon size={iconSize} strokeWidth={2} />,
+        placeholder ?? PLACEHOLDER_TEXT.image,
       );
     }
 
     // ── Multiple images ────────────────────────────────────────────────────────
-
-    // Empty state — dropzone already has fixed height via dropzoneVariants
     if (displayItems.length === 0) {
-      return (
-        <div
-          {...dropzoneInteractionProps}
-          className={cn(dropzoneVariants({ size, state: dzState }), "w-full", dropzoneClassName)}
-        >
-          <div className={iconWrapperVariants({ size })}>
-            <ImageIcon size={iconSize} className="text-gray-400" />
-          </div>
-          <span
-            className={cn(
-              "font-medium text-gray-600",
-              size === "sm" && "text-xs",
-              size === "md" && "text-sm",
-              size === "lg" && "text-base",
-            )}
-          >
-            {placeholder ?? PLACEHOLDER_TEXT.image}
-          </span>
-          {description && (
-            <span
-              className={cn(
-                "text-gray-400",
-                size === "sm" && "text-[10px]",
-                size === "md" && "text-xs",
-                size === "lg" && "text-sm",
-              )}
-            >
-              {description}
-            </span>
-          )}
-        </div>
+      return renderDropzone(
+        <ImageIcon size={iconSize} strokeWidth={2} />,
+        placeholder ?? PLACEHOLDER_TEXT.image,
       );
     }
 
-    // Filled state — fixed-height scrollable grid
     return (
       <div
         {...filledDragProps}
-        className={cn(
-          "w-full overflow-y-auto rounded-xl border transition-colors duration-150",
-          isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
-          size === "sm" && "h-24",
-          size === "md" && "h-32",
-          size === "lg" && "h-44",
-        )}
+        className="w-full"
+        style={{
+          borderRadius: spec.compactRadius,
+          border: isDragOver ? `1.5px solid ${C.dropBorderActive}` : `1px solid ${C.border}`,
+          padding: spec.galleryPad,
+          transition: FILE_UPLOAD_TRANSITION,
+        }}
       >
-        <div className="flex flex-wrap gap-2 p-2">
+        <div className="flex flex-wrap" style={{ gap: spec.galleryGap }}>
           {displayItems.map((item) => {
-            const url =
-              item.kind === "url" ? item.url : item.localFile.previewUrl;
+            const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
             return (
               <div
                 key={item.kind === "url" ? `url-${item.index}` : item.localFile.id}
-                className="relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0"
+                className="relative group flex-shrink-0 overflow-hidden"
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: spec.galleryTileRadius,
+                  border: `1px solid ${C.galleryTileBorder}`,
+                  background: C.galleryTileBg,
+                }}
               >
-                <img
-                  src={url}
-                  alt={`Image ${item.index + 1}`}
-                  className="w-full h-full object-cover"
-                />
+                <img src={url} alt={`Image ${item.index + 1}`} className="w-full h-full object-cover" />
                 {!disabled && !readOnly && clearable && (
                   <button
                     type="button"
                     onClick={(e) => handleRemoveItem(e, item)}
-                    className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: "rgba(0,0,0,.6)" }}
                     aria-label="Remove"
                   >
-                    <X size={10} className="text-white" />
+                    <X size={10} strokeWidth={3} className="text-white" />
                   </button>
                 )}
               </div>
             );
           })}
 
-          {/* Add-more slot */}
           {canAddMore && (
             <button
               type="button"
               onClick={openFilePicker}
-              className="rounded-xl border-2 border-dashed border-gray-300 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]"
+              className="flex flex-col items-center justify-center flex-shrink-0 transition-colors"
+              style={{
+                width: 80,
+                height: 80,
+                gap: 2,
+                borderRadius: spec.galleryTileRadius,
+                border: `1.5px dashed ${C.borderStrong}`,
+                background: C.surface,
+                color: C.inkFg3,
+              }}
               aria-label="Add image"
             >
-              <Plus size={18} />
-              <span className="text-[10px] font-medium">Add</span>
+              <Plus size={15} strokeWidth={2.4} />
+              <span style={{ fontSize: spec.chip + 1, fontWeight: 600 }}>Add</span>
             </button>
           )}
         </div>
@@ -713,7 +1273,183 @@ function FileUpload({
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // RENDER: avatar variant
+  // RENDER: gallery variant — reorderable grid, first tile is always the cover
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const renderGalleryVariant = () => (
+    <div
+      {...filledDragProps}
+      className="w-full grid"
+      style={{
+        gridTemplateColumns: `repeat(${galleryColumns}, 1fr)`,
+        gap: spec.galleryGap,
+        padding: spec.galleryPad,
+        borderRadius: spec.galleryRadius,
+        border: isDragOver ? `1.5px solid ${C.dropBorderActive}` : `1px solid ${C.border}`,
+        transition: FILE_UPLOAD_TRANSITION,
+      }}
+    >
+      {displayItems.map((item) => {
+        const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
+        return (
+          <span
+            key={item.kind === "url" ? `url-${item.index}` : item.localFile.id}
+            className="relative group flex items-center justify-center overflow-hidden"
+            style={{
+              aspectRatio: "1",
+              borderRadius: spec.galleryTileRadius,
+              background: C.galleryTileBg,
+              border: `1px solid ${C.galleryTileBorder}`,
+            }}
+          >
+            {url ? (
+              <img src={url} alt={`Image ${item.index + 1}`} className="w-full h-full object-cover" />
+            ) : (
+              <ImageIcon size={15} strokeWidth={1.7} color={C.forest} style={{ opacity: 0.55 }} />
+            )}
+
+            {coverBadge && item.index === 0 && (
+              <span
+                className="absolute text-center"
+                style={{
+                  bottom: 3,
+                  left: 3,
+                  right: 3,
+                  fontSize: 8,
+                  fontWeight: 600,
+                  lineHeight: 1.4,
+                  letterSpacing: ".04em",
+                  textTransform: "uppercase",
+                  background: C.coverBg,
+                  color: C.coverFg,
+                  borderRadius: 4,
+                  padding: "2px 0",
+                }}
+              >
+                Cover
+              </span>
+            )}
+
+            {!disabled && !readOnly && clearable && (
+              <button
+                type="button"
+                onClick={(e) => handleRemoveItem(e, item)}
+                className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: "rgba(0,0,0,.6)" }}
+                aria-label="Remove"
+              >
+                <X size={10} strokeWidth={3} className="text-white" />
+              </button>
+            )}
+          </span>
+        );
+      })}
+
+      {canAddMore && (
+        <button
+          type="button"
+          onClick={openFilePicker}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className="flex items-center justify-center transition-colors"
+          style={{
+            aspectRatio: "1",
+            borderRadius: spec.galleryTileRadius,
+            background: C.surface,
+            border: `1.5px dashed ${C.borderStrong}`,
+            color: C.borderStrong,
+          }}
+          aria-label="Add image"
+        >
+          <Plus size={15} strokeWidth={2.4} />
+        </button>
+      )}
+    </div>
+  );
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER: compact variant — a single required document inside a form row
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const renderCompactVariant = () => {
+    const title =
+      placeholder ?? (typeof label === "string" ? label : undefined) ?? PLACEHOLDER_TEXT.compact;
+    const sub =
+      description ??
+      (chips.length > 0 ? chips.join(" · ") : undefined);
+
+    return (
+      <div className="flex flex-col" style={{ gap: 9 }}>
+        <div
+          {...filledDragProps}
+          className="flex items-center w-full"
+          style={{
+            gap: 10,
+            padding: `${spec.compactPadY}px ${spec.compactPadX}px`,
+            border: isDragOver ? `1px solid ${C.dropBorderActive}` : `1px solid ${C.border}`,
+            borderRadius: spec.compactRadius,
+            background: disabled ? C.subtle : C.surface,
+            transition: FILE_UPLOAD_TRANSITION,
+          }}
+        >
+          <span className="flex-1 min-w-0 flex flex-col" style={{ gap: 2 }}>
+            <span
+              className="truncate"
+              style={{
+                fontSize: spec.name,
+                fontWeight: 600,
+                lineHeight: 1.3,
+                color: disabled ? C.muted : C.inkFg1,
+              }}
+            >
+              {title}
+              {required && <span style={{ color: C.dangerBar, marginLeft: 3 }}>*</span>}
+            </span>
+            {sub && (
+              <span style={{ fontSize: spec.meta, fontWeight: 400, lineHeight: 1.4, color: C.inkFg3 }}>
+                {sub}
+              </span>
+            )}
+          </span>
+
+          <button
+            type="button"
+            onClick={openFilePicker}
+            disabled={disabled || readOnly}
+            onMouseEnter={() => setIsHover(true)}
+            onMouseLeave={() => setIsHover(false)}
+            className="flex-none"
+            style={{
+              height: spec.compactButton,
+              padding: "0 12px",
+              border: `1px solid ${isHover && !disabled && !readOnly ? C.dropBorderActive : C.outlineBorder}`,
+              borderRadius: 8,
+              background: isHover && !disabled && !readOnly ? C.outlineHoverBg : C.surface,
+              color: disabled ? C.muted : C.deep,
+              fontSize: spec.meta + 1,
+              fontWeight: 600,
+              lineHeight: 1,
+              cursor: disabled || readOnly ? "not-allowed" : "pointer",
+              transition: FILE_UPLOAD_TRANSITION,
+              whiteSpace: "nowrap",
+            }}
+          >
+            Choose file
+          </button>
+        </div>
+
+        {rows.length > 0 && (
+          <div className="flex flex-col" style={{ gap: 9 }}>
+            {rows.map(renderRow)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER: avatar variant — initials are the fallback, never a grey silhouette
   // ─────────────────────────────────────────────────────────────────────────────
 
   const renderAvatarVariant = () => {
@@ -725,25 +1461,40 @@ function FileUpload({
       : null;
 
     const avatarState = disabled ? "disabled" : previewUrl ? "filled" : "empty";
+    const title =
+      placeholder ?? (typeof label === "string" ? label : undefined) ?? PLACEHOLDER_TEXT.avatar;
+    const fallbackInitials = initials ?? deriveInitials(typeof label === "string" ? label : placeholder);
 
     return (
-      <div className="flex items-center gap-4">
-        {/* Avatar circle + optional icon badge */}
-        <div className="relative flex-shrink-0">
+      <div
+        className="flex items-center w-full"
+        style={{
+          gap: 14,
+          padding: spec.galleryPad + 2,
+          border: `1px solid ${C.border}`,
+          borderRadius: spec.compactRadius,
+          background: disabled ? C.subtle : C.surface,
+        }}
+      >
+        {/* Avatar disc + camera badge */}
+        <div className="relative flex-shrink-0" style={{ width: spec.avatar, height: spec.avatar }}>
           <div
             {...(!previewUrl ? dropzoneInteractionProps : {})}
             className={avatarContainerVariants({ size, state: avatarState })}
+            style={{
+              width: spec.avatar,
+              height: spec.avatar,
+              background: previewUrl ? C.surface : C.deep,
+              color: C.mint,
+            }}
           >
             {previewUrl ? (
               <>
-                <img
-                  src={previewUrl}
-                  alt="Avatar"
-                  className="w-full h-full object-cover"
-                />
+                <img src={previewUrl} alt="Avatar" className="w-full h-full object-cover" />
                 {!disabled && !readOnly && (
                   <div
-                    className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full"
+                    className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full"
+                    style={{ background: "rgba(0,0,0,.4)" }}
                     onClick={openFilePicker}
                     role="button"
                     tabIndex={0}
@@ -755,169 +1506,115 @@ function FileUpload({
                 )}
               </>
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Upload size={avatarIconSize} className="text-gray-400" />
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{ fontSize: spec.avatarInitials, fontWeight: 700, lineHeight: 1 }}
+              >
+                {fallbackInitials ?? <Upload size={avatarIconSize} />}
               </div>
             )}
           </div>
 
-          {/* Icon badge — bottom-right corner, outside overflow-hidden */}
-          {icon && !disabled && !readOnly && (
-            <button
-              type="button"
-              onClick={openFilePicker}
-              onKeyDown={handleKeyDown}
-              className="absolute bottom-0 right-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow border border-gray-100 text-gray-600 hover:text-[#007a4d] hover:border-[#007a4d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]"
-              aria-label="Change photo"
-            >
-              {icon}
-            </button>
-          )}
-        </div>
-
-        {/* Aside text */}
-        <div className="flex flex-col gap-1">
           {!disabled && !readOnly && (
             <button
               type="button"
               onClick={openFilePicker}
-              className="text-sm font-medium text-[#007a4d] hover:underline text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d] rounded"
+              onKeyDown={handleKeyDown}
+              className="absolute z-10 flex items-center justify-center rounded-full"
+              style={{
+                bottom: -2,
+                right: -2,
+                width: spec.avatarBadge,
+                height: spec.avatarBadge,
+                background: C.surface,
+                border: `1px solid ${C.border}`,
+                color: C.forest,
+                boxShadow: "1px 1px 3px rgba(0,0,0,.12)",
+              }}
+              aria-label="Change photo"
             >
-              {previewUrl ? "Change photo" : (placeholder ?? "Upload photo")}
-            </button>
-          )}
-          {description && (
-            <p className="text-xs text-gray-400">{description}</p>
-          )}
-          {clearable && previewUrl && !disabled && !readOnly && (
-            <button
-              type="button"
-              onClick={handleClearAll}
-              className="text-xs text-red-400 hover:text-red-600 text-left"
-            >
-              Remove
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // RENDER: file variant
-  // ─────────────────────────────────────────────────────────────────────────────
-
-  const renderFileVariant = () => {
-    // ── File list (has content) ────────────────────────────────────────────────
-    if (hasContent) {
-      return (
-        <div
-          {...filledDragProps}
-          className={cn(
-            "w-full rounded-xl border overflow-hidden flex flex-col transition-colors duration-150",
-            isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
-            size === "sm" && "h-24",
-            size === "md" && "h-32",
-            size === "lg" && "h-44",
-            disabled && "opacity-50",
-          )}
-        >
-          <div className="flex-1 overflow-y-auto divide-y divide-gray-100 min-h-0">
-            {displayItems.map((item) => {
-              const name =
-                item.kind === "file"
-                  ? item.localFile.file.name
-                  : item.url.split("/").pop() ?? item.url;
-              const size_ =
-                item.kind === "file" ? formatBytes(item.localFile.file.size) : null;
-
-              return (
-                <div
-                  key={
-                    item.kind === "url"
-                      ? `url-${item.index}`
-                      : item.localFile.id
-                  }
-                  className="flex items-center gap-3 px-3 py-2.5 bg-white"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <FileIcon size={15} className="text-gray-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{name}</p>
-                    {size_ && (
-                      <p className="text-xs text-gray-400">{size_}</p>
-                    )}
-                  </div>
-                  {clearable && !disabled && !readOnly && (
-                    <button
-                      type="button"
-                      onClick={(e) => handleRemoveItem(e, item)}
-                      className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors rounded flex-shrink-0"
-                      aria-label={`Remove ${name}`}
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Add-more row — pinned to bottom */}
-          {multiple && canAddMore && (
-            <button
-              type="button"
-              onClick={openFilePicker}
-              className="flex-shrink-0 w-full flex items-center gap-2 px-3 py-2.5 bg-gray-50 border-t border-gray-100 text-sm text-gray-500 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#007a4d]"
-            >
-              <Plus size={14} />
-              Add more files
+              {icon ?? <Camera size={Math.round(spec.avatarBadge * 0.46)} strokeWidth={2.2} />}
             </button>
           )}
         </div>
-      );
-    }
 
-    // ── Empty dropzone ─────────────────────────────────────────────────────────
-    return (
-      <div
-        {...dropzoneInteractionProps}
-        className={cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName)}
-      >
-        <div className={iconWrapperVariants({ size })}>
-          <Upload size={iconSize} className="text-gray-400" />
-        </div>
-        <div className="flex flex-col items-center gap-0.5 text-center">
+        {/* Aside */}
+        <div className="flex-1 min-w-0 flex flex-col" style={{ gap: 5 }}>
           <span
-            className={cn(
-              "font-medium text-gray-600",
-              size === "sm" && "text-xs",
-              size === "md" && "text-sm",
-              size === "lg" && "text-base",
-            )}
+            className="truncate"
+            style={{ fontSize: spec.name, fontWeight: 600, lineHeight: 1.3, color: C.inkFg1 }}
           >
-            {placeholder ?? PLACEHOLDER_TEXT.file}
+            {title}
           </span>
           {description && (
-            <span
-              className={cn(
-                "text-gray-400",
-                size === "sm" && "text-[10px]",
-                size === "md" && "text-xs",
-                size === "lg" && "text-sm",
-              )}
-            >
+            <span style={{ fontSize: spec.meta, fontWeight: 400, lineHeight: 1.4, color: C.inkFg3 }}>
               {description}
             </span>
           )}
+          {!disabled && !readOnly && (
+            <span className="flex items-center" style={{ gap: 9, marginTop: 2 }}>
+              <button
+                type="button"
+                onClick={openFilePicker}
+                style={{
+                  fontSize: spec.meta + 1,
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  color: C.forest,
+                  background: "transparent",
+                  border: 0,
+                  cursor: "pointer",
+                }}
+              >
+                {previewUrl ? "Change" : "Upload"}
+              </button>
+              {clearable && previewUrl && (
+                <button
+                  type="button"
+                  onClick={handleClearAll}
+                  style={{
+                    fontSize: spec.meta + 1,
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    color: C.dangerBar,
+                    background: "transparent",
+                    border: 0,
+                    cursor: "pointer",
+                  }}
+                >
+                  Remove
+                </button>
+              )}
+            </span>
+          )}
         </div>
-        {dragAndDrop && (
-          <span className="text-[10px] text-gray-300">Drag &amp; drop supported</span>
-        )}
       </div>
     );
   };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER: file variant — dropzone above, rows below
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const renderFileVariant = () => (
+    <div className="flex flex-col w-full" style={{ gap: 10 }}>
+      {showDropzone && (canAddMore || rows.length === 0) &&
+        renderDropzone(
+          <Upload size={iconSize} strokeWidth={2} />,
+          placeholder ?? PLACEHOLDER_TEXT.file,
+        )}
+
+      {batchSummary && rows.length > 0 && renderBatchSummary()}
+
+      {rows.length > 0 ? (
+        <div className="flex flex-col" style={{ gap: 9 }}>
+          {rows.map(renderRow)}
+        </div>
+      ) : (
+        showEmptyListHint && renderEmptyListHint()
+      )}
+    </div>
+  );
 
   // ─────────────────────────────────────────────────────────────────────────────
   // RENDER: video variant
@@ -937,13 +1634,13 @@ function FileUpload({
         return (
           <div
             {...filledDragProps}
-            className={cn(
-              "relative w-full overflow-hidden rounded-xl border bg-black group transition-colors duration-150",
-              isDragOver ? "border-[#007a4d]" : "border-gray-200",
-              size === "sm" && "h-24",
-              size === "md" && "h-32",
-              size === "lg" && "h-44",
-            )}
+            className="relative w-full overflow-hidden bg-black group"
+            style={{
+              borderRadius: spec.dropRadius,
+              border: isDragOver ? `1.5px solid ${C.dropBorderActive}` : `1px solid ${C.border}`,
+              height: size === "sm" ? 96 : size === "lg" ? 176 : 128,
+              transition: FILE_UPLOAD_TRANSITION,
+            }}
           >
             <video
               src={previewUrl}
@@ -953,7 +1650,9 @@ function FileUpload({
             />
             {isDragOver && !disabled && !readOnly && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px] pointer-events-none z-10">
-                <span className="text-xs font-semibold text-white">Drop to replace</span>
+                <span style={{ fontSize: spec.name, fontWeight: 600 }} className="text-white">
+                  Drop to replace
+                </span>
               </div>
             )}
             {!disabled && !readOnly && (changeable || clearable) && (
@@ -963,7 +1662,13 @@ function FileUpload({
                     type="button"
                     onClick={openFilePicker}
                     onKeyDown={handleKeyDown}
-                    className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 shadow"
+                    style={{
+                      background: "rgba(255,255,255,.95)",
+                      color: C.deep,
+                      fontSize: spec.meta + 1,
+                      fontWeight: 600,
+                    }}
                     aria-label="Change video"
                   >
                     <VideoIcon size={12} />
@@ -974,7 +1679,13 @@ function FileUpload({
                   <button
                     type="button"
                     onClick={(e) => item && handleRemoveItem(e, item)}
-                    className="flex items-center gap-1.5 bg-red-500/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 shadow"
+                    style={{
+                      background: C.dangerBar,
+                      color: "#FFFFFF",
+                      fontSize: spec.meta + 1,
+                      fontWeight: 600,
+                    }}
                     aria-label="Remove video"
                   >
                     <X size={12} />
@@ -987,112 +1698,51 @@ function FileUpload({
         );
       }
 
-      // Empty state
-      return (
-        <div
-          {...dropzoneInteractionProps}
-          className={cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName)}
-        >
-          <div className={iconWrapperVariants({ size })}>
-            <VideoIcon size={iconSize} className="text-gray-400" />
-          </div>
-          <div className="flex flex-col items-center gap-0.5 text-center">
-            <span
-              className={cn(
-                "font-medium text-gray-600",
-                size === "sm" && "text-xs",
-                size === "md" && "text-sm",
-                size === "lg" && "text-base",
-              )}
-            >
-              {placeholder ?? PLACEHOLDER_TEXT.video}
-            </span>
-            {description && (
-              <span
-                className={cn(
-                  "text-gray-400",
-                  size === "sm" && "text-[10px]",
-                  size === "md" && "text-xs",
-                  size === "lg" && "text-sm",
-                )}
-              >
-                {description}
-              </span>
-            )}
-          </div>
-          {dragAndDrop && (
-            <span className="text-[10px] text-gray-300">Drag &amp; drop supported</span>
-          )}
-        </div>
+      return renderDropzone(
+        <VideoIcon size={iconSize} strokeWidth={2} />,
+        placeholder ?? PLACEHOLDER_TEXT.video,
       );
     }
 
     // ── Multiple videos ────────────────────────────────────────────────────────
-
-    // Empty state — dropzone already has fixed height via dropzoneVariants
     if (displayItems.length === 0) {
-      return (
-        <div
-          {...dropzoneInteractionProps}
-          className={cn(dropzoneVariants({ size, state: dzState }), "w-full", dropzoneClassName)}
-        >
-          <div className={iconWrapperVariants({ size })}>
-            <VideoIcon size={iconSize} className="text-gray-400" />
-          </div>
-          <span
-            className={cn(
-              "font-medium text-gray-600",
-              size === "sm" && "text-xs",
-              size === "md" && "text-sm",
-              size === "lg" && "text-base",
-            )}
-          >
-            {placeholder ?? PLACEHOLDER_TEXT.video}
-          </span>
-          {description && (
-            <span
-              className={cn(
-                "text-gray-400",
-                size === "sm" && "text-[10px]",
-                size === "md" && "text-xs",
-                size === "lg" && "text-sm",
-              )}
-            >
-              {description}
-            </span>
-          )}
-        </div>
+      return renderDropzone(
+        <VideoIcon size={iconSize} strokeWidth={2} />,
+        placeholder ?? PLACEHOLDER_TEXT.video,
       );
     }
 
-    // Filled state — fixed-height scrollable grid
     return (
       <div
         {...filledDragProps}
-        className={cn(
-          "w-full overflow-y-auto rounded-xl border transition-colors duration-150",
-          isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
-          size === "sm" && "h-24",
-          size === "md" && "h-32",
-          size === "lg" && "h-44",
-        )}
+        className="w-full"
+        style={{
+          borderRadius: spec.compactRadius,
+          border: isDragOver ? `1.5px solid ${C.dropBorderActive}` : `1px solid ${C.border}`,
+          padding: spec.galleryPad,
+          transition: FILE_UPLOAD_TRANSITION,
+        }}
       >
-        <div className="flex flex-wrap gap-2 p-2">
+        <div className="flex flex-wrap" style={{ gap: spec.galleryGap }}>
           {displayItems.map((item) => {
             const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
             return (
               <div
                 key={item.kind === "url" ? `url-${item.index}` : item.localFile.id}
-                className="relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0 bg-black"
+                className="relative group flex-shrink-0 overflow-hidden bg-black"
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: spec.galleryTileRadius,
+                  border: `1px solid ${C.border}`,
+                }}
               >
-                <video
-                  src={url}
-                  className="w-full h-full object-cover"
-                  muted
-                  preload="metadata"
-                />
+                <video src={url} className="w-full h-full object-cover" muted preload="metadata" />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-6 h-6 rounded-full bg-black/50 flex items-center justify-center">
+                  <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center"
+                    style={{ background: "rgba(0,0,0,.5)" }}
+                  >
                     <Play size={10} className="text-white ml-0.5" />
                   </div>
                 </div>
@@ -1100,26 +1750,35 @@ function FileUpload({
                   <button
                     type="button"
                     onClick={(e) => handleRemoveItem(e, item)}
-                    className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: "rgba(0,0,0,.6)" }}
                     aria-label="Remove"
                   >
-                    <X size={10} className="text-white" />
+                    <X size={10} strokeWidth={3} className="text-white" />
                   </button>
                 )}
               </div>
             );
           })}
 
-          {/* Add-more slot */}
           {canAddMore && (
             <button
               type="button"
               onClick={openFilePicker}
-              className="rounded-xl border-2 border-dashed border-gray-300 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]"
+              className="flex flex-col items-center justify-center flex-shrink-0"
+              style={{
+                width: 80,
+                height: 80,
+                gap: 2,
+                borderRadius: spec.galleryTileRadius,
+                border: `1.5px dashed ${C.borderStrong}`,
+                background: C.surface,
+                color: C.inkFg3,
+              }}
               aria-label="Add video"
             >
-              <Plus size={18} />
-              <span className="text-[10px] font-medium">Add</span>
+              <Plus size={15} strokeWidth={2.4} />
+              <span style={{ fontSize: spec.chip + 1, fontWeight: 600 }}>Add</span>
             </button>
           )}
         </div>
@@ -1131,10 +1790,14 @@ function FileUpload({
   // MAIN RENDER
   // ─────────────────────────────────────────────────────────────────────────────
 
+  /** Compact and avatar carry their own label line inside the box. */
+  const hideOuterLabel =
+    (variant === "compact" || variant === "avatar") && !placeholder && typeof label === "string";
+
   return (
     <div className={cn("flex flex-col gap-1.5 w-full", className)}>
       {/* Field label */}
-      {label && (
+      {label && !hideOuterLabel && (
         <InputLabel
           htmlFor={inputId}
           required={required}
@@ -1147,13 +1810,18 @@ function FileUpload({
       {/* Upload area */}
       {variant === "avatar"
         ? renderAvatarVariant()
+        : variant === "compact"
+        ? renderCompactVariant()
+        : variant === "gallery"
+        ? renderGalleryVariant()
         : variant === "image"
         ? renderImageVariant()
         : variant === "video"
         ? renderVideoVariant()
         : renderFileVariant()}
 
-      {/* Hidden native file input — shadcn ui/input base */}
+      {/* Hidden native file input — the dropzone is a real input behind a label,
+          so keyboard and screen-reader users get the native picker. */}
       <input
         ref={attachInputRef}
         type="file"

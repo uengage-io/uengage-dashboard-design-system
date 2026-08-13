@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
 import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Separator$1, Dialog, Slot, Popover as Popover$1, RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Accordion as Accordion$1, Collapsible, Tabs as Tabs$1 } from 'radix-ui';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Search, X, Clock, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, Lock, ChevronDown, Plus, EyeOff, Eye, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, File, Video, Play, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
+import { Search, X, Clock, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, Lock, ChevronDown, Plus, EyeOff, Eye, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, Camera, Video, Play, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
@@ -2289,6 +2289,9 @@ var triggerVariants = cva(
   }
 );
 var CREATE_VALUE = "__create__";
+var PILL_MAX_WIDTH = 140;
+var PILL_MIN_WIDTH = 56;
+var PILL_GAP = 4;
 function CheckboxIcon({ checked }) {
   return /* @__PURE__ */ jsx(
     "span",
@@ -2449,9 +2452,26 @@ function Select({
   };
   const pillsContainerRef = React9.useRef(null);
   const [visibleCount, setVisibleCount] = React9.useState(null);
+  const [rowWidth, setRowWidth] = React9.useState(0);
+  React9.useLayoutEffect(() => {
+    const container = pillsContainerRef.current;
+    if (!container || resolvedMode !== "multi") return;
+    const measure = () => setRowWidth(container.getBoundingClientRect().width);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [resolvedMode]);
+  const badgeReserve = 20 + 7 * String(selectedArr.length).length + PILL_GAP;
+  const pillMaxWidth = React9.useMemo(() => {
+    if (rowWidth === 0) return PILL_MAX_WIDTH;
+    const budget = selectedArr.length <= 1 ? rowWidth : rowWidth - badgeReserve;
+    return Math.max(PILL_MIN_WIDTH, Math.min(PILL_MAX_WIDTH, Math.floor(budget)));
+  }, [rowWidth, selectedArr.length, badgeReserve]);
   React9.useLayoutEffect(() => {
     if (resolvedMode === "multi") setVisibleCount(null);
-  }, [selectedArr.join(","), resolvedMode]);
+  }, [selectedArr.join(","), resolvedMode, rowWidth]);
   React9.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     if (maxChips !== void 0) {
@@ -2463,23 +2483,23 @@ function Select({
       setVisibleCount(selectedArr.length);
       return;
     }
+    if (rowWidth === 0) return;
     const containerRight = container.getBoundingClientRect().right;
     const pills = Array.from(
       container.querySelectorAll("[data-pill]")
     );
-    const BADGE_RESERVE = 40;
     let count = pills.length;
     for (let i = 0; i < pills.length; i++) {
       const pillRight = pills[i].getBoundingClientRect().right;
       const hasMore = i < pills.length - 1;
-      const limit = hasMore ? containerRight - BADGE_RESERVE : containerRight;
+      const limit = hasMore ? containerRight - badgeReserve : containerRight;
       if (pillRight > limit) {
         count = i === 0 ? 1 : i;
         break;
       }
     }
     setVisibleCount(count);
-  }, [visibleCount, maxChips]);
+  }, [visibleCount, maxChips, badgeReserve, rowWidth]);
   const displayedPills = visibleCount === null ? selectedArr : selectedArr.slice(0, visibleCount);
   const overflowCount = visibleCount === null ? 0 : selectedArr.length - visibleCount;
   const hasSelection = resolvedMode === "multi" ? selectedArr.length > 0 : !!selected;
@@ -2602,359 +2622,367 @@ function Select({
       option.value
     );
   };
-  return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1.5", children: [
-    label && /* @__PURE__ */ jsx(
-      InputLabel,
-      {
-        size,
-        required,
-        tone: state === "error" || state === "disabled" ? getLabelColor(state) : void 0,
-        children: label
-      }
-    ),
-    /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
-      /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
-        "div",
+  return (
+    // `min-w-0` lets the field shrink inside a flex parent (a sidebar column
+    // otherwise refuses to go below the chips' intrinsic width) and
+    // `max-w-full` caps it when that parent sizes children to max-content.
+    // Without both, the trigger overflows the sidebar before the chip
+    // measurement below ever gets a say.
+    /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 max-w-full flex-col gap-1.5", children: [
+      label && /* @__PURE__ */ jsx(
+        InputLabel,
         {
-          role: "button",
-          "data-slot": "select-trigger",
-          "data-size": size,
-          "data-state": state,
-          tabIndex: disabled ? -1 : 0,
-          "aria-disabled": disabled,
-          "aria-haspopup": "listbox",
-          "aria-expanded": open,
-          "aria-busy": loading || void 0,
-          onPointerEnter: () => setHovered(true),
-          onPointerLeave: () => setHovered(false),
-          onFocus: () => {
-            interactedRef.current = true;
-          },
-          onBlur: handleTriggerBlur,
-          onKeyDown: (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              if (!disabled && !readOnly && !loading) setOpen((o) => !o);
-            } else if (e.key === "Escape") {
-              setOpen(false);
-            }
-          },
-          className: cn(
-            triggerVariants({ state: legacyState, size }),
-            width,
-            className
-          ),
-          style: {
-            minHeight: spec.height,
-            paddingLeft: spec.padLeft,
-            paddingRight: spec.padRight,
-            paddingTop: resolvedMode === "multi" ? spec.padMultiY : 0,
-            paddingBottom: resolvedMode === "multi" ? spec.padMultiY : 0,
-            gap: SELECT_GAP,
-            borderRadius: spec.radius,
-            fontSize: spec.font,
-            background: box.background,
-            border: box.border,
-            boxShadow: box.boxShadow,
-            color: box.color,
-            cursor: box.cursor ?? "pointer",
-            transition: INPUT_TRANSITION
-          },
-          children: [
-            leftIcon && /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: "flex shrink-0 items-center justify-center [&>svg]:size-full",
-                style: { width: spec.icon + 1, height: spec.icon + 1, color: INPUT_COLORS.icon },
-                children: leftIcon
+          size,
+          required,
+          tone: state === "error" || state === "disabled" ? getLabelColor(state) : void 0,
+          children: label
+        }
+      ),
+      /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: handleOpenChange, children: [
+        /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
+          "div",
+          {
+            role: "button",
+            "data-slot": "select-trigger",
+            "data-size": size,
+            "data-state": state,
+            tabIndex: disabled ? -1 : 0,
+            "aria-disabled": disabled,
+            "aria-haspopup": "listbox",
+            "aria-expanded": open,
+            "aria-busy": loading || void 0,
+            onPointerEnter: () => setHovered(true),
+            onPointerLeave: () => setHovered(false),
+            onFocus: () => {
+              interactedRef.current = true;
+            },
+            onBlur: handleTriggerBlur,
+            onKeyDown: (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!disabled && !readOnly && !loading) setOpen((o) => !o);
+              } else if (e.key === "Escape") {
+                setOpen(false);
               }
+            },
+            className: cn(
+              triggerVariants({ state: legacyState, size }),
+              width,
+              className
             ),
-            /* @__PURE__ */ jsx(
-              "div",
-              {
-                ref: resolvedMode === "multi" ? pillsContainerRef : void 0,
-                className: "flex min-w-0 flex-1 items-center gap-1 overflow-hidden",
-                children: resolvedMode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxs(Fragment, { children: [
-                  displayedPills.map((val) => {
-                    const opt = resolvedOptions.find((o) => o.value === val);
-                    if (!opt) return null;
-                    return /* @__PURE__ */ jsxs(
+            style: {
+              minHeight: spec.height,
+              paddingLeft: spec.padLeft,
+              paddingRight: spec.padRight,
+              paddingTop: resolvedMode === "multi" ? spec.padMultiY : 0,
+              paddingBottom: resolvedMode === "multi" ? spec.padMultiY : 0,
+              gap: SELECT_GAP,
+              borderRadius: spec.radius,
+              fontSize: spec.font,
+              background: box.background,
+              border: box.border,
+              boxShadow: box.boxShadow,
+              color: box.color,
+              cursor: box.cursor ?? "pointer",
+              transition: INPUT_TRANSITION
+            },
+            children: [
+              leftIcon && /* @__PURE__ */ jsx(
+                "span",
+                {
+                  className: "flex shrink-0 items-center justify-center [&>svg]:size-full",
+                  style: { width: spec.icon + 1, height: spec.icon + 1, color: INPUT_COLORS.icon },
+                  children: leftIcon
+                }
+              ),
+              /* @__PURE__ */ jsx(
+                "div",
+                {
+                  ref: resolvedMode === "multi" ? pillsContainerRef : void 0,
+                  className: "flex min-w-0 flex-1 items-center gap-1 overflow-hidden",
+                  children: resolvedMode === "multi" ? selectedArr.length > 0 ? /* @__PURE__ */ jsxs(Fragment, { children: [
+                    displayedPills.map((val) => {
+                      const opt = resolvedOptions.find((o) => o.value === val);
+                      if (!opt) return null;
+                      return /* @__PURE__ */ jsxs(
+                        "span",
+                        {
+                          "data-pill": true,
+                          className: "inline-flex shrink-0 items-center gap-1 rounded-full font-semibold",
+                          style: {
+                            maxWidth: pillMaxWidth,
+                            padding: clearable ? "4px 4px 4px 10px" : "4px 10px",
+                            background: MENU.selectedBg,
+                            color: MENU.selectedInk,
+                            fontSize: spec.font - 2
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx("span", { className: "truncate", children: opt.label }),
+                            clearable && /* @__PURE__ */ jsx(
+                              "button",
+                              {
+                                type: "button",
+                                tabIndex: -1,
+                                onClick: (e) => removePill(val, e),
+                                "aria-label": `Remove ${opt.label}`,
+                                className: "flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full transition-colors",
+                                style: { background: "rgba(0,60,27,.1)", color: MENU.selectedInk },
+                                children: /* @__PURE__ */ jsx(X, { size: 8, strokeWidth: 3.4 })
+                              }
+                            )
+                          ]
+                        },
+                        val
+                      );
+                    }),
+                    overflowCount > 0 && /* @__PURE__ */ jsxs(
                       "span",
                       {
-                        "data-pill": true,
-                        className: "inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-full font-semibold",
+                        className: "inline-flex shrink-0 items-center justify-center rounded-full font-semibold",
                         style: {
-                          padding: clearable ? "4px 4px 4px 10px" : "4px 10px",
-                          background: MENU.selectedBg,
-                          color: MENU.selectedInk,
+                          padding: "4px 8px",
+                          background: INPUT_COLORS.subtle,
+                          color: INPUT_COLORS.message,
                           fontSize: spec.font - 2
                         },
                         children: [
-                          /* @__PURE__ */ jsx("span", { className: "truncate", children: opt.label }),
-                          clearable && /* @__PURE__ */ jsx(
-                            "button",
-                            {
-                              type: "button",
-                              tabIndex: -1,
-                              onClick: (e) => removePill(val, e),
-                              "aria-label": `Remove ${opt.label}`,
-                              className: "flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full transition-colors",
-                              style: { background: "rgba(0,60,27,.1)", color: MENU.selectedInk },
-                              children: /* @__PURE__ */ jsx(X, { size: 8, strokeWidth: 3.4 })
-                            }
-                          )
+                          "+",
+                          overflowCount
                         ]
-                      },
-                      val
-                    );
-                  }),
-                  overflowCount > 0 && /* @__PURE__ */ jsxs(
+                      }
+                    )
+                  ] }) : /* @__PURE__ */ jsx("span", { className: "truncate", style: { color: INPUT_COLORS.placeholder }, children: placeholder }) : /* @__PURE__ */ jsx(
                     "span",
                     {
-                      className: "inline-flex shrink-0 items-center justify-center rounded-full font-semibold",
+                      className: "truncate",
                       style: {
-                        padding: "4px 8px",
-                        background: INPUT_COLORS.subtle,
-                        color: INPUT_COLORS.message,
-                        fontSize: spec.font - 2
+                        color: singleLabel ? box.color : INPUT_COLORS.placeholder
                       },
-                      children: [
-                        "+",
-                        overflowCount
-                      ]
+                      children: singleLabel ?? placeholder
                     }
                   )
-                ] }) : /* @__PURE__ */ jsx("span", { className: "truncate", style: { color: INPUT_COLORS.placeholder }, children: placeholder }) : /* @__PURE__ */ jsx(
-                  "span",
+                }
+              ),
+              /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center", style: { gap: 6 }, children: [
+                clearable && hasSelection && !readOnly && !disabled && /* @__PURE__ */ jsx(
+                  "button",
                   {
-                    className: "truncate",
+                    type: "button",
+                    tabIndex: -1,
+                    onClick: clearAll,
+                    "aria-label": "Clear selection",
+                    className: "flex shrink-0 items-center justify-center rounded-full transition-colors",
                     style: {
-                      color: singleLabel ? box.color : INPUT_COLORS.placeholder
+                      width: spec.icon + 4,
+                      height: spec.icon + 4,
+                      background: INPUT_COLORS.subtle,
+                      color: INPUT_COLORS.message
                     },
-                    children: singleLabel ?? placeholder
+                    children: /* @__PURE__ */ jsx(X, { size: spec.icon - 6, strokeWidth: 3 })
+                  }
+                ),
+                sorting && /* @__PURE__ */ jsx(
+                  "button",
+                  {
+                    type: "button",
+                    tabIndex: -1,
+                    onClick: (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSortOrder((o) => o === "asc" ? "desc" : "asc");
+                    },
+                    disabled,
+                    "aria-label": sortOrder === "asc" ? "Sorted A\u2192Z, click for Z\u2192A" : "Sorted Z\u2192A, click for A\u2192Z",
+                    className: "flex items-center transition-colors",
+                    style: { color: INPUT_COLORS.message },
+                    children: sortOrder === "asc" ? /* @__PURE__ */ jsx(ArrowUpAZ, { size: spec.icon - 1, strokeWidth: 2 }) : /* @__PURE__ */ jsx(ArrowDownAZ, { size: spec.icon - 1, strokeWidth: 2 })
+                  }
+                ),
+                loading && /* @__PURE__ */ jsx(Spinner, { size: spec.icon - 2 }),
+                state === "readonly" && /* @__PURE__ */ jsx(Lock, { size: spec.icon - 2, strokeWidth: 2, color: INPUT_COLORS.placeholder }),
+                state === "error" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.errorInk }),
+                state === "warning" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.warningInk }),
+                state === "success" && /* @__PURE__ */ jsx(Check, { size: spec.icon, strokeWidth: 2.6, color: INPUT_COLORS.successInk }),
+                showChevron && /* @__PURE__ */ jsx(
+                  ChevronDown,
+                  {
+                    size: spec.icon,
+                    strokeWidth: 2,
+                    className: "transition-transform duration-[120ms]",
+                    style: {
+                      color: disabled ? INPUT_COLORS.borderHover : INPUT_COLORS.placeholder,
+                      transform: open ? "rotate(180deg)" : "rotate(0deg)"
+                    }
                   }
                 )
-              }
-            ),
-            /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 items-center", style: { gap: 6 }, children: [
-              clearable && hasSelection && !readOnly && !disabled && /* @__PURE__ */ jsx(
-                "button",
-                {
-                  type: "button",
-                  tabIndex: -1,
-                  onClick: clearAll,
-                  "aria-label": "Clear selection",
-                  className: "flex shrink-0 items-center justify-center rounded-full transition-colors",
-                  style: {
-                    width: spec.icon + 4,
-                    height: spec.icon + 4,
-                    background: INPUT_COLORS.subtle,
-                    color: INPUT_COLORS.message
-                  },
-                  children: /* @__PURE__ */ jsx(X, { size: spec.icon - 6, strokeWidth: 3 })
-                }
-              ),
-              sorting && /* @__PURE__ */ jsx(
-                "button",
-                {
-                  type: "button",
-                  tabIndex: -1,
-                  onClick: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSortOrder((o) => o === "asc" ? "desc" : "asc");
-                  },
-                  disabled,
-                  "aria-label": sortOrder === "asc" ? "Sorted A\u2192Z, click for Z\u2192A" : "Sorted Z\u2192A, click for A\u2192Z",
-                  className: "flex items-center transition-colors",
-                  style: { color: INPUT_COLORS.message },
-                  children: sortOrder === "asc" ? /* @__PURE__ */ jsx(ArrowUpAZ, { size: spec.icon - 1, strokeWidth: 2 }) : /* @__PURE__ */ jsx(ArrowDownAZ, { size: spec.icon - 1, strokeWidth: 2 })
-                }
-              ),
-              loading && /* @__PURE__ */ jsx(Spinner, { size: spec.icon - 2 }),
-              state === "readonly" && /* @__PURE__ */ jsx(Lock, { size: spec.icon - 2, strokeWidth: 2, color: INPUT_COLORS.placeholder }),
-              state === "error" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.errorInk }),
-              state === "warning" && /* @__PURE__ */ jsx(CircleAlert, { size: spec.icon, strokeWidth: 2.2, color: INPUT_COLORS.warningInk }),
-              state === "success" && /* @__PURE__ */ jsx(Check, { size: spec.icon, strokeWidth: 2.6, color: INPUT_COLORS.successInk }),
-              showChevron && /* @__PURE__ */ jsx(
-                ChevronDown,
-                {
-                  size: spec.icon,
-                  strokeWidth: 2,
-                  className: "transition-transform duration-[120ms]",
-                  style: {
-                    color: disabled ? INPUT_COLORS.borderHover : INPUT_COLORS.placeholder,
-                    transform: open ? "rotate(180deg)" : "rotate(0deg)"
-                  }
-                }
-              )
-            ] })
-          ]
-        }
-      ) }),
-      /* @__PURE__ */ jsx(
-        PopoverContent,
-        {
-          side: placement === "auto" ? "bottom" : placement,
-          className: "max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
-          collisionPadding: { top: 64 },
-          style: { width: "var(--radix-popover-trigger-width)" },
-          children: /* @__PURE__ */ jsxs(
-            "div",
-            {
-              style: {
-                padding: MENU.padding,
-                borderRadius: MENU.radius,
-                border: MENU.border,
-                background: MENU.background,
-                boxShadow: MENU.shadow
-              },
-              children: [
-                /* @__PURE__ */ jsx("style", { children: MENU_SCROLLBAR_CSS }),
-                /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
-                  searchEnabled && !loading && /* @__PURE__ */ jsx(
-                    CommandInput,
-                    {
-                      placeholder: "Search...",
-                      value: searchQuery,
-                      onValueChange: handleSearchChange,
-                      spellCheck,
-                      style: { fontSize: spec.font }
-                    }
-                  ),
-                  resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
-                    "div",
-                    {
-                      className: "sticky top-0 z-10 flex items-center justify-between",
-                      style: {
-                        padding: "6px 10px",
-                        background: MENU.background,
-                        borderBottom: `1px solid ${MENU.groupRule}`,
-                        fontSize: spec.font - 2,
-                        color: INPUT_COLORS.message
-                      },
-                      children: [
-                        /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
-                          selectedArr.length,
-                          " selected"
-                        ] }),
-                        /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
-                          /* @__PURE__ */ jsx(
-                            "button",
+              ] })
+            ]
+          }
+        ) }),
+        /* @__PURE__ */ jsx(
+          PopoverContent,
+          {
+            side: placement === "auto" ? "bottom" : placement,
+            className: "max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
+            collisionPadding: { top: 64 },
+            style: { width: "var(--radix-popover-trigger-width)" },
+            children: /* @__PURE__ */ jsxs(
+              "div",
+              {
+                style: {
+                  padding: MENU.padding,
+                  borderRadius: MENU.radius,
+                  border: MENU.border,
+                  background: MENU.background,
+                  boxShadow: MENU.shadow
+                },
+                children: [
+                  /* @__PURE__ */ jsx("style", { children: MENU_SCROLLBAR_CSS }),
+                  /* @__PURE__ */ jsxs(Command, { shouldFilter: false, children: [
+                    searchEnabled && !loading && /* @__PURE__ */ jsx(
+                      CommandInput,
+                      {
+                        placeholder: "Search...",
+                        value: searchQuery,
+                        onValueChange: handleSearchChange,
+                        spellCheck,
+                        style: { fontSize: spec.font }
+                      }
+                    ),
+                    resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxs(
+                      "div",
+                      {
+                        className: "sticky top-0 z-10 flex items-center justify-between",
+                        style: {
+                          padding: "6px 10px",
+                          background: MENU.background,
+                          borderBottom: `1px solid ${MENU.groupRule}`,
+                          fontSize: spec.font - 2,
+                          color: INPUT_COLORS.message
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxs("span", { className: "font-semibold", children: [
+                            selectedArr.length,
+                            " selected"
+                          ] }),
+                          /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
+                            /* @__PURE__ */ jsx(
+                              "button",
+                              {
+                                type: "button",
+                                onClick: () => commit(enabledOptions.map((o) => o.value)),
+                                disabled: allSelected,
+                                className: "font-semibold disabled:opacity-40",
+                                style: { color: MENU.selectedInk },
+                                children: "All"
+                              }
+                            ),
+                            /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
+                            /* @__PURE__ */ jsx(
+                              "button",
+                              {
+                                type: "button",
+                                onClick: () => commit([]),
+                                disabled: selectedArr.length === 0,
+                                className: "font-semibold disabled:opacity-40",
+                                style: { color: INPUT_COLORS.message },
+                                children: "None"
+                              }
+                            )
+                          ] })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsx(
+                      CommandList,
+                      {
+                        ref: listRef,
+                        "data-slot": "select-menu-list",
+                        style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
+                        children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                          groups.map((group, gi) => /* @__PURE__ */ jsxs(
+                            "div",
                             {
-                              type: "button",
-                              onClick: () => commit(enabledOptions.map((o) => o.value)),
-                              disabled: allSelected,
-                              className: "font-semibold disabled:opacity-40",
-                              style: { color: MENU.selectedInk },
-                              children: "All"
+                              style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
+                              children: [
+                                group.name && /* @__PURE__ */ jsx(
+                                  "div",
+                                  {
+                                    className: "sticky top-0 z-[5] font-semibold uppercase",
+                                    style: {
+                                      padding: "6px 10px 4px",
+                                      background: MENU.background,
+                                      fontSize: 10,
+                                      letterSpacing: "0.09em",
+                                      color: MENU.groupInk
+                                    },
+                                    children: group.name
+                                  }
+                                ),
+                                group.options.map(renderOption)
+                              ]
+                            },
+                            group.name ?? `__ungrouped_${gi}`
+                          )),
+                          showCreate && /* @__PURE__ */ jsxs(
+                            CommandItem,
+                            {
+                              value: CREATE_VALUE,
+                              onSelect: () => {
+                                onCreate?.(query);
+                                setOpen(false);
+                              },
+                              className: "cursor-pointer",
+                              style: {
+                                minHeight: spec.option,
+                                gap: SELECT_GAP,
+                                padding: "0 10px",
+                                marginTop: 4,
+                                borderTop: `1px solid ${MENU.groupRule}`,
+                                borderRadius: MENU.optionRadius,
+                                fontSize: spec.font,
+                                fontWeight: 600,
+                                color: MENU.selectedInk
+                              },
+                              children: [
+                                /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
+                                /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
+                                  "Create \u201C",
+                                  query,
+                                  "\u201D"
+                                ] })
+                              ]
                             }
                           ),
-                          /* @__PURE__ */ jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
-                          /* @__PURE__ */ jsx(
-                            "button",
+                          showEmpty && /* @__PURE__ */ jsx(
+                            "div",
                             {
-                              type: "button",
-                              onClick: () => commit([]),
-                              disabled: selectedArr.length === 0,
-                              className: "font-semibold disabled:opacity-40",
-                              style: { color: INPUT_COLORS.message },
-                              children: "None"
+                              className: "flex flex-col items-start gap-1",
+                              style: { padding: "14px 10px", fontSize: spec.font },
+                              children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
                             }
                           )
                         ] })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsx(
-                    CommandList,
-                    {
-                      ref: listRef,
-                      "data-slot": "select-menu-list",
-                      style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
-                      children: loading ? /* @__PURE__ */ jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-                        groups.map((group, gi) => /* @__PURE__ */ jsxs(
-                          "div",
-                          {
-                            style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
-                            children: [
-                              group.name && /* @__PURE__ */ jsx(
-                                "div",
-                                {
-                                  className: "sticky top-0 z-[5] font-semibold uppercase",
-                                  style: {
-                                    padding: "6px 10px 4px",
-                                    background: MENU.background,
-                                    fontSize: 10,
-                                    letterSpacing: "0.09em",
-                                    color: MENU.groupInk
-                                  },
-                                  children: group.name
-                                }
-                              ),
-                              group.options.map(renderOption)
-                            ]
-                          },
-                          group.name ?? `__ungrouped_${gi}`
-                        )),
-                        showCreate && /* @__PURE__ */ jsxs(
-                          CommandItem,
-                          {
-                            value: CREATE_VALUE,
-                            onSelect: () => {
-                              onCreate?.(query);
-                              setOpen(false);
-                            },
-                            className: "cursor-pointer",
-                            style: {
-                              minHeight: spec.option,
-                              gap: SELECT_GAP,
-                              padding: "0 10px",
-                              marginTop: 4,
-                              borderTop: `1px solid ${MENU.groupRule}`,
-                              borderRadius: MENU.optionRadius,
-                              fontSize: spec.font,
-                              fontWeight: 600,
-                              color: MENU.selectedInk
-                            },
-                            children: [
-                              /* @__PURE__ */ jsx(Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
-                              /* @__PURE__ */ jsxs("span", { className: "truncate", children: [
-                                "Create \u201C",
-                                query,
-                                "\u201D"
-                              ] })
-                            ]
-                          }
-                        ),
-                        showEmpty && /* @__PURE__ */ jsx(
-                          "div",
-                          {
-                            className: "flex flex-col items-start gap-1",
-                            style: { padding: "14px 10px", fontSize: spec.font },
-                            children: emptyState ?? /* @__PURE__ */ jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
-                          }
-                        )
-                      ] })
-                    }
-                  )
-                ] })
-              ]
-            }
-          )
+                      }
+                    )
+                  ] })
+                ]
+              }
+            )
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsx(
+        InputHelper,
+        {
+          size,
+          state: state === "open" ? "focused" : state,
+          helperText: error ?? (status && statusMessage) ?? helperText,
+          error
         }
       )
-    ] }),
-    /* @__PURE__ */ jsx(
-      InputHelper,
-      {
-        size,
-        state: state === "open" ? "focused" : state,
-        helperText: error ?? (status && statusMessage) ?? helperText,
-        error
-      }
-    )
-  ] });
+    ] })
+  );
 }
 Select.displayName = "Select";
 function Tabs({
@@ -8755,75 +8783,493 @@ function Section({
   return /* @__PURE__ */ jsx(SectionContext.Provider, { value: ctx, children: /* @__PURE__ */ jsx(Card, { "data-slot": "section", className: cardClass, ...props, children }) });
 }
 Section.displayName = "Section";
+var FILE_UPLOAD_COLORS = {
+  surface: "#FFFFFF",
+  subtle: "#F3F5F9",
+  border: "#E2E2E2",
+  borderSoft: "#EEEEEE",
+  borderStrong: "#C6C6C6",
+  ink: "#161616",
+  inkFg1: "#202020",
+  inkFg2: "#595959",
+  inkFg3: "#787878",
+  muted: "#9C9C9C",
+  /** Dashed dropzone rule, resting. */
+  dropBorder: "#C4DCB6",
+  /** Dropzone fill, resting. */
+  dropBg: "#FAFFF7",
+  /** Dropzone fill on hover / drag-over. */
+  dropBgActive: "#F2FBEB",
+  /** Dashed rule goes solid forest on drag-over. */
+  dropBorderActive: "#1F5E2C",
+  /** Hairline around the dropzone icon tile and the format chips. */
+  dropChipBorder: "#D5E8CA",
+  forest: "#1F5E2C",
+  deep: "#003C1B",
+  mint: "#DCF3CE",
+  green: "#00A86B",
+  greenInk: "#00795A",
+  lime: "#8CC42A",
+  /** Outline button border on the compact shape. */
+  outlineBorder: "#BFD6C6",
+  /** Outline button fill on hover. */
+  outlineHoverBg: "#F5FFF0",
+  infoBg: "#E4F2FB",
+  infoInk: "#0B4A6F",
+  infoBar: "#4BADE3",
+  warnBg: "#FFF6D6",
+  warnBorder: "#EFD98A",
+  warnInk: "#6A5300",
+  warnInkDeep: "#4A3B00",
+  warnOutline: "#E0C866",
+  dangerBg: "#FBE9EA",
+  dangerBorder: "#F2C8CC",
+  dangerOutline: "#E4A6AC",
+  dangerInk: "#7A0009",
+  dangerBar: "#A8000F",
+  /** Translucent white used for tiles/badges sitting on a tinted row. */
+  onTint: "rgba(255,255,255,.7)",
+  /** Gallery cover ribbon. */
+  coverBg: "rgba(0,60,27,.86)",
+  coverFg: "#DCF3CE",
+  galleryTileBg: "#DCF3CE",
+  galleryTileBorder: "#CDE3C0",
+  darkDropBg: "#141C17",
+  darkDropBorder: "#2C4A38",
+  darkTileBg: "#1B3423",
+  darkTileFg: "#8CC42A",
+  darkTitle: "#E7F0E9",
+  darkSub: "#8FB79C"
+};
+var FILE_UPLOAD_TRANSITION = "border-color 140ms cubic-bezier(.2,.8,.3,1), background-color 140ms cubic-bezier(.2,.8,.3,1), box-shadow 140ms cubic-bezier(.2,.8,.3,1)";
+var PROGRESS_TRANSITION = "width 200ms linear";
+var FILE_UPLOAD_SIZES = {
+  sm: {
+    dropPadY: 18,
+    dropPadX: 14,
+    dropGap: 7,
+    dropRadius: 10,
+    tile: 32,
+    tileRadius: 10,
+    tileIcon: 15,
+    title: 12,
+    sub: 10,
+    chip: 8,
+    rowPadY: 9,
+    rowPadX: 10,
+    rowGap: 9,
+    rowRadius: 10,
+    rowMinHeight: 48,
+    extTile: 28,
+    extRadius: 8,
+    extFont: 8,
+    name: 11,
+    meta: 9,
+    bar: 3,
+    action: 24,
+    actionFont: 9,
+    compactPadY: 8,
+    compactPadX: 10,
+    compactRadius: 9,
+    compactButton: 28,
+    avatar: 48,
+    avatarBadge: 20,
+    avatarInitials: 15,
+    galleryPad: 10,
+    galleryGap: 7,
+    galleryRadius: 9,
+    galleryTileRadius: 8
+  },
+  md: {
+    dropPadY: 26,
+    dropPadX: 18,
+    dropGap: 9,
+    dropRadius: 12,
+    tile: 40,
+    tileRadius: 12,
+    tileIcon: 18,
+    title: 13,
+    sub: 11,
+    chip: 9,
+    rowPadY: 11,
+    rowPadX: 12,
+    rowGap: 11,
+    rowRadius: 11,
+    rowMinHeight: 56,
+    extTile: 32,
+    extRadius: 9,
+    extFont: 9,
+    name: 12,
+    meta: 10,
+    bar: 4,
+    action: 26,
+    actionFont: 10,
+    compactPadY: 10,
+    compactPadX: 12,
+    compactRadius: 10,
+    compactButton: 30,
+    avatar: 60,
+    avatarBadge: 24,
+    avatarInitials: 19,
+    galleryPad: 12,
+    galleryGap: 8,
+    galleryRadius: 10,
+    galleryTileRadius: 9
+  },
+  lg: {
+    dropPadY: 34,
+    dropPadX: 22,
+    dropGap: 11,
+    dropRadius: 14,
+    tile: 48,
+    tileRadius: 14,
+    tileIcon: 22,
+    title: 15,
+    sub: 12,
+    chip: 10,
+    rowPadY: 13,
+    rowPadX: 14,
+    rowGap: 13,
+    rowRadius: 12,
+    rowMinHeight: 64,
+    extTile: 36,
+    extRadius: 10,
+    extFont: 10,
+    name: 13,
+    meta: 11,
+    bar: 5,
+    action: 30,
+    actionFont: 11,
+    compactPadY: 12,
+    compactPadX: 14,
+    compactRadius: 11,
+    compactButton: 34,
+    avatar: 76,
+    avatarBadge: 28,
+    avatarInitials: 24,
+    galleryPad: 14,
+    galleryGap: 9,
+    galleryRadius: 11,
+    galleryTileRadius: 10
+  }
+};
+var C = FILE_UPLOAD_COLORS;
+var FILE_UPLOAD_STATUS_STYLES = {
+  idle: {
+    label: "Idle",
+    rowBg: C.surface,
+    rowBorder: `1px solid ${C.border}`,
+    tileBg: C.subtle,
+    tileFg: C.inkFg2,
+    nameColor: C.ink,
+    noteColor: C.muted,
+    note: "Ready to upload",
+    bar: false,
+    barColor: C.green,
+    badgeText: "",
+    badgeBg: C.subtle,
+    badgeFg: C.inkFg2
+  },
+  queued: {
+    label: "Queued",
+    rowBg: C.surface,
+    rowBorder: `1px solid ${C.border}`,
+    tileBg: C.subtle,
+    tileFg: C.inkFg2,
+    nameColor: C.ink,
+    noteColor: C.muted,
+    note: "Waiting to upload",
+    bar: false,
+    barColor: C.green,
+    badgeText: "Queued",
+    badgeBg: C.subtle,
+    badgeFg: C.inkFg2
+  },
+  uploading: {
+    label: "Uploading",
+    rowBg: C.surface,
+    rowBorder: `1px solid ${C.border}`,
+    tileBg: C.mint,
+    tileFg: C.deep,
+    nameColor: C.ink,
+    noteColor: C.muted,
+    bar: true,
+    barColor: C.green,
+    badgeText: "{pct}",
+    badgeBg: C.mint,
+    badgeFg: C.deep
+  },
+  processing: {
+    label: "Processing",
+    rowBg: C.surface,
+    rowBorder: `1px solid ${C.border}`,
+    tileBg: C.infoBg,
+    tileFg: C.infoInk,
+    nameColor: C.ink,
+    noteColor: C.muted,
+    note: "Validating\u2026",
+    bar: true,
+    barColor: C.infoBar,
+    badgeText: "Scanning",
+    badgeBg: C.infoBg,
+    badgeFg: C.infoInk
+  },
+  done: {
+    label: "Success",
+    rowBg: C.surface,
+    rowBorder: `1px solid ${C.border}`,
+    tileBg: C.mint,
+    tileFg: C.deep,
+    nameColor: C.ink,
+    noteColor: C.greenInk,
+    note: "Uploaded",
+    bar: false,
+    barColor: C.green,
+    badgeText: "Done",
+    badgeBg: C.mint,
+    badgeFg: C.greenInk
+  },
+  failed: {
+    label: "Upload failed",
+    rowBg: C.surface,
+    rowBorder: `1px solid ${C.dangerBorder}`,
+    tileBg: C.dangerBg,
+    tileFg: C.dangerInk,
+    nameColor: C.ink,
+    noteColor: C.dangerInk,
+    note: "Connection dropped \u2014 nothing was saved",
+    bar: true,
+    barColor: C.dangerBar,
+    badgeText: "",
+    badgeBg: C.dangerBg,
+    badgeFg: C.dangerInk,
+    action: "retry"
+  },
+  rejected: {
+    label: "Rejected",
+    rowBg: C.dangerBg,
+    rowBorder: `1px solid ${C.dangerBorder}`,
+    tileBg: C.onTint,
+    tileFg: C.dangerInk,
+    nameColor: C.dangerInk,
+    noteColor: C.dangerInk,
+    note: "This file was not accepted",
+    bar: false,
+    barColor: C.dangerBar,
+    badgeText: "Rejected",
+    badgeBg: C.onTint,
+    badgeFg: C.dangerInk
+  },
+  partial: {
+    label: "Partial import",
+    rowBg: C.warnBg,
+    rowBorder: `1px solid ${C.warnBorder}`,
+    tileBg: C.onTint,
+    tileFg: C.warnInk,
+    nameColor: C.warnInkDeep,
+    noteColor: C.warnInk,
+    note: "Some rows were skipped",
+    bar: false,
+    barColor: C.warnInk,
+    badgeText: "Review",
+    badgeBg: C.onTint,
+    badgeFg: C.warnInk
+  },
+  paused: {
+    label: "Paused",
+    rowBg: C.subtle,
+    rowBorder: `1px solid ${C.border}`,
+    tileBg: C.surface,
+    tileFg: C.inkFg3,
+    nameColor: C.inkFg2,
+    noteColor: C.inkFg3,
+    note: "Paused \u2014 waiting for a connection.",
+    bar: true,
+    barColor: C.borderStrong,
+    badgeText: "Paused",
+    badgeBg: C.surface,
+    badgeFg: C.inkFg2
+  },
+  duplicate: {
+    label: "Duplicate file",
+    rowBg: C.surface,
+    rowBorder: `1px solid ${C.border}`,
+    tileBg: C.subtle,
+    tileFg: C.inkFg3,
+    nameColor: C.inkFg1,
+    noteColor: C.inkFg3,
+    note: "Already uploaded",
+    bar: false,
+    barColor: C.green,
+    badgeText: "",
+    badgeBg: C.subtle,
+    badgeFg: C.inkFg2,
+    action: "duplicate"
+  },
+  dimension: {
+    label: "Wrong dimensions",
+    rowBg: C.warnBg,
+    rowBorder: `1px solid ${C.warnBorder}`,
+    tileBg: C.onTint,
+    tileFg: C.warnInk,
+    nameColor: C.warnInkDeep,
+    noteColor: C.warnInk,
+    note: "Wrong dimensions",
+    bar: false,
+    barColor: C.warnInk,
+    badgeText: "",
+    badgeBg: C.onTint,
+    badgeFg: C.warnInk,
+    action: "crop"
+  }
+};
+function getDropzoneStyle(state, tone = "light") {
+  if (tone === "dark") {
+    const dark = {
+      background: C.darkDropBg,
+      border: `1.5px dashed ${C.darkDropBorder}`,
+      boxShadow: "none",
+      titleColor: C.darkTitle,
+      subColor: C.darkSub,
+      tileBg: C.darkTileBg,
+      tileBorder: "1px solid transparent",
+      tileFg: C.darkTileFg,
+      chipBg: C.darkTileBg,
+      chipBorder: "1px solid transparent",
+      chipFg: C.darkTileFg,
+      cursor: "pointer"
+    };
+    if (state === "dragover") {
+      return { ...dark, border: `1.5px solid ${C.lime}`, background: "#18221B" };
+    }
+    if (state === "hover") return { ...dark, background: "#18221B" };
+    if (state === "error") {
+      return { ...dark, border: `1.5px dashed ${C.dangerOutline}`, subColor: C.dangerOutline };
+    }
+    if (state === "disabled") return { ...dark, cursor: "not-allowed", opacity: 0.5 };
+    return dark;
+  }
+  const base = {
+    background: C.dropBg,
+    border: `1.5px dashed ${C.dropBorder}`,
+    boxShadow: "none",
+    titleColor: C.inkFg1,
+    subColor: C.inkFg3,
+    tileBg: C.surface,
+    tileBorder: `1px solid ${C.dropChipBorder}`,
+    tileFg: C.forest,
+    chipBg: C.surface,
+    chipBorder: `1px solid ${C.dropChipBorder}`,
+    chipFg: C.forest,
+    cursor: "pointer"
+  };
+  switch (state) {
+    case "hover":
+      return { ...base, background: C.dropBgActive, border: `1.5px dashed ${C.dropBorderActive}` };
+    case "dragover":
+      return {
+        ...base,
+        background: C.dropBgActive,
+        border: `1.5px solid ${C.dropBorderActive}`,
+        boxShadow: "0 0 0 3px rgba(140,196,42,.28)"
+      };
+    case "error":
+      return {
+        ...base,
+        background: C.dangerBg,
+        border: `1.5px dashed ${C.dangerBorder}`,
+        titleColor: C.dangerInk,
+        subColor: C.dangerInk,
+        tileBorder: `1px solid ${C.dangerBorder}`,
+        tileFg: C.dangerInk,
+        chipBorder: `1px solid ${C.dangerBorder}`,
+        chipFg: C.dangerInk
+      };
+    case "disabled":
+      return {
+        ...base,
+        background: C.subtle,
+        border: `1.5px dashed ${C.border}`,
+        titleColor: C.muted,
+        subColor: C.muted,
+        tileFg: C.muted,
+        chipFg: C.muted,
+        chipBorder: `1px solid ${C.border}`,
+        tileBorder: `1px solid ${C.border}`,
+        cursor: "not-allowed",
+        opacity: 0.7
+      };
+    default:
+      return base;
+  }
+}
+function getFileExt(name) {
+  const raw = name.split(".").pop() ?? "";
+  if (!raw || raw === name) return "FILE";
+  return raw.slice(0, 4).toUpperCase();
+}
+function truncateMiddle(name, max = 28) {
+  if (name.length <= max) return name;
+  const dot = name.lastIndexOf(".");
+  const ext = dot > 0 ? name.slice(dot) : "";
+  const stem = dot > 0 ? name.slice(0, dot) : name;
+  const keep = Math.max(4, max - ext.length - 1);
+  return `${stem.slice(0, keep)}\u2026${ext}`;
+}
 var dropzoneVariants = cva(
   [
-    "relative w-full flex flex-col items-center justify-center",
-    "rounded-xl border-2 border-dashed transition-all duration-150",
-    "cursor-pointer select-none outline-none",
-    "focus-visible:ring-2 focus-visible:ring-[#007a4d] focus-visible:ring-offset-2"
+    "relative w-full flex flex-col items-center justify-center text-center",
+    "select-none outline-none",
+    "focus-visible:ring-2 focus-visible:ring-[#1F5E2C] focus-visible:ring-offset-2"
   ],
   {
     variants: {
-      size: {
-        sm: "h-24 gap-1.5 px-3 py-3",
-        md: "h-32 gap-2 px-4 py-5",
-        lg: "h-44 gap-3 px-6 py-8"
-      },
-      state: {
-        idle: "border-gray-300 bg-gray-50 hover:border-[#007a4d] hover:bg-green-50/60",
-        dragover: "border-[#007a4d] bg-green-50 ring-2 ring-[#007a4d]/20 ring-offset-0",
-        error: "border-red-400 bg-red-50/60",
-        disabled: "cursor-not-allowed border-gray-200 bg-gray-50/80 opacity-50 pointer-events-none"
-      }
+      size: { sm: "", md: "", lg: "" },
+      state: { idle: "", dragover: "", error: "", disabled: "pointer-events-none" }
     },
-    defaultVariants: {
-      size: "md",
-      state: "idle"
-    }
+    defaultVariants: { size: "md", state: "idle" }
   }
 );
 var iconWrapperVariants = cva(
-  "flex items-center justify-center rounded-xl bg-gray-100 flex-shrink-0",
+  "flex items-center justify-center flex-shrink-0",
   {
-    variants: {
-      size: {
-        sm: "w-8 h-8",
-        md: "w-10 h-10",
-        lg: "w-12 h-12"
-      }
-    },
+    variants: { size: { sm: "", md: "", lg: "" } },
     defaultVariants: { size: "md" }
   }
 );
 var avatarContainerVariants = cva(
   [
-    "relative rounded-full overflow-hidden flex-shrink-0 transition-all duration-150",
-    "focus-visible:ring-2 focus-visible:ring-[#007a4d] focus-visible:ring-offset-2"
+    "relative rounded-full overflow-hidden flex-shrink-0",
+    "focus-visible:ring-2 focus-visible:ring-[#1F5E2C] focus-visible:ring-offset-2"
   ],
   {
     variants: {
-      size: {
-        sm: "w-16 h-16",
-        md: "w-20 h-20",
-        lg: "w-28 h-28"
-      },
+      size: { sm: "", md: "", lg: "" },
       state: {
-        empty: "border-2 border-dashed border-gray-300 bg-gray-50 cursor-pointer hover:border-[#007a4d] hover:bg-green-50/60",
-        filled: "border border-gray-200 cursor-pointer",
-        disabled: "border-2 border-dashed border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed pointer-events-none"
+        empty: "cursor-pointer",
+        filled: "cursor-pointer",
+        disabled: "cursor-not-allowed pointer-events-none opacity-60"
       }
     },
     defaultVariants: { size: "md", state: "empty" }
   }
 );
-var ICON_SIZES = { sm: 14, md: 18, lg: 22 };
+var ICON_SIZES = {
+  sm: FILE_UPLOAD_SIZES.sm.tileIcon,
+  md: FILE_UPLOAD_SIZES.md.tileIcon,
+  lg: FILE_UPLOAD_SIZES.lg.tileIcon
+};
 var AVATAR_ICON_SIZES = { sm: 16, md: 20, lg: 26 };
 var PLACEHOLDER_TEXT = {
-  image: "Click or drag to upload image",
-  file: "Click or drag to upload file",
+  image: "Drop images here",
+  file: "Drop files here",
   avatar: "Upload photo",
-  video: "Click or drag to upload video"
+  video: "Drop videos here",
+  compact: "Choose file",
+  gallery: "Drop images here"
 };
+var BROWSE_HINT = "or click to browse";
+var C2 = FILE_UPLOAD_COLORS;
 function formatBytes(bytes, decimals = 1) {
   if (bytes === 0) return "0 B";
   const k = 1024;
@@ -8832,16 +9278,24 @@ function formatBytes(bytes, decimals = 1) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${units[i]}`;
 }
 function getDefaultAccept(variant) {
-  if (variant === "image" || variant === "avatar") return "image/*";
+  if (variant === "image" || variant === "avatar" || variant === "gallery") return "image/*";
   if (variant === "video") return "video/*";
   return void 0;
 }
 function makeId() {
   return Math.random().toString(36).slice(2, 9);
 }
+function deriveInitials(source) {
+  if (!source) return null;
+  const parts = source.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return null;
+  return parts.slice(0, 2).map((p) => p[0].toUpperCase()).join("");
+}
+var TABULAR = { fontFeatureSettings: '"tnum" 1, "lnum" 1' };
 function FileUpload({
   variant = "file",
   size = "md",
+  tone = "light",
   accept,
   multiple = false,
   disabled = false,
@@ -8851,22 +9305,38 @@ function FileUpload({
   maxSize,
   maxFiles,
   allowedFiles,
+  formats,
   value,
+  items,
   onChange,
   onFilesChange,
   onRemove,
   onRemoveFile,
   onValidationError,
+  onRetry,
+  onRetryAll,
+  onSkip,
+  onReplace,
+  onCrop,
   label,
   required = false,
   error,
   helperText,
   placeholder,
   description,
+  browseHint = BROWSE_HINT,
   dragAndDrop = true,
   showLocalPreview = true,
   clearable = true,
   changeable = true,
+  showStatusBadge = true,
+  showEmptyListHint = false,
+  showDropzone = true,
+  batchSummary = false,
+  batchCaption,
+  initials,
+  galleryColumns = 4,
+  coverBadge = true,
   icon,
   className,
   dropzoneClassName,
@@ -8874,6 +9344,7 @@ function FileUpload({
 }) {
   const reactId = React9.useId();
   const inputId = id ?? reactId;
+  const spec = FILE_UPLOAD_SIZES[size] ?? FILE_UPLOAD_SIZES.md;
   const internalInputRef = React9.useRef(null);
   const attachInputRef = React9.useCallback(
     (node) => {
@@ -8888,31 +9359,38 @@ function FileUpload({
     [externalInputRef]
   );
   const [isDragOver, setIsDragOver] = React9.useState(false);
+  const [isHover, setIsHover] = React9.useState(false);
   const [localFiles, setLocalFiles] = React9.useState([]);
   const [validationErrors, setValidationErrors] = React9.useState([]);
-  const isImageVariant = variant === "image" || variant === "avatar";
+  const isImageVariant = variant === "image" || variant === "avatar" || variant === "gallery";
   const isPreviewVariant = isImageVariant || variant === "video";
   const normalizedAllowedExts = React9.useMemo(
     () => allowedFiles?.map((e) => e.startsWith(".") ? e.toLowerCase() : `.${e.toLowerCase()}`),
     [allowedFiles]
   );
   const effectiveAccept = accept ?? (normalizedAllowedExts ? normalizedAllowedExts.join(",") : getDefaultAccept(variant));
+  const chips = React9.useMemo(() => {
+    if (formats) return formats;
+    const derived = [];
+    normalizedAllowedExts?.forEach((e) => derived.push(e.replace(".", "").toUpperCase()));
+    if (maxSize) derived.push(`Max ${formatBytes(maxSize, 0)}`);
+    return derived;
+  }, [formats, normalizedAllowedExts, maxSize]);
   const controlledUrls = React9.useMemo(() => {
     if (!value) return [];
     return Array.isArray(value) ? value.filter(Boolean) : [value].filter(Boolean);
   }, [value]);
   const hasControlledValue = controlledUrls.length > 0;
   const displayItems = React9.useMemo(() => {
-    const items = [];
-    controlledUrls.forEach((url, i) => items.push({ kind: "url", url, index: i }));
+    const list = [];
+    controlledUrls.forEach((url, i) => list.push({ kind: "url", url, index: i }));
     if (showLocalPreview) {
       localFiles.forEach(
-        (lf, i) => items.push({ kind: "file", localFile: lf, index: controlledUrls.length + i })
+        (lf, i) => list.push({ kind: "file", localFile: lf, index: controlledUrls.length + i })
       );
     }
-    return items;
+    return list;
   }, [controlledUrls, localFiles, showLocalPreview]);
-  const hasContent = displayItems.length > 0;
   React9.useEffect(() => {
     if (hasControlledValue && localFiles.length > 0) {
       localFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
@@ -9088,11 +9566,43 @@ function FileUpload({
     onFilesChange?.([]);
     onRemove?.();
   };
-  const dzState = disabled ? "disabled" : isDragOver ? "dragover" : error || validationErrors.length > 0 ? "error" : "idle";
+  const dzState = disabled ? "disabled" : isDragOver ? "dragover" : error || validationErrors.length > 0 ? "error" : isHover && !readOnly ? "hover" : "idle";
+  const dz = getDropzoneStyle(dzState, tone);
   const combinedError = error ?? validationErrors[0];
-  const iconSize = ICON_SIZES[size] ?? 18;
+  const iconSize = ICON_SIZES[size] ?? spec.tileIcon;
   const avatarIconSize = AVATAR_ICON_SIZES[size] ?? 20;
-  const canAddMore = !disabled && !readOnly && (!maxFiles || displayItems.length < maxFiles);
+  const rows = React9.useMemo(() => {
+    if (items) return items;
+    return displayItems.map((item) => {
+      if (item.kind === "url") {
+        const fileName = item.url.split("/").pop() || item.url;
+        return { id: `url-${item.index}`, name: fileName, url: item.url, status: "done" };
+      }
+      return {
+        id: item.localFile.id,
+        name: item.localFile.file.name,
+        size: item.localFile.file.size,
+        url: item.localFile.previewUrl || void 0,
+        status: "idle"
+      };
+    });
+  }, [items, displayItems]);
+  const filledCount = items ? rows.length : displayItems.length;
+  const canAddMore = !disabled && !readOnly && (!maxFiles || filledCount < maxFiles);
+  const removeRow = (index) => {
+    if (items) {
+      onRemoveFile?.(index);
+      return;
+    }
+    const target = displayItems[index];
+    if (!target) return;
+    handleRemoveItem(
+      { preventDefault() {
+      }, stopPropagation() {
+      } },
+      target
+    );
+  };
   const dropzoneInteractionProps = {
     role: "button",
     tabIndex: disabled ? -1 : 0,
@@ -9101,9 +9611,370 @@ function FileUpload({
     onDragLeave: handleDragLeave,
     onDrop: handleDrop,
     onKeyDown: handleKeyDown,
-    "aria-label": placeholder ?? PLACEHOLDER_TEXT[variant]
+    onMouseEnter: () => setIsHover(true),
+    onMouseLeave: () => setIsHover(false),
+    "aria-label": placeholder ?? PLACEHOLDER_TEXT[variant] ?? PLACEHOLDER_TEXT.file
   };
   const filledDragProps = dragAndDrop && !disabled && !readOnly ? { onDragOver: handleDragOver, onDragLeave: handleDragLeave, onDrop: handleDrop } : {};
+  const renderDropzone = (glyph, title) => /* @__PURE__ */ jsxs(
+    "div",
+    {
+      ...dropzoneInteractionProps,
+      className: cn(dropzoneVariants({ size, state: disabled ? "disabled" : "idle" }), dropzoneClassName),
+      style: {
+        gap: spec.dropGap,
+        padding: `${spec.dropPadY}px ${spec.dropPadX}px`,
+        borderRadius: spec.dropRadius,
+        background: dz.background,
+        border: dz.border,
+        boxShadow: dz.boxShadow,
+        cursor: dz.cursor,
+        opacity: dz.opacity,
+        transition: FILE_UPLOAD_TRANSITION
+      },
+      children: [
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            className: iconWrapperVariants({ size }),
+            style: {
+              width: spec.tile,
+              height: spec.tile,
+              borderRadius: spec.tileRadius,
+              background: dz.tileBg,
+              border: dz.tileBorder,
+              color: dz.tileFg
+            },
+            children: glyph
+          }
+        ),
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            style: {
+              fontSize: spec.title,
+              fontWeight: 600,
+              lineHeight: 1.3,
+              color: dz.titleColor
+            },
+            children: title
+          }
+        ),
+        browseHint && /* @__PURE__ */ jsx("span", { style: { fontSize: spec.sub, fontWeight: 400, lineHeight: 1.5, color: dz.subColor }, children: browseHint }),
+        description && /* @__PURE__ */ jsx("span", { style: { fontSize: spec.sub, fontWeight: 400, lineHeight: 1.5, color: dz.subColor }, children: description }),
+        chips.length > 0 && /* @__PURE__ */ jsx("span", { className: "flex flex-wrap items-center justify-center", style: { gap: 6, marginTop: 2 }, children: chips.map((chip) => /* @__PURE__ */ jsx(
+          "span",
+          {
+            style: {
+              fontSize: spec.chip,
+              fontWeight: 600,
+              lineHeight: 1.4,
+              letterSpacing: ".05em",
+              textTransform: "uppercase",
+              background: dz.chipBg,
+              border: dz.chipBorder,
+              color: dz.chipFg,
+              padding: "3px 7px",
+              borderRadius: 999,
+              whiteSpace: "nowrap"
+            },
+            children: chip
+          },
+          chip
+        )) })
+      ]
+    }
+  );
+  const renderRow = (row, index) => {
+    const status = row.status ?? "idle";
+    const st = FILE_UPLOAD_STATUS_STYLES[status];
+    const pct = Math.max(0, Math.min(100, Math.round(row.progress ?? 0)));
+    const pctLabel = `${pct}%`;
+    const sizeLabel = typeof row.size === "number" ? formatBytes(row.size) : row.size ?? void 0;
+    const note = row.note ?? st.note;
+    const badgeText = showStatusBadge ? st.badgeText.replace("{pct}", pctLabel) : "";
+    const showBar = st.bar;
+    const actionPill = (text, onPress, border, color, bg = C2.surface) => /* @__PURE__ */ jsx(
+      "button",
+      {
+        type: "button",
+        onClick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onPress?.();
+        },
+        disabled: disabled || readOnly,
+        style: {
+          height: spec.action,
+          padding: "0 9px",
+          border: `1px solid ${border}`,
+          borderRadius: 7,
+          background: bg,
+          color,
+          fontSize: spec.actionFont,
+          fontWeight: 600,
+          lineHeight: 1,
+          cursor: disabled || readOnly ? "not-allowed" : "pointer",
+          flex: "none",
+          whiteSpace: "nowrap"
+        },
+        children: text
+      },
+      text
+    );
+    return /* @__PURE__ */ jsxs(
+      "div",
+      {
+        className: "flex items-center",
+        style: {
+          gap: spec.rowGap,
+          padding: `${spec.rowPadY}px ${spec.rowPadX}px`,
+          borderRadius: spec.rowRadius,
+          minHeight: spec.rowMinHeight,
+          background: st.rowBg,
+          border: st.rowBorder
+        },
+        children: [
+          /* @__PURE__ */ jsx(
+            "span",
+            {
+              className: "flex items-center justify-center flex-none",
+              style: {
+                width: spec.extTile,
+                height: spec.extTile,
+                borderRadius: spec.extRadius,
+                background: st.tileBg,
+                color: st.tileFg,
+                fontSize: spec.extFont,
+                fontWeight: 700,
+                lineHeight: 1
+              },
+              children: row.ext ?? getFileExt(row.name)
+            }
+          ),
+          /* @__PURE__ */ jsxs("span", { className: "flex-1 min-w-0 flex flex-col", style: { gap: 5 }, children: [
+            /* @__PURE__ */ jsxs("span", { className: "flex items-center", style: { gap: 8 }, children: [
+              /* @__PURE__ */ jsx(
+                "span",
+                {
+                  className: "flex-1 min-w-0 truncate",
+                  title: row.name,
+                  style: {
+                    fontSize: spec.name,
+                    fontWeight: 600,
+                    lineHeight: 1.3,
+                    color: st.nameColor
+                  },
+                  children: truncateMiddle(row.name, 34)
+                }
+              ),
+              sizeLabel && /* @__PURE__ */ jsx(
+                "span",
+                {
+                  className: "flex-none",
+                  style: { ...TABULAR, fontSize: spec.meta, fontWeight: 500, lineHeight: 1, color: C2.inkFg3 },
+                  children: sizeLabel
+                }
+              )
+            ] }),
+            showBar && /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: "block overflow-hidden",
+                style: { height: spec.bar, borderRadius: 99, background: C2.borderSoft },
+                children: /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    className: "block h-full",
+                    style: {
+                      width: `${pct}%`,
+                      borderRadius: 99,
+                      background: st.barColor,
+                      transition: PROGRESS_TRANSITION
+                    }
+                  }
+                )
+              }
+            ),
+            note && /* @__PURE__ */ jsx(
+              "span",
+              {
+                style: { ...TABULAR, fontSize: spec.meta, fontWeight: 500, lineHeight: 1.4, color: st.noteColor },
+                children: note
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs("span", { className: "flex items-center flex-none", style: { gap: 6 }, children: [
+            badgeText && /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: "flex-none",
+                style: {
+                  ...TABULAR,
+                  fontSize: spec.actionFont,
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  padding: "5px 9px",
+                  borderRadius: 7,
+                  background: st.badgeBg,
+                  color: st.badgeFg
+                },
+                children: badgeText
+              }
+            ),
+            !showStatusBadge && (status === "uploading" || status === "processing") && /* @__PURE__ */ jsx("span", { style: { ...TABULAR, fontSize: spec.actionFont, fontWeight: 600, color: C2.inkFg3 }, children: pctLabel }),
+            !showStatusBadge && status === "done" && /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: "flex items-center justify-center",
+                style: { width: 20, height: 20, borderRadius: "50%", background: C2.mint },
+                children: /* @__PURE__ */ jsx(Check, { size: 11, strokeWidth: 3.2, color: C2.greenInk })
+              }
+            ),
+            st.action === "retry" && actionPill("Retry", () => onRetry?.(row, index), C2.dangerOutline, C2.dangerInk),
+            st.action === "crop" && actionPill("Crop it", () => onCrop?.(row, index), C2.warnOutline, C2.warnInk, C2.onTint),
+            st.action === "duplicate" && /* @__PURE__ */ jsxs(Fragment, { children: [
+              actionPill("Skip", () => onSkip?.(row, index), C2.border, C2.inkFg2),
+              actionPill("Replace", () => onReplace?.(row, index), C2.outlineBorder, C2.deep)
+            ] }),
+            clearable && !disabled && !readOnly && /* @__PURE__ */ jsx(
+              "button",
+              {
+                type: "button",
+                onClick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  removeRow(index);
+                },
+                className: "flex items-center justify-center flex-none transition-colors hover:bg-[#FBE9EA] hover:text-[#A8000F]",
+                style: { width: 24, height: 24, borderRadius: 6, background: "transparent", color: C2.inkFg3 },
+                "aria-label": `Remove ${row.name}`,
+                children: /* @__PURE__ */ jsx(X, { size: 11, strokeWidth: 3 })
+              }
+            )
+          ] })
+        ]
+      },
+      row.id ?? `${row.name}-${index}`
+    );
+  };
+  const renderEmptyListHint = () => /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: "flex flex-col items-center justify-center text-center",
+      style: {
+        gap: 6,
+        border: `1px solid ${C2.borderSoft}`,
+        borderRadius: spec.rowRadius,
+        padding: `${spec.dropPadY}px ${spec.dropPadX}px`
+      },
+      children: [
+        /* @__PURE__ */ jsx("span", { style: { fontSize: spec.name, fontWeight: 600, lineHeight: 1.3, color: C2.inkFg2 }, children: "Nothing uploaded yet" }),
+        /* @__PURE__ */ jsx("span", { style: { fontSize: spec.meta, fontWeight: 400, lineHeight: 1.4, color: C2.inkFg3 }, children: "Files appear here as a list with their own progress and errors." })
+      ]
+    }
+  );
+  const renderBatchSummary = () => {
+    const total = rows.length;
+    const doneCount = rows.filter((r) => r.status === "done" || r.status === "partial").length;
+    const failedCount = rows.filter(
+      (r) => r.status === "failed" || r.status === "rejected"
+    ).length;
+    const pct = total === 0 ? 0 : Math.round(doneCount / total * 100);
+    return /* @__PURE__ */ jsxs(
+      "div",
+      {
+        className: "overflow-hidden",
+        style: { border: `1px solid ${C2.border}`, borderRadius: spec.compactRadius },
+        children: [
+          /* @__PURE__ */ jsxs(
+            "div",
+            {
+              className: "flex items-center",
+              style: {
+                gap: 9,
+                padding: `${spec.compactPadY}px ${spec.compactPadX}px`,
+                background: C2.subtle,
+                borderBottom: `1px solid ${C2.borderSoft}`
+              },
+              children: [
+                /* @__PURE__ */ jsxs(
+                  "span",
+                  {
+                    className: "flex-1",
+                    style: { ...TABULAR, fontSize: spec.name, fontWeight: 600, lineHeight: 1.3, color: C2.ink },
+                    children: [
+                      doneCount,
+                      " of ",
+                      total,
+                      " uploaded"
+                    ]
+                  }
+                ),
+                failedCount > 0 && /* @__PURE__ */ jsxs(
+                  "span",
+                  {
+                    style: { ...TABULAR, fontSize: spec.meta, fontWeight: 500, lineHeight: 1.3, color: C2.dangerInk },
+                    children: [
+                      failedCount,
+                      " failed"
+                    ]
+                  }
+                ),
+                failedCount > 0 && onRetryAll && /* @__PURE__ */ jsx(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: onRetryAll,
+                    disabled: disabled || readOnly,
+                    style: {
+                      fontSize: spec.name,
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      color: C2.forest,
+                      background: "transparent",
+                      border: 0,
+                      cursor: disabled || readOnly ? "not-allowed" : "pointer"
+                    },
+                    children: "Retry all"
+                  }
+                )
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxs(
+            "div",
+            {
+              className: "flex flex-col",
+              style: { gap: 8, padding: `${spec.rowPadY}px ${spec.rowPadX}px` },
+              children: [
+                /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    className: "block overflow-hidden",
+                    style: { height: spec.bar + 1, borderRadius: 99, background: C2.borderSoft },
+                    children: /* @__PURE__ */ jsx(
+                      "span",
+                      {
+                        className: "block h-full",
+                        style: {
+                          width: `${pct}%`,
+                          borderRadius: 99,
+                          background: C2.deep,
+                          transition: PROGRESS_TRANSITION
+                        }
+                      }
+                    )
+                  }
+                ),
+                batchCaption && /* @__PURE__ */ jsx("span", { style: { ...TABULAR, fontSize: spec.meta, fontWeight: 500, lineHeight: 1.4, color: C2.inkFg3 }, children: batchCaption })
+              ]
+            }
+          )
+        ]
+      }
+    );
+  };
   const renderImageVariant = () => {
     if (!multiple) {
       const item = displayItems[0];
@@ -9113,13 +9984,13 @@ function FileUpload({
           "div",
           {
             ...filledDragProps,
-            className: cn(
-              "relative w-full overflow-hidden rounded-xl border group transition-colors duration-150",
-              isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
-              size === "sm" && "h-24",
-              size === "md" && "h-32",
-              size === "lg" && "h-44"
-            ),
+            className: "relative w-full overflow-hidden group",
+            style: {
+              borderRadius: spec.dropRadius,
+              border: isDragOver ? `1.5px solid ${C2.dropBorderActive}` : `1px solid ${C2.border}`,
+              transition: FILE_UPLOAD_TRANSITION,
+              height: size === "sm" ? 96 : size === "lg" ? 176 : 128
+            },
             children: [
               /* @__PURE__ */ jsx(
                 "img",
@@ -9129,14 +10000,29 @@ function FileUpload({
                   className: "absolute inset-0 w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 }
               ),
-              isDragOver && !disabled && !readOnly && /* @__PURE__ */ jsx("div", { className: "absolute inset-0 flex items-center justify-center bg-green-50/60 backdrop-blur-[1px] pointer-events-none", children: /* @__PURE__ */ jsx("span", { className: "text-xs font-semibold text-[#007a4d]", children: "Drop to replace" }) }),
+              isDragOver && !disabled && !readOnly && /* @__PURE__ */ jsx(
+                "div",
+                {
+                  className: "absolute inset-0 flex items-center justify-center backdrop-blur-[1px] pointer-events-none",
+                  style: { background: "rgba(242,251,235,.7)" },
+                  children: /* @__PURE__ */ jsx("span", { style: { fontSize: spec.name, fontWeight: 600, color: C2.forest }, children: "Drop to replace" })
+                }
+              ),
               icon && !disabled && !readOnly && /* @__PURE__ */ jsx(
                 "button",
                 {
                   type: "button",
                   onClick: openFilePicker,
                   onKeyDown: handleKeyDown,
-                  className: "absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#007a4d] hover:border-[#007a4d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
+                  className: "absolute bottom-2 right-2 z-10 flex items-center justify-center rounded-full",
+                  style: {
+                    width: spec.avatarBadge,
+                    height: spec.avatarBadge,
+                    background: C2.surface,
+                    border: `1px solid ${C2.border}`,
+                    color: C2.forest,
+                    boxShadow: "1px 1px 3px rgba(0,0,0,.12)"
+                  },
                   "aria-label": "Change image",
                   children: icon
                 }
@@ -9148,7 +10034,13 @@ function FileUpload({
                     type: "button",
                     onClick: openFilePicker,
                     onKeyDown: handleKeyDown,
-                    className: "flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+                    className: "flex items-center gap-1.5 rounded-lg px-3 py-1.5 shadow transition-colors",
+                    style: {
+                      background: "rgba(255,255,255,.95)",
+                      color: C2.deep,
+                      fontSize: spec.meta + 1,
+                      fontWeight: 600
+                    },
                     "aria-label": "Change image",
                     children: [
                       /* @__PURE__ */ jsx(ImageIcon, { size: 12 }),
@@ -9161,7 +10053,13 @@ function FileUpload({
                   {
                     type: "button",
                     onClick: (e) => item && handleRemoveItem(e, item),
-                    className: "flex items-center gap-1.5 bg-red-500/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400",
+                    className: "flex items-center gap-1.5 rounded-lg px-3 py-1.5 shadow transition-colors",
+                    style: {
+                      background: C2.dangerBar,
+                      color: "#FFFFFF",
+                      fontSize: spec.meta + 1,
+                      fontWeight: 600
+                    },
                     "aria-label": "Remove image",
                     children: [
                       /* @__PURE__ */ jsx(X, { size: 12 }),
@@ -9174,115 +10072,53 @@ function FileUpload({
           }
         );
       }
-      return /* @__PURE__ */ jsxs(
-        "div",
-        {
-          ...dropzoneInteractionProps,
-          className: cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName),
-          children: [
-            /* @__PURE__ */ jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsx(ImageIcon, { size: iconSize, className: "text-gray-400" }) }),
-            /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-0.5 text-center", children: [
-              /* @__PURE__ */ jsx(
-                "span",
-                {
-                  className: cn(
-                    "font-medium text-gray-600",
-                    size === "sm" && "text-xs",
-                    size === "md" && "text-sm",
-                    size === "lg" && "text-base"
-                  ),
-                  children: placeholder ?? PLACEHOLDER_TEXT.image
-                }
-              ),
-              description && /* @__PURE__ */ jsx(
-                "span",
-                {
-                  className: cn(
-                    "text-gray-400",
-                    size === "sm" && "text-[10px]",
-                    size === "md" && "text-xs",
-                    size === "lg" && "text-sm"
-                  ),
-                  children: description
-                }
-              )
-            ] }),
-            dragAndDrop && /* @__PURE__ */ jsx("span", { className: "text-[10px] text-gray-300", children: "Drag & drop supported" })
-          ]
-        }
+      return renderDropzone(
+        /* @__PURE__ */ jsx(ImageIcon, { size: iconSize, strokeWidth: 2 }),
+        placeholder ?? PLACEHOLDER_TEXT.image
       );
     }
     if (displayItems.length === 0) {
-      return /* @__PURE__ */ jsxs(
-        "div",
-        {
-          ...dropzoneInteractionProps,
-          className: cn(dropzoneVariants({ size, state: dzState }), "w-full", dropzoneClassName),
-          children: [
-            /* @__PURE__ */ jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsx(ImageIcon, { size: iconSize, className: "text-gray-400" }) }),
-            /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: cn(
-                  "font-medium text-gray-600",
-                  size === "sm" && "text-xs",
-                  size === "md" && "text-sm",
-                  size === "lg" && "text-base"
-                ),
-                children: placeholder ?? PLACEHOLDER_TEXT.image
-              }
-            ),
-            description && /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: cn(
-                  "text-gray-400",
-                  size === "sm" && "text-[10px]",
-                  size === "md" && "text-xs",
-                  size === "lg" && "text-sm"
-                ),
-                children: description
-              }
-            )
-          ]
-        }
+      return renderDropzone(
+        /* @__PURE__ */ jsx(ImageIcon, { size: iconSize, strokeWidth: 2 }),
+        placeholder ?? PLACEHOLDER_TEXT.image
       );
     }
     return /* @__PURE__ */ jsx(
       "div",
       {
         ...filledDragProps,
-        className: cn(
-          "w-full overflow-y-auto rounded-xl border transition-colors duration-150",
-          isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
-          size === "sm" && "h-24",
-          size === "md" && "h-32",
-          size === "lg" && "h-44"
-        ),
-        children: /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap gap-2 p-2", children: [
+        className: "w-full",
+        style: {
+          borderRadius: spec.compactRadius,
+          border: isDragOver ? `1.5px solid ${C2.dropBorderActive}` : `1px solid ${C2.border}`,
+          padding: spec.galleryPad,
+          transition: FILE_UPLOAD_TRANSITION
+        },
+        children: /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap", style: { gap: spec.galleryGap }, children: [
           displayItems.map((item) => {
             const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
             return /* @__PURE__ */ jsxs(
               "div",
               {
-                className: "relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0",
+                className: "relative group flex-shrink-0 overflow-hidden",
+                style: {
+                  width: 80,
+                  height: 80,
+                  borderRadius: spec.galleryTileRadius,
+                  border: `1px solid ${C2.galleryTileBorder}`,
+                  background: C2.galleryTileBg
+                },
                 children: [
-                  /* @__PURE__ */ jsx(
-                    "img",
-                    {
-                      src: url,
-                      alt: `Image ${item.index + 1}`,
-                      className: "w-full h-full object-cover"
-                    }
-                  ),
+                  /* @__PURE__ */ jsx("img", { src: url, alt: `Image ${item.index + 1}`, className: "w-full h-full object-cover" }),
                   !disabled && !readOnly && clearable && /* @__PURE__ */ jsx(
                     "button",
                     {
                       type: "button",
                       onClick: (e) => handleRemoveItem(e, item),
-                      className: "absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
+                      className: "absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
+                      style: { background: "rgba(0,0,0,.6)" },
                       "aria-label": "Remove",
-                      children: /* @__PURE__ */ jsx(X, { size: 10, className: "text-white" })
+                      children: /* @__PURE__ */ jsx(X, { size: 10, strokeWidth: 3, className: "text-white" })
                     }
                   )
                 ]
@@ -9295,11 +10131,20 @@ function FileUpload({
             {
               type: "button",
               onClick: openFilePicker,
-              className: "rounded-xl border-2 border-dashed border-gray-300 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
+              className: "flex flex-col items-center justify-center flex-shrink-0 transition-colors",
+              style: {
+                width: 80,
+                height: 80,
+                gap: 2,
+                borderRadius: spec.galleryTileRadius,
+                border: `1.5px dashed ${C2.borderStrong}`,
+                background: C2.surface,
+                color: C2.inkFg3
+              },
               "aria-label": "Add image",
               children: [
-                /* @__PURE__ */ jsx(Plus, { size: 18 }),
-                /* @__PURE__ */ jsx("span", { className: "text-[10px] font-medium", children: "Add" })
+                /* @__PURE__ */ jsx(Plus, { size: 15, strokeWidth: 2.4 }),
+                /* @__PURE__ */ jsx("span", { style: { fontSize: spec.chip + 1, fontWeight: 600 }, children: "Add" })
               ]
             }
           )
@@ -9307,173 +10152,299 @@ function FileUpload({
       }
     );
   };
-  const renderAvatarVariant = () => {
-    const item = displayItems[0];
-    const previewUrl = item ? item.kind === "url" ? item.url : item.localFile.previewUrl : null;
-    const avatarState = disabled ? "disabled" : previewUrl ? "filled" : "empty";
-    return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-4", children: [
-      /* @__PURE__ */ jsxs("div", { className: "relative flex-shrink-0", children: [
-        /* @__PURE__ */ jsx(
-          "div",
-          {
-            ...!previewUrl ? dropzoneInteractionProps : {},
-            className: avatarContainerVariants({ size, state: avatarState }),
-            children: previewUrl ? /* @__PURE__ */ jsxs(Fragment, { children: [
-              /* @__PURE__ */ jsx(
-                "img",
-                {
-                  src: previewUrl,
-                  alt: "Avatar",
-                  className: "w-full h-full object-cover"
-                }
-              ),
-              !disabled && !readOnly && /* @__PURE__ */ jsx(
-                "div",
-                {
-                  className: "absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full",
-                  onClick: openFilePicker,
-                  role: "button",
-                  tabIndex: 0,
-                  onKeyDown: handleKeyDown,
-                  "aria-label": "Change photo",
-                  children: /* @__PURE__ */ jsx(ImageIcon, { size: avatarIconSize, className: "text-white" })
-                }
-              )
-            ] }) : /* @__PURE__ */ jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsx(Upload, { size: avatarIconSize, className: "text-gray-400" }) })
-          }
-        ),
-        icon && !disabled && !readOnly && /* @__PURE__ */ jsx(
+  const renderGalleryVariant = () => /* @__PURE__ */ jsxs(
+    "div",
+    {
+      ...filledDragProps,
+      className: "w-full grid",
+      style: {
+        gridTemplateColumns: `repeat(${galleryColumns}, 1fr)`,
+        gap: spec.galleryGap,
+        padding: spec.galleryPad,
+        borderRadius: spec.galleryRadius,
+        border: isDragOver ? `1.5px solid ${C2.dropBorderActive}` : `1px solid ${C2.border}`,
+        transition: FILE_UPLOAD_TRANSITION
+      },
+      children: [
+        displayItems.map((item) => {
+          const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
+          return /* @__PURE__ */ jsxs(
+            "span",
+            {
+              className: "relative group flex items-center justify-center overflow-hidden",
+              style: {
+                aspectRatio: "1",
+                borderRadius: spec.galleryTileRadius,
+                background: C2.galleryTileBg,
+                border: `1px solid ${C2.galleryTileBorder}`
+              },
+              children: [
+                url ? /* @__PURE__ */ jsx("img", { src: url, alt: `Image ${item.index + 1}`, className: "w-full h-full object-cover" }) : /* @__PURE__ */ jsx(ImageIcon, { size: 15, strokeWidth: 1.7, color: C2.forest, style: { opacity: 0.55 } }),
+                coverBadge && item.index === 0 && /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    className: "absolute text-center",
+                    style: {
+                      bottom: 3,
+                      left: 3,
+                      right: 3,
+                      fontSize: 8,
+                      fontWeight: 600,
+                      lineHeight: 1.4,
+                      letterSpacing: ".04em",
+                      textTransform: "uppercase",
+                      background: C2.coverBg,
+                      color: C2.coverFg,
+                      borderRadius: 4,
+                      padding: "2px 0"
+                    },
+                    children: "Cover"
+                  }
+                ),
+                !disabled && !readOnly && clearable && /* @__PURE__ */ jsx(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: (e) => handleRemoveItem(e, item),
+                    className: "absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
+                    style: { background: "rgba(0,0,0,.6)" },
+                    "aria-label": "Remove",
+                    children: /* @__PURE__ */ jsx(X, { size: 10, strokeWidth: 3, className: "text-white" })
+                  }
+                )
+              ]
+            },
+            item.kind === "url" ? `url-${item.index}` : item.localFile.id
+          );
+        }),
+        canAddMore && /* @__PURE__ */ jsx(
           "button",
           {
             type: "button",
             onClick: openFilePicker,
-            onKeyDown: handleKeyDown,
-            className: "absolute bottom-0 right-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow border border-gray-100 text-gray-600 hover:text-[#007a4d] hover:border-[#007a4d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
-            "aria-label": "Change photo",
-            children: icon
+            onDragOver: handleDragOver,
+            onDragLeave: handleDragLeave,
+            onDrop: handleDrop,
+            className: "flex items-center justify-center transition-colors",
+            style: {
+              aspectRatio: "1",
+              borderRadius: spec.galleryTileRadius,
+              background: C2.surface,
+              border: `1.5px dashed ${C2.borderStrong}`,
+              color: C2.borderStrong
+            },
+            "aria-label": "Add image",
+            children: /* @__PURE__ */ jsx(Plus, { size: 15, strokeWidth: 2.4 })
           }
         )
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1", children: [
-        !disabled && !readOnly && /* @__PURE__ */ jsx(
-          "button",
-          {
-            type: "button",
-            onClick: openFilePicker,
-            className: "text-sm font-medium text-[#007a4d] hover:underline text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d] rounded",
-            children: previewUrl ? "Change photo" : placeholder ?? "Upload photo"
-          }
-        ),
-        description && /* @__PURE__ */ jsx("p", { className: "text-xs text-gray-400", children: description }),
-        clearable && previewUrl && !disabled && !readOnly && /* @__PURE__ */ jsx(
-          "button",
-          {
-            type: "button",
-            onClick: handleClearAll,
-            className: "text-xs text-red-400 hover:text-red-600 text-left",
-            children: "Remove"
-          }
-        )
-      ] })
-    ] });
-  };
-  const renderFileVariant = () => {
-    if (hasContent) {
-      return /* @__PURE__ */ jsxs(
+      ]
+    }
+  );
+  const renderCompactVariant = () => {
+    const title = placeholder ?? (typeof label === "string" ? label : void 0) ?? PLACEHOLDER_TEXT.compact;
+    const sub = description ?? (chips.length > 0 ? chips.join(" \xB7 ") : void 0);
+    return /* @__PURE__ */ jsxs("div", { className: "flex flex-col", style: { gap: 9 }, children: [
+      /* @__PURE__ */ jsxs(
         "div",
         {
           ...filledDragProps,
-          className: cn(
-            "w-full rounded-xl border overflow-hidden flex flex-col transition-colors duration-150",
-            isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
-            size === "sm" && "h-24",
-            size === "md" && "h-32",
-            size === "lg" && "h-44",
-            disabled && "opacity-50"
-          ),
+          className: "flex items-center w-full",
+          style: {
+            gap: 10,
+            padding: `${spec.compactPadY}px ${spec.compactPadX}px`,
+            border: isDragOver ? `1px solid ${C2.dropBorderActive}` : `1px solid ${C2.border}`,
+            borderRadius: spec.compactRadius,
+            background: disabled ? C2.subtle : C2.surface,
+            transition: FILE_UPLOAD_TRANSITION
+          },
           children: [
-            /* @__PURE__ */ jsx("div", { className: "flex-1 overflow-y-auto divide-y divide-gray-100 min-h-0", children: displayItems.map((item) => {
-              const name2 = item.kind === "file" ? item.localFile.file.name : item.url.split("/").pop() ?? item.url;
-              const size_ = item.kind === "file" ? formatBytes(item.localFile.file.size) : null;
-              return /* @__PURE__ */ jsxs(
-                "div",
+            /* @__PURE__ */ jsxs("span", { className: "flex-1 min-w-0 flex flex-col", style: { gap: 2 }, children: [
+              /* @__PURE__ */ jsxs(
+                "span",
                 {
-                  className: "flex items-center gap-3 px-3 py-2.5 bg-white",
+                  className: "truncate",
+                  style: {
+                    fontSize: spec.name,
+                    fontWeight: 600,
+                    lineHeight: 1.3,
+                    color: disabled ? C2.muted : C2.inkFg1
+                  },
                   children: [
-                    /* @__PURE__ */ jsx("div", { className: "w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsx(File, { size: 15, className: "text-gray-400" }) }),
-                    /* @__PURE__ */ jsxs("div", { className: "flex-1 min-w-0", children: [
-                      /* @__PURE__ */ jsx("p", { className: "text-sm font-medium text-gray-800 truncate", children: name2 }),
-                      size_ && /* @__PURE__ */ jsx("p", { className: "text-xs text-gray-400", children: size_ })
-                    ] }),
-                    clearable && !disabled && !readOnly && /* @__PURE__ */ jsx(
-                      "button",
-                      {
-                        type: "button",
-                        onClick: (e) => handleRemoveItem(e, item),
-                        className: "w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors rounded flex-shrink-0",
-                        "aria-label": `Remove ${name2}`,
-                        children: /* @__PURE__ */ jsx(X, { size: 14 })
-                      }
-                    )
+                    title,
+                    required && /* @__PURE__ */ jsx("span", { style: { color: C2.dangerBar, marginLeft: 3 }, children: "*" })
                   ]
-                },
-                item.kind === "url" ? `url-${item.index}` : item.localFile.id
-              );
-            }) }),
-            multiple && canAddMore && /* @__PURE__ */ jsxs(
+                }
+              ),
+              sub && /* @__PURE__ */ jsx("span", { style: { fontSize: spec.meta, fontWeight: 400, lineHeight: 1.4, color: C2.inkFg3 }, children: sub })
+            ] }),
+            /* @__PURE__ */ jsx(
               "button",
               {
                 type: "button",
                 onClick: openFilePicker,
-                className: "flex-shrink-0 w-full flex items-center gap-2 px-3 py-2.5 bg-gray-50 border-t border-gray-100 text-sm text-gray-500 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#007a4d]",
-                children: [
-                  /* @__PURE__ */ jsx(Plus, { size: 14 }),
-                  "Add more files"
-                ]
+                disabled: disabled || readOnly,
+                onMouseEnter: () => setIsHover(true),
+                onMouseLeave: () => setIsHover(false),
+                className: "flex-none",
+                style: {
+                  height: spec.compactButton,
+                  padding: "0 12px",
+                  border: `1px solid ${isHover && !disabled && !readOnly ? C2.dropBorderActive : C2.outlineBorder}`,
+                  borderRadius: 8,
+                  background: isHover && !disabled && !readOnly ? C2.outlineHoverBg : C2.surface,
+                  color: disabled ? C2.muted : C2.deep,
+                  fontSize: spec.meta + 1,
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  cursor: disabled || readOnly ? "not-allowed" : "pointer",
+                  transition: FILE_UPLOAD_TRANSITION,
+                  whiteSpace: "nowrap"
+                },
+                children: "Choose file"
               }
             )
           ]
         }
-      );
-    }
+      ),
+      rows.length > 0 && /* @__PURE__ */ jsx("div", { className: "flex flex-col", style: { gap: 9 }, children: rows.map(renderRow) })
+    ] });
+  };
+  const renderAvatarVariant = () => {
+    const item = displayItems[0];
+    const previewUrl = item ? item.kind === "url" ? item.url : item.localFile.previewUrl : null;
+    const avatarState = disabled ? "disabled" : previewUrl ? "filled" : "empty";
+    const title = placeholder ?? (typeof label === "string" ? label : void 0) ?? PLACEHOLDER_TEXT.avatar;
+    const fallbackInitials = initials ?? deriveInitials(typeof label === "string" ? label : placeholder);
     return /* @__PURE__ */ jsxs(
       "div",
       {
-        ...dropzoneInteractionProps,
-        className: cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName),
+        className: "flex items-center w-full",
+        style: {
+          gap: 14,
+          padding: spec.galleryPad + 2,
+          border: `1px solid ${C2.border}`,
+          borderRadius: spec.compactRadius,
+          background: disabled ? C2.subtle : C2.surface
+        },
         children: [
-          /* @__PURE__ */ jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsx(Upload, { size: iconSize, className: "text-gray-400" }) }),
-          /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-0.5 text-center", children: [
+          /* @__PURE__ */ jsxs("div", { className: "relative flex-shrink-0", style: { width: spec.avatar, height: spec.avatar }, children: [
             /* @__PURE__ */ jsx(
-              "span",
+              "div",
               {
-                className: cn(
-                  "font-medium text-gray-600",
-                  size === "sm" && "text-xs",
-                  size === "md" && "text-sm",
-                  size === "lg" && "text-base"
-                ),
-                children: placeholder ?? PLACEHOLDER_TEXT.file
+                ...!previewUrl ? dropzoneInteractionProps : {},
+                className: avatarContainerVariants({ size, state: avatarState }),
+                style: {
+                  width: spec.avatar,
+                  height: spec.avatar,
+                  background: previewUrl ? C2.surface : C2.deep,
+                  color: C2.mint
+                },
+                children: previewUrl ? /* @__PURE__ */ jsxs(Fragment, { children: [
+                  /* @__PURE__ */ jsx("img", { src: previewUrl, alt: "Avatar", className: "w-full h-full object-cover" }),
+                  !disabled && !readOnly && /* @__PURE__ */ jsx(
+                    "div",
+                    {
+                      className: "absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full",
+                      style: { background: "rgba(0,0,0,.4)" },
+                      onClick: openFilePicker,
+                      role: "button",
+                      tabIndex: 0,
+                      onKeyDown: handleKeyDown,
+                      "aria-label": "Change photo",
+                      children: /* @__PURE__ */ jsx(ImageIcon, { size: avatarIconSize, className: "text-white" })
+                    }
+                  )
+                ] }) : /* @__PURE__ */ jsx(
+                  "div",
+                  {
+                    className: "w-full h-full flex items-center justify-center",
+                    style: { fontSize: spec.avatarInitials, fontWeight: 700, lineHeight: 1 },
+                    children: fallbackInitials ?? /* @__PURE__ */ jsx(Upload, { size: avatarIconSize })
+                  }
+                )
               }
             ),
-            description && /* @__PURE__ */ jsx(
-              "span",
+            !disabled && !readOnly && /* @__PURE__ */ jsx(
+              "button",
               {
-                className: cn(
-                  "text-gray-400",
-                  size === "sm" && "text-[10px]",
-                  size === "md" && "text-xs",
-                  size === "lg" && "text-sm"
-                ),
-                children: description
+                type: "button",
+                onClick: openFilePicker,
+                onKeyDown: handleKeyDown,
+                className: "absolute z-10 flex items-center justify-center rounded-full",
+                style: {
+                  bottom: -2,
+                  right: -2,
+                  width: spec.avatarBadge,
+                  height: spec.avatarBadge,
+                  background: C2.surface,
+                  border: `1px solid ${C2.border}`,
+                  color: C2.forest,
+                  boxShadow: "1px 1px 3px rgba(0,0,0,.12)"
+                },
+                "aria-label": "Change photo",
+                children: icon ?? /* @__PURE__ */ jsx(Camera, { size: Math.round(spec.avatarBadge * 0.46), strokeWidth: 2.2 })
               }
             )
           ] }),
-          dragAndDrop && /* @__PURE__ */ jsx("span", { className: "text-[10px] text-gray-300", children: "Drag & drop supported" })
+          /* @__PURE__ */ jsxs("div", { className: "flex-1 min-w-0 flex flex-col", style: { gap: 5 }, children: [
+            /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: "truncate",
+                style: { fontSize: spec.name, fontWeight: 600, lineHeight: 1.3, color: C2.inkFg1 },
+                children: title
+              }
+            ),
+            description && /* @__PURE__ */ jsx("span", { style: { fontSize: spec.meta, fontWeight: 400, lineHeight: 1.4, color: C2.inkFg3 }, children: description }),
+            !disabled && !readOnly && /* @__PURE__ */ jsxs("span", { className: "flex items-center", style: { gap: 9, marginTop: 2 }, children: [
+              /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: openFilePicker,
+                  style: {
+                    fontSize: spec.meta + 1,
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    color: C2.forest,
+                    background: "transparent",
+                    border: 0,
+                    cursor: "pointer"
+                  },
+                  children: previewUrl ? "Change" : "Upload"
+                }
+              ),
+              clearable && previewUrl && /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleClearAll,
+                  style: {
+                    fontSize: spec.meta + 1,
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    color: C2.dangerBar,
+                    background: "transparent",
+                    border: 0,
+                    cursor: "pointer"
+                  },
+                  children: "Remove"
+                }
+              )
+            ] })
+          ] })
         ]
       }
     );
   };
+  const renderFileVariant = () => /* @__PURE__ */ jsxs("div", { className: "flex flex-col w-full", style: { gap: 10 }, children: [
+    showDropzone && (canAddMore || rows.length === 0) && renderDropzone(
+      /* @__PURE__ */ jsx(Upload, { size: iconSize, strokeWidth: 2 }),
+      placeholder ?? PLACEHOLDER_TEXT.file
+    ),
+    batchSummary && rows.length > 0 && renderBatchSummary(),
+    rows.length > 0 ? /* @__PURE__ */ jsx("div", { className: "flex flex-col", style: { gap: 9 }, children: rows.map(renderRow) }) : showEmptyListHint && renderEmptyListHint()
+  ] });
   const renderVideoVariant = () => {
     if (!multiple) {
       const item = displayItems[0];
@@ -9483,13 +10454,13 @@ function FileUpload({
           "div",
           {
             ...filledDragProps,
-            className: cn(
-              "relative w-full overflow-hidden rounded-xl border bg-black group transition-colors duration-150",
-              isDragOver ? "border-[#007a4d]" : "border-gray-200",
-              size === "sm" && "h-24",
-              size === "md" && "h-32",
-              size === "lg" && "h-44"
-            ),
+            className: "relative w-full overflow-hidden bg-black group",
+            style: {
+              borderRadius: spec.dropRadius,
+              border: isDragOver ? `1.5px solid ${C2.dropBorderActive}` : `1px solid ${C2.border}`,
+              height: size === "sm" ? 96 : size === "lg" ? 176 : 128,
+              transition: FILE_UPLOAD_TRANSITION
+            },
             children: [
               /* @__PURE__ */ jsx(
                 "video",
@@ -9500,7 +10471,7 @@ function FileUpload({
                   preload: "metadata"
                 }
               ),
-              isDragOver && !disabled && !readOnly && /* @__PURE__ */ jsx("div", { className: "absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px] pointer-events-none z-10", children: /* @__PURE__ */ jsx("span", { className: "text-xs font-semibold text-white", children: "Drop to replace" }) }),
+              isDragOver && !disabled && !readOnly && /* @__PURE__ */ jsx("div", { className: "absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px] pointer-events-none z-10", children: /* @__PURE__ */ jsx("span", { style: { fontSize: spec.name, fontWeight: 600 }, className: "text-white", children: "Drop to replace" }) }),
               !disabled && !readOnly && (changeable || clearable) && /* @__PURE__ */ jsxs("div", { className: "absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-2.5 bg-gradient-to-b from-black/65 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto", children: [
                 changeable && /* @__PURE__ */ jsxs(
                   "button",
@@ -9508,7 +10479,13 @@ function FileUpload({
                     type: "button",
                     onClick: openFilePicker,
                     onKeyDown: handleKeyDown,
-                    className: "flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 shadow hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+                    className: "flex items-center gap-1.5 rounded-lg px-3 py-1.5 shadow",
+                    style: {
+                      background: "rgba(255,255,255,.95)",
+                      color: C2.deep,
+                      fontSize: spec.meta + 1,
+                      fontWeight: 600
+                    },
                     "aria-label": "Change video",
                     children: [
                       /* @__PURE__ */ jsx(Video, { size: 12 }),
@@ -9521,7 +10498,13 @@ function FileUpload({
                   {
                     type: "button",
                     onClick: (e) => item && handleRemoveItem(e, item),
-                    className: "flex items-center gap-1.5 bg-red-500/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400",
+                    className: "flex items-center gap-1.5 rounded-lg px-3 py-1.5 shadow",
+                    style: {
+                      background: C2.dangerBar,
+                      color: "#FFFFFF",
+                      fontSize: spec.meta + 1,
+                      fontWeight: 600
+                    },
                     "aria-label": "Remove video",
                     children: [
                       /* @__PURE__ */ jsx(X, { size: 12 }),
@@ -9534,117 +10517,60 @@ function FileUpload({
           }
         );
       }
-      return /* @__PURE__ */ jsxs(
-        "div",
-        {
-          ...dropzoneInteractionProps,
-          className: cn(dropzoneVariants({ size, state: dzState }), dropzoneClassName),
-          children: [
-            /* @__PURE__ */ jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsx(Video, { size: iconSize, className: "text-gray-400" }) }),
-            /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-0.5 text-center", children: [
-              /* @__PURE__ */ jsx(
-                "span",
-                {
-                  className: cn(
-                    "font-medium text-gray-600",
-                    size === "sm" && "text-xs",
-                    size === "md" && "text-sm",
-                    size === "lg" && "text-base"
-                  ),
-                  children: placeholder ?? PLACEHOLDER_TEXT.video
-                }
-              ),
-              description && /* @__PURE__ */ jsx(
-                "span",
-                {
-                  className: cn(
-                    "text-gray-400",
-                    size === "sm" && "text-[10px]",
-                    size === "md" && "text-xs",
-                    size === "lg" && "text-sm"
-                  ),
-                  children: description
-                }
-              )
-            ] }),
-            dragAndDrop && /* @__PURE__ */ jsx("span", { className: "text-[10px] text-gray-300", children: "Drag & drop supported" })
-          ]
-        }
+      return renderDropzone(
+        /* @__PURE__ */ jsx(Video, { size: iconSize, strokeWidth: 2 }),
+        placeholder ?? PLACEHOLDER_TEXT.video
       );
     }
     if (displayItems.length === 0) {
-      return /* @__PURE__ */ jsxs(
-        "div",
-        {
-          ...dropzoneInteractionProps,
-          className: cn(dropzoneVariants({ size, state: dzState }), "w-full", dropzoneClassName),
-          children: [
-            /* @__PURE__ */ jsx("div", { className: iconWrapperVariants({ size }), children: /* @__PURE__ */ jsx(Video, { size: iconSize, className: "text-gray-400" }) }),
-            /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: cn(
-                  "font-medium text-gray-600",
-                  size === "sm" && "text-xs",
-                  size === "md" && "text-sm",
-                  size === "lg" && "text-base"
-                ),
-                children: placeholder ?? PLACEHOLDER_TEXT.video
-              }
-            ),
-            description && /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: cn(
-                  "text-gray-400",
-                  size === "sm" && "text-[10px]",
-                  size === "md" && "text-xs",
-                  size === "lg" && "text-sm"
-                ),
-                children: description
-              }
-            )
-          ]
-        }
+      return renderDropzone(
+        /* @__PURE__ */ jsx(Video, { size: iconSize, strokeWidth: 2 }),
+        placeholder ?? PLACEHOLDER_TEXT.video
       );
     }
     return /* @__PURE__ */ jsx(
       "div",
       {
         ...filledDragProps,
-        className: cn(
-          "w-full overflow-y-auto rounded-xl border transition-colors duration-150",
-          isDragOver ? "border-[#007a4d] bg-green-50/40" : "border-gray-200",
-          size === "sm" && "h-24",
-          size === "md" && "h-32",
-          size === "lg" && "h-44"
-        ),
-        children: /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap gap-2 p-2", children: [
+        className: "w-full",
+        style: {
+          borderRadius: spec.compactRadius,
+          border: isDragOver ? `1.5px solid ${C2.dropBorderActive}` : `1px solid ${C2.border}`,
+          padding: spec.galleryPad,
+          transition: FILE_UPLOAD_TRANSITION
+        },
+        children: /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap", style: { gap: spec.galleryGap }, children: [
           displayItems.map((item) => {
             const url = item.kind === "url" ? item.url : item.localFile.previewUrl;
             return /* @__PURE__ */ jsxs(
               "div",
               {
-                className: "relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0 bg-black",
+                className: "relative group flex-shrink-0 overflow-hidden bg-black",
+                style: {
+                  width: 80,
+                  height: 80,
+                  borderRadius: spec.galleryTileRadius,
+                  border: `1px solid ${C2.border}`
+                },
                 children: [
-                  /* @__PURE__ */ jsx(
-                    "video",
+                  /* @__PURE__ */ jsx("video", { src: url, className: "w-full h-full object-cover", muted: true, preload: "metadata" }),
+                  /* @__PURE__ */ jsx("div", { className: "absolute inset-0 flex items-center justify-center pointer-events-none", children: /* @__PURE__ */ jsx(
+                    "div",
                     {
-                      src: url,
-                      className: "w-full h-full object-cover",
-                      muted: true,
-                      preload: "metadata"
+                      className: "w-6 h-6 rounded-full flex items-center justify-center",
+                      style: { background: "rgba(0,0,0,.5)" },
+                      children: /* @__PURE__ */ jsx(Play, { size: 10, className: "text-white ml-0.5" })
                     }
-                  ),
-                  /* @__PURE__ */ jsx("div", { className: "absolute inset-0 flex items-center justify-center pointer-events-none", children: /* @__PURE__ */ jsx("div", { className: "w-6 h-6 rounded-full bg-black/50 flex items-center justify-center", children: /* @__PURE__ */ jsx(Play, { size: 10, className: "text-white ml-0.5" }) }) }),
+                  ) }),
                   !disabled && !readOnly && clearable && /* @__PURE__ */ jsx(
                     "button",
                     {
                       type: "button",
                       onClick: (e) => handleRemoveItem(e, item),
-                      className: "absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
+                      className: "absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",
+                      style: { background: "rgba(0,0,0,.6)" },
                       "aria-label": "Remove",
-                      children: /* @__PURE__ */ jsx(X, { size: 10, className: "text-white" })
+                      children: /* @__PURE__ */ jsx(X, { size: 10, strokeWidth: 3, className: "text-white" })
                     }
                   )
                 ]
@@ -9657,11 +10583,20 @@ function FileUpload({
             {
               type: "button",
               onClick: openFilePicker,
-              className: "rounded-xl border-2 border-dashed border-gray-300 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:border-[#007a4d] hover:text-green-600 hover:bg-green-50/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007a4d]",
+              className: "flex flex-col items-center justify-center flex-shrink-0",
+              style: {
+                width: 80,
+                height: 80,
+                gap: 2,
+                borderRadius: spec.galleryTileRadius,
+                border: `1.5px dashed ${C2.borderStrong}`,
+                background: C2.surface,
+                color: C2.inkFg3
+              },
               "aria-label": "Add video",
               children: [
-                /* @__PURE__ */ jsx(Plus, { size: 18 }),
-                /* @__PURE__ */ jsx("span", { className: "text-[10px] font-medium", children: "Add" })
+                /* @__PURE__ */ jsx(Plus, { size: 15, strokeWidth: 2.4 }),
+                /* @__PURE__ */ jsx("span", { style: { fontSize: spec.chip + 1, fontWeight: 600 }, children: "Add" })
               ]
             }
           )
@@ -9669,8 +10604,9 @@ function FileUpload({
       }
     );
   };
+  const hideOuterLabel = (variant === "compact" || variant === "avatar") && !placeholder && typeof label === "string";
   return /* @__PURE__ */ jsxs("div", { className: cn("flex flex-col gap-1.5 w-full", className), children: [
-    label && /* @__PURE__ */ jsx(
+    label && !hideOuterLabel && /* @__PURE__ */ jsx(
       InputLabel,
       {
         htmlFor: inputId,
@@ -9679,7 +10615,7 @@ function FileUpload({
         children: label
       }
     ),
-    variant === "avatar" ? renderAvatarVariant() : variant === "image" ? renderImageVariant() : variant === "video" ? renderVideoVariant() : renderFileVariant(),
+    variant === "avatar" ? renderAvatarVariant() : variant === "compact" ? renderCompactVariant() : variant === "gallery" ? renderGalleryVariant() : variant === "image" ? renderImageVariant() : variant === "video" ? renderVideoVariant() : renderFileVariant(),
     /* @__PURE__ */ jsx(
       "input",
       {
