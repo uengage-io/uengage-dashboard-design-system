@@ -334,6 +334,8 @@ function Select<TItem = unknown>({
 
   const hasSelection =
     resolvedMode === "multi" ? selectedArr.length > 0 : !!selected;
+  /** A multi select actually rendering chips — see the chip row's `w-0` note. */
+  const hasChips = resolvedMode === "multi" && selectedArr.length > 0;
   const singleLabel =
     resolvedMode === "single"
       ? resolvedOptions.find((o) => o.value === selected)?.label
@@ -595,6 +597,21 @@ function Select<TItem = unknown>({
             <div
               ref={resolvedMode === "multi" ? pillsContainerRef : undefined}
               className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden"
+              style={{
+                // `min-w-0` only stops this row overflowing a parent that has a
+                // definite width. An ancestor sized to max-content — a bare
+                // `flex-1` column in a sidebar, whose min-width defaults to
+                // `auto` — instead grows to fit every chip, dragging the whole
+                // trigger past the sidebar edge before any of the measurement
+                // above can help. An explicit `width: 0` clamps this row's
+                // intrinsic contribution to zero so chips can never inflate an
+                // ancestor; `flex-1` still grows it to the real width at layout
+                // time, which is what gets measured. Inline rather than `w-0`
+                // so it survives consuming apps that do not scan this package.
+                // Scoped to a populated multi select so an auto-width single
+                // select and the placeholder keep sizing to their content.
+                width: hasChips ? 0 : undefined,
+              }}
             >
               {resolvedMode === "multi" ? (
                 selectedArr.length > 0 ? (

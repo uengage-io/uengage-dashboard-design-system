@@ -34,6 +34,7 @@ import LayoutDemo from "./components/LayoutDemo";
 import FileUploadPreview from "./components/FileUpload";
 import SectionPreview from "./components/Section";
 import BadgePreview from "./components/Badge";
+import SidebarMultiSelectPreview from "./components/SidebarMultiSelect";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <TabsPreview /> */}
@@ -42,7 +43,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <TabsPreview/> */}
     {/* <TablePreview /> */}
     {/* <ButtonPreview /> */}
-    <SelectPreview />
+    <SidebarMultiSelectPreview />
+    {/* <SelectPreview /> */}
     {/* <FilterGroupDatePickerPreview /> */}
   </React.StrictMode>,
 );
