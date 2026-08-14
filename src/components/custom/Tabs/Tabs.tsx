@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Tabs as T, TabsList } from "@/components/ui/tabs";
 import { CustomTabsTrigger } from "@/components/custom/Tabs/CustomTabsTrigger";
+import { DesignTabs } from "@/components/custom/Tabs/DesignTabs";
 import {
   Popover,
   PopoverContent,
@@ -291,7 +292,16 @@ function LineTabsOverflow({
 
 function Tabs(props: CustomTabsProps) {
   const variant = props.variant ?? "primary";
-  if (variant === "secondary") return <TertiaryTabs {...props} />;
+
+  // primary is the underline look, secondary is the segmented one.
+  if (variant === "primary") return <DesignTabs {...props} variant="underline" />;
+  if (variant === "secondary") return <DesignTabs {...props} variant="segmented" />;
+  if (variant === "pill" || variant === "vertical") {
+    return <DesignTabs {...props} variant={variant} />;
+  }
+
+  // The pre-design-system looks, still reachable by name.
+  if (variant === "legacySecondary") return <TertiaryTabs {...props} />;
   return <SecondaryTabs {...props} />;
 }
 

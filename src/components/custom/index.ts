@@ -17,7 +17,23 @@ export {
 export { Sidebar, type SidebarProps } from "./sidebar";
 export { Modal, type ModalProps } from "./Modal";
 export { Loader } from "./Loader";
-export { Banner, type BannerProps, type BannerVariant } from "./Banner";
+export {
+  Banner,
+  BannerStack,
+  resetBannerDismissal,
+  type BannerProps,
+  type BannerVariant,
+  type BannerTone,
+  type BannerToneKey,
+  type BannerSize,
+  type BannerPlacement,
+  type BannerLayout,
+  type BannerAppearance,
+  type BannerAction,
+  type BannerActionVariant,
+  type BannerStackItem,
+  type BannerStackProps,
+} from "./Banner";
 export {
   FileUpload,
   type FileUploadProps,

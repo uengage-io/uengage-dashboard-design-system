@@ -82,10 +82,24 @@ export {
 // Tabs (custom)
 export {
   Tabs,
+  DesignTabs,
+  TabPanel,
+  TabsActiveValueContext,
   CustomTabsTrigger,
   type CustomTabsTriggerProps,
   type CustomTabsProps,
   type TabItem,
+  type TabPanelProps,
+  type TabsVariant,
+  type TabsDesignVariant,
+  type TabsSize,
+  type TabsAppearance,
+  type TabsActivation,
+  type TabsOverflowMode,
+  TABS_SIZES,
+  getTabsPalette,
+  type TabsPalette,
+  type TabsSizeSpec,
   tabTriggerVariants,
   // tabPillVariants,
   // tabIndicatorVariants,
@@ -310,8 +324,20 @@ export { FilterGroupMobileContext } from "./lib/filterGroupContext";
 // Banner
 export {
   Banner,
+  BannerStack,
+  resetBannerDismissal,
   type BannerProps,
   type BannerVariant,
+  type BannerTone,
+  type BannerToneKey,
+  type BannerSize,
+  type BannerPlacement,
+  type BannerLayout,
+  type BannerAppearance,
+  type BannerAction,
+  type BannerActionVariant,
+  type BannerStackItem,
+  type BannerStackProps,
 } from "./components/custom/Banner";
 
 // Section

@@ -1,21 +1,21 @@
 "use client";
-import * as React9 from 'react';
+import * as React10 from 'react';
 import { useMemo, useState, useRef, useLayoutEffect } from 'react';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import { cva } from 'class-variance-authority';
 import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Separator$1, Dialog, Slot, Popover as Popover$1, RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Accordion as Accordion$1, Collapsible, Tabs as Tabs$1 } from 'radix-ui';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Search, X, Clock, CircleAlert, Check, ArrowUpAZ, ArrowDownAZ, Lock, ChevronDown, Plus, EyeOff, Eye, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, Camera, Video, Play, HelpCircle, Info, AlertTriangle, TriangleAlert, CircleX, CircleCheck } from 'lucide-react';
+import { X, ChevronDown, Info, Check, CircleX, TriangleAlert, Search, Clock, CircleAlert, ArrowUpAZ, ArrowDownAZ, Lock, Plus, EyeOff, Eye, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, Camera, Video, Play, HelpCircle, AlertTriangle } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
 import * as ReactDOM from 'react-dom';
 
 // src/lib/zIndexContext.tsx
-var ZIndexContext = React9.createContext({ popover: 20 });
+var ZIndexContext = React10.createContext({ popover: 20 });
 function useZIndex() {
-  return React9.useContext(ZIndexContext);
+  return React10.useContext(ZIndexContext);
 }
 function SidebarZIndexProvider({
   children
@@ -623,9 +623,9 @@ function Button2({
   onBlur,
   ...props
 }) {
-  const [hovered, setHovered] = React9.useState(false);
-  const [pressed, setPressed] = React9.useState(false);
-  const [focused, setFocused] = React9.useState(false);
+  const [hovered, setHovered] = React10.useState(false);
+  const [pressed, setPressed] = React10.useState(false);
+  const [focused, setFocused] = React10.useState(false);
   const interactionBlocked = disabled || loading;
   const state = disabled ? "disabled" : pressed ? "pressed" : hovered ? "hover" : focused ? "focused" : "default";
   const gradientStyle = getButtonStyle(variant, state, size, loading);
@@ -785,7 +785,7 @@ function TopHeader({
                   className: "flex min-w-0 flex-1 items-center overflow-hidden",
                   style: { gap: toCssSize(titleGap), minWidth: "160px" },
                   children: [
-                    React9.isValidElement(title) ? title : /* @__PURE__ */ jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
+                    React10.isValidElement(title) ? title : /* @__PURE__ */ jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
                     helper != null && /* @__PURE__ */ jsx("span", { className: "shrink-0 text-xs leading-none sm:text-sm", children: helper })
                   ]
                 }
@@ -869,8 +869,8 @@ function SubHeader({
                   },
                   children: [
                     hasHeading && /* @__PURE__ */ jsxs("div", { "data-slot": "sub-header-heading", children: [
-                      title != null && (React9.isValidElement(title) ? title : /* @__PURE__ */ jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
-                      subtitle != null && (React9.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
+                      title != null && (React10.isValidElement(title) ? title : /* @__PURE__ */ jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
+                      subtitle != null && (React10.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
                     ] }),
                     children != null && /* @__PURE__ */ jsx("div", { "data-slot": "sub-header-content", children })
                   ]
@@ -1590,23 +1590,23 @@ function SearchBar({
   debounce = 0,
   onDebouncedChange
 }) {
-  const [internal, setInternal] = React9.useState(
+  const [internal, setInternal] = React10.useState(
     String(controlledValue ?? defaultValue ?? "")
   );
-  const [dropdownOpen, setDropdownOpen] = React9.useState(false);
-  const [focused, setFocused] = React9.useState(false);
-  const [hovered, setHovered] = React9.useState(false);
-  const wrapperRef = React9.useRef(null);
-  const touchedRef = React9.useRef(false);
-  const debounceRef = React9.useRef(
+  const [dropdownOpen, setDropdownOpen] = React10.useState(false);
+  const [focused, setFocused] = React10.useState(false);
+  const [hovered, setHovered] = React10.useState(false);
+  const wrapperRef = React10.useRef(null);
+  const touchedRef = React10.useRef(false);
+  const debounceRef = React10.useRef(
     void 0
   );
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (controlledValue !== void 0) setInternal(String(controlledValue));
   }, [controlledValue]);
-  React9.useEffect(() => () => clearTimeout(debounceRef.current), []);
+  React10.useEffect(() => () => clearTimeout(debounceRef.current), []);
   const displayValue = internal;
-  const resolvedItems = React9.useMemo(() => {
+  const resolvedItems = React10.useMemo(() => {
     if (dropdownItems && getLabel) {
       return dropdownItems.map((item) => ({
         label: getLabel(item),
@@ -2045,8 +2045,8 @@ function SearchBar({
   );
 }
 SearchBar.displayName = "SearchBar";
-var FilterGroupMobileContext = React9.createContext(false);
-var FilterGroupDrawerCalendarContext = React9.createContext(null);
+var FilterGroupMobileContext = React10.createContext(false);
+var FilterGroupDrawerCalendarContext = React10.createContext(null);
 function Popover({
   ...props
 }) {
@@ -2148,7 +2148,7 @@ function CommandInput({ className, ...props }) {
     }
   ) });
 }
-var CommandList = React9.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+var CommandList = React10.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
   CommandList$1,
   {
     ref,
@@ -2375,13 +2375,13 @@ function Select({
   emptyState,
   placement = "auto"
 }) {
-  const isMobileDrawer = React9.useContext(FilterGroupMobileContext);
-  const touchedRef = React9.useRef(false);
-  const interactedRef = React9.useRef(false);
+  const isMobileDrawer = React10.useContext(FilterGroupMobileContext);
+  const touchedRef = React10.useRef(false);
+  const interactedRef = React10.useRef(false);
   const resolvedMode = multiple ? "multi" : mode;
   const searchEnabled = searchable ?? searchProp;
   const spec = SELECT_SIZES[size];
-  const resolvedOptions = React9.useMemo(() => {
+  const resolvedOptions = React10.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -2391,22 +2391,22 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React9.useState(false);
-  const [hovered, setHovered] = React9.useState(false);
-  const [searchQuery, setSearchQuery] = React9.useState("");
-  const [sortOrder, setSortOrder] = React9.useState("asc");
-  const listRef = React9.useRef(null);
-  React9.useEffect(() => {
+  const [open, setOpen] = React10.useState(false);
+  const [hovered, setHovered] = React10.useState(false);
+  const [searchQuery, setSearchQuery] = React10.useState("");
+  const [sortOrder, setSortOrder] = React10.useState("asc");
+  const listRef = React10.useRef(null);
+  React10.useEffect(() => {
     listRef.current?.scrollTo({ top: 0 });
   }, [sortOrder]);
-  const sortedOptions = React9.useMemo(() => {
+  const sortedOptions = React10.useMemo(() => {
     if (!sorting) return resolvedOptions;
     return [...resolvedOptions].sort(
       (a, b) => sortOrder === "asc" ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)
     );
   }, [resolvedOptions, sorting, sortOrder]);
   const fuseFilteredOptions = useFuzzySearch(sortedOptions, searchQuery);
-  const visibleOptions = React9.useMemo(() => {
+  const visibleOptions = React10.useMemo(() => {
     if (!searchEnabled) return sortedOptions;
     const q = searchQuery.trim();
     if (indexing && /^\d+$/.test(q)) {
@@ -2416,10 +2416,10 @@ function Select({
     }
     return fuseFilteredOptions;
   }, [searchEnabled, searchQuery, indexing, sortedOptions, fuseFilteredOptions]);
-  const [selected, setSelected] = React9.useState(
+  const [selected, setSelected] = React10.useState(
     controlledValue ?? defaultValue ?? (resolvedMode === "multi" ? [] : "")
   );
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = resolvedMode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -2450,10 +2450,10 @@ function Select({
     e.stopPropagation();
     commit(resolvedMode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React9.useRef(null);
-  const [visibleCount, setVisibleCount] = React9.useState(null);
-  const [rowWidth, setRowWidth] = React9.useState(0);
-  React9.useLayoutEffect(() => {
+  const pillsContainerRef = React10.useRef(null);
+  const [visibleCount, setVisibleCount] = React10.useState(null);
+  const [rowWidth, setRowWidth] = React10.useState(0);
+  React10.useLayoutEffect(() => {
     const container = pillsContainerRef.current;
     if (!container || resolvedMode !== "multi") return;
     const measure = () => setRowWidth(container.getBoundingClientRect().width);
@@ -2464,15 +2464,15 @@ function Select({
     return () => observer.disconnect();
   }, [resolvedMode]);
   const badgeReserve = 20 + 7 * String(selectedArr.length).length + PILL_GAP;
-  const pillMaxWidth = React9.useMemo(() => {
+  const pillMaxWidth = React10.useMemo(() => {
     if (rowWidth === 0) return PILL_MAX_WIDTH;
     const budget = selectedArr.length <= 1 ? rowWidth : rowWidth - badgeReserve;
     return Math.max(PILL_MIN_WIDTH, Math.min(PILL_MAX_WIDTH, Math.floor(budget)));
   }, [rowWidth, selectedArr.length, badgeReserve]);
-  React9.useLayoutEffect(() => {
+  React10.useLayoutEffect(() => {
     if (resolvedMode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), resolvedMode, rowWidth]);
-  React9.useLayoutEffect(() => {
+  React10.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     if (maxChips !== void 0) {
       setVisibleCount(Math.min(maxChips, selectedArr.length));
@@ -2560,7 +2560,7 @@ function Select({
   );
   const showCreate = creatable && query.length > 0 && !exactMatch;
   const showEmpty = visibleOptions.length === 0 && !showCreate;
-  const groups = React9.useMemo(() => {
+  const groups = React10.useMemo(() => {
     const out = [];
     for (const opt of visibleOptions) {
       const name = opt.group ?? null;
@@ -3070,6 +3070,19 @@ function TabsTrigger({
     }
   );
 }
+function TabsContent({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(
+    Tabs$1.Content,
+    {
+      "data-slot": "tabs-content",
+      className: cn("uengage-ui flex-1 outline-none", className),
+      ...props
+    }
+  );
+}
 
 // src/utils/tokens.ts
 var FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006F42]";
@@ -3176,6 +3189,821 @@ function CustomTabsTrigger({
   );
 }
 CustomTabsTrigger.displayName = "CustomTabsTrigger";
+
+// src/components/custom/Tabs/tabsTokens.ts
+var FOREST = "#003C1B";
+var TABS_SIZES = {
+  sm: {
+    name: "Small",
+    fs: 12,
+    gap: 16,
+    underPad: "0 0 8px",
+    segPad: "6px 11px",
+    pillPad: "5px 11px",
+    icon: 13,
+    spec: "12px \xB7 pad 8 \xB7 gap 16"
+  },
+  md: {
+    name: "Medium",
+    fs: 13,
+    gap: 22,
+    underPad: "0 0 11px",
+    segPad: "8px 14px",
+    pillPad: "7px 14px",
+    icon: 15,
+    spec: "13px \xB7 pad 11 \xB7 gap 22"
+  },
+  lg: {
+    name: "Large",
+    fs: 15,
+    gap: 28,
+    underPad: "0 0 14px",
+    segPad: "10px 17px",
+    pillPad: "9px 17px",
+    icon: 17,
+    spec: "15px \xB7 pad 14 \xB7 gap 28"
+  }
+};
+var LIGHT = {
+  strip: "#E2E2E2",
+  fg: "#595959",
+  fgHover: "#1F5E2C",
+  fgActive: FOREST,
+  fgDisabled: "#C6C6C6",
+  bar: FOREST,
+  segTrack: "#F3F5F9",
+  segActiveBg: "#FFFFFF",
+  segActiveShadow: "0 1px 3px rgba(0,0,0,.12)",
+  segHoverBg: "#EFF3F0",
+  pillBg: "#FFFFFF",
+  pillFg: "#161616",
+  pillBorder: "#E2E2E2",
+  pillHoverBg: "#F5FFF0",
+  pillHoverBorder: "#BFD6C6",
+  pillActiveBg: FOREST,
+  pillActiveFg: "#FFFFFF",
+  pillActiveBorder: FOREST,
+  vertActiveBg: "#DCF3CE",
+  vertHoverBg: "#FAFFF7",
+  countBg: "#F3F5F9",
+  countFg: "#595959",
+  countActiveBg: "#DCF3CE",
+  countActiveFg: FOREST,
+  panelBg: "#FAFFF7",
+  panelBorder: "#EEEEEE",
+  panelFg: "#595959",
+  dirty: "#F5C518",
+  ring: "0 0 0 3px rgba(140,196,42,.38)",
+  surface: "#FFFFFF"
+};
+var DARK = {
+  strip: "#2C4A38",
+  fg: "#8FB79C",
+  fgHover: "#DCF3CE",
+  fgActive: "#8CC42A",
+  fgDisabled: "#4A5C51",
+  bar: "#8CC42A",
+  segTrack: "#141C17",
+  segActiveBg: "#1B3423",
+  segActiveShadow: "none",
+  segHoverBg: "#18251D",
+  pillBg: "transparent",
+  pillFg: "#DCF3CE",
+  pillBorder: "#2C4A38",
+  pillHoverBg: "#1B3423",
+  pillHoverBorder: "#37563F",
+  pillActiveBg: "#8CC42A",
+  pillActiveFg: "#0C1712",
+  pillActiveBorder: "#8CC42A",
+  vertActiveBg: "#1B3423",
+  vertHoverBg: "#141C17",
+  countBg: "#141C17",
+  countFg: "#8FB79C",
+  countActiveBg: "#2C4A38",
+  countActiveFg: "#DCF3CE",
+  panelBg: "#111A15",
+  panelBorder: "#2C4A38",
+  panelFg: "#8FB79C",
+  dirty: "#F5C518",
+  ring: "0 0 0 3px rgba(140,196,42,.38)",
+  surface: "#0C1712"
+};
+function getTabsPalette(appearance = "light") {
+  return appearance === "dark" ? DARK : LIGHT;
+}
+var TabsActiveValueContext = React10.createContext(null);
+var TRIGGER_RESET = [
+  "relative h-auto w-auto flex-none border-0 bg-transparent shadow-none outline-none",
+  "after:hidden after:content-none",
+  "data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-transparent",
+  "focus-visible:border-transparent focus-visible:ring-0 focus-visible:outline-none",
+  "disabled:pointer-events-auto"
+].join(" ");
+var SCROLLBAR_HIDDEN = "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden";
+function firstEnabled(tabs) {
+  return tabs.find((t) => !t.disabled)?.value ?? tabs[0]?.value ?? "";
+}
+function paramNameOf(syncToUrl) {
+  return syncToUrl.replace(/^\?/, "") || "tab";
+}
+function escapeValue(value) {
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+    return CSS.escape(value);
+  }
+  return value.replace(/["\\]/g, "\\$&");
+}
+function useDesignTabValue({
+  tabs,
+  value,
+  defaultValue,
+  onChange,
+  onBeforeChange,
+  syncToUrl
+}) {
+  const [uncontrolled, setUncontrolled] = React10.useState(() => {
+    if (syncToUrl && typeof window !== "undefined") {
+      const fromUrl = new URLSearchParams(window.location.search).get(
+        paramNameOf(syncToUrl)
+      );
+      if (fromUrl && tabs.some((t) => t.value === fromUrl && !t.disabled)) {
+        return fromUrl;
+      }
+    }
+    return value ?? defaultValue ?? firstEnabled(tabs);
+  });
+  const activeValue = value ?? uncontrolled;
+  React10.useEffect(() => {
+    if (value !== void 0) return;
+    if (tabs.some((t) => t.value === uncontrolled)) return;
+    setUncontrolled(defaultValue ?? firstEnabled(tabs));
+  }, [defaultValue, tabs, uncontrolled, value]);
+  React10.useEffect(() => {
+    if (!syncToUrl || typeof window === "undefined" || !activeValue) return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get(paramNameOf(syncToUrl)) === activeValue) return;
+    url.searchParams.set(paramNameOf(syncToUrl), activeValue);
+    window.history.replaceState(window.history.state, "", url.toString());
+  }, [activeValue, syncToUrl]);
+  const commit = React10.useCallback(
+    (next) => {
+      if (value === void 0) setUncontrolled(next);
+      onChange?.(next);
+    },
+    [onChange, value]
+  );
+  const handleChange = React10.useCallback(
+    (next) => {
+      if (!tabs.some((t) => t.value === next && !t.disabled)) return;
+      if (next === activeValue) return;
+      if (!onBeforeChange) {
+        commit(next);
+        return;
+      }
+      const allowed = onBeforeChange(next, activeValue);
+      if (allowed instanceof Promise) {
+        void allowed.then((ok) => {
+          if (ok) commit(next);
+        });
+        return;
+      }
+      if (allowed) commit(next);
+    },
+    [activeValue, commit, onBeforeChange, tabs]
+  );
+  return { activeValue, handleChange };
+}
+function splitOverflow(tabs, activeValue, limit) {
+  if (limit === void 0 || tabs.length <= limit) {
+    return { visibleTabs: tabs, overflowTabs: [] };
+  }
+  const safeLimit = Math.min(Math.max(limit, 1), tabs.length - 1);
+  const visible = tabs.slice(0, safeLimit);
+  const overflow = tabs.slice(safeLimit);
+  const activeIsHidden = overflow.some((t) => t.value === activeValue);
+  if (!activeIsHidden) return { visibleTabs: visible, overflowTabs: overflow };
+  const activeTab = tabs.find((t) => t.value === activeValue);
+  const swapped = [...visible];
+  const displaced = swapped[safeLimit - 1];
+  swapped[safeLimit - 1] = activeTab;
+  return {
+    visibleTabs: swapped,
+    overflowTabs: overflow.filter((t) => t.value !== activeValue).concat(displaced)
+  };
+}
+function TabIcon({ icon, size }) {
+  return /* @__PURE__ */ jsx(
+    "span",
+    {
+      "aria-hidden": "true",
+      className: "block [&>svg]:h-full [&>svg]:w-full",
+      style: { width: size, height: size, flex: "none" },
+      children: icon
+    }
+  );
+}
+function DirtyDot({ color }) {
+  return /* @__PURE__ */ jsx(
+    "span",
+    {
+      "aria-hidden": "true",
+      style: { width: 6, height: 6, borderRadius: "50%", background: color, flex: "none" }
+    }
+  );
+}
+function CountBadge({
+  count,
+  active,
+  palette,
+  radius,
+  padding
+}) {
+  return /* @__PURE__ */ jsx(
+    "span",
+    {
+      className: "ue-tabular",
+      style: {
+        padding,
+        borderRadius: radius,
+        fontWeight: 700,
+        fontSize: 10,
+        lineHeight: 1.4,
+        fontVariantNumeric: "tabular-nums",
+        background: active ? palette.countActiveBg : palette.countBg,
+        color: active ? palette.countActiveFg : palette.countFg
+      },
+      children: count
+    }
+  );
+}
+function useSlidingIndicator(enabled, activeValue, signature) {
+  const innerRef = React10.useRef(null);
+  const settled = React10.useRef(false);
+  const [indicator, setIndicator] = React10.useState({ left: 0, width: 0, ready: false });
+  const measure = React10.useCallback(() => {
+    const inner = innerRef.current;
+    if (!inner || !activeValue) return;
+    const btn = inner.querySelector(
+      `[data-tab-value="${escapeValue(activeValue)}"]`
+    );
+    if (!btn) {
+      settled.current = false;
+      setIndicator((i) => ({ ...i, ready: false }));
+      return;
+    }
+    const innerRect = inner.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    setIndicator({
+      left: btnRect.left - innerRect.left,
+      width: btnRect.width,
+      ready: true
+    });
+  }, [activeValue]);
+  React10.useLayoutEffect(() => {
+    if (!enabled) return;
+    measure();
+  }, [enabled, measure, signature]);
+  React10.useEffect(() => {
+    if (!enabled) return;
+    const inner = innerRef.current;
+    if (!inner) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(inner);
+    window.addEventListener("resize", measure);
+    void document.fonts?.ready.then(measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [enabled, measure]);
+  const animate = settled.current;
+  if (indicator.ready) settled.current = true;
+  return { innerRef, indicator, animate };
+}
+function useEdgeScroll(enabled, activeValue) {
+  const ref = React10.useRef(null);
+  const [edges, setEdges] = React10.useState({ left: false, right: false });
+  const measure = React10.useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    setEdges({
+      left: el.scrollLeft > 1,
+      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+    });
+  }, []);
+  React10.useEffect(() => {
+    if (!enabled) return;
+    const el = ref.current;
+    if (!el) return;
+    measure();
+    el.addEventListener("scroll", measure, { passive: true });
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", measure);
+      ro.disconnect();
+    };
+  }, [enabled, measure]);
+  React10.useEffect(() => {
+    if (!enabled) return;
+    const el = ref.current;
+    if (!el || !activeValue) return;
+    const btn = el.querySelector(
+      `[data-tab-value="${CSS?.escape?.(activeValue) ?? activeValue}"]`
+    );
+    btn?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+  }, [activeValue, enabled]);
+  const scrollBy = React10.useCallback((delta) => {
+    ref.current?.scrollBy({ left: delta, behavior: "smooth" });
+  }, []);
+  return { ref, edges, scrollBy };
+}
+function EdgeControl({
+  side,
+  palette,
+  onClick
+}) {
+  const Icon = side === "left" ? ChevronLeft : ChevronRight;
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(
+      "span",
+      {
+        "aria-hidden": "true",
+        className: "pointer-events-none absolute inset-y-0 w-11",
+        style: {
+          [side]: 0,
+          background: `linear-gradient(${side === "left" ? "270deg" : "90deg"}, rgba(0,0,0,0), ${palette.surface} 62%)`
+        }
+      }
+    ),
+    /* @__PURE__ */ jsx(
+      "button",
+      {
+        type: "button",
+        tabIndex: -1,
+        "aria-hidden": "true",
+        onClick,
+        className: "absolute top-1/2 flex h-[22px] w-[22px] -translate-y-1/2 cursor-pointer items-center justify-center rounded-md",
+        style: {
+          [side]: 2,
+          background: palette.surface,
+          border: `1px solid ${palette.strip}`,
+          color: palette.fg
+        },
+        children: /* @__PURE__ */ jsx(Icon, { size: 11, strokeWidth: 2.6 })
+      }
+    )
+  ] });
+}
+function OverflowMenu({
+  overflowTabs,
+  overflowLabel,
+  activeValue,
+  onChange,
+  palette,
+  spec,
+  padding
+}) {
+  const [open, setOpen] = React10.useState(false);
+  if (overflowTabs.length === 0) return null;
+  const holdsActive = overflowTabs.some((t) => t.value === activeValue);
+  return /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: setOpen, children: [
+    /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
+      "button",
+      {
+        type: "button",
+        className: "inline-flex flex-none cursor-pointer items-center gap-[5px] whitespace-nowrap border-0 bg-transparent",
+        style: {
+          padding,
+          fontSize: spec.fs,
+          fontWeight: 600,
+          color: holdsActive ? palette.fgActive : palette.fg
+        },
+        children: [
+          overflowLabel,
+          /* @__PURE__ */ jsx(
+            ChevronDown,
+            {
+              size: 11,
+              strokeWidth: 2.4,
+              className: cn("transition-transform duration-200", open && "rotate-180")
+            }
+          )
+        ]
+      }
+    ) }),
+    /* @__PURE__ */ jsx(
+      PopoverContent,
+      {
+        align: "end",
+        sideOffset: 8,
+        collisionPadding: 8,
+        className: "w-[190px] max-w-[calc(100vw-1rem)] rounded-lg p-1 shadow-[2px_2px_4px_rgba(0,0,0,0.12)]",
+        children: /* @__PURE__ */ jsx("div", { className: "flex flex-col", children: overflowTabs.map((tab) => {
+          const isActive = tab.value === activeValue;
+          return /* @__PURE__ */ jsxs(
+            "button",
+            {
+              type: "button",
+              disabled: tab.disabled,
+              title: tab.disabled ? tab.disabledReason : void 0,
+              onClick: () => {
+                if (tab.disabled) return;
+                onChange(tab.value);
+                setOpen(false);
+              },
+              className: cn(
+                "flex w-full items-center justify-between gap-3 rounded-md px-[10px] py-[7px] text-left",
+                "text-[12px] font-medium transition-colors duration-150",
+                tab.disabled && "cursor-not-allowed opacity-50"
+              ),
+              style: {
+                color: tab.disabled ? palette.fgDisabled : "#202020",
+                background: isActive ? palette.vertHoverBg : "transparent"
+              },
+              children: [
+                /* @__PURE__ */ jsxs("span", { className: "flex min-w-0 items-center gap-2 truncate", children: [
+                  tab.label,
+                  tab.dirty && /* @__PURE__ */ jsx(DirtyDot, { color: palette.dirty })
+                ] }),
+                isActive && /* @__PURE__ */ jsx(Check, { size: 14, strokeWidth: 2.5, className: "shrink-0", style: { color: palette.fgActive } })
+              ]
+            },
+            tab.value
+          );
+        }) })
+      }
+    )
+  ] });
+}
+function UnderlineTrigger({ tab, active, palette, spec, fitted }) {
+  const [hover, setHover] = React10.useState(false);
+  const fg = tab.disabled ? palette.fgDisabled : active ? palette.fgActive : hover ? palette.fgHover : palette.fg;
+  return /* @__PURE__ */ jsxs(
+    TabsTrigger,
+    {
+      value: tab.value,
+      disabled: tab.disabled,
+      "data-tab-value": tab.value,
+      title: tab.disabled ? tab.disabledReason : void 0,
+      onMouseEnter: () => setHover(true),
+      onMouseLeave: () => setHover(false),
+      className: cn(
+        TRIGGER_RESET,
+        // The underline is a border-bottom — any radius would bow it into an arc.
+        "rounded-none",
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap",
+        "transition-all duration-[160ms] ease-[cubic-bezier(.2,.8,.3,1)]",
+        "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
+        fitted && "flex-1",
+        tab.disabled ? "cursor-not-allowed" : "cursor-pointer"
+      ),
+      style: {
+        padding: spec.underPad,
+        fontSize: spec.fs,
+        fontWeight: 600,
+        color: fg,
+        // The bar itself is a single sliding span in the strip — this only
+        // reserves the 2px it occupies so the label never shifts.
+        borderBottom: "2px solid transparent",
+        marginBottom: -1,
+        opacity: tab.disabled ? 0.5 : 1
+      },
+      children: [
+        tab.icon && /* @__PURE__ */ jsx(TabIcon, { icon: tab.icon, size: spec.icon }),
+        tab.label,
+        tab.dirty && /* @__PURE__ */ jsx(DirtyDot, { color: palette.dirty }),
+        tab.count !== void 0 && tab.count !== null && /* @__PURE__ */ jsx(CountBadge, { count: tab.count, active, palette, radius: 6, padding: "2px 7px" })
+      ]
+    }
+  );
+}
+function SegmentedTrigger({ tab, active, palette, spec, fitted }) {
+  const [hover, setHover] = React10.useState(false);
+  const fg = tab.disabled ? palette.fgDisabled : active ? palette.fgActive : hover ? palette.fgHover : palette.fg;
+  return /* @__PURE__ */ jsxs(
+    TabsTrigger,
+    {
+      value: tab.value,
+      disabled: tab.disabled,
+      "data-tab-value": tab.value,
+      title: tab.disabled ? tab.disabledReason : void 0,
+      onMouseEnter: () => setHover(true),
+      onMouseLeave: () => setHover(false),
+      className: cn(
+        TRIGGER_RESET,
+        "inline-flex items-center justify-center gap-[7px] whitespace-nowrap rounded-[7px]",
+        "transition-all duration-[160ms] ease-[cubic-bezier(.2,.8,.3,1)]",
+        "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
+        fitted && "flex-1",
+        tab.disabled ? "cursor-not-allowed" : "cursor-pointer"
+      ),
+      style: {
+        padding: spec.segPad,
+        fontSize: spec.fs,
+        fontWeight: 600,
+        color: fg,
+        background: active ? palette.segActiveBg : hover && !tab.disabled ? palette.segHoverBg : "transparent",
+        boxShadow: active ? palette.segActiveShadow : "none",
+        opacity: tab.disabled ? 0.5 : 1
+      },
+      children: [
+        tab.icon && /* @__PURE__ */ jsx(TabIcon, { icon: tab.icon, size: spec.icon }),
+        tab.label,
+        tab.dirty && /* @__PURE__ */ jsx(DirtyDot, { color: palette.dirty }),
+        tab.count !== void 0 && tab.count !== null && /* @__PURE__ */ jsx(CountBadge, { count: tab.count, active, palette, radius: 5, padding: "2px 6px" })
+      ]
+    }
+  );
+}
+function PillTrigger({ tab, active, palette, spec, fitted }) {
+  const [hover, setHover] = React10.useState(false);
+  const bg = active ? palette.pillActiveBg : hover && !tab.disabled ? palette.pillHoverBg : palette.pillBg;
+  const border = active ? palette.pillActiveBorder : hover && !tab.disabled ? palette.pillHoverBorder : palette.pillBorder;
+  const fg = active ? palette.pillActiveFg : tab.disabled ? palette.fgDisabled : palette.pillFg;
+  return /* @__PURE__ */ jsxs(
+    TabsTrigger,
+    {
+      value: tab.value,
+      disabled: tab.disabled,
+      "data-tab-value": tab.value,
+      title: tab.disabled ? tab.disabledReason : void 0,
+      onMouseEnter: () => setHover(true),
+      onMouseLeave: () => setHover(false),
+      className: cn(
+        TRIGGER_RESET,
+        "inline-flex items-center justify-center gap-[7px] whitespace-nowrap rounded-full",
+        "transition-all duration-[160ms] ease-[cubic-bezier(.2,.8,.3,1)]",
+        "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
+        fitted && "flex-1",
+        tab.disabled ? "cursor-not-allowed" : "cursor-pointer"
+      ),
+      style: {
+        padding: spec.pillPad,
+        fontSize: spec.fs,
+        fontWeight: 600,
+        color: fg,
+        background: bg,
+        border: `1px solid ${border}`,
+        opacity: tab.disabled ? 0.5 : 1
+      },
+      children: [
+        tab.icon && /* @__PURE__ */ jsx(TabIcon, { icon: tab.icon, size: spec.icon }),
+        tab.label,
+        tab.dirty && /* @__PURE__ */ jsx(DirtyDot, { color: palette.dirty }),
+        tab.count !== void 0 && tab.count !== null && /* @__PURE__ */ jsx("span", { className: "ue-tabular", style: { fontWeight: 500, opacity: 0.66 }, children: tab.count })
+      ]
+    }
+  );
+}
+function VerticalTrigger({ tab, active, palette, spec }) {
+  const [hover, setHover] = React10.useState(false);
+  const fg = tab.disabled ? palette.fgDisabled : active ? palette.fgActive : hover ? palette.fgHover : palette.fg;
+  return /* @__PURE__ */ jsxs(
+    TabsTrigger,
+    {
+      value: tab.value,
+      disabled: tab.disabled,
+      "data-tab-value": tab.value,
+      title: tab.disabled ? tab.disabledReason : void 0,
+      onMouseEnter: () => setHover(true),
+      onMouseLeave: () => setHover(false),
+      className: cn(
+        TRIGGER_RESET,
+        "flex w-full items-center justify-start gap-[9px] rounded-lg text-left",
+        "transition-all duration-140 ease-[cubic-bezier(.2,.8,.3,1)]",
+        "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
+        tab.disabled ? "cursor-not-allowed" : "cursor-pointer"
+      ),
+      style: {
+        padding: "9px 11px",
+        fontSize: spec.fs,
+        fontWeight: 600,
+        color: fg,
+        background: active ? palette.vertActiveBg : hover && !tab.disabled ? palette.vertHoverBg : "transparent",
+        opacity: tab.disabled ? 0.5 : 1
+      },
+      children: [
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            "aria-hidden": "true",
+            style: {
+              width: 2,
+              height: 16,
+              borderRadius: 99,
+              flex: "none",
+              background: active && !tab.disabled ? palette.bar : "transparent"
+            }
+          }
+        ),
+        /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1 truncate", children: tab.label }),
+        tab.dirty && /* @__PURE__ */ jsx(DirtyDot, { color: palette.dirty }),
+        tab.count !== void 0 && tab.count !== null && /* @__PURE__ */ jsx(CountBadge, { count: tab.count, active, palette, radius: 5, padding: "2px 6px" })
+      ]
+    }
+  );
+}
+var TRIGGERS = {
+  underline: UnderlineTrigger,
+  segmented: SegmentedTrigger,
+  pill: PillTrigger,
+  vertical: VerticalTrigger
+};
+function DesignTabs({
+  tabs,
+  variant,
+  size = "md",
+  appearance = "light",
+  activation = "automatic",
+  fitted = false,
+  overflow = "scroll",
+  overflowLabel = "More",
+  visibleTabLimit,
+  showBottomBorder = true,
+  syncToUrl,
+  onBeforeChange,
+  loop = true,
+  value,
+  defaultValue,
+  onChange,
+  className,
+  listClassName,
+  children,
+  verticalWidth = 190
+}) {
+  const spec = TABS_SIZES[size];
+  const palette = getTabsPalette(appearance);
+  const Trigger = TRIGGERS[variant];
+  const { activeValue, handleChange } = useDesignTabValue({
+    tabs,
+    value,
+    defaultValue,
+    onChange,
+    onBeforeChange,
+    syncToUrl
+  });
+  const useMenu = (overflow === "menu" || visibleTabLimit !== void 0) && variant !== "vertical" && variant !== "pill";
+  const { visibleTabs, overflowTabs } = React10.useMemo(
+    () => useMenu ? splitOverflow(tabs, activeValue, visibleTabLimit ?? 2) : { visibleTabs: tabs, overflowTabs: [] },
+    [activeValue, tabs, useMenu, visibleTabLimit]
+  );
+  const scrollable = !useMenu && variant !== "vertical" && variant !== "pill";
+  const { ref: scrollRef, edges, scrollBy } = useEdgeScroll(scrollable, activeValue);
+  const { innerRef, indicator, animate } = useSlidingIndicator(
+    variant === "underline",
+    activeValue,
+    `${size}|${visibleTabs.map((t) => t.value).join(",")}`
+  );
+  const renderTriggers = (list2) => list2.map((tab) => /* @__PURE__ */ jsx(
+    Trigger,
+    {
+      tab,
+      active: tab.value === activeValue,
+      palette,
+      spec,
+      fitted
+    },
+    tab.value
+  ));
+  if (variant === "vertical") {
+    return /* @__PURE__ */ jsx(TabsActiveValueContext.Provider, { value: activeValue, children: /* @__PURE__ */ jsxs(
+      Tabs,
+      {
+        value: activeValue,
+        onValueChange: handleChange,
+        activationMode: activation,
+        orientation: "vertical",
+        className: cn("w-full flex-row! items-start gap-5", className),
+        children: [
+          /* @__PURE__ */ jsx(
+            TabsList,
+            {
+              variant: "line",
+              loop,
+              className: cn(
+                "h-auto! flex-none flex-col items-stretch justify-start rounded-none bg-transparent p-0",
+                listClassName
+              ),
+              style: {
+                width: verticalWidth,
+                gap: 2,
+                borderRight: showBottomBorder ? `1px solid ${palette.strip}` : void 0,
+                paddingRight: showBottomBorder ? 10 : 0
+              },
+              children: renderTriggers(visibleTabs)
+            }
+          ),
+          children && /* @__PURE__ */ jsx("div", { className: "min-w-[220px] flex-1", children })
+        ]
+      }
+    ) });
+  }
+  const list = /* @__PURE__ */ jsx(
+    TabsList,
+    {
+      variant: "line",
+      loop,
+      className: cn(
+        "h-auto! items-center justify-start rounded-none bg-transparent p-0",
+        fitted ? "flex w-full" : "flex w-max",
+        variant === "pill" && "flex-wrap",
+        listClassName
+      ),
+      style: {
+        gap: variant === "underline" ? spec.gap : variant === "pill" ? 8 : 2
+      },
+      children: renderTriggers(visibleTabs)
+    }
+  );
+  const menuNode = useMenu ? /* @__PURE__ */ jsx(
+    OverflowMenu,
+    {
+      overflowTabs,
+      overflowLabel,
+      activeValue,
+      onChange: handleChange,
+      palette,
+      spec,
+      padding: variant === "segmented" ? spec.segPad : spec.underPad
+    }
+  ) : null;
+  let strip;
+  if (variant === "segmented") {
+    strip = /* @__PURE__ */ jsxs("div", { className: cn("flex max-w-full items-center gap-2", fitted && "w-full"), children: [
+      /* @__PURE__ */ jsx(
+        "div",
+        {
+          className: cn("inline-flex min-w-0 overflow-auto", SCROLLBAR_HIDDEN),
+          style: {
+            padding: 3,
+            background: palette.segTrack,
+            borderRadius: 10,
+            width: fitted ? "100%" : "fit-content"
+          },
+          children: list
+        }
+      ),
+      menuNode
+    ] });
+  } else if (variant === "pill") {
+    strip = list;
+  } else {
+    strip = /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+      /* @__PURE__ */ jsx(
+        "div",
+        {
+          ref: scrollRef,
+          className: cn("overflow-x-auto overflow-y-hidden", SCROLLBAR_HIDDEN),
+          style: { borderBottom: showBottomBorder ? `1px solid ${palette.strip}` : void 0 },
+          children: /* @__PURE__ */ jsxs(
+            "div",
+            {
+              ref: innerRef,
+              className: "relative flex w-max items-end",
+              style: { gap: spec.gap },
+              children: [
+                list,
+                menuNode,
+                /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    "aria-hidden": "true",
+                    className: "pointer-events-none absolute left-0 rounded-full",
+                    style: {
+                      bottom: -1,
+                      height: 2,
+                      width: indicator.width,
+                      background: palette.bar,
+                      opacity: indicator.ready ? 1 : 0,
+                      transform: `translateX(${indicator.left}px)`,
+                      transition: animate ? "transform 260ms cubic-bezier(.2,.8,.3,1), width 260ms cubic-bezier(.2,.8,.3,1), opacity 120ms linear" : "opacity 120ms linear"
+                    }
+                  }
+                )
+              ]
+            }
+          )
+        }
+      ),
+      scrollable && edges.left && /* @__PURE__ */ jsx(EdgeControl, { side: "left", palette, onClick: () => scrollBy(-180) }),
+      scrollable && edges.right && /* @__PURE__ */ jsx(EdgeControl, { side: "right", palette, onClick: () => scrollBy(180) })
+    ] });
+  }
+  return /* @__PURE__ */ jsx(TabsActiveValueContext.Provider, { value: activeValue, children: /* @__PURE__ */ jsxs(
+    Tabs,
+    {
+      value: activeValue,
+      onValueChange: handleChange,
+      activationMode: activation,
+      className: cn("w-full gap-4", className),
+      children: [
+        strip,
+        children
+      ]
+    }
+  ) });
+}
+DesignTabs.displayName = "DesignTabs";
 function getInitialValue(tabs, value, defaultValue) {
   return value ?? defaultValue ?? tabs[0]?.value ?? "";
 }
@@ -3186,16 +4014,16 @@ function escapeTabValue(value) {
   return value.replace(/["\\]/g, "\\$&");
 }
 function useTabValue(tabs, value, defaultValue, onChange) {
-  const [uncontrolledValue, setUncontrolledValue] = React9.useState(
+  const [uncontrolledValue, setUncontrolledValue] = React10.useState(
     () => getInitialValue(tabs, value, defaultValue)
   );
   const activeValue = value ?? uncontrolledValue;
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (value !== void 0) return;
     if (tabs.some((tab) => tab.value === uncontrolledValue)) return;
     setUncontrolledValue(getInitialValue(tabs, value, defaultValue));
   }, [defaultValue, tabs, uncontrolledValue, value]);
-  const handleChange = React9.useCallback(
+  const handleChange = React10.useCallback(
     (nextValue) => {
       if (!tabs.some((tab) => tab.value === nextValue && !tab.disabled)) return;
       if (value === void 0) setUncontrolledValue(nextValue);
@@ -3257,7 +4085,7 @@ function OverflowTabsSelect({
   onChange,
   className
 }) {
-  const [open, setOpen] = React9.useState(false);
+  const [open, setOpen] = React10.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
@@ -3336,7 +4164,7 @@ function LineTabsOverflow({
   activeValue,
   onChange
 }) {
-  const [open, setOpen] = React9.useState(false);
+  const [open, setOpen] = React10.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
@@ -3411,7 +4239,12 @@ function LineTabsOverflow({
 }
 function Tabs2(props) {
   const variant = props.variant ?? "primary";
-  if (variant === "secondary") return /* @__PURE__ */ jsx(TertiaryTabs, { ...props });
+  if (variant === "primary") return /* @__PURE__ */ jsx(DesignTabs, { ...props, variant: "underline" });
+  if (variant === "secondary") return /* @__PURE__ */ jsx(DesignTabs, { ...props, variant: "segmented" });
+  if (variant === "pill" || variant === "vertical") {
+    return /* @__PURE__ */ jsx(DesignTabs, { ...props, variant });
+  }
+  if (variant === "legacySecondary") return /* @__PURE__ */ jsx(TertiaryTabs, { ...props });
   return /* @__PURE__ */ jsx(SecondaryTabs, { ...props });
 }
 function SecondaryTabs({
@@ -3424,25 +4257,25 @@ function SecondaryTabs({
   showBottomBorder = true,
   className
 }) {
-  const outerRef = React9.useRef(null);
-  const measureRef = React9.useRef(null);
-  const wrapperRef = React9.useRef(null);
+  const outerRef = React10.useRef(null);
+  const measureRef = React10.useRef(null);
+  const wrapperRef = React10.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [indicator, setIndicator] = React9.useState({ left: 0, width: 0, ready: false });
-  const [containerWidth, setContainerWidth] = React9.useState(0);
-  const [tabWidths, setTabWidths] = React9.useState([]);
-  const [moreButtonWidth, setMoreButtonWidth] = React9.useState(120);
-  React9.useLayoutEffect(() => {
+  const [indicator, setIndicator] = React10.useState({ left: 0, width: 0, ready: false });
+  const [containerWidth, setContainerWidth] = React10.useState(0);
+  const [tabWidths, setTabWidths] = React10.useState([]);
+  const [moreButtonWidth, setMoreButtonWidth] = React10.useState(120);
+  React10.useLayoutEffect(() => {
     const el = outerRef.current;
     if (!el) return;
     setContainerWidth(el.getBoundingClientRect().width);
   }, []);
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     const el = outerRef.current;
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
@@ -3452,7 +4285,7 @@ function SecondaryTabs({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  React9.useLayoutEffect(() => {
+  React10.useLayoutEffect(() => {
     if (containerWidth === 0) return;
     const el = measureRef.current;
     if (!el) return;
@@ -3463,7 +4296,7 @@ function SecondaryTabs({
     const moreBtn = el.querySelector("[data-measure-more]");
     if (moreBtn) setMoreButtonWidth(moreBtn.getBoundingClientRect().width);
   }, [containerWidth, tabs, overflowLabel]);
-  const dynamicLimit = React9.useMemo(() => {
+  const dynamicLimit = React10.useMemo(() => {
     if (visibleTabLimit !== void 0) return visibleTabLimit;
     if (containerWidth === 0 || tabWidths.length === 0) return void 0;
     const GAP = 8;
@@ -3486,11 +4319,11 @@ function SecondaryTabs({
     }
     return count > 0 ? count : 1;
   }, [visibleTabLimit, containerWidth, tabWidths, tabs, moreButtonWidth]);
-  const { visibleTabs, overflowTabs } = React9.useMemo(
+  const { visibleTabs, overflowTabs } = React10.useMemo(
     () => getVisibleTabs(tabs, activeValue, dynamicLimit),
     [activeValue, tabs, dynamicLimit]
   );
-  const measureIndicator = React9.useCallback(() => {
+  const measureIndicator = React10.useCallback(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper || !activeValue) return;
     const btn = wrapper.querySelector(
@@ -3508,14 +4341,14 @@ function SecondaryTabs({
       ready: true
     });
   }, [activeValue]);
-  React9.useLayoutEffect(() => {
+  React10.useLayoutEffect(() => {
     measureIndicator();
   }, [
     measureIndicator,
     visibleTabs.length,
     visibleTabs.map((t) => t.value + t.label).join("|")
   ]);
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     window.addEventListener("resize", measureIndicator);
     return () => window.removeEventListener("resize", measureIndicator);
   }, [measureIndicator]);
@@ -3624,19 +4457,19 @@ function TertiaryTabs({
   overflowLabel = "More Options",
   className
 }) {
-  const listRef = React9.useRef(null);
+  const listRef = React10.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [chip, setChip] = React9.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React9.useMemo(
+  const [chip, setChip] = React10.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React10.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  const measureChip = React9.useCallback(() => {
+  const measureChip = React10.useCallback(() => {
     const list = listRef.current;
     if (!list || !activeValue) return;
     const btn = list.querySelector(
@@ -3654,14 +4487,14 @@ function TertiaryTabs({
       ready: true
     });
   }, [activeValue]);
-  React9.useLayoutEffect(() => {
+  React10.useLayoutEffect(() => {
     measureChip();
   }, [
     measureChip,
     visibleTabs.length,
     visibleTabs.map((t) => t.value + t.label).join("|")
   ]);
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     window.addEventListener("resize", measureChip);
     return () => window.removeEventListener("resize", measureChip);
   }, [measureChip]);
@@ -3739,6 +4572,38 @@ function TertiaryTabs({
   );
 }
 Tabs2.displayName = "Tabs";
+function TabPanel({
+  value,
+  lazy = true,
+  keepMounted = false,
+  className,
+  children,
+  ...rest
+}) {
+  const activeValue = React10.useContext(TabsActiveValueContext);
+  const isActive = activeValue === value;
+  const [seen, setSeen] = React10.useState(isActive);
+  React10.useEffect(() => {
+    if (isActive) setSeen(true);
+  }, [isActive]);
+  const contextless = activeValue === null;
+  if (!contextless && lazy && !seen) return null;
+  return /* @__PURE__ */ jsx(
+    TabsContent,
+    {
+      value,
+      forceMount: keepMounted && !contextless ? true : void 0,
+      className: cn(
+        "outline-none data-[state=inactive]:hidden",
+        "data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:slide-in-from-bottom-1 data-[state=active]:duration-200",
+        className
+      ),
+      ...rest,
+      children
+    }
+  );
+}
+TabPanel.displayName = "TabPanel";
 var COUNT_WARN_RATIO = 0.83;
 function Spinner2({ size }) {
   return /* @__PURE__ */ jsx(
@@ -3817,24 +4682,24 @@ function Input2({
   resize = "vertical",
   ...rest
 }) {
-  const reactId = React9.useId();
+  const reactId = React10.useId();
   const inputId = id ?? reactId;
   const spec = INPUT_SIZES[size];
-  const [focused, setFocused] = React9.useState(false);
-  const [hovered, setHovered] = React9.useState(false);
-  const [showPassword, setShowPassword] = React9.useState(false);
-  const [internalError, setInternalError] = React9.useState(void 0);
-  const touchedRef = React9.useRef(false);
+  const [focused, setFocused] = React10.useState(false);
+  const [hovered, setHovered] = React10.useState(false);
+  const [showPassword, setShowPassword] = React10.useState(false);
+  const [internalError, setInternalError] = React10.useState(void 0);
+  const touchedRef = React10.useRef(false);
   const isControlled = rest.value !== void 0;
-  const [uncontrolledQuery, setUncontrolledQuery] = React9.useState(
+  const [uncontrolledQuery, setUncontrolledQuery] = React10.useState(
     String(rest.defaultValue ?? "")
   );
   const currentValue = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
   const fuseResults = useFuzzySearch(suggestions ?? [], currentValue);
   const showSuggestions = !multiline && !!suggestions?.length && focused && fuseResults.length > 0 && currentValue.trim().length > 0;
-  const wrapperRef = React9.useRef(null);
-  const inputRef = React9.useRef(null);
-  const textareaRef = React9.useRef(null);
+  const wrapperRef = React10.useRef(null);
+  const inputRef = React10.useRef(null);
+  const textareaRef = React10.useRef(null);
   const runValidation = (el) => {
     if (!el.validity.valid) {
       return validationMessage ?? el.validationMessage ?? "Invalid value";
@@ -4301,14 +5166,14 @@ function Radio({
   textColor,
   ...rest
 }) {
-  const reactId = React9.useId();
+  const reactId = React10.useId();
   const itemId = id ?? reactId;
-  const itemRef = React9.useRef(null);
-  const [isChecked, setIsChecked] = React9.useState(false);
-  React9.useEffect(() => {
+  const itemRef = React10.useRef(null);
+  const [isChecked, setIsChecked] = React10.useState(false);
+  React10.useEffect(() => {
     validateLabelWordLimit(label, "Radio");
   }, [label]);
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     const el = itemRef.current;
     if (!el) return;
     setIsChecked(el.dataset.state === "checked");
@@ -4323,8 +5188,8 @@ function Radio({
   const effectiveBorderColor = borderColor;
   const effectiveBgColor = bgColor;
   const effectiveTextColor = textColor;
-  const hasCustomColors2 = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
-  const labelStyle = hasCustomColors2 ? {
+  const hasCustomColors = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
+  const labelStyle = hasCustomColors ? {
     ...isChecked && effectiveBorderColor ? { borderColor: effectiveBorderColor } : {},
     ...isChecked && effectiveBgColor ? { backgroundColor: effectiveBgColor } : {}
   } : void 0;
@@ -4335,7 +5200,7 @@ function Radio({
       style: labelStyle,
       className: cn(
         "group inline-flex cursor-pointer items-start transition-colors duration-[120ms] ease-linear",
-        hasCustomColors2 ? cn(
+        hasCustomColors ? cn(
           "rounded-[10px] border",
           PILL_PADDING[size],
           error ? "border-[#A8000F]" : "border-[#E2E2E2]"
@@ -4420,7 +5285,7 @@ function RadioGroup({
   textColor,
   readOnly
 }) {
-  const reactId = React9.useId();
+  const reactId = React10.useId();
   const groupId = `radio-group-${reactId}`;
   const describedById = error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0;
   const gridColsMap = {
@@ -4581,13 +5446,13 @@ function Checkbox({
   textColor,
   ...rest
 }) {
-  const reactId = React9.useId();
+  const reactId = React10.useId();
   const itemId = rest.id ?? reactId;
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     validateLabelWordLimit(label, "CustomCheckbox");
   }, [label]);
   const isControlled = checked !== void 0;
-  const [internalChecked, setInternalChecked] = React9.useState(
+  const [internalChecked, setInternalChecked] = React10.useState(
     defaultChecked ?? false
   );
   const visualChecked = isControlled ? Boolean(checked) : internalChecked;
@@ -4604,13 +5469,13 @@ function Checkbox({
   const effectiveBorderColor = borderColor;
   const effectiveBgColor = bgColor;
   const effectiveTextColor = textColor;
-  const hasCustomColors2 = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
+  const hasCustomColors = !!(effectiveBorderColor || effectiveBgColor || effectiveTextColor);
   const isActive = (visualChecked || !!indeterminate) && !error && !disabled && !readOnly;
   return /* @__PURE__ */ jsxs(
     "label",
     {
       htmlFor: itemId,
-      style: hasCustomColors2 && isActive ? {
+      style: hasCustomColors && isActive ? {
         ...effectiveBorderColor ? { borderColor: effectiveBorderColor } : {},
         ...effectiveBgColor ? { backgroundColor: effectiveBgColor } : {}
       } : void 0,
@@ -4618,7 +5483,7 @@ function Checkbox({
         // The box aligns to the first line of the label, not the centre of it,
         // so multi-line labels stay tidy.
         "group inline-flex cursor-pointer items-start transition-colors duration-[120ms] ease-linear",
-        hasCustomColors2 ? cn(
+        hasCustomColors ? cn(
           "rounded-[10px] border",
           PILL_PADDING2[size],
           error ? "border-[#A8000F]" : disabled ? "border-[#E2E2E2]" : "border-[#E2E2E2]"
@@ -4699,10 +5564,10 @@ function CheckboxGroup({
   textColor,
   readOnly
 }) {
-  const reactId = React9.useId();
+  const reactId = React10.useId();
   const groupId = `checkbox-group-${reactId}`;
   const isControlled = value !== void 0;
-  const [internalValue, setInternalValue] = React9.useState([]);
+  const [internalValue, setInternalValue] = React10.useState([]);
   const currentValue = isControlled ? value : internalValue;
   const setValue = (next) => {
     if (!isControlled) setInternalValue(next);
@@ -4975,7 +5840,7 @@ function JumpCell({
   height,
   onClick
 }) {
-  const [hovered, setHovered] = React9.useState(false);
+  const [hovered, setHovered] = React10.useState(false);
   return /* @__PURE__ */ jsx(
     "button",
     {
@@ -5008,9 +5873,9 @@ function makeDayButton({ size }) {
     className,
     ...props
   }) {
-    const ref = React9.useRef(null);
-    const [hovered, setHovered] = React9.useState(false);
-    React9.useEffect(() => {
+    const ref = React10.useRef(null);
+    const [hovered, setHovered] = React10.useState(false);
+    React10.useEffect(() => {
       if (modifiers.focused) ref.current?.focus();
     }, [modifiers.focused]);
     const isEdge = !!(modifiers.range_start || modifiers.range_end);
@@ -5074,17 +5939,17 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React9.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React10.useMemo(() => /* @__PURE__ */ new Date(), []);
   const spec = DATEPICKER_SIZES[size];
   const clampedToday = maxDate && today > maxDate ? maxDate : minDate && today < minDate ? minDate : today;
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? clampedToday;
-  const [viewMonth, setViewMonth] = React9.useState(initialMonth);
+  const [viewMonth, setViewMonth] = React10.useState(initialMonth);
   const focusKey = focusDate ? focusDate.getFullYear() * 100 + focusDate.getMonth() : null;
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (focusKey === null) return;
     setViewMonth(new Date(Math.floor(focusKey / 100), focusKey % 100, 1));
   }, [focusKey]);
-  const yearOptions = React9.useMemo(
+  const yearOptions = React10.useMemo(
     () => buildYearOptions(
       today.getFullYear(),
       minDate?.getFullYear(),
@@ -5092,7 +5957,7 @@ function DatePickerCalendar({
     ),
     [today, minDate, maxDate]
   );
-  const monthOptions = React9.useMemo(() => {
+  const monthOptions = React10.useMemo(() => {
     const year = viewMonth.getFullYear();
     return MONTH_OPTIONS.map((opt) => {
       const month = Number(opt.value);
@@ -5102,7 +5967,7 @@ function DatePickerCalendar({
   }, [viewMonth, minDate, maxDate]);
   const handleMonthSelect = (val) => setViewMonth((prev) => new Date(prev.getFullYear(), Number(val), 1));
   const handleYearSelect = (val) => setViewMonth((prev) => new Date(Number(val), prev.getMonth(), 1));
-  const DayButtonComponent = React9.useMemo(() => makeDayButton({ size }), [size]);
+  const DayButtonComponent = React10.useMemo(() => makeDayButton({ size }), [size]);
   const gridStyle = {
     display: "grid",
     gridTemplateColumns: `repeat(7, ${spec.cell}px)`,
@@ -5221,11 +6086,11 @@ function MonthPickerCalendar({
   onSelect,
   className
 }) {
-  const today = React9.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const [viewYear, setViewYear] = React9.useState(
+  const today = React10.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React10.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React9.useMemo(
+  const yearOptions = React10.useMemo(
     () => buildYearOptions(
       today.getFullYear(),
       minDate?.getFullYear(),
@@ -5321,11 +6186,11 @@ function TimeColumn({
   selected,
   onSelect
 }) {
-  const containerRef = React9.useRef(null);
-  const settleTimeout = React9.useRef(
+  const containerRef = React10.useRef(null);
+  const settleTimeout = React10.useRef(
     void 0
   );
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     const index = items.findIndex((item) => item.value === selected);
     if (containerRef.current && index >= 0) {
       containerRef.current.scrollTop = index * ITEM_HEIGHT;
@@ -5512,22 +6377,22 @@ function DatePicker({
 }) {
   const isSingleWithTime = mode === "single" && showTime;
   const spec = DATEPICKER_SIZES[size];
-  const [hovered, setHovered] = React9.useState(false);
-  const [internalOpen, setInternalOpen] = React9.useState(false);
+  const [hovered, setHovered] = React10.useState(false);
+  const [internalOpen, setInternalOpen] = React10.useState(false);
   const open = controlledOpen !== void 0 ? controlledOpen : internalOpen;
-  const setOpen = React9.useCallback(
+  const setOpen = React10.useCallback(
     (next) => {
       if (controlledOpen === void 0) setInternalOpen(next);
       onOpenChangeProp?.(next);
     },
     [controlledOpen, onOpenChangeProp]
   );
-  const touchedRef = React9.useRef(false);
-  const interactedRef = React9.useRef(false);
-  const isMobileDrawer = React9.useContext(FilterGroupMobileContext);
-  const registerDrawerCalendar = React9.useContext(FilterGroupDrawerCalendarContext);
+  const touchedRef = React10.useRef(false);
+  const interactedRef = React10.useRef(false);
+  const isMobileDrawer = React10.useContext(FilterGroupMobileContext);
+  const registerDrawerCalendar = React10.useContext(FilterGroupDrawerCalendarContext);
   const isControlled = controlledOpen !== void 0;
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (!isMobileDrawer || !isControlled || !registerDrawerCalendar) return;
     if (open) {
       registerDrawerCalendar({ mode, value: committed, onChange, onOpenChange: setOpen, minDate, maxDate });
@@ -5538,24 +6403,24 @@ function DatePicker({
       registerDrawerCalendar(null);
     };
   }, [open, isMobileDrawer, isControlled]);
-  const [committed, setCommitted] = React9.useState(
+  const [committed, setCommitted] = React10.useState(
     controlledValue !== void 0 ? controlledValue ?? null : null
   );
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (controlledValue !== void 0) setCommitted(controlledValue ?? null);
   }, [controlledValue]);
-  const [pendingFrom, setPendingFrom] = React9.useState(null);
-  const [draftRange, setDraftRange] = React9.useState(null);
-  const [hoverDate, setHoverDate] = React9.useState(null);
-  const [draftSingleDate, setDraftSingleDate] = React9.useState(
+  const [pendingFrom, setPendingFrom] = React10.useState(null);
+  const [draftRange, setDraftRange] = React10.useState(null);
+  const [hoverDate, setHoverDate] = React10.useState(null);
+  const [draftSingleDate, setDraftSingleDate] = React10.useState(
     null
   );
-  const [draftTime, setDraftTime] = React9.useState({
+  const [draftTime, setDraftTime] = React10.useState({
     hours: (/* @__PURE__ */ new Date()).getHours(),
     minutes: (/* @__PURE__ */ new Date()).getMinutes()
   });
-  const prevOpen = React9.useRef(false);
-  React9.useEffect(() => {
+  const prevOpen = React10.useRef(false);
+  React10.useEffect(() => {
     if (open && !prevOpen.current) {
       setPendingFrom(null);
       setHoverDate(null);
@@ -5579,13 +6444,13 @@ function DatePicker({
     }
     prevOpen.current = open;
   }, [open, committed, mode, isSingleWithTime]);
-  const calendarDisabled = React9.useMemo(() => {
+  const calendarDisabled = React10.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length > 0 ? m : void 0;
   }, [minDate, maxDate]);
-  const triggerLabel = React9.useMemo(() => {
+  const triggerLabel = React10.useMemo(() => {
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return isSingleWithTime ? formatDateTime(committed) : formatDate(committed);
@@ -5595,7 +6460,7 @@ function DatePicker({
       return formatRange(committed.from, committed.to) ?? null;
     return null;
   }, [committed, mode, isSingleWithTime]);
-  const effectiveDisplayRange = React9.useMemo(() => {
+  const effectiveDisplayRange = React10.useMemo(() => {
     if (mode !== "range") return null;
     const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
     if (pendingFrom) {
@@ -5603,7 +6468,7 @@ function DatePicker({
     }
     return existingRange;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const calendarSelected = React9.useMemo(() => {
+  const calendarSelected = React10.useMemo(() => {
     if (mode === "single") {
       if (isSingleWithTime) {
         return draftSingleDate ?? (committed instanceof Date ? committed : void 0);
@@ -5612,7 +6477,7 @@ function DatePicker({
     }
     return effectiveDisplayRange ?? void 0;
   }, [mode, committed, effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
-  const footerHint = React9.useMemo(() => {
+  const footerHint = React10.useMemo(() => {
     if (isSingleWithTime) {
       return draftSingleDate ? formatDate(draftSingleDate) ?? "" : "No date";
     }
@@ -6610,7 +7475,7 @@ var TITLE_TEXT = {
   md: "text-[13px]",
   lg: "text-[14px]"
 };
-var Toggle = React9.forwardRef(
+var Toggle = React10.forwardRef(
   ({
     size = "md",
     type = "default",
@@ -6629,10 +7494,10 @@ var Toggle = React9.forwardRef(
     bgColor,
     ...props
   }, ref) => {
-    const [internalChecked, setInternalChecked] = React9.useState(defaultChecked ?? false);
+    const [internalChecked, setInternalChecked] = React10.useState(defaultChecked ?? false);
     const isChecked = checked !== void 0 ? checked : internalChecked;
-    const hasCustomColors2 = !!(borderColor || bgColor);
-    const pillStyle = hasCustomColors2 ? {
+    const hasCustomColors = !!(borderColor || bgColor);
+    const pillStyle = hasCustomColors ? {
       ...borderColor ? { borderColor } : {},
       ...isChecked && bgColor ? { backgroundColor: bgColor } : {}
     } : void 0;
@@ -6682,7 +7547,7 @@ var Toggle = React9.forwardRef(
         style: pillStyle,
         className: cn(
           "inline-flex cursor-pointer items-center transition-colors duration-[120ms] ease-linear",
-          hasCustomColors2 ? cn("rounded-[10px] border", PILL_PADDING3[size], "border-[#E2E2E2]") : GAP_ONLY3[size],
+          hasCustomColors ? cn("rounded-[10px] border", PILL_PADDING3[size], "border-[#E2E2E2]") : GAP_ONLY3[size],
           disabled && "cursor-not-allowed",
           readOnly && "pointer-events-none cursor-default"
         ),
@@ -6712,7 +7577,7 @@ var Toggle = React9.forwardRef(
           )
         ]
       }
-    ) : hasCustomColors2 ? /* @__PURE__ */ jsx(
+    ) : hasCustomColors ? /* @__PURE__ */ jsx(
       "div",
       {
         style: pillStyle,
@@ -6839,8 +7704,8 @@ var sidebarPersistentVariants = cva("bg-background border", {
   }
 });
 function useIsDesktop(breakpoint = 768) {
-  const [isDesktop, setIsDesktop] = React9.useState(false);
-  React9.useEffect(() => {
+  const [isDesktop, setIsDesktop] = React10.useState(false);
+  React10.useEffect(() => {
     const query = `(min-width: ${breakpoint}px)`;
     const media = window.matchMedia(query);
     const setFromMedia = () => setIsDesktop(media.matches);
@@ -6894,9 +7759,9 @@ function Sidebar({
 }) {
   const isDesktop = useIsDesktop();
   const isControlled = open !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React9.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React10.useState(defaultOpen);
   const resolvedOpen = isControlled ? open : uncontrolledOpen;
-  const handleOpenChange = React9.useCallback(
+  const handleOpenChange = React10.useCallback(
     (nextOpen) => {
       if (!isControlled) {
         setUncontrolledOpen(nextOpen);
@@ -6905,7 +7770,7 @@ function Sidebar({
     },
     [isControlled, onOpenChange]
   );
-  const customSizeStyle = React9.useMemo(() => {
+  const customSizeStyle = React10.useMemo(() => {
     if (sizePercent == null) return {};
     const pct = Math.min(100, Math.max(1, sizePercent));
     if (side === "top" || side === "bottom") {
@@ -6914,7 +7779,7 @@ function Sidebar({
     if (!isDesktop) return { width: "100vw", maxWidth: "100vw" };
     return { width: `${pct}vw`, maxWidth: "100vw" };
   }, [sizePercent, side, isDesktop]);
-  const animDurationStyle = React9.useMemo(() => {
+  const animDurationStyle = React10.useMemo(() => {
     if (sizePercent != null) {
       const pct = Math.min(100, Math.max(1, sizePercent));
       return {
@@ -6935,7 +7800,7 @@ function Sidebar({
     };
   }, [size, sizePercent]);
   const shouldRenderPersistent = persistentOnDesktop && isDesktop;
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (!resolvedOpen || shouldRenderPersistent || !overlay) return;
     lockBodyScroll();
     return unlockBodyScroll;
@@ -7153,33 +8018,33 @@ function AlertDialog2({
   ...options
 }) {
   const isControlled = openProp !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React9.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React10.useState(defaultOpen);
   const open = isControlled ? openProp : uncontrolledOpen;
-  const [inputValue, setInputValue] = React9.useState(defaultValue ?? "");
-  const [inputError, setInputError] = React9.useState(null);
-  const [submitError, setSubmitError] = React9.useState(null);
-  const [loading, setLoading] = React9.useState(false);
-  const setOpen = React9.useCallback(
+  const [inputValue, setInputValue] = React10.useState(defaultValue ?? "");
+  const [inputError, setInputError] = React10.useState(null);
+  const [submitError, setSubmitError] = React10.useState(null);
+  const [loading, setLoading] = React10.useState(false);
+  const setOpen = React10.useCallback(
     (next) => {
       if (!isControlled) setUncontrolledOpen(next);
       onOpenChange?.(next);
     },
     [isControlled, onOpenChange]
   );
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (!open) return;
     setInputValue(defaultValue ?? "");
     setInputError(null);
     setSubmitError(null);
     setLoading(false);
   }, [open]);
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (!open || !autoCloseMs || loading) return;
     const id = window.setTimeout(() => setOpen(false), autoCloseMs);
     return () => window.clearTimeout(id);
   }, [open, autoCloseMs, loading]);
-  const dismiss = React9.useCallback(() => setOpen(false), [setOpen]);
-  const confirm = React9.useCallback(async () => {
+  const dismiss = React10.useCallback(() => setOpen(false), [setOpen]);
+  const confirm = React10.useCallback(async () => {
     const validationError = inputValidator?.(inputValue);
     if (validationError) {
       setInputError(validationError);
@@ -7226,23 +8091,23 @@ function AlertDialog2({
     )
   ] });
 }
-var SweetAlertContext = React9.createContext(null);
+var SweetAlertContext = React10.createContext(null);
 function useSweetAlert() {
-  const ctx = React9.useContext(SweetAlertContext);
+  const ctx = React10.useContext(SweetAlertContext);
   if (!ctx) throw new Error("useSweetAlert must be used inside <SweetAlertProvider>");
   return ctx;
 }
 function SweetAlertProvider({ children }) {
-  const [queue, setQueue] = React9.useState([]);
-  const counter = React9.useRef(0);
-  const fire = React9.useCallback(
+  const [queue, setQueue] = React10.useState([]);
+  const counter = React10.useRef(0);
+  const fire = React10.useCallback(
     (options) => new Promise((resolve) => {
       counter.current += 1;
       setQueue((q) => [...q, { id: counter.current, options, resolve }]);
     }),
     []
   );
-  const ctx = React9.useMemo(() => ({ fire }), [fire]);
+  const ctx = React10.useMemo(() => ({ fire }), [fire]);
   return /* @__PURE__ */ jsxs(SweetAlertContext.Provider, { value: ctx, children: [
     children,
     queue[0] && /* @__PURE__ */ jsx(
@@ -7259,10 +8124,10 @@ function SweetAlertInstance({
   pending,
   onDone
 }) {
-  const [open, setOpen] = React9.useState(true);
-  const resolvedRef = React9.useRef(false);
-  const close = React9.useCallback(() => setOpen(false), []);
-  const handlePreConfirm = React9.useCallback(
+  const [open, setOpen] = React10.useState(true);
+  const resolvedRef = React10.useRef(false);
+  const close = React10.useCallback(() => setOpen(false), []);
+  const handlePreConfirm = React10.useCallback(
     async (value) => {
       await pending.options.preConfirm?.(value);
       resolvedRef.current = true;
@@ -7271,7 +8136,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  const handleOpenChange = React9.useCallback(
+  const handleOpenChange = React10.useCallback(
     (next) => {
       if (!next && !resolvedRef.current) {
         resolvedRef.current = true;
@@ -7281,7 +8146,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (!open) {
       const id = window.setTimeout(onDone, 200);
       return () => window.clearTimeout(id);
@@ -7345,8 +8210,8 @@ function Modal({
   bodyClassName,
   modalClassName
 }) {
-  const mouseDownOnBackdropRef = React9.useRef(false);
-  React9.useEffect(() => {
+  const mouseDownOnBackdropRef = React10.useRef(false);
+  React10.useEffect(() => {
     if (!isOpen) return;
     lockBodyScroll();
     return unlockBodyScroll;
@@ -7645,8 +8510,8 @@ function UengageProvider({ children, className }) {
 // src/assets/uEngage_icon.png
 var uEngage_icon_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPwAAAD7CAYAAABOrvnfAAAEHklEQVR4nO3d0U1jSRCG0WKFSIocCJYcSIoX9mE00uwsxjb4uqv6PyeCEre/rmujGaoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuMTD6gG+8vTy/LF6hku8v761/jnuott5mPjc2w7c7eGeM/HhT9L5PEx69v+sHgDO6Rz7NIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKnvffXt4fVM+xC8IzQNfquc53yuHoAuNS0uDqy4SGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CHI4+oB4BJPL88fq2f4zPvr28PqGa5hw8MPdL2IThE87U2LqjPBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDB34h/0cUEgocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggr8h/+vNMd5f3x5Wz3BK59k+87h6ALjEtLC6suEhiOBvzGs9nQkegggeggj+AF7r6UrwEKRt8H4NA7fXNvjpvNbTkeAhiOAPZMvTjeAPJno6aR28L+7gtloHvwtbni4EfyeipwPBQxDB35Etz2rtg9/tizvRs1L74HckelYR/CKiZ4URwe/2Wv+b6Lm3EcHvTPTck+AbED33IvgmRM89jPpsnBLFrt9ZsJ4N31DKxcb9jdskaTHY9tySDd9c2gXHsUZuj9QIbHt+yoYf5Onl+SP1suM2xm4MB/8XW59r2PDD2fpcY/R2cNC/Zvvzt9EHQvDHc2nsZfzDFD2rTLwMfYaHb5q4bMYHP/GWhVXGB18lerjUFsEDl9kmeFseztsm+CrRwzlbBQ98bbvgbXk4bbvgq0QPp2wZfJXo4TPbBg/839bB2/LwX1sHXyV6+NP2wVeJHn6LCL5K9FAVFHyV6CEq+CrRky0u+CrRkysy+CrRkyk2+CrRkyc6+CrRkyU++Kpf0QufBIL/g+jZneD/Inp2JvhPiJ5dCf4En+vZkeDPED47EfyFRM8OBH8F257pBP8Nwmcqwf+A6JlG8D9k2zOJg3qAiX83nO+Zdtnb8Aew9elK8AcSPt04jHfmdX8v0y70UcPuyAUwm+D5MZfAHILnEC6BfqbFXiV4rpBy6UwMGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDb+hd78es6KyZOZAAAAABJRU5ErkJggg==";
 function Loader(_props) {
-  const [mounted, setMounted] = React9.useState(false);
-  React9.useEffect(() => {
+  const [mounted, setMounted] = React10.useState(false);
+  React10.useEffect(() => {
     setMounted(true);
   }, []);
   if (!mounted) return null;
@@ -7851,7 +8716,7 @@ function AppSidebar({
                     className: "mt-2 flex-1 cursor-pointer overflow-y-auto",
                     children: modules.map((module, index) => {
                       const isActive = module.page === activeModulePage;
-                      return /* @__PURE__ */ jsxs(React9.Fragment, { children: [
+                      return /* @__PURE__ */ jsxs(React10.Fragment, { children: [
                         /* @__PURE__ */ jsx(
                           "button",
                           {
@@ -8033,14 +8898,14 @@ function Accordion(props) {
 }
 Accordion.displayName = "Accordion";
 function findDatePickerInTree(node) {
-  if (!React9.isValidElement(node)) return null;
+  if (!React10.isValidElement(node)) return null;
   const props = node.props;
   if (node.type.displayName === "DatePicker" && props.open === void 0) {
     return node;
   }
   const children = props.children;
   if (!children) return null;
-  for (const child of React9.Children.toArray(children)) {
+  for (const child of React10.Children.toArray(children)) {
     const found = findDatePickerInTree(child);
     if (found) return found;
   }
@@ -8052,31 +8917,31 @@ function InlineDatePickerPanel({ child }) {
   const minDate = p.minDate;
   const maxDate = p.maxDate;
   const onChange = p.onChange;
-  const [committed, setCommitted] = React9.useState(
+  const [committed, setCommitted] = React10.useState(
     p.value ?? null
   );
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (p.value !== void 0) setCommitted(p.value ?? null);
   }, [p.value]);
-  const [pendingFrom, setPendingFrom] = React9.useState(null);
-  const [draftRange, setDraftRange] = React9.useState(null);
-  const [hoverDate, setHoverDate] = React9.useState(null);
+  const [pendingFrom, setPendingFrom] = React10.useState(null);
+  const [draftRange, setDraftRange] = React10.useState(null);
+  const [hoverDate, setHoverDate] = React10.useState(null);
   const isRange = (v) => !!v && typeof v === "object" && "from" in v;
   const orderedRange2 = (a, b) => a <= b ? { from: a, to: b } : { from: b, to: a };
-  const calendarDisabled = React9.useMemo(() => {
+  const calendarDisabled = React10.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length ? m : void 0;
   }, [minDate, maxDate]);
-  const effectiveRange = React9.useMemo(() => {
+  const effectiveRange = React10.useMemo(() => {
     if (mode !== "range") return null;
     const existing = draftRange ?? (isRange(committed) ? committed : null);
     if (pendingFrom)
       return hoverDate ? orderedRange2(pendingFrom, hoverDate) : { from: pendingFrom };
     return existing;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const calendarSelected = React9.useMemo(() => {
+  const calendarSelected = React10.useMemo(() => {
     if (mode === "single") return committed instanceof Date ? committed : void 0;
     return effectiveRange ?? void 0;
   }, [mode, committed, effectiveRange]);
@@ -8162,10 +9027,10 @@ function FilterGroup({
   drawerClassName,
   forceDrawer = false
 }) {
-  const [open, setOpen] = React9.useState(false);
-  const [activeIndex, setActiveIndex] = React9.useState(0);
-  const programmaticClose = React9.useRef(false);
-  const childArray = React9.Children.toArray(children);
+  const [open, setOpen] = React10.useState(false);
+  const [activeIndex, setActiveIndex] = React10.useState(0);
+  const programmaticClose = React10.useRef(false);
+  const childArray = React10.Children.toArray(children);
   const items = childArray.map((child, i) => ({
     label: labels[i] ?? `Filter ${i + 1}`,
     content: child
@@ -8293,103 +9158,1049 @@ function FilterGroup({
   ] });
   if (forceDrawer) return drawer;
   return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx("div", { className: cn("hidden sm:flex items-center gap-2 flex-wrap", className), children: items.map((item, i) => /* @__PURE__ */ jsx(React9.Fragment, { children: item.content }, i)) }),
+    /* @__PURE__ */ jsx("div", { className: cn("hidden sm:flex items-center gap-2 flex-wrap", className), children: items.map((item, i) => /* @__PURE__ */ jsx(React10.Fragment, { children: item.content }, i)) }),
     /* @__PURE__ */ jsx("div", { className: "flex sm:hidden", children: drawer })
   ] });
 }
 FilterGroup.displayName = "FilterGroup";
+var BANNER_SIZES = {
+  sm: {
+    radius: 8,
+    padY: 9,
+    padX: 12,
+    gap: 9,
+    icon: 14,
+    fs: 11,
+    btnH: 26,
+    btnPadX: 10,
+    btnFs: 10,
+    showDescription: false,
+    closeSize: 22,
+    closeIcon: 11
+  },
+  md: {
+    radius: 10,
+    padY: 13,
+    padX: 15,
+    gap: 11,
+    icon: 17,
+    fs: 12,
+    btnH: 29,
+    btnPadX: 12,
+    btnFs: 11,
+    showDescription: true,
+    closeSize: 24,
+    closeIcon: 12
+  },
+  lg: {
+    radius: 12,
+    padY: 16,
+    padX: 18,
+    gap: 13,
+    icon: 20,
+    fs: 13,
+    btnH: 34,
+    btnPadX: 14,
+    btnFs: 12,
+    showDescription: true,
+    closeSize: 26,
+    closeIcon: 13
+  }
+};
+var LIGHT_PALETTE = {
+  info: {
+    bg: "#E6F4FC",
+    border: "#C6E4F5",
+    ink: "#0B5E88",
+    icon: "#0B5E88",
+    body: "#0B5E88",
+    bodyOpacity: 0.82,
+    btnBorder: "#A9D3EC",
+    btnBg: "rgba(255,255,255,.7)",
+    btnBgHover: "#FFFFFF",
+    track: "rgba(11,94,136,.16)",
+    fill: "#0B5E88"
+  },
+  warning: {
+    bg: "#FFF6D6",
+    border: "#EFD98A",
+    ink: "#6A5300",
+    icon: "#6A5300",
+    body: "#6A5300",
+    bodyOpacity: 0.82,
+    btnBorder: "#E0C866",
+    btnBg: "rgba(255,255,255,.7)",
+    btnBgHover: "#FFFFFF",
+    track: "rgba(106,83,0,.16)",
+    fill: "#6A5300"
+  },
+  danger: {
+    bg: "#FBE2E4",
+    border: "#F2C8CC",
+    ink: "#A8000F",
+    icon: "#A8000F",
+    body: "#A8000F",
+    bodyOpacity: 0.86,
+    btnBorder: "#E4A6AC",
+    btnBg: "rgba(255,255,255,.7)",
+    btnBgHover: "#FFFFFF",
+    track: "rgba(168,0,15,.16)",
+    fill: "#A8000F"
+  },
+  success: {
+    bg: "#FAFFF7",
+    border: "#CDE3C0",
+    ink: "#003C1B",
+    icon: "#003C1B",
+    body: "#003C1B",
+    bodyOpacity: 0.78,
+    btnBorder: "#BFD6C6",
+    btnBg: "rgba(255,255,255,.7)",
+    btnBgHover: "#FFFFFF",
+    track: "rgba(0,60,27,.14)",
+    fill: "#00A86B"
+  },
+  neutral: {
+    bg: "#F3F5F9",
+    border: "#E2E2E2",
+    ink: "#595959",
+    icon: "#595959",
+    body: "#595959",
+    bodyOpacity: 0.82,
+    btnBorder: "#D4D8DE",
+    btnBg: "rgba(255,255,255,.7)",
+    btnBgHover: "#FFFFFF",
+    track: "rgba(89,89,89,.16)",
+    fill: "#595959"
+  }
+};
+var DARK_PALETTE = {
+  info: {
+    bg: "#10293A",
+    border: "#1E4560",
+    ink: "#A5D8F2",
+    icon: "#4BADE3",
+    body: "#7FA8BF",
+    bodyOpacity: 1,
+    btnBorder: "#2A5876",
+    btnBg: "rgba(255,255,255,.08)",
+    btnBgHover: "rgba(255,255,255,.16)",
+    track: "rgba(165,216,242,.18)",
+    fill: "#4BADE3"
+  },
+  warning: {
+    bg: "#2E2611",
+    border: "#4A3E1C",
+    ink: "#F0DA9A",
+    icon: "#F5C518",
+    body: "#BFAE73",
+    bodyOpacity: 1,
+    btnBorder: "#5A4C24",
+    btnBg: "rgba(255,255,255,.08)",
+    btnBgHover: "rgba(255,255,255,.16)",
+    track: "rgba(240,218,154,.18)",
+    fill: "#F5C518"
+  },
+  danger: {
+    bg: "#2A1416",
+    border: "#4A2226",
+    ink: "#F2A0A6",
+    icon: "#F2A0A6",
+    body: "#C98A8F",
+    bodyOpacity: 1,
+    btnBorder: "#5C2A2F",
+    btnBg: "rgba(255,255,255,.08)",
+    btnBgHover: "rgba(255,255,255,.16)",
+    track: "rgba(242,160,166,.18)",
+    fill: "#F2A0A6"
+  },
+  success: {
+    bg: "#1B3423",
+    border: "#2C4A38",
+    ink: "#DCF3CE",
+    icon: "#8CC42A",
+    body: "#8FB79C",
+    bodyOpacity: 1,
+    btnBorder: "#37563F",
+    btnBg: "rgba(255,255,255,.08)",
+    btnBgHover: "rgba(255,255,255,.16)",
+    track: "rgba(220,243,206,.18)",
+    fill: "#8CC42A"
+  },
+  neutral: {
+    bg: "#1A1F1C",
+    border: "#2E3532",
+    ink: "#D6DBD8",
+    icon: "#9CACA3",
+    body: "#94A09A",
+    bodyOpacity: 1,
+    btnBorder: "#3A423E",
+    btnBg: "rgba(255,255,255,.08)",
+    btnBgHover: "rgba(255,255,255,.16)",
+    track: "rgba(214,219,216,.18)",
+    fill: "#9CACA3"
+  }
+};
+var BANNER_BAR_PALETTE = {
+  info: { bg: "#0B3B54", ink: "#E2F3FC", accent: "#7FD0F5", muted: "#8FB0C2" },
+  warning: { bg: "#3B2F05", ink: "#FBF3D9", accent: "#F5C518", muted: "#B7A87A" },
+  danger: { bg: "#3A0206", ink: "#FBE2E4", accent: "#F2A0A6", muted: "#B98A8D" },
+  success: { bg: "#003C1B", ink: "#E4F3E8", accent: "#8CC42A", muted: "#8FB79C" },
+  neutral: { bg: "#202020", ink: "#EEEEEE", accent: "#C6C6C6", muted: "#9C9C9C" }
+};
+function toBannerToneKey(tone) {
+  return tone === "error" ? "danger" : tone ?? "info";
+}
+function getBannerPalette(tone, appearance = "light") {
+  const key = toBannerToneKey(tone);
+  return appearance === "dark" ? DARK_PALETTE[key] : LIGHT_PALETTE[key];
+}
+var BANNER_TONE_SEVERITY = {
+  danger: 4,
+  warning: 3,
+  info: 2,
+  success: 1,
+  neutral: 0
+};
+var BANNER_TONE_DOT = {
+  info: "#4BADE3",
+  warning: "#F5C518",
+  danger: "#A8000F",
+  success: "#00A86B",
+  neutral: "#9C9C9C"
+};
 var bannerVariants = cva(
-  "flex flex-row items-start gap-3 rounded-xl border border-l-4 p-5 text-sm text-[#131313] font-medium leading-snug min-w-0 break-all",
+  "relative flex w-full min-w-0 flex-row overflow-hidden text-left",
   {
     variants: {
       variant: {
-        info: "bg-blue-100 border-blue-400 [--banner-icon:#2563EB]",
-        success: "bg-green-100 border-green-400 [--banner-icon:#16A34A]",
-        error: "bg-red-100 border-red-400 [--banner-icon:#DC2626]",
-        warning: "bg-amber-100 border-amber-400 [--banner-icon:#D97706]"
+        info: "",
+        success: "",
+        error: "",
+        danger: "",
+        warning: "",
+        neutral: ""
+      },
+      size: {
+        sm: "",
+        md: "",
+        lg: ""
       }
     },
-    defaultVariants: { variant: "info" }
+    defaultVariants: { variant: "info", size: "md" }
   }
 );
-var BannerRoot = React9.forwardRef(
-  ({ className, variant, ...props }, ref) => /* @__PURE__ */ jsx(
-    "div",
+var BannerRoot = React10.forwardRef(
+  ({ className, variant, size, appearance = "light", style, ...props }, ref) => {
+    const spec = BANNER_SIZES[size ?? "md"];
+    const palette = getBannerPalette(variant, appearance);
+    const isAlert = toBannerToneKey(variant) === "danger";
+    return /* @__PURE__ */ jsx(
+      "div",
+      {
+        ref,
+        role: isAlert ? "alert" : "status",
+        "aria-live": isAlert ? "assertive" : "polite",
+        className: cn(bannerVariants({ variant, size }), className),
+        style: {
+          background: palette.bg,
+          border: `1px solid ${palette.border}`,
+          borderRadius: spec.radius,
+          color: palette.ink,
+          ...style
+        },
+        ...props
+      }
+    );
+  }
+);
+BannerRoot.displayName = "Banner";
+var BannerIcon = React10.forwardRef(
+  ({ className, style, size = BANNER_SIZES.md.icon, align = "start", ...props }, ref) => /* @__PURE__ */ jsx(
+    "span",
     {
       ref,
-      role: "alert",
-      className: cn(bannerVariants({ variant }), className),
+      className: cn(
+        "block shrink-0 [&>svg]:h-full [&>svg]:w-full",
+        className
+      ),
+      style: {
+        width: size,
+        height: size,
+        flex: "none",
+        marginTop: align === "start" ? 1 : 0,
+        color: "var(--banner-icon, currentColor)",
+        ...style
+      },
+      "aria-hidden": "true",
       ...props
     }
   )
 );
-BannerRoot.displayName = "Banner";
-var BannerIcon = React9.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsx(
-  "span",
+BannerIcon.displayName = "BannerIcon";
+var BannerContent = React10.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  "div",
   {
     ref,
-    className: cn("mt-0.5 shrink-0 [&_svg]:size-4", className),
-    style: { color: "var(--banner-icon)", ...style },
-    "aria-hidden": "true",
+    className: cn("flex min-w-0 flex-1 flex-col", className),
     ...props
   }
 ));
-BannerIcon.displayName = "BannerIcon";
-var BannerContent = React9.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx("div", { ref, className: cn("flex-1 min-w-0 break-normal", className), ...props }));
 BannerContent.displayName = "BannerContent";
+var BannerTitle = React10.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsx(
+  "span",
+  {
+    ref,
+    className: cn("min-w-0", className),
+    style: { fontWeight: 600, lineHeight: 1.4, textWrap: "pretty", ...style },
+    ...props
+  }
+));
+BannerTitle.displayName = "BannerTitle";
+var BannerDescription = React10.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsx(
+  "span",
+  {
+    ref,
+    className: cn("min-w-0", className),
+    style: { fontWeight: 400, lineHeight: 1.5, textWrap: "pretty", ...style },
+    ...props
+  }
+));
+BannerDescription.displayName = "BannerDescription";
+var BannerAction = React10.forwardRef(({ className, type = "button", ...props }, ref) => /* @__PURE__ */ jsx(
+  "button",
+  {
+    ref,
+    type,
+    className: cn(
+      "flex shrink-0 cursor-pointer items-center justify-center rounded-lg font-semibold",
+      "bg-(--banner-btn-bg) transition-colors duration-120 hover:bg-(--banner-btn-bg-hover)",
+      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
+      "disabled:cursor-not-allowed disabled:opacity-50",
+      className
+    ),
+    ...props
+  }
+));
+BannerAction.displayName = "BannerAction";
+var BannerClose = React10.forwardRef(({ className, type = "button", "aria-label": ariaLabel = "Dismiss", ...props }, ref) => /* @__PURE__ */ jsx(
+  "button",
+  {
+    ref,
+    type,
+    "aria-label": ariaLabel,
+    className: cn(
+      "flex shrink-0 cursor-pointer items-center justify-center rounded-[7px] border-0 bg-transparent",
+      "opacity-60 transition-all duration-120 hover:bg-white/60 hover:opacity-100",
+      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
+      className
+    ),
+    ...props
+  }
+));
+BannerClose.displayName = "BannerClose";
 var DEFAULT_ICONS = {
-  info: /* @__PURE__ */ jsx(Info, {}),
-  success: /* @__PURE__ */ jsx(CircleCheck, {}),
-  error: /* @__PURE__ */ jsx(CircleX, {}),
-  warning: /* @__PURE__ */ jsx(TriangleAlert, {})
+  info: /* @__PURE__ */ jsx(Info, { strokeWidth: 2 }),
+  warning: /* @__PURE__ */ jsx(TriangleAlert, { strokeWidth: 2 }),
+  danger: /* @__PURE__ */ jsx(CircleX, { strokeWidth: 2 }),
+  success: /* @__PURE__ */ jsx(Check, { strokeWidth: 2.4 }),
+  neutral: /* @__PURE__ */ jsx(Info, { strokeWidth: 2 })
 };
-var CUSTOM_COLOR_KEYS = ["backgroundColor", "borderColor", "iconColor", "textColor"];
-function hasCustomColors(props) {
-  return CUSTOM_COLOR_KEYS.some((k) => props[k] !== void 0);
+var CALLOUT_BUTTON = {
+  info: { from: "#1478A8", to: "#0B5E88", hover: "#094E70", secondary: "#0B5E88" },
+  warning: { from: "#8A6D06", to: "#6A5300", hover: "#574400", secondary: "#6A5300" },
+  danger: { from: "#C4141F", to: "#A8000F", hover: "#8C000C", secondary: "#A8000F" },
+  success: { from: "#0A5A2C", to: "#003C1B", hover: "#00331A", secondary: "#1F5E2C" },
+  neutral: { from: "#6E6E6E", to: "#595959", hover: "#4A4A4A", secondary: "#595959" }
+};
+var CALLOUT_TILE = { sm: 30, md: 36, lg: 42 };
+var CALLOUT_TITLE_FS = { sm: 13, md: 14, lg: 16 };
+var DISMISS_STORAGE_PREFIX = "ue-banner-dismissed:";
+function readDismissed(dismissId) {
+  if (!dismissId || typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(DISMISS_STORAGE_PREFIX + dismissId) === "1";
+  } catch {
+    return false;
+  }
 }
-function Banner({
-  variant = "info",
-  message,
-  children,
-  icon,
-  showIcon = true,
-  className,
-  backgroundColor,
-  borderColor,
-  iconColor,
-  textColor,
-  style,
-  ...rest
+function persistDismissed(dismissId) {
+  if (!dismissId || typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(DISMISS_STORAGE_PREFIX + dismissId, "1");
+  } catch {
+  }
+}
+function resetBannerDismissal(dismissId) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(DISMISS_STORAGE_PREFIX + dismissId);
+  } catch {
+  }
+}
+function ActionNode({
+  action,
+  spec,
+  palette,
+  ink,
+  fallbackVariant
 }) {
-  const usingCustom = hasCustomColors({ variant, message, children, icon, showIcon, className, backgroundColor, borderColor, iconColor, textColor });
-  const customStyle = usingCustom ? {
-    ...backgroundColor && { backgroundColor },
-    ...borderColor && { borderColor },
-    ...textColor && { color: textColor }
-  } : {};
-  const resolvedIcon = icon ?? DEFAULT_ICONS[variant ?? "info"];
-  return /* @__PURE__ */ jsxs(
-    BannerRoot,
-    {
-      variant: usingCustom ? void 0 : variant,
-      className: cn(className),
-      style: { ...customStyle, ...style },
-      ...rest,
-      children: [
-        showIcon && /* @__PURE__ */ jsx(
-          BannerIcon,
-          {
-            style: iconColor ? { color: iconColor, ["--banner-icon"]: iconColor } : void 0,
-            children: resolvedIcon
-          }
-        ),
-        /* @__PURE__ */ jsx(BannerContent, { children: children ?? message })
-      ]
+  const variant = action.variant ?? fallbackVariant;
+  const { label, onClick, disabled, href, target, rel } = action;
+  if (variant === "link") {
+    const linkStyle = {
+      fontWeight: 600,
+      fontSize: spec.btnFs,
+      lineHeight: 1,
+      color: ink,
+      background: "transparent",
+      border: 0,
+      padding: 0,
+      cursor: disabled ? "not-allowed" : "pointer",
+      opacity: disabled ? 0.5 : 1,
+      flex: "none",
+      whiteSpace: "nowrap"
+    };
+    if (href) {
+      return /* @__PURE__ */ jsx(
+        "a",
+        {
+          href,
+          target,
+          rel,
+          "aria-label": action["aria-label"],
+          style: linkStyle,
+          className: "underline-offset-2 hover:underline",
+          children: label
+        }
+      );
     }
-  );
+    return /* @__PURE__ */ jsx(
+      "button",
+      {
+        type: "button",
+        onClick,
+        disabled,
+        "aria-label": action["aria-label"],
+        style: linkStyle,
+        className: "underline-offset-2 hover:underline",
+        children: label
+      }
+    );
+  }
+  const buttonStyle = {
+    height: spec.btnH,
+    padding: `0 ${spec.btnPadX}px`,
+    fontSize: spec.btnFs,
+    lineHeight: 1,
+    color: ink,
+    border: `1px solid ${palette.btnBorder}`,
+    whiteSpace: "nowrap",
+    ["--banner-btn-bg"]: palette.btnBg,
+    ["--banner-btn-bg-hover"]: palette.btnBgHover
+  };
+  if (href) {
+    return /* @__PURE__ */ jsx(
+      "a",
+      {
+        href,
+        target,
+        rel,
+        "aria-label": action["aria-label"],
+        style: buttonStyle,
+        className: "flex shrink-0 cursor-pointer items-center justify-center rounded-lg bg-(--banner-btn-bg) font-semibold transition-colors duration-120 hover:bg-(--banner-btn-bg-hover)",
+        children: label
+      }
+    );
+  }
+  return /* @__PURE__ */ jsx(BannerAction, { onClick, disabled, "aria-label": action["aria-label"], style: buttonStyle, children: label });
 }
+var Banner = React10.forwardRef(
+  function Banner2({
+    variant,
+    tone,
+    size,
+    placement = "section",
+    layout = "default",
+    appearance = "light",
+    title,
+    description,
+    message,
+    children,
+    items,
+    maxItems = 3,
+    renderMoreItems,
+    action,
+    secondaryAction,
+    actionPlacement = "inline",
+    icon,
+    showIcon = true,
+    dismissible = false,
+    dismissId,
+    onDismiss,
+    open,
+    onOpenChange,
+    autoDismiss,
+    progress,
+    progressLabel,
+    expiryProgress,
+    role,
+    className,
+    contentClassName,
+    backgroundColor,
+    borderColor,
+    iconColor,
+    textColor,
+    style,
+    ...rest
+  }, ref) {
+    const resolvedTone = tone ?? variant ?? "info";
+    const toneKey = toBannerToneKey(resolvedTone);
+    const resolvedSize = size ?? (placement === "inline" ? "sm" : "md");
+    const spec = BANNER_SIZES[resolvedSize];
+    const palette = getBannerPalette(resolvedTone, appearance);
+    const ink = textColor ?? palette.ink;
+    const bodyInk = textColor ?? palette.body;
+    const iconInk = iconColor ?? palette.icon;
+    const [internalOpen, setInternalOpen] = React10.useState(true);
+    const [remembered, setRemembered] = React10.useState(false);
+    React10.useEffect(() => {
+      setRemembered(readDismissed(dismissId));
+    }, [dismissId]);
+    const isOpen = open ?? (internalOpen && !remembered);
+    const close = React10.useCallback(() => {
+      persistDismissed(dismissId);
+      if (open === void 0) setInternalOpen(false);
+      onOpenChange?.(false);
+      onDismiss?.();
+    }, [dismissId, onDismiss, onOpenChange, open]);
+    const closeRef = React10.useRef(close);
+    closeRef.current = close;
+    const [expiry, setExpiry] = React10.useState(100);
+    React10.useEffect(() => {
+      if (!autoDismiss || autoDismiss <= 0 || !isOpen) return;
+      const start = Date.now();
+      setExpiry(100);
+      const id = window.setInterval(() => {
+        const left = Math.max(0, 100 - (Date.now() - start) / autoDismiss * 100);
+        setExpiry(left);
+        if (left <= 0) {
+          window.clearInterval(id);
+          closeRef.current();
+        }
+      }, 60);
+      return () => window.clearInterval(id);
+    }, [autoDismiss, isOpen]);
+    if (!isOpen) return null;
+    const body = children ?? message;
+    const heading = title ?? body;
+    const detail = title !== void 0 && title !== null ? description ?? body : description;
+    const showDetail = spec.showDescription && detail !== void 0 && detail !== null && detail !== "";
+    const visibleItems = items?.slice(0, maxItems) ?? [];
+    const hiddenItems = Math.max(0, (items?.length ?? 0) - visibleItems.length);
+    const isBusy = progress !== void 0 && progress !== null;
+    const progressValue = typeof progress === "number" ? Math.min(100, Math.max(0, progress)) : null;
+    const hasRule = autoDismiss !== void 0 && autoDismiss > 0 || expiryProgress !== void 0;
+    const rulePct = expiryProgress ?? expiry;
+    const resolvedRole = role ?? (toneKey === "danger" ? "alert" : "status");
+    if (placement === "global") {
+      const bar = BANNER_BAR_PALETTE[toneKey];
+      const barBg = backgroundColor ?? bar.bg;
+      const barInk = textColor ?? bar.ink;
+      const barAccent = iconColor ?? bar.accent;
+      return /* @__PURE__ */ jsxs(
+        "div",
+        {
+          ref,
+          role: resolvedRole,
+          "aria-live": toneKey === "danger" ? "assertive" : "polite",
+          className: cn("flex w-full flex-wrap items-center justify-center", className),
+          style: {
+            gap: spec.gap,
+            padding: `${spec.padY - 3}px 16px`,
+            background: barBg,
+            color: barInk,
+            ...style
+          },
+          ...rest,
+          children: [
+            showIcon && icon !== null && /* @__PURE__ */ jsx(BannerIcon, { size: spec.icon - 2, align: "center", style: { color: barAccent }, children: icon ?? DEFAULT_ICONS[toneKey] }),
+            /* @__PURE__ */ jsxs(
+              "span",
+              {
+                className: cn("min-w-0", contentClassName),
+                style: { fontWeight: 600, fontSize: spec.fs, lineHeight: 1.4, color: barInk },
+                children: [
+                  heading,
+                  showDetail && /* @__PURE__ */ jsx("span", { style: { fontWeight: 400, color: bar.muted, marginLeft: 6 }, children: detail })
+                ]
+              }
+            ),
+            action && /* @__PURE__ */ jsx(
+              ActionNode,
+              {
+                action,
+                spec,
+                palette,
+                ink: barAccent,
+                fallbackVariant: "link"
+              }
+            ),
+            secondaryAction && /* @__PURE__ */ jsx(
+              ActionNode,
+              {
+                action: secondaryAction,
+                spec,
+                palette,
+                ink: bar.muted,
+                fallbackVariant: "link"
+              }
+            ),
+            dismissible && /* @__PURE__ */ jsx(
+              BannerClose,
+              {
+                onClick: close,
+                className: "hover:bg-white/10",
+                style: { width: 20, height: 20, color: bar.muted },
+                children: /* @__PURE__ */ jsx(X, { size: 11, strokeWidth: 3 })
+              }
+            )
+          ]
+        }
+      );
+    }
+    const leading = !showIcon || icon === null ? null : isBusy ? /* @__PURE__ */ jsx(
+      "span",
+      {
+        "aria-hidden": "true",
+        className: "animate-spin",
+        style: {
+          width: spec.icon,
+          height: spec.icon,
+          flex: "none",
+          marginTop: 1,
+          borderRadius: "50%",
+          border: `2px solid ${palette.track}`,
+          borderTopColor: iconInk
+        }
+      }
+    ) : /* @__PURE__ */ jsx(BannerIcon, { size: spec.icon, style: { color: iconInk }, children: icon ?? DEFAULT_ICONS[toneKey] });
+    const actions = action || secondaryAction ? /* @__PURE__ */ jsxs(
+      "div",
+      {
+        className: "flex flex-none items-center",
+        style: {
+          gap: 8,
+          alignSelf: actionPlacement === "below" ? "flex-start" : "center",
+          marginTop: actionPlacement === "below" ? 2 : void 0
+        },
+        children: [
+          action && /* @__PURE__ */ jsx(
+            ActionNode,
+            {
+              action,
+              spec,
+              palette,
+              ink,
+              fallbackVariant: "button"
+            }
+          ),
+          secondaryAction && /* @__PURE__ */ jsx(
+            ActionNode,
+            {
+              action: secondaryAction,
+              spec,
+              palette,
+              ink,
+              fallbackVariant: "link"
+            }
+          )
+        ]
+      }
+    ) : null;
+    const closeButton = dismissible ? /* @__PURE__ */ jsx(
+      BannerClose,
+      {
+        onClick: close,
+        className: appearance === "dark" ? "hover:bg-white/10" : void 0,
+        style: {
+          width: spec.closeSize,
+          height: spec.closeSize,
+          alignSelf: "flex-start",
+          color: ink
+        },
+        children: /* @__PURE__ */ jsx(X, { size: spec.closeIcon, strokeWidth: 3 })
+      }
+    ) : null;
+    const rule = hasRule ? /* @__PURE__ */ jsx("span", { style: { display: "block", height: 3, background: palette.track }, children: /* @__PURE__ */ jsx(
+      "span",
+      {
+        style: {
+          display: "block",
+          height: "100%",
+          width: `${Math.min(100, Math.max(0, rulePct))}%`,
+          background: palette.fill,
+          transition: "width 80ms linear"
+        }
+      }
+    ) }) : null;
+    if (layout === "callout") {
+      const btn = CALLOUT_BUTTON[toneKey];
+      const tile = CALLOUT_TILE[resolvedSize];
+      return /* @__PURE__ */ jsxs(
+        BannerRoot,
+        {
+          ref,
+          variant: toneKey,
+          size: resolvedSize,
+          appearance,
+          role: resolvedRole,
+          className,
+          style: {
+            ...backgroundColor && { background: backgroundColor },
+            ...borderColor && { border: `1px solid ${borderColor}` },
+            ...textColor && { color: textColor },
+            ...style
+          },
+          ...rest,
+          children: [
+            /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 flex-1", style: { gap: spec.gap + 3, padding: spec.padX }, children: [
+              showIcon && icon !== null && /* @__PURE__ */ jsx(
+                "span",
+                {
+                  "aria-hidden": "true",
+                  className: "flex items-center justify-center [&>svg]:h-[47%] [&>svg]:w-[47%]",
+                  style: {
+                    width: tile,
+                    height: tile,
+                    flex: "none",
+                    borderRadius: 11,
+                    background: appearance === "dark" ? palette.btnBg : "#FFFFFF",
+                    border: `1px solid ${borderColor ?? palette.border}`,
+                    color: iconInk
+                  },
+                  children: icon ?? DEFAULT_ICONS[toneKey]
+                }
+              ),
+              /* @__PURE__ */ jsxs(BannerContent, { className: cn("gap-1.5", contentClassName), children: [
+                /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    style: {
+                      fontWeight: 700,
+                      fontSize: CALLOUT_TITLE_FS[resolvedSize],
+                      lineHeight: 1.3,
+                      color: ink
+                    },
+                    children: heading
+                  }
+                ),
+                detail !== void 0 && detail !== null && detail !== "" && /* @__PURE__ */ jsx(
+                  BannerDescription,
+                  {
+                    style: {
+                      fontSize: spec.fs,
+                      color: appearance === "dark" ? palette.body : textColor ?? "#595959"
+                    },
+                    children: detail
+                  }
+                ),
+                (action || secondaryAction) && /* @__PURE__ */ jsxs("div", { className: "flex items-center", style: { gap: 8, marginTop: 4 }, children: [
+                  action && /* @__PURE__ */ jsx(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: action.onClick,
+                      disabled: action.disabled,
+                      className: "flex cursor-pointer items-center justify-center rounded-lg border-0 font-semibold transition-all duration-120 hover:bg-(--banner-cta-hover) hover:bg-none disabled:cursor-not-allowed disabled:opacity-50",
+                      style: {
+                        height: spec.btnH + 3,
+                        padding: `0 ${spec.btnPadX + 2}px`,
+                        fontSize: spec.btnFs + 1,
+                        lineHeight: 1,
+                        color: "#FFFFFF",
+                        backgroundColor: btn.to,
+                        backgroundImage: `linear-gradient(180deg, ${btn.from}, ${btn.to})`,
+                        ["--banner-cta-hover"]: btn.hover
+                      },
+                      children: action.label
+                    }
+                  ),
+                  secondaryAction && /* @__PURE__ */ jsx(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: secondaryAction.onClick,
+                      disabled: secondaryAction.disabled,
+                      className: "flex cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent font-semibold disabled:cursor-not-allowed disabled:opacity-50",
+                      style: {
+                        height: spec.btnH + 3,
+                        padding: `0 ${spec.btnPadX}px`,
+                        fontSize: spec.btnFs + 1,
+                        lineHeight: 1,
+                        color: appearance === "dark" ? palette.ink : btn.secondary
+                      },
+                      children: secondaryAction.label
+                    }
+                  )
+                ] })
+              ] }),
+              closeButton
+            ] }),
+            rule
+          ]
+        }
+      );
+    }
+    const stacked = actionPlacement === "below";
+    const centreAlign = !showDetail && !isBusy && visibleItems.length === 0 && !stacked;
+    return /* @__PURE__ */ jsxs(
+      BannerRoot,
+      {
+        ref,
+        variant: toneKey,
+        size: resolvedSize,
+        appearance,
+        role: resolvedRole,
+        className,
+        style: {
+          ...backgroundColor && { background: backgroundColor },
+          ...borderColor && { border: `1px solid ${borderColor}` },
+          ...textColor && { color: textColor },
+          ...style
+        },
+        ...rest,
+        children: [
+          /* @__PURE__ */ jsxs(
+            "div",
+            {
+              className: "flex min-w-0 flex-1",
+              style: {
+                gap: spec.gap,
+                padding: `${spec.padY}px ${spec.padX}px`,
+                alignItems: centreAlign ? "center" : "flex-start"
+              },
+              children: [
+                leading,
+                /* @__PURE__ */ jsxs(BannerContent, { className: contentClassName, style: { gap: isBusy || visibleItems.length ? 6 : 2 }, children: [
+                  /* @__PURE__ */ jsx(BannerTitle, { style: { fontSize: spec.fs, color: ink }, children: heading }),
+                  showDetail && /* @__PURE__ */ jsx(
+                    BannerDescription,
+                    {
+                      style: {
+                        fontSize: spec.fs,
+                        color: bodyInk,
+                        opacity: appearance === "dark" ? 1 : palette.bodyOpacity
+                      },
+                      children: detail
+                    }
+                  ),
+                  visibleItems.length > 0 && /* @__PURE__ */ jsxs("div", { className: "flex flex-col", style: { gap: 4 }, children: [
+                    visibleItems.map((item, i) => /* @__PURE__ */ jsxs("span", { className: "flex items-baseline", style: { gap: 8 }, children: [
+                      /* @__PURE__ */ jsx(
+                        "span",
+                        {
+                          "aria-hidden": "true",
+                          style: {
+                            width: 3,
+                            height: 3,
+                            borderRadius: "50%",
+                            background: bodyInk,
+                            flex: "none",
+                            opacity: 0.6,
+                            transform: "translateY(-2px)"
+                          }
+                        }
+                      ),
+                      /* @__PURE__ */ jsx(
+                        "span",
+                        {
+                          style: {
+                            fontWeight: 400,
+                            fontSize: spec.fs - 1,
+                            lineHeight: 1.5,
+                            color: bodyInk,
+                            opacity: appearance === "dark" ? 1 : 0.86
+                          },
+                          children: item
+                        }
+                      )
+                    ] }, i)),
+                    hiddenItems > 0 && /* @__PURE__ */ jsx(
+                      "span",
+                      {
+                        style: {
+                          fontWeight: 600,
+                          fontSize: spec.fs - 1,
+                          lineHeight: 1.5,
+                          color: bodyInk,
+                          opacity: appearance === "dark" ? 1 : 0.7,
+                          paddingLeft: 11
+                        },
+                        children: renderMoreItems ? renderMoreItems(hiddenItems) : `and ${hiddenItems} more`
+                      }
+                    )
+                  ] }),
+                  progressValue !== null && /* @__PURE__ */ jsx(
+                    "span",
+                    {
+                      style: {
+                        height: 4,
+                        borderRadius: 99,
+                        background: palette.track,
+                        overflow: "hidden",
+                        display: "block"
+                      },
+                      children: /* @__PURE__ */ jsx(
+                        "span",
+                        {
+                          style: {
+                            display: "block",
+                            height: "100%",
+                            width: `${progressValue}%`,
+                            borderRadius: 99,
+                            background: palette.fill,
+                            transition: "width 200ms linear"
+                          }
+                        }
+                      )
+                    }
+                  ),
+                  progressLabel !== void 0 && progressLabel !== null && /* @__PURE__ */ jsx(
+                    "span",
+                    {
+                      className: "ue-tabular",
+                      style: {
+                        fontWeight: 400,
+                        fontSize: spec.fs - 1,
+                        lineHeight: 1.4,
+                        color: bodyInk,
+                        opacity: appearance === "dark" ? 1 : palette.bodyOpacity,
+                        fontVariantNumeric: "tabular-nums"
+                      },
+                      children: progressLabel
+                    }
+                  ),
+                  stacked && actions
+                ] }),
+                !stacked && actions,
+                closeButton
+              ]
+            }
+          ),
+          rule
+        ]
+      }
+    );
+  }
+);
 Banner.displayName = "Banner";
-var SectionContext = React9.createContext({
+function severity(item) {
+  return BANNER_TONE_SEVERITY[toBannerToneKey(item.tone ?? item.variant)];
+}
+var BannerStack = React10.forwardRef(
+  function BannerStack2({
+    banners,
+    max = 1,
+    collapseRest = true,
+    sortBySeverity = true,
+    size,
+    appearance = "light",
+    gap = 8,
+    moreLabel,
+    className,
+    style,
+    ...rest
+  }, ref) {
+    const [expanded, setExpanded] = React10.useState(false);
+    const [dismissed, setDismissed] = React10.useState([]);
+    const live = React10.useMemo(
+      () => banners.filter((b) => !dismissed.includes(b.id)),
+      [banners, dismissed]
+    );
+    const ordered = React10.useMemo(() => {
+      if (!sortBySeverity) return live;
+      return [...live].sort((a, b) => severity(b) - severity(a));
+    }, [live, sortBySeverity]);
+    const shown = expanded ? ordered : ordered.slice(0, max);
+    const hidden = expanded ? [] : ordered.slice(max);
+    const renderBanner = (item) => {
+      const { id, onDismiss, ...bannerProps } = item;
+      return /* @__PURE__ */ jsx(
+        Banner,
+        {
+          size,
+          appearance,
+          ...bannerProps,
+          dismissId: item.dismissId ?? id,
+          onDismiss: () => {
+            setDismissed((d) => d.includes(id) ? d : [...d, id]);
+            onDismiss?.();
+          }
+        },
+        id
+      );
+    };
+    if (ordered.length === 0) return null;
+    return /* @__PURE__ */ jsxs(
+      "div",
+      {
+        ref,
+        className: cn("flex w-full flex-col", className),
+        style: { gap, ...style },
+        ...rest,
+        children: [
+          shown.map(renderBanner),
+          collapseRest && hidden.length > 0 && /* @__PURE__ */ jsxs(
+            "button",
+            {
+              type: "button",
+              onClick: () => setExpanded(true),
+              "aria-expanded": false,
+              className: "flex cursor-pointer items-center rounded-[9px] border border-dashed bg-transparent transition-all duration-120 hover:bg-black/[0.02]",
+              style: {
+                gap: 8,
+                padding: "8px 12px",
+                borderColor: appearance === "dark" ? "#3A423E" : "#C6C6C6"
+              },
+              children: [
+                /* @__PURE__ */ jsx("span", { className: "flex flex-none", style: { gap: 3 }, children: hidden.map((b) => /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    "aria-hidden": "true",
+                    style: {
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: BANNER_TONE_DOT[toBannerToneKey(b.tone ?? b.variant)]
+                    }
+                  },
+                  b.id
+                )) }),
+                /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    className: "flex-1 text-left",
+                    style: {
+                      fontWeight: 600,
+                      fontSize: 11,
+                      lineHeight: 1.4,
+                      color: appearance === "dark" ? "#94A09A" : "#595959"
+                    },
+                    children: moreLabel ? moreLabel(hidden.length) : `${hidden.length} more notice${hidden.length === 1 ? "" : "s"}`
+                  }
+                ),
+                /* @__PURE__ */ jsx(ChevronDown, { size: 11, strokeWidth: 2.4, color: appearance === "dark" ? "#94A09A" : "#787878" })
+              ]
+            }
+          )
+        ]
+      }
+    );
+  }
+);
+BannerStack.displayName = "BannerStack";
+var SectionContext = React10.createContext({
   collapsible: false,
   isOpen: true,
   divider: false,
@@ -8403,7 +10214,7 @@ function SectionHeader({
   className,
   ...props
 }) {
-  const { collapsible, isOpen, divider } = React9.useContext(SectionContext);
+  const { collapsible, isOpen, divider } = React10.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsxs(Fragment, { children: [
     /* @__PURE__ */ jsxs("div", { className: "flex flex-1 min-w-0 flex-wrap items-center gap-3", children: [
       /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-[11px] min-w-0 pointer-events-none", children: [
@@ -8561,7 +10372,7 @@ function SectionContent({
   children,
   ...props
 }) {
-  const { collapsible, divider, dividerStyle } = React9.useContext(SectionContext);
+  const { collapsible, divider, dividerStyle } = React10.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsx(
     "div",
     {
@@ -8640,7 +10451,7 @@ function SectionRow({
   ...props
 }) {
   if (dividers) {
-    const items = React9.Children.toArray(children).filter(Boolean);
+    const items = React10.Children.toArray(children).filter(Boolean);
     return /* @__PURE__ */ jsx(
       "div",
       {
@@ -8649,7 +10460,7 @@ function SectionRow({
         className: cn("flex items-stretch gap-0", className),
         style,
         ...props,
-        children: items.map((child, i) => /* @__PURE__ */ jsxs(React9.Fragment, { children: [
+        children: items.map((child, i) => /* @__PURE__ */ jsxs(React10.Fragment, { children: [
           i > 0 && /* @__PURE__ */ jsx(SectionDivider, { orientation: "vertical", className: "mx-5" }),
           /* @__PURE__ */ jsx("div", { className: "flex-1 min-w-0", children: child })
         ] }, i))
@@ -8699,7 +10510,7 @@ function SectionTableContent({
   children,
   ...props
 }) {
-  const { collapsible } = React9.useContext(SectionContext);
+  const { collapsible } = React10.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsx(
     "div",
     {
@@ -8724,8 +10535,8 @@ function SectionGroup({
   children,
   ...props
 }) {
-  const [openIndex, setOpenIndex] = React9.useState(defaultOpen);
-  const items = React9.Children.toArray(children).filter(Boolean);
+  const [openIndex, setOpenIndex] = React10.useState(defaultOpen);
+  const items = React10.Children.toArray(children).filter(Boolean);
   return /* @__PURE__ */ jsx(
     "div",
     {
@@ -8733,8 +10544,8 @@ function SectionGroup({
       className: cn("flex flex-col gap-4", className),
       ...props,
       children: items.map((child, i) => {
-        if (!React9.isValidElement(child)) return child;
-        return React9.cloneElement(child, {
+        if (!React10.isValidElement(child)) return child;
+        return React10.cloneElement(child, {
           key: i,
           collapsible: true,
           open: openIndex === i,
@@ -8760,11 +10571,11 @@ function Section({
   ...props
 }) {
   const isControlled = openProp !== void 0;
-  const [internalOpen, setInternalOpen] = React9.useState(
+  const [internalOpen, setInternalOpen] = React10.useState(
     isControlled ? openProp : defaultOpen
   );
   const isOpen = isControlled ? openProp : internalOpen;
-  const handleOpenChange = React9.useCallback(
+  const handleOpenChange = React10.useCallback(
     (next) => {
       if (!isControlled) setInternalOpen(next);
       onOpenChange?.(next);
@@ -9358,11 +11169,11 @@ function FileUpload({
   dropzoneClassName,
   inputRef: externalInputRef
 }) {
-  const reactId = React9.useId();
+  const reactId = React10.useId();
   const inputId = id ?? reactId;
   const spec = FILE_UPLOAD_SIZES[size] ?? FILE_UPLOAD_SIZES.md;
-  const internalInputRef = React9.useRef(null);
-  const attachInputRef = React9.useCallback(
+  const internalInputRef = React10.useRef(null);
+  const attachInputRef = React10.useCallback(
     (node) => {
       internalInputRef.current = node;
       if (!externalInputRef) return;
@@ -9374,30 +11185,30 @@ function FileUpload({
     },
     [externalInputRef]
   );
-  const [isDragOver, setIsDragOver] = React9.useState(false);
-  const [isHover, setIsHover] = React9.useState(false);
-  const [localFiles, setLocalFiles] = React9.useState([]);
-  const [validationErrors, setValidationErrors] = React9.useState([]);
+  const [isDragOver, setIsDragOver] = React10.useState(false);
+  const [isHover, setIsHover] = React10.useState(false);
+  const [localFiles, setLocalFiles] = React10.useState([]);
+  const [validationErrors, setValidationErrors] = React10.useState([]);
   const isImageVariant = variant === "image" || variant === "avatar" || variant === "gallery";
   const isPreviewVariant = isImageVariant || variant === "video";
-  const normalizedAllowedExts = React9.useMemo(
+  const normalizedAllowedExts = React10.useMemo(
     () => allowedFiles?.map((e) => e.startsWith(".") ? e.toLowerCase() : `.${e.toLowerCase()}`),
     [allowedFiles]
   );
   const effectiveAccept = accept ?? (normalizedAllowedExts ? normalizedAllowedExts.join(",") : getDefaultAccept(variant));
-  const chips = React9.useMemo(() => {
+  const chips = React10.useMemo(() => {
     if (formats) return formats;
     const derived = [];
     normalizedAllowedExts?.forEach((e) => derived.push(e.replace(".", "").toUpperCase()));
     if (maxSize) derived.push(`Max ${formatBytes(maxSize, 0)}`);
     return derived;
   }, [formats, normalizedAllowedExts, maxSize]);
-  const controlledUrls = React9.useMemo(() => {
+  const controlledUrls = React10.useMemo(() => {
     if (!value) return [];
     return Array.isArray(value) ? value.filter(Boolean) : [value].filter(Boolean);
   }, [value]);
   const hasControlledValue = controlledUrls.length > 0;
-  const displayItems = React9.useMemo(() => {
+  const displayItems = React10.useMemo(() => {
     const list = [];
     controlledUrls.forEach((url, i) => list.push({ kind: "url", url, index: i }));
     if (showLocalPreview) {
@@ -9407,13 +11218,13 @@ function FileUpload({
     }
     return list;
   }, [controlledUrls, localFiles, showLocalPreview]);
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     if (hasControlledValue && localFiles.length > 0) {
       localFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
       setLocalFiles([]);
     }
   }, [hasControlledValue]);
-  React9.useEffect(() => {
+  React10.useEffect(() => {
     return () => {
       localFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
     };
@@ -9460,7 +11271,7 @@ function FileUpload({
     }
     return { valid, errors };
   };
-  const processFiles = React9.useCallback(
+  const processFiles = React10.useCallback(
     (incoming) => {
       const fileArray = Array.from(incoming);
       const { valid, errors } = validateAndFilter(fileArray);
@@ -9518,7 +11329,7 @@ function FileUpload({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [multiple, maxFiles, maxSize, normalizedAllowedExts, displayItems.length, isImageVariant, showLocalPreview, onChange, onFilesChange, onValidationError]
   );
-  const openFilePicker = React9.useCallback(() => {
+  const openFilePicker = React10.useCallback(() => {
     if (disabled || readOnly) return;
     internalInputRef.current?.click();
   }, [disabled, readOnly]);
@@ -9587,7 +11398,7 @@ function FileUpload({
   const combinedError = error ?? validationErrors[0];
   const iconSize = ICON_SIZES[size] ?? spec.tileIcon;
   const avatarIconSize = AVATAR_ICON_SIZES[size] ?? 20;
-  const rows = React9.useMemo(() => {
+  const rows = React10.useMemo(() => {
     if (items) return items;
     return displayItems.map((item) => {
       if (item.kind === "url") {
@@ -10711,6 +12522,6 @@ function Chip({
   );
 }
 
-export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, ModalZIndexProvider, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, SidebarZIndexProvider, StatusBadge, SubHeader, SweetAlertProvider, Table2 as Table, Tabs2 as Tabs, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
+export { Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, BannerStack, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, DesignTabs, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, ModalZIndexProvider, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, SidebarZIndexProvider, StatusBadge, SubHeader, SweetAlertProvider, TABS_SIZES, TabPanel, Table2 as Table, Tabs2 as Tabs, TabsActiveValueContext, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getTabsPalette, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map
