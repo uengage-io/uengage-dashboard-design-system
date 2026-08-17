@@ -253,21 +253,12 @@ function DatePicker({
   }, [mode, committed, effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
 
   // ── Footer hint ───────────────────────────────────────────────────────
-  // The design replaces the old From/To boxes with a single hint that counts
-  // the selection, so the panel never repeats what the trigger already says.
+  // Only single+time shows a hint (the draft date being timed). Range mode
+  // shows nothing — the trigger already states the selection.
   const footerHint = React.useMemo((): string => {
-    if (isSingleWithTime) {
-      return draftSingleDate ? (formatDate(draftSingleDate) ?? "") : "No date";
-    }
-    const range = effectiveDisplayRange;
-    if (!range) return "No range";
-    if (!range.to) return "Pick an end date";
-    const startOfDay = (d: Date) =>
-      new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-    const days =
-      Math.round((startOfDay(range.to) - startOfDay(range.from)) / 86400000) + 1;
-    return `${days} ${days === 1 ? "day" : "days"}`;
-  }, [effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
+    if (!isSingleWithTime) return "";
+    return draftSingleDate ? (formatDate(draftSingleDate) ?? "") : "No date";
+  }, [isSingleWithTime, draftSingleDate]);
 
   // ── Event handlers ────────────────────────────────────────────────────
 

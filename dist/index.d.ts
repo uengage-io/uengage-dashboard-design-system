@@ -1565,21 +1565,87 @@ declare namespace AppSidebar {
     var displayName: string;
 }
 
+/** Per-row state. A row keeps its title in every one of them. */
+type AccordionItemState = "default" | "loading" | "error" | "dirty";
+type AccordionSummaryTone = "brand" | "success" | "neutral" | "warning" | "danger";
 interface AccordionItem {
     value: string;
-    title: string;
+    /** 600 weight, one line, truncates before the summary. */
+    title: React.ReactNode;
     content: React.ReactNode;
     disabled?: boolean;
+    /** Rendered inside the optional mint icon tile. */
     icon?: React.ReactNode;
+    /**
+     * Extra header content. Rendered outside the toggle's hit area so clicking it
+     * never expands the row.
+     */
     action?: React.ReactNode;
+    /** Optional second line. Stays visible when collapsed; dropped at `sm`. */
+    subtitle?: React.ReactNode;
+    /** The collapsed answer — a right-aligned chip. Never truncates. */
+    summary?: React.ReactNode;
+    /** Palette for the summary chip. @default "neutral" */
+    summaryTone?: AccordionSummaryTone;
+    /** Tints the row and swaps the chevron for a spinner when `loading`. */
+    state?: AccordionItemState;
+    /** Why a disabled row is disabled — surfaced as a tooltip. */
+    disabledReason?: string;
+    /** Same as `action`; both render outside the toggle, separated by a hairline. */
+    headerActions?: React.ReactNode;
+    /** Mount the panel on first open rather than up front. @default false */
+    lazy?: boolean;
+    /** Keep the panel mounted once opened, so form state survives a collapse. */
+    keepMounted?: boolean;
 }
-type AccordionVariant = "default" | "ghost" | "bordered";
+/**
+ * `bordered` is the design default — one shell with hairline dividers.
+ * `separated` gives each row its own box, `flush` drops the outer border, and
+ * `card` is separated plus elevation.
+ *
+ * `default` and `ghost` are the pre-design-system names, kept so existing call
+ * sites keep working: `default` renders as `flush`, `ghost` as a flush stack
+ * with no dividers. The old `bordered` look — boxes with elevation — is `card`.
+ */
+type AccordionVariant = "bordered" | "separated" | "flush" | "card" | "default" | "ghost";
 type AccordionSize = "sm" | "md" | "lg";
+type AccordionAppearance = "light" | "dark";
+/** The chevron leads by default — never a right-side chevron, per the design. */
+type AccordionChevronPosition = "start" | "end";
 interface AccordionBaseProps {
     items: AccordionItem[];
+    /** @default "default" */
     variant?: AccordionVariant;
+    /** @default "md" */
     size?: AccordionSize;
     className?: string;
+    /** Light surface, or the dark mix where the open row fills #1B3423. */
+    appearance?: AccordionAppearance;
+    /** @default "start" */
+    chevronPosition?: AccordionChevronPosition;
+    /** Hide the chevron entirely. @default true */
+    showChevron?: boolean;
+    /** Force the icon tile on or off. Defaults to the size scale. */
+    showIconTile?: boolean;
+    /** Renders the Expand all / Collapse all control above the stack. */
+    expandAll?: boolean;
+    /** Labels for that control. */
+    expandAllLabels?: {
+        expand: React.ReactNode;
+        collapse: React.ReactNode;
+    };
+    /**
+     * Indents the stack and drops its shell, for one level of nesting. Two levels
+     * is the hard cap — three means the page needs tabs.
+     */
+    nested?: boolean;
+    /**
+     * Gate a row opening or closing — return `false` to keep it as it is.
+     * Receives the value that changed and whether it was opening.
+     */
+    onBeforeToggle?: (value: string, opening: boolean) => boolean;
+    /** Extra className for each row. */
+    itemClassName?: string;
 }
 interface AccordionSingleProps extends AccordionBaseProps {
     type?: "single";
@@ -1601,6 +1667,61 @@ declare function Accordion(props: CustomAccordionProps): react_jsx_runtime.JSX.E
 declare namespace Accordion {
     var displayName: string;
 }
+
+interface AccordionSizeSpec {
+    /** Label used by the docs table. */
+    name: string;
+    /** Header padding. */
+    pad: string;
+    /** Gap between chevron, tile, title and summary. */
+    gap: number;
+    /** Panel padding. */
+    bodyPad: number;
+    /** Chevron box, px. */
+    chev: number;
+    /** Icon tile box, px. */
+    tile: number;
+    /** Icon inside the tile, px. */
+    tileIcon: number;
+    /** Title font size, px. */
+    fs: number;
+    /** Compact drops the icon tile. */
+    showTile: boolean;
+    /** Compact drops the subtitle — a title and a summary, nothing else. */
+    showSubtitle: boolean;
+    spec: string;
+    use: string;
+}
+declare const ACCORDION_SIZES: Record<AccordionSize, AccordionSizeSpec>;
+interface AccordionPalette {
+    /** Wash behind an open header, so the open row is obvious at a glance. */
+    openBg: string;
+    hoverBg: string;
+    /** Hairline between a header and its panel. */
+    divider: string;
+    chevronOpen: string;
+    chevronClosed: string;
+    titleOpen: string;
+    titleClosed: string;
+    subtitle: string;
+    tileOpenBg: string;
+    tileOpenFg: string;
+    tileClosedBg: string;
+    tileClosedFg: string;
+    panelFg: string;
+    /** Focus ring, drawn inset so it never clips against the shell. */
+    ring: string;
+    /** Amber dot marking unsaved work. */
+    dirtyDot: string;
+    spinnerTrack: string;
+    spinnerHead: string;
+}
+declare function getAccordionPalette(appearance?: AccordionAppearance): AccordionPalette;
+interface AccordionChipTone {
+    bg: string;
+    fg: string;
+}
+declare function getAccordionChip(tone?: AccordionSummaryTone, appearance?: AccordionAppearance): AccordionChipTone;
 
 declare const accordionRootVariants: (props?: ({
     variant?: "default" | "ghost" | "bordered" | null | undefined;
@@ -2180,4 +2301,4 @@ interface ChipProps extends ChipVariants {
 }
 declare function Chip({ label, variant, size, icon, iconPosition, bgColor, textColor, className, }: ChipProps): react_jsx_runtime.JSX.Element;
 
-export { Accordion, type AccordionContentVariants, type AccordionItem, type AccordionItemVariants, type AccordionRootVariants, type AccordionSize, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerAction, type BannerActionVariant, BannerAppearance, type BannerLayout, BannerPlacement, type BannerProps, BannerSize, BannerStack, type BannerStackItem, type BannerStackProps, BannerTone, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DateRange, DesignTabs, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, TABS_SIZES, type TabItem, TabPanel, type TabPanelProps, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type TabsActivation, TabsActiveValueContext, type TabsAppearance, type TabsDesignVariant, type TabsOverflowMode, type TabsPalette, type TabsSize, type TabsSizeSpec, type TabsVariant, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getTabsPalette, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
+export { ACCORDION_SIZES, Accordion, type AccordionAppearance, type AccordionChevronPosition, type AccordionChipTone, type AccordionContentVariants, type AccordionItem, type AccordionItemState, type AccordionItemVariants, type AccordionPalette, type AccordionRootVariants, type AccordionSize, type AccordionSizeSpec, type AccordionSummaryTone, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerAction, type BannerActionVariant, BannerAppearance, type BannerLayout, BannerPlacement, type BannerProps, BannerSize, BannerStack, type BannerStackItem, type BannerStackProps, BannerTone, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DateRange, DesignTabs, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, TABS_SIZES, type TabItem, TabPanel, type TabPanelProps, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type TabsActivation, TabsActiveValueContext, type TabsAppearance, type TabsDesignVariant, type TabsOverflowMode, type TabsPalette, type TabsSize, type TabsSizeSpec, type TabsVariant, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getAccordionChip, getAccordionPalette, getTabsPalette, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
