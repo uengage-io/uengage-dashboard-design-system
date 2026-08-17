@@ -4,7 +4,27 @@ export type {
   CustomAccordionProps,
   AccordionVariant,
   AccordionSize,
+  AccordionAppearance,
+  AccordionChevronPosition,
+  AccordionItemState,
+  AccordionSummaryTone,
 } from "./Accordion.types";
+export {
+  ACCORDION_SIZES,
+  getAccordionPalette,
+  getAccordionChip,
+  getAccordionShell,
+  getAccordionItem,
+  getAccordionStateSpec,
+  toAccordionVariantKey,
+  type AccordionSizeSpec,
+  type AccordionPalette,
+  type AccordionChipTone,
+  type AccordionShellSpec,
+  type AccordionItemSpec,
+  type AccordionVariantKey,
+  type AccordionStateSpec,
+} from "./accordionTokens";
 export {
   accordionRootVariants,
   accordionItemVariants,
