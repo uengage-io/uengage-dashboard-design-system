@@ -75,6 +75,7 @@ export function TableHeaderCell({
       )}
       style={{
         height: spec.headerHeight,
+        boxSizing: "border-box",
         paddingLeft: spec.cellPadX,
         paddingRight: spec.cellPadX,
         background: TABLE_COLORS.headerBg,

@@ -1239,8 +1239,10 @@ interface TableCellProps extends ComponentProps<"td"> {
     stickyShadow?: boolean;
     /** Horizontal padding override, px. Falls back to the size scale. */
     padX?: number;
+    /** Vertical padding override, px. Falls back to the size scale. */
+    padY?: number;
 }
-declare function TableCell({ size, align, verticalAlign, tabular, identifier, color, strike, height, sticky, stickyOffset, stickyBackground, stickyShadow, padX, className, children, style, ...props }: TableCellProps): react_jsx_runtime.JSX.Element;
+declare function TableCell({ size, align, verticalAlign, tabular, identifier, color, strike, height, sticky, stickyOffset, stickyBackground, stickyShadow, padX, padY, className, children, style, ...props }: TableCellProps): react_jsx_runtime.JSX.Element;
 
 /** Kept as a named export — it predates `TableSortDirection` in the types barrel. */
 type SortDirection = TableSortDirection;
@@ -1377,6 +1379,13 @@ interface TableSizeSpec {
     showMeta: boolean;
     /** Horizontal padding inside a cell, px. */
     cellPadX: number;
+    /**
+     * Vertical padding inside a cell, px. Sits *inside* `rowHeight` (border-box),
+     * so a single-line row still measures exactly `rowHeight` — it only opens up
+     * once a cell stacks more than one line, which is where the row would
+     * otherwise press against the rules above and below it.
+     */
+    cellPadY: number;
     /** Padding against the table's left and right edges, px. */
     edgePad: number;
     /** Roughly how many rows land on one screen — docs copy. */

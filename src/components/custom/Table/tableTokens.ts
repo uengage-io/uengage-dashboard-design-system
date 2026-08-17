@@ -27,6 +27,13 @@ export interface TableSizeSpec {
   showMeta: boolean;
   /** Horizontal padding inside a cell, px. */
   cellPadX: number;
+  /**
+   * Vertical padding inside a cell, px. Sits *inside* `rowHeight` (border-box),
+   * so a single-line row still measures exactly `rowHeight` — it only opens up
+   * once a cell stacks more than one line, which is where the row would
+   * otherwise press against the rules above and below it.
+   */
+  cellPadY: number;
   /** Padding against the table's left and right edges, px. */
   edgePad: number;
   /** Roughly how many rows land on one screen — docs copy. */
@@ -44,6 +51,7 @@ export const TABLE_SIZES: Record<TableSize, TableSizeSpec> = {
     avatarFontSize: 8,
     showMeta: false,
     cellPadX: 12,
+    cellPadY: 6,
     edgePad: 16,
     rowsPerScreen: "~18 rows",
     use: "Reconciliation and audit screens where volume beats detail",
@@ -57,6 +65,7 @@ export const TABLE_SIZES: Record<TableSize, TableSizeSpec> = {
     avatarFontSize: 10,
     showMeta: true,
     cellPadX: 14,
+    cellPadY: 10,
     edgePad: 20,
     rowsPerScreen: "~13 rows",
     use: "The default. Fits an avatar and a secondary line",
@@ -70,6 +79,7 @@ export const TABLE_SIZES: Record<TableSize, TableSizeSpec> = {
     avatarFontSize: 11,
     showMeta: true,
     cellPadX: 16,
+    cellPadY: 12,
     edgePad: 22,
     rowsPerScreen: "~11 rows",
     use: "Short lists with thumbnails — menus, outlets, offers",
