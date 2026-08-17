@@ -1,6 +1,6 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
-import * as React from 'react';
-import { ReactNode, ComponentProps } from 'react';
+import * as React$1 from 'react';
+import { ReactNode, ComponentProps, CSSProperties } from 'react';
 export { buttonVariants } from './components/ui/button.js';
 export { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger } from './components/ui/alert-dialog.js';
 export { Separator } from './components/ui/separator.js';
@@ -27,10 +27,10 @@ import 'react-day-picker';
 import 'clsx';
 
 declare function SidebarZIndexProvider({ children, }: {
-    children: React.ReactNode;
+    children: React$1.ReactNode;
 }): react_jsx_runtime.JSX.Element;
 declare function ModalZIndexProvider({ children, }: {
-    children: React.ReactNode;
+    children: React$1.ReactNode;
 }): react_jsx_runtime.JSX.Element;
 
 type ColorVariant = "primary" | "secondary" | "tertiary" | "alertPrimary" | "warningPrimary" | "alertSecondary";
@@ -40,25 +40,25 @@ type ButtonSize = "xs" | "sm" | "md" | "lg";
 declare const buttonVariants: (props?: ({
     size?: "xs" | "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
-interface ButtonProps extends Omit<React.ComponentProps<"button">, "title">, VariantProps<typeof buttonVariants> {
+interface ButtonProps extends Omit<React$1.ComponentProps<"button">, "title">, VariantProps<typeof buttonVariants> {
     variant?: ColorVariant;
     size?: ButtonSize;
-    leftIcon?: React.ReactNode;
-    rightIcon?: React.ReactNode;
+    leftIcon?: React$1.ReactNode;
+    rightIcon?: React$1.ReactNode;
     asChild?: boolean;
     /** Shows a spinner, hides label + icons, blocks clicks, and sets aria-busy. */
     loading?: boolean;
     /** Custom icon rendered while `loading`. Defaults to a spinning `Loader2`. */
-    loadingIcon?: React.ReactNode;
+    loadingIcon?: React$1.ReactNode;
     /** Text label. Used when `children` is not provided. */
-    title?: React.ReactNode;
+    title?: React$1.ReactNode;
 }
 declare function Button({ className, variant, size, leftIcon, rightIcon, disabled, loading, loadingIcon, asChild, style, title, children, onPointerEnter, onPointerLeave, onPointerDown, onPointerUp, onFocus, onBlur, ...props }: ButtonProps): react_jsx_runtime.JSX.Element;
 declare namespace Button {
     var displayName: string;
 }
 
-interface PageContainerProps extends React.HTMLAttributes<HTMLElement> {
+interface PageContainerProps extends React$1.HTMLAttributes<HTMLElement> {
     maxWidth?: CssSize;
     /**
      * Extra left padding added ON TOP of the base content padding.
@@ -77,15 +77,15 @@ declare namespace PageContainer {
     var displayName: string;
 }
 
-interface TopHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
+interface TopHeaderProps extends Omit<React$1.HTMLAttributes<HTMLElement>, "title"> {
     /** Module / page title, rendered bold on the left. */
-    title: React.ReactNode;
+    title: React$1.ReactNode;
     /**
      * Optional helper element beside the title (e.g. a "How it Works?" link).
      */
-    helper?: React.ReactNode;
+    helper?: React$1.ReactNode;
     /** Right-side slot (e.g. action buttons). */
-    action?: React.ReactNode;
+    action?: React$1.ReactNode;
     /** Render a bottom divider. Defaults to true. */
     divider?: boolean;
     /** Gap between title and helper. Defaults to 10px. */
@@ -97,15 +97,15 @@ declare namespace TopHeader {
 }
 
 type SubHeaderAlign = "start" | "center" | "end";
-interface SubHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
+interface SubHeaderProps extends Omit<React$1.HTMLAttributes<HTMLElement>, "title"> {
     /** Primary section heading. */
-    title?: React.ReactNode;
+    title?: React$1.ReactNode;
     /**
      * Supporting subtitle. Accepts ReactNode for rich content.
      */
-    subtitle?: React.ReactNode;
+    subtitle?: React$1.ReactNode;
     /** Right-side slot (e.g. filters, step navigation, CTAs). */
-    right?: React.ReactNode;
+    right?: React$1.ReactNode;
     /**
      * Vertical alignment of left block vs. right slot on sm+ screens.
      * Defaults to "center".
@@ -126,7 +126,7 @@ declare namespace SubHeader {
 
 type GridColumns = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "2:1" | "1:2" | "3:1" | "1:3" | "1:1:2" | "2:1:1" | (string & {});
 type GridLimit = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
+interface GridProps extends React$1.HTMLAttributes<HTMLDivElement> {
     /** Column layout. A preset name or raw CSS grid-template-columns value. */
     columns?: GridColumns;
     /**
@@ -148,16 +148,16 @@ declare namespace Grid {
     var displayName: string;
 }
 
-interface CardProps extends React.ComponentProps<"div"> {
+interface CardProps extends React$1.ComponentProps<"div"> {
 }
 declare function Card({ className, ...props }: CardProps): react_jsx_runtime.JSX.Element;
 declare namespace Card {
     var displayName: string;
 }
-declare function CardHeader({ className, ...props }: React.ComponentProps<"div">): react_jsx_runtime.JSX.Element;
-declare function CardTitle({ className, ...props }: React.ComponentProps<"div">): react_jsx_runtime.JSX.Element;
-declare function CardContent({ className, ...props }: React.ComponentProps<"div">): react_jsx_runtime.JSX.Element;
-declare function CardFooter({ className, ...props }: React.ComponentProps<"div">): react_jsx_runtime.JSX.Element;
+declare function CardHeader({ className, ...props }: React$1.ComponentProps<"div">): react_jsx_runtime.JSX.Element;
+declare function CardTitle({ className, ...props }: React$1.ComponentProps<"div">): react_jsx_runtime.JSX.Element;
+declare function CardContent({ className, ...props }: React$1.ComponentProps<"div">): react_jsx_runtime.JSX.Element;
+declare function CardFooter({ className, ...props }: React$1.ComponentProps<"div">): react_jsx_runtime.JSX.Element;
 
 type SearchValueType = "string" | "number" | "alphanumeric";
 type SearchBarSize = "sm" | "md" | "lg";
@@ -167,7 +167,7 @@ interface SearchBarProps<T extends string | number = string, TItem = unknown> {
     valueType?: SearchValueType;
     size?: SearchBarSize;
     /** Label displayed above the search bar. */
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     /** When `true`, appends a red asterisk to the label. */
     required?: boolean;
     placeholder?: string;
@@ -243,7 +243,7 @@ interface SearchBarProps<T extends string | number = string, TItem = unknown> {
         onApply?: () => void;
     };
     /** Helper text under the field. Overrides the generated result message. */
-    message?: React.ReactNode;
+    message?: React$1.ReactNode;
     /**
      * Keyboard shortcut badge pinned to the right of an empty field (e.g. `"⌘K"`).
      * Hidden as soon as the field has a value.
@@ -289,7 +289,7 @@ interface SelectOption {
      */
     description?: string;
     /** Leading avatar/initials chip or icon for a rich row. */
-    icon?: React.ReactNode;
+    icon?: React$1.ReactNode;
 }
 type SelectMode = "single" | "multi";
 /** Non-error validation states, mirroring Input. */
@@ -335,7 +335,7 @@ interface SelectProps<TItem = unknown> {
     /** Show the X clear button (and pill remove buttons) when a value is selected. Defaults to `false`. */
     clearable?: boolean;
     /** Field label rendered above the trigger. */
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     /** When true, appends a red asterisk directly after the label text. */
     required?: boolean;
     /** Helper text rendered below the trigger. */
@@ -369,7 +369,7 @@ interface SelectProps<TItem = unknown> {
     /** Message shown under the trigger for the active `status`. Falls back to `helperText`. */
     statusMessage?: string;
     /** Leading glyph inside the trigger, ahead of the value. */
-    leftIcon?: React.ReactNode;
+    leftIcon?: React$1.ReactNode;
     /**
      * Options are being fetched. The trigger shows a spinner and the menu shows
      * shimmer rows rather than a centred spinner.
@@ -387,7 +387,7 @@ interface SelectProps<TItem = unknown> {
     /** Fires when the create row is chosen. Receives the raw query text. */
     onCreate?: (query: string) => void;
     /** Replaces the default "No results found." body when there is nothing to show. */
-    emptyState?: React.ReactNode;
+    emptyState?: React$1.ReactNode;
     /** Where the menu opens. `auto` lets it flip above the trigger near the fold. */
     placement?: "auto" | "top" | "bottom";
 }
@@ -406,7 +406,7 @@ type InputSize = "xs" | "sm" | "md" | "lg";
  * that is both `status="success"` and in error renders as an error.
  */
 type InputStatus = "validating" | "success" | "warning";
-interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "width" | "height" | "onChange" | "prefix"> {
+interface CustomInputProps extends Omit<React$1.InputHTMLAttributes<HTMLInputElement>, "size" | "width" | "height" | "onChange" | "prefix"> {
     size?: InputSize;
     /**
      * `"default"` renders the usual bordered box. `"underline"` drops the box
@@ -418,11 +418,11 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
     variant?: "default" | "underline";
     inputType?: InputType;
     allowPattern?: AllowPattern;
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     helperText?: string;
     error?: string;
-    leftIcon?: React.ReactNode;
-    rightIcon?: React.ReactNode;
+    leftIcon?: React$1.ReactNode;
+    rightIcon?: React$1.ReactNode;
     /**
      * Async/advisory state that is not an error:
      * - `"validating"` — a check is in flight; renders a spinner and keeps the
@@ -440,9 +440,9 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
      * a hairline (e.g. `"₹"`, `"+91"`). Unlike `leftIcon` it is a boxed affix,
      * not a glyph floating on the field background.
      */
-    prefix?: React.ReactNode;
+    prefix?: React$1.ReactNode;
     /** Trailing counterpart to `prefix` (e.g. `"INR"`, `".00"`). */
-    suffix?: React.ReactNode;
+    suffix?: React$1.ReactNode;
     /**
      * The value is still being fetched. Renders a muted box with a spinner and
      * blocks interaction, without marking the field disabled for the form.
@@ -466,7 +466,7 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
      * not the `<input>`. Use for composition — e.g. squaring off one side so a
      * button can attach flush to the field. `style` still lands on the `<input>`.
      */
-    boxStyle?: React.CSSProperties;
+    boxStyle?: React$1.CSSProperties;
     /**
      * Tailwind width class(es) applied to the outer wrapper. Use any responsive
      * utility (e.g. `"w-full md:w-96 lg:w-[400px]"`). Defaults to `w-full` when
@@ -493,7 +493,7 @@ interface CustomInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
     clearable?: boolean;
     /** Fires when the clear button is clicked. */
     onClear?: () => void;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onChange?: (e: React$1.ChangeEvent<HTMLInputElement> | React$1.ChangeEvent<HTMLTextAreaElement>) => void;
     /** Renders a <textarea> instead of <input>. Incompatible with inputType="password" and suggestions. */
     multiline?: boolean;
     /** Number of visible text rows. Only used when multiline=true. */
@@ -563,9 +563,9 @@ type TabItem = {
     label: string;
     disabled?: boolean;
     /** Leading icon. Rendered at the size scale's icon box. */
-    icon?: React.ReactNode;
+    icon?: React$1.ReactNode;
     /** Count badge rendered after the label. */
-    count?: React.ReactNode;
+    count?: React$1.ReactNode;
     /** Amber dot marking unsaved work behind this tab. */
     dirty?: boolean;
     /** Tooltip on a disabled tab saying what unlocks it. */
@@ -643,11 +643,11 @@ interface CustomTabsProps {
     /** Extra className for the tab strip itself. */
     listClassName?: string;
     /** Panels. Use `TabPanel` — rendered below the strip, or beside it when vertical. */
-    children?: React.ReactNode;
+    children?: React$1.ReactNode;
     /** Width of the rail in the `vertical` variant, in px. @default 190 */
     verticalWidth?: number;
 }
-interface TabPanelProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+interface TabPanelProps extends Omit<React$1.HTMLAttributes<HTMLDivElement>, "children"> {
     value: string;
     /**
      * Mount the panel on its first visit rather than up front.
@@ -656,7 +656,7 @@ interface TabPanelProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "chil
     lazy?: boolean;
     /** Keep the panel mounted once seen, preserving scroll and form state. */
     keepMounted?: boolean;
-    children?: React.ReactNode;
+    children?: React$1.ReactNode;
 }
 
 declare function Tabs(props: CustomTabsProps): react_jsx_runtime.JSX.Element;
@@ -665,7 +665,7 @@ declare namespace Tabs {
 }
 
 /** Lets `TabPanel` know which tab is live so it can mount lazily. */
-declare const TabsActiveValueContext: React.Context<string | null>;
+declare const TabsActiveValueContext: React$1.Context<string | null>;
 /**
  * The design-system tab set — underline, segmented, pill and vertical.
  * Built on Radix so arrow keys, Home/End and `activation` come for free.
@@ -688,7 +688,7 @@ declare namespace TabPanel {
     var displayName: string;
 }
 
-interface CustomTabsTriggerProps extends React.ComponentProps<typeof TabsTrigger> {
+interface CustomTabsTriggerProps extends React$1.ComponentProps<typeof TabsTrigger> {
     variant?: "secondary" | "tertiary";
 }
 declare function CustomTabsTrigger({ className, children, disabled, variant, ...props }: CustomTabsTriggerProps): react_jsx_runtime.JSX.Element;
@@ -773,7 +773,7 @@ declare namespace Input {
 }
 
 type InputLabelSize = InputSize;
-interface InputLabelProps extends React.ComponentProps<typeof Label> {
+interface InputLabelProps extends React$1.ComponentProps<typeof Label> {
     size?: InputLabelSize;
     required?: boolean;
     /**
@@ -790,7 +790,7 @@ declare namespace InputLabel {
 }
 
 type InputHelperSize = InputSize;
-interface InputHelperProps extends React.HTMLAttributes<HTMLParagraphElement> {
+interface InputHelperProps extends React$1.HTMLAttributes<HTMLParagraphElement> {
     size?: InputHelperSize;
     helperText?: string;
     error?: string;
@@ -813,8 +813,8 @@ declare namespace InputHelper {
 }
 
 type Size = "xs" | "sm" | "md" | "lg";
-interface CustomRadioItemProps extends Omit<React.ComponentProps<typeof RadioGroup$1.Item>, "children"> {
-    label: React.ReactNode;
+interface CustomRadioItemProps extends Omit<React$1.ComponentProps<typeof RadioGroup$1.Item>, "children"> {
+    label: React$1.ReactNode;
     size?: Size;
     disabled?: boolean;
     error?: boolean;
@@ -853,7 +853,7 @@ interface CustomRadioGroupProps<T = RadioOption> {
     /** Max columns at the largest breakpoint when `layout="grid"`. Smaller breakpoints scale down (mobile=1, sm=2). */
     columns?: 1 | 2 | 3 | 4;
     disabled?: boolean;
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     required?: boolean;
     helperText?: string;
     error?: string;
@@ -898,7 +898,7 @@ interface CustomCheckboxProps {
     defaultChecked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
     size?: "xs" | "sm" | "md" | "lg";
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     disabled?: boolean;
     indeterminate?: boolean;
     error?: boolean;
@@ -926,7 +926,7 @@ interface CustomCheckboxGroupProps<T = CheckboxOption> {
     layout?: "horizontal" | "vertical" | "grid";
     columns?: number;
     disabled?: boolean;
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     required?: boolean;
     helperText?: string;
     error?: string;
@@ -941,7 +941,7 @@ interface CustomCheckboxGroupProps<T = CheckboxOption> {
     readOnly?: boolean;
 }
 
-declare function Checkbox({ checked, defaultChecked, onCheckedChange, size, label, disabled, readOnly, indeterminate, error, className, borderColor, bgColor, textColor, ...rest }: CustomCheckboxProps & Omit<React.ComponentProps<typeof Checkbox$1.Root>, "checked" | "defaultChecked" | "onCheckedChange" | "disabled" | "className">): react_jsx_runtime.JSX.Element;
+declare function Checkbox({ checked, defaultChecked, onCheckedChange, size, label, disabled, readOnly, indeterminate, error, className, borderColor, bgColor, textColor, ...rest }: CustomCheckboxProps & Omit<React$1.ComponentProps<typeof Checkbox$1.Root>, "checked" | "defaultChecked" | "onCheckedChange" | "disabled" | "className">): react_jsx_runtime.JSX.Element;
 declare namespace Checkbox {
     var displayName: string;
 }
@@ -993,7 +993,7 @@ interface DatePickerProps {
     /** When true, shows a clear button to reset the selected value. Defaults to false. */
     clearable?: boolean;
     /** Field label rendered above the trigger. */
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     /** When true, appends a red asterisk directly after the label text. */
     required?: boolean;
     /** Helper text rendered below the trigger. */
@@ -1040,6 +1040,27 @@ declare function formatRange(from: Date | null | undefined, to: Date | null | un
 declare function formatMonthYear(date: Date | null | undefined): string | null;
 declare function isSameDay(a: Date | null | undefined, b: Date | null | undefined): boolean;
 
+type TableSize = "sm" | "md" | "lg";
+/** Tri-state sort. `null` means "unsorted". */
+type TableSortDirection = "asc" | "desc" | null;
+interface TableSortState {
+    key: string | null;
+    direction: TableSortDirection;
+}
+/**
+ * How many rows a click can pick.
+ * - "none"     — (default) no checkbox column, selection is off.
+ * - "single"   — one row at a time; picking another releases the previous one.
+ * - "multiple" — checkbox column with a tri-state header box.
+ */
+type TableSelectionMode = "none" | "single" | "multiple";
+/**
+ * Per-row lifecycle tint. A deleted row greys and strikes for one beat before
+ * it leaves — rows never disappear silently.
+ */
+type TableRowState = "default" | "saving" | "deleted" | "disabled";
+/** Chip tones used by status cells. */
+type TableStatusTone = "success" | "info" | "warning" | "danger" | "neutral";
 interface ColumnDef<T> {
     key: keyof T | string;
     header: ReactNode;
@@ -1063,19 +1084,76 @@ interface ColumnDef<T> {
     hideOnMobile?: boolean;
     /** Extra Tailwind classes applied to both the <th> and <td> for this column. */
     className?: string;
+    /**
+     * Render digits on tabular figures so they stack down the column. Defaults to
+     * `true` for right-aligned columns — numbers are the reason the rule exists.
+     */
+    tabular?: boolean;
+    /**
+     * Mark this column the identifier: semibold, and the one that stays put when
+     * `stickyFirstColumn` is set. Inferred for the first column when unset.
+     */
+    identifier?: boolean;
+    /** Custom sort comparator. Falls back to a value comparison when not given. */
+    sortFn?: (a: T, b: T) => number;
+}
+interface TableBulkAction<T> {
+    label: ReactNode;
+    /** "danger" paints the label red; everything else reads as brand green. */
+    tone?: "default" | "danger";
+    onClick: (rows: T[], keys: string[]) => void;
+    disabled?: boolean;
+}
+interface TableEmptyConfig {
+    icon?: ReactNode;
+    title?: ReactNode;
+    description?: ReactNode;
+    /** Buttons or links placed under the description. */
+    actions?: ReactNode;
+}
+interface TableErrorConfig {
+    title?: ReactNode;
+    description?: ReactNode;
+    /** Correlation id shown in monospace so it can be read out over a call. */
+    requestId?: ReactNode;
+    onRetry?: () => void;
+    retryLabel?: string;
+}
+interface TablePaginationConfig {
+    /** 1-based current page. */
+    page: number;
+    /** Total number of pages. Omit for cursor-style paging. */
+    pageCount?: number;
+    pageSize?: number;
+    /** Page-size choices for the segmented control. Pass `[]` to hide it. */
+    pageSizes?: number[];
+    /** Total row count across all pages — drives the "Showing 1–25 of 1,584" line. */
+    total?: number;
+    onPageChange?: (page: number) => void;
+    onPageSizeChange?: (pageSize: number) => void;
+    /** Replaces the generated "Showing x–y of n" line. */
+    label?: ReactNode;
+    /** Noun used in the generated label. Defaults to "rows". */
+    itemLabel?: string;
+    /**
+     * Above this many pages the footer also offers a "Go to" box, because
+     * clicking through is unreasonable. Defaults to 20.
+     */
+    jumpThreshold?: number;
 }
 interface CustomTableProps<T> {
     columns: ColumnDef<T>[];
     data: T[];
     keyField: keyof T;
     loading?: boolean;
+    /** Plain-string empty copy. `empty` takes precedence when both are given. */
     emptyMessage?: string;
     onRowClick?: (row: T) => void;
     rowClassName?: (row: T) => string;
     stickyHeader?: boolean;
     maxHeight?: string;
     bordered?: boolean;
-    size?: "sm" | "md" | "lg";
+    size?: TableSize;
     className?: string;
     /**
      * How the table renders on small screens (< md / 768px).
@@ -1089,13 +1167,287 @@ interface CustomTableProps<T> {
      * Set to `false` to disable the hover effect entirely.
      */
     hover?: boolean;
+    /** Controlled sort. Leave unset to let the table own its sort state. */
+    sort?: TableSortState;
+    onSortChange?: (sort: TableSortState) => void;
+    /** Initial sort when uncontrolled. */
+    defaultSort?: TableSortState;
+    /**
+     * Set when `data` arrives already sorted by the server — the table then only
+     * reports sort changes instead of re-ordering rows itself.
+     */
+    manualSort?: boolean;
+    selectable?: TableSelectionMode;
+    /** Controlled selection, as stringified `keyField` values. */
+    selectedKeys?: string[];
+    defaultSelectedKeys?: string[];
+    onSelectionChange?: (keys: string[], rows: T[]) => void;
+    /** Rows that cannot be picked (their checkbox renders disabled). */
+    isRowSelectable?: (row: T) => boolean;
+    /** Actions offered in the bar that slides in above the header on selection. */
+    bulkActions?: TableBulkAction<T>[];
+    /** Icon buttons pinned to a right-aligned last column, revealed on row hover. */
+    rowActions?: (row: T, index: number) => ReactNode;
+    /** Keeps the actions column visible instead of fading it in on hover. */
+    alwaysShowRowActions?: boolean;
+    rowState?: (row: T) => TableRowState;
+    /** Rich empty state. Falls back to `emptyMessage` when omitted. */
+    empty?: TableEmptyConfig;
+    /** When set, replaces the body with the error panel — data is not shown. */
+    error?: TableErrorConfig | null;
+    /** Pins the identifier column (and the checkbox) while scrolling sideways. */
+    stickyFirstColumn?: boolean;
+    /** Footer pager rendered inside the table shell. */
+    pagination?: TablePaginationConfig;
+    /**
+     * Arrow-key row focus, Space to select, ⇧-click to range-select, ⌘/Ctrl+A,
+     * Enter to open, Esc to clear. On by default whenever rows are selectable
+     * or clickable.
+     */
+    keyboardNavigation?: boolean;
+    /** Number of shimmer rows drawn while `loading`. Defaults to 6. */
+    loadingRows?: number;
 }
 
-declare function Table<T>({ columns, data, keyField, loading, emptyMessage, onRowClick, rowClassName, stickyHeader, maxHeight, bordered, size, mobileLayout, className, hover, }: CustomTableProps<T>): react_jsx_runtime.JSX.Element;
+declare function Table<T>({ columns, data, keyField, loading, emptyMessage, onRowClick, rowClassName, stickyHeader, maxHeight, bordered, size, mobileLayout, className, hover, sort, onSortChange, defaultSort, manualSort, selectable, selectedKeys, defaultSelectedKeys, onSelectionChange, isRowSelectable, bulkActions, rowActions, alwaysShowRowActions, rowState, empty, error, stickyFirstColumn, pagination, keyboardNavigation, loadingRows, }: CustomTableProps<T>): react_jsx_runtime.JSX.Element;
+
+interface TableCellProps extends ComponentProps<"td"> {
+    size?: TableSize;
+    align?: "left" | "center" | "right";
+    /**
+     * Defaults to "middle" — rows have a fixed height, so centred content is what
+     * reads as a row. Pass "top" for cells that stack several lines.
+     */
+    verticalAlign?: "top" | "middle";
+    /** Render digits on tabular figures so they stack down the column. */
+    tabular?: boolean;
+    /** The identifier column: semibold, and never truncated. */
+    identifier?: boolean;
+    /** Text colour override — row states (saving, deleted) drive this. */
+    color?: string;
+    /** Strikes the content through, for a row on its way out. */
+    strike?: boolean;
+    /** Row height in px. Behaves as a minimum on a table cell. */
+    height?: number;
+    /** Pins the cell while the table scrolls sideways. */
+    sticky?: boolean;
+    /** Left offset for a pinned cell, px. */
+    stickyOffset?: number;
+    /** Background painted behind a pinned cell so scrolled content cannot show through. */
+    stickyBackground?: string;
+    /** Only the outermost pinned cell draws the shadow, so it reads as one edge. */
+    stickyShadow?: boolean;
+    /** Horizontal padding override, px. Falls back to the size scale. */
+    padX?: number;
+}
+declare function TableCell({ size, align, verticalAlign, tabular, identifier, color, strike, height, sticky, stickyOffset, stickyBackground, stickyShadow, padX, className, children, style, ...props }: TableCellProps): react_jsx_runtime.JSX.Element;
+
+/** Kept as a named export — it predates `TableSortDirection` in the types barrel. */
+type SortDirection = TableSortDirection;
+interface TableHeaderCellProps extends Omit<ComponentProps<"th">, "onClick"> {
+    size?: TableSize;
+    align?: "left" | "center" | "right";
+    sortable?: boolean;
+    sorted?: SortDirection;
+    onSort?: () => void;
+    /** Draws the pinned-column shadow and takes the cell out of the scroll flow. */
+    sticky?: boolean;
+    /** Left offset for a pinned cell, px. */
+    stickyOffset?: number;
+    /** Only the outermost pinned cell draws the shadow, so it reads as one edge. */
+    stickyShadow?: boolean;
+}
+declare function TableHeaderCell({ size, align, sortable, sorted, onSort, sticky, stickyOffset, stickyShadow, className, children, style, ...props }: TableHeaderCellProps): react_jsx_runtime.JSX.Element;
+
+interface TableSkeletonProps {
+    rows?: number;
+    columns: number;
+    size?: TableSize;
+    className?: string;
+}
+/** The sweeping fill shared by every skeleton bar. */
+declare const tableShimmerStyle: CSSProperties;
+declare function TableSkeleton({ rows, columns, size, className, }: TableSkeletonProps): react_jsx_runtime.JSX.Element;
+
+interface TableCheckboxProps {
+    checked: boolean;
+    /** Some but not all rows picked — draws a dash instead of a tick. */
+    indeterminate?: boolean;
+    disabled?: boolean;
+    label: string;
+    onChange: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    className?: string;
+}
+/**
+ * A 17px box rather than the shared Checkbox component: inside a 36px compact
+ * row the standard control eats the whole cell.
+ */
+declare function TableCheckbox({ checked, indeterminate, disabled, label, onChange, className, }: TableCheckboxProps): react_jsx_runtime.JSX.Element;
+
+interface TableSelectionBarProps<T> {
+    count: number;
+    rows: T[];
+    keys: string[];
+    actions?: TableBulkAction<T>[];
+    onClear: () => void;
+    /** Noun used in "3 orders selected". Defaults to "row" / "rows". */
+    itemLabel?: string;
+    padX: number;
+}
+/**
+ * Slides in above the header the moment a row is picked, and takes the bulk
+ * actions with it — the actions never live in a menu the operator has to hunt for.
+ */
+declare function TableSelectionBar<T>({ count, rows, keys, actions, onClear, itemLabel, padX, }: TableSelectionBarProps<T>): react_jsx_runtime.JSX.Element | null;
+
+interface TableEmptyStateProps extends TableEmptyConfig {
+    /** Fallback copy when no `title` is supplied. */
+    message?: string;
+}
+declare function TableEmptyState({ icon, title, description, actions, message, }: TableEmptyStateProps): react_jsx_runtime.JSX.Element;
+type TableErrorStateProps = TableErrorConfig;
+/**
+ * An error keeps the filters and says so — the operator should never wonder
+ * whether retrying will lose their query.
+ */
+declare function TableErrorState({ title, description, requestId, onRetry, retryLabel, }: TableErrorStateProps): react_jsx_runtime.JSX.Element;
+
+interface TablePaginationBarProps extends TablePaginationConfig {
+    padX: number;
+}
+/**
+ * First, last, and a window of three around the current page. Above
+ * `jumpThreshold` pages a "Go to" box appears, because clicking through
+ * sixty-four pages is not a real interaction.
+ */
+declare function buildPageWindow(page: number, pageCount: number): Array<number | "ellipsis">;
+declare function TablePaginationBar({ page, pageCount, pageSize, pageSizes, total, onPageChange, onPageSizeChange, label, itemLabel, jumpThreshold, padX, }: TablePaginationBarProps): react_jsx_runtime.JSX.Element;
+
+interface TableStatusCellProps {
+    children: ReactNode;
+    tone?: TableStatusTone;
+    /** Drop the leading dot when the label already carries the meaning. */
+    showDot?: boolean;
+    className?: string;
+}
+/** A chip with a dot — never bare coloured text. */
+declare function TableStatusCell({ children, tone, showDot, className, }: TableStatusCellProps): react_jsx_runtime.JSX.Element;
+interface TableIdentityCellProps {
+    name: ReactNode;
+    /** Secondary line — a phone number, an email. Hidden at size "sm". */
+    meta?: ReactNode;
+    /** Initials shown in the avatar. Derived from `name` when it is a string. */
+    initials?: string;
+    /** Replaces the initials avatar entirely — a thumbnail, a channel logo. */
+    avatar?: ReactNode;
+    size?: TableSize;
+    className?: string;
+}
+/** Avatar plus a name, and at md/lg a muted second line under it. */
+declare function TableIdentityCell({ name, meta, initials, avatar, size, className, }: TableIdentityCellProps): react_jsx_runtime.JSX.Element;
+interface TableActionButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    label: string;
+    children: ReactNode;
+}
+/** A 26px icon button for the actions column. */
+declare function TableActionButton({ label, children, className, onClick, style, ...props }: TableActionButtonProps): react_jsx_runtime.JSX.Element;
+/** An em-dash, muted — never a blank cell or "N/A". */
+declare function TableEmptyValue(): react_jsx_runtime.JSX.Element;
+
+/**
+ * Row height is the only thing that really changes between sizes. `sm` drops
+ * the secondary line under a name; `lg` keeps everything and breathes.
+ *
+ * These map to the design system's compact / cosy / roomy densities.
+ */
+interface TableSizeSpec {
+    /** Density label used by docs and stories. */
+    name: string;
+    /** Body row height, px. */
+    rowHeight: number;
+    /** Header row height, px. */
+    headerHeight: number;
+    /** Body font size, px. */
+    fontSize: number;
+    /** Avatar box in an identity cell, px. */
+    avatar: number;
+    /** Initials inside the avatar, px. */
+    avatarFontSize: number;
+    /** Compact drops the secondary line under a name. */
+    showMeta: boolean;
+    /** Horizontal padding inside a cell, px. */
+    cellPadX: number;
+    /** Padding against the table's left and right edges, px. */
+    edgePad: number;
+    /** Roughly how many rows land on one screen — docs copy. */
+    rowsPerScreen: string;
+    use: string;
+}
+declare const TABLE_SIZES: Record<TableSize, TableSizeSpec>;
+/**
+ * Only horizontal rules exist — no vertical grid lines, ever — and there is no
+ * zebra striping. Rules plus density do that job with less noise.
+ */
+declare const TABLE_COLORS: {
+    readonly surface: "#FFFFFF";
+    readonly headerBg: "#F3F5F9";
+    readonly headerFg: "#595959";
+    readonly headerActiveFg: "#003C1B";
+    /** Hairline under the header — one shade darker than the body rules. */
+    readonly headerRule: "#E2E2E2";
+    /** Hairline between body rows. */
+    readonly rowRule: "#F3F5F9";
+    /** Full-row wash on hover, 120ms. */
+    readonly hoverBg: "#FAFFF7";
+    /** Selected rows tint — never an outline. */
+    readonly selectedBg: "#DCF3CE";
+    readonly selectedRule: "#CDE3C0";
+    readonly fg1: "#161616";
+    readonly fg2: "#595959";
+    readonly fg3: "#9C9C9C";
+    readonly fgDisabled: "#C6C6C6";
+    readonly border: "#E2E2E2";
+    readonly subtle: "#F3F5F9";
+    readonly brand: "#003C1B";
+    readonly brandSoft: "#1F5E2C";
+    readonly brandTint: "#DCF3CE";
+    readonly brandFaint: "#F5FFF0";
+    readonly brandRule: "#D5E8CA";
+    readonly brandGradient: "linear-gradient(180deg,#0A5A2C,#003C1B)";
+    readonly danger: "#A8000F";
+    readonly dangerDeep: "#7A0009";
+    readonly dangerTint: "#FBE9EA";
+    readonly dangerRule: "#F2C8CC";
+    /** Focus ring shared with the rest of the kit. */
+    readonly ring: "0 0 0 3px rgba(140,196,42,.28)";
+    /** Soft right shadow on the pinned identifier column. */
+    readonly pinShadow: "6px 0 8px -6px rgba(0,0,0,.18)";
+    /** Shimmer sweep used by the loading skeleton. */
+    readonly shimmer: "linear-gradient(90deg,#F3F5F9 0px,#E9EDF2 130px,#F3F5F9 260px)";
+};
+interface TableStatusToneSpec {
+    bg: string;
+    fg: string;
+    dot: string;
+}
+declare const TABLE_STATUS_TONES: Record<TableStatusTone, TableStatusToneSpec>;
+interface TableRowStateSpec {
+    /** Base row background before hover and selection are applied. */
+    bg?: string;
+    fg?: string;
+    strike: boolean;
+    /** Saving and deleted rows stop responding to hover, click and selection. */
+    inert: boolean;
+    opacity?: number;
+}
+declare function getTableRowStateSpec(state?: TableRowState): TableRowStateSpec;
+/** The em-dash stand-in for an empty cell — never a blank cell or "N/A". */
+declare const TABLE_EMPTY_CELL = "\u2014";
 
 declare const tableWrapperVariants: (props?: ({
     bordered?: boolean | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
+/** 11px uppercase on a #F3F5F9 fill — the header never competes with the data. */
 declare const tableHeaderRowVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
@@ -1112,30 +1464,6 @@ type TableWrapperVariants = VariantProps<typeof tableWrapperVariants>;
 type TableHeaderRowVariants = VariantProps<typeof tableHeaderRowVariants>;
 type TableBodyRowVariants = VariantProps<typeof tableBodyRowVariants>;
 type StatusBadgeVariants = VariantProps<typeof statusBadgeVariants>;
-
-interface TableCellProps extends ComponentProps<"td"> {
-    size?: TableBodyRowVariants["size"];
-    align?: "left" | "center" | "right";
-    verticalAlign?: "top" | "middle";
-}
-declare function TableCell({ size, align, verticalAlign, className, children, ...props }: TableCellProps): react_jsx_runtime.JSX.Element;
-
-type SortDirection = "asc" | "desc" | null;
-interface TableHeaderCellProps extends Omit<ComponentProps<"th">, "onClick"> {
-    size?: TableHeaderRowVariants["size"];
-    align?: "left" | "center" | "right";
-    sortable?: boolean;
-    sorted?: SortDirection;
-    onSort?: () => void;
-}
-declare function TableHeaderCell({ size, align, sortable, sorted, onSort, className, children, ...props }: TableHeaderCellProps): react_jsx_runtime.JSX.Element;
-
-interface TableSkeletonProps {
-    rows?: number;
-    columns: number;
-    className?: string;
-}
-declare function TableSkeleton({ rows, columns, className, }: TableSkeletonProps): react_jsx_runtime.JSX.Element;
 
 interface StatusBadgeProps extends Omit<StatusBadgeVariants, "variant" | "size"> {
     /**
@@ -1174,13 +1502,13 @@ declare const thumbVariants: (props?: ({
 type TrackVariants = VariantProps<typeof trackVariants>;
 type ThumbVariants = VariantProps<typeof thumbVariants>;
 
-interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "onChange" | "defaultChecked" | "checked" | "type"> {
+interface ToggleProps extends Omit<React$1.ComponentProps<typeof Switch.Root>, "onChange" | "defaultChecked" | "checked" | "type"> {
     /** Size of the toggle */
     size?: ToggleVariantSize;
     /** Color variant of the toggle's off (unchecked) state. Defaults to `"default"` (gray); `"danger"` makes it red. */
     type?: ToggleVariantType;
     /** Field label rendered above the toggle. */
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     /** When true, appends a red asterisk to the label. */
     required?: boolean;
     /** Inline text rendered beside the switch. Position is controlled by `titlePosition`. */
@@ -1207,7 +1535,7 @@ interface ToggleProps extends Omit<React.ComponentProps<typeof Switch.Root>, "on
     /** When provided together with borderColor, enables pill look. Background color applied when checked. */
     bgColor?: string;
 }
-declare const Toggle: React.ForwardRefExoticComponent<Omit<ToggleProps, "ref"> & React.RefAttributes<HTMLButtonElement>>;
+declare const Toggle: React$1.ForwardRefExoticComponent<Omit<ToggleProps, "ref"> & React$1.RefAttributes<HTMLButtonElement>>;
 
 type SidebarSide = "left" | "right" | "right-slide" | "top" | "bottom";
 type SidebarSize = "sm" | "md" | "lg" | "full";
@@ -1223,13 +1551,13 @@ interface SidebarProps {
     overlay?: boolean;
     closeOnOutsideClick?: boolean;
     persistentOnDesktop?: boolean;
-    trigger?: React.ReactNode;
-    heading?: React.ReactNode;
+    trigger?: React$1.ReactNode;
+    heading?: React$1.ReactNode;
     closeIcon?: boolean;
     divider?: boolean;
     className?: string;
     contentClassName?: string;
-    children?: React.ReactNode;
+    children?: React$1.ReactNode;
 }
 
 declare function Sidebar({ open, defaultOpen, onOpenChange, side, size, sizePercent, overlay, closeOnOutsideClick, persistentOnDesktop, trigger, heading, closeIcon, divider, className, contentClassName, children, }: SidebarProps): react_jsx_runtime.JSX.Element | null;
@@ -1271,14 +1599,14 @@ interface AlertDialogOptions<TValue = string> {
      */
     variant?: AlertDialogVariant;
     /** The dialog title — required. */
-    title: React.ReactNode;
+    title: React$1.ReactNode;
     /**
      * Body text shown below the title.
      * `text` and `description` are identical aliases; use whichever reads better.
      */
-    text?: React.ReactNode;
+    text?: React$1.ReactNode;
     /** Alias for `text`. */
-    description?: React.ReactNode;
+    description?: React$1.ReactNode;
     /**
      * Controls the max-width of the dialog.
      * - `"default"` → `max-w-md` (~448 px)
@@ -1290,12 +1618,12 @@ interface AlertDialogOptions<TValue = string> {
      * Label for the confirm / primary button.
      * @default "OK"
      */
-    confirmButtonText?: React.ReactNode;
+    confirmButtonText?: React$1.ReactNode;
     /**
      * Label for the cancel button (only visible when `showCancelButton` is true).
      * @default "Cancel"
      */
-    cancelButtonText?: React.ReactNode;
+    cancelButtonText?: React$1.ReactNode;
     /**
      * Show a cancel / dismiss button alongside the confirm button.
      * @default false
@@ -1322,7 +1650,7 @@ interface AlertDialogOptions<TValue = string> {
      * When provided, `confirmButtonText`, `cancelButtonText`, `showCancelButton`,
      * `confirmButtonVariant`, and `cancelButtonVariant` are ignored.
      */
-    footer?: React.ReactNode;
+    footer?: React$1.ReactNode;
     /**
      * Close the dialog when the user clicks the semi-transparent backdrop.
      * @default true
@@ -1382,7 +1710,7 @@ interface AlertDialogProps<TValue = string> extends AlertDialogOptions<TValue> {
      * Wrap it in `asChild` automatically — pass the raw element, not a wrapper.
      * @example trigger={<Button>Open</Button>}
      */
-    trigger?: React.ReactNode;
+    trigger?: React$1.ReactNode;
     /** Extra Tailwind classes merged onto the dialog panel. */
     className?: string;
 }
@@ -1432,7 +1760,7 @@ declare function useSweetAlert(): SweetAlertContextValue;
  * </SweetAlertProvider>
  */
 declare function SweetAlertProvider({ children }: {
-    children: React.ReactNode;
+    children: React$1.ReactNode;
 }): react_jsx_runtime.JSX.Element;
 
 declare function useFuzzySearch<T extends {
@@ -1445,15 +1773,15 @@ declare const modalSizeVariants: (props?: ({
 interface ModalProps extends VariantProps<typeof modalSizeVariants> {
     isOpen: boolean;
     onClose: () => void;
-    title?: React.ReactNode;
-    children: React.ReactNode;
+    title?: React$1.ReactNode;
+    children: React$1.ReactNode;
     showCloseButton?: boolean;
-    closeIcon?: React.ReactNode;
+    closeIcon?: React$1.ReactNode;
     headerClassName?: string;
     bodyClassName?: string;
     modalClassName?: string;
 }
-declare function Modal({ isOpen, onClose, title, children, size, showCloseButton, closeIcon, headerClassName, bodyClassName, modalClassName, }: ModalProps): React.ReactPortal | null;
+declare function Modal({ isOpen, onClose, title, children, size, showCloseButton, closeIcon, headerClassName, bodyClassName, modalClassName, }: ModalProps): React$1.ReactPortal | null;
 
 interface CustomPaginationProps {
     currentPage: number;
@@ -1485,7 +1813,7 @@ declare function usePagination({ currentPage, totalPages, siblingCount, }: {
 }): (number | "...")[];
 
 interface UengageProviderProps {
-    children: React.ReactNode;
+    children: React$1.ReactNode;
     className?: string;
 }
 declare function UengageProvider({ children, className }: UengageProviderProps): react_jsx_runtime.JSX.Element;
@@ -1497,12 +1825,12 @@ declare namespace Loader {
     var displayName: string;
 }
 
-interface AppHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, "children"> {
+interface AppHeaderProps extends Omit<React$1.HTMLAttributes<HTMLElement>, "children"> {
     /**
      * Brand / logo slot — rendered in a fixed-width zone on the left.
      * On mobile this zone is hidden so the center slot leads.
      */
-    logo?: React.ReactNode;
+    logo?: React$1.ReactNode;
     /**
      * Width of the logo zone on desktop.
      * Set this to match your sidebar width so the center slot aligns
@@ -1514,9 +1842,9 @@ interface AppHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, "childr
      * Center-left slot — typically a business-selector dropdown.
      * On mobile (logo zone hidden) this becomes the leading element.
      */
-    center?: React.ReactNode;
+    center?: React$1.ReactNode;
     /** Right-side slot — action icons, wallet balance, user profile, etc. */
-    right?: React.ReactNode;
+    right?: React$1.ReactNode;
     /** Render a bottom border divider. @default true */
     divider?: boolean;
 }
@@ -1529,7 +1857,7 @@ interface AppSidebarProduct {
     id: string | number;
     name: string;
     /** URL or ReactNode icon */
-    icon?: React.ReactNode;
+    icon?: React$1.ReactNode;
 }
 interface AppSidebarModule {
     /** Unique page/slug identifier */
@@ -1537,7 +1865,7 @@ interface AppSidebarModule {
     /** Display name */
     label: string;
 }
-interface AppSidebarProps extends React.HTMLAttributes<HTMLElement> {
+interface AppSidebarProps extends React$1.HTMLAttributes<HTMLElement> {
     /** List of products shown in the left column */
     products?: AppSidebarProduct[];
     /** List of modules shown in the right column for the active product */
@@ -1558,7 +1886,7 @@ interface AppSidebarProps extends React.HTMLAttributes<HTMLElement> {
      */
     offsetTop?: CssSize;
     /** Optional slot rendered at the bottom of the right column (e.g. version badge) */
-    footer?: React.ReactNode;
+    footer?: React$1.ReactNode;
 }
 declare function AppSidebar({ products, modules, activeProductId, activeModulePage, onProductSelect, onModuleClick, collapsed, offsetTop, footer, className, style, ...props }: AppSidebarProps): react_jsx_runtime.JSX.Element;
 declare namespace AppSidebar {
@@ -1571,20 +1899,20 @@ type AccordionSummaryTone = "brand" | "success" | "neutral" | "warning" | "dange
 interface AccordionItem {
     value: string;
     /** 600 weight, one line, truncates before the summary. */
-    title: React.ReactNode;
-    content: React.ReactNode;
+    title: React$1.ReactNode;
+    content: React$1.ReactNode;
     disabled?: boolean;
     /** Rendered inside the optional mint icon tile. */
-    icon?: React.ReactNode;
+    icon?: React$1.ReactNode;
     /**
      * Extra header content. Rendered outside the toggle's hit area so clicking it
      * never expands the row.
      */
-    action?: React.ReactNode;
+    action?: React$1.ReactNode;
     /** Optional second line. Stays visible when collapsed; dropped at `sm`. */
-    subtitle?: React.ReactNode;
+    subtitle?: React$1.ReactNode;
     /** The collapsed answer — a right-aligned chip. Never truncates. */
-    summary?: React.ReactNode;
+    summary?: React$1.ReactNode;
     /** Palette for the summary chip. @default "neutral" */
     summaryTone?: AccordionSummaryTone;
     /** Tints the row and swaps the chevron for a spinner when `loading`. */
@@ -1592,7 +1920,7 @@ interface AccordionItem {
     /** Why a disabled row is disabled — surfaced as a tooltip. */
     disabledReason?: string;
     /** Same as `action`; both render outside the toggle, separated by a hairline. */
-    headerActions?: React.ReactNode;
+    headerActions?: React$1.ReactNode;
     /** Mount the panel on first open rather than up front. @default false */
     lazy?: boolean;
     /** Keep the panel mounted once opened, so form state survives a collapse. */
@@ -1631,8 +1959,8 @@ interface AccordionBaseProps {
     expandAll?: boolean;
     /** Labels for that control. */
     expandAllLabels?: {
-        expand: React.ReactNode;
-        collapse: React.ReactNode;
+        expand: React$1.ReactNode;
+        collapse: React$1.ReactNode;
     };
     /**
      * Indents the stack and drops its shell, for one level of nesting. Two levels
@@ -1748,7 +2076,7 @@ interface FilterGroupProps {
      * Your filter components — <Select />, <SearchBar />, <Input />, <DatePicker />, etc.
      * Each direct child maps 1-to-1 with an entry in `labels`.
      */
-    children: React.ReactNode;
+    children: React$1.ReactNode;
     /**
      * Category labels shown in the mobile drawer's left panel, in the same order as children.
      * e.g. ["Outlet", "State", "City", "Date"]
@@ -1781,7 +2109,7 @@ declare namespace FilterGroup {
  * Set to `true` when a component is rendered inside the FilterGroup mobile drawer.
  * Components like Select read this to switch to a flat tap-list instead of a popover.
  */
-declare const FilterGroupMobileContext: React.Context<boolean>;
+declare const FilterGroupMobileContext: React$1.Context<boolean>;
 
 /**
  * Visual style of the banner.
@@ -1796,8 +2124,8 @@ type BannerLayout = "default" | "callout";
 /** How an action renders: an outline button, or a bare text link. */
 type BannerActionVariant = "button" | "link";
 interface BannerAction {
-    label: React.ReactNode;
-    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    label: React$1.ReactNode;
+    onClick?: (event: React$1.MouseEvent<HTMLButtonElement>) => void;
     /** Outline button (default) or a bare text link. */
     variant?: BannerActionVariant;
     disabled?: boolean;
@@ -1807,7 +2135,7 @@ interface BannerAction {
     rel?: string;
     "aria-label"?: string;
 }
-interface BannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title" | "content"> {
+interface BannerProps extends Omit<React$1.HTMLAttributes<HTMLDivElement>, "title" | "content"> {
     /**
      * Visual style of the banner.
      * @default "info"
@@ -1836,22 +2164,22 @@ interface BannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"
     /** Light tinted surface, or the dark mix of the same hue for dark surfaces. */
     appearance?: BannerAppearance;
     /** The fact. 600 weight, full ink, one line, no full stop. */
-    title?: React.ReactNode;
+    title?: React$1.ReactNode;
     /** The consequence. 400 weight, the same ink at 82%. */
-    description?: React.ReactNode;
+    description?: React$1.ReactNode;
     /** Text content. Rendered as the title when no `title` is given. */
-    message?: React.ReactNode;
+    message?: React$1.ReactNode;
     /** Same as `message`. Takes precedence over it. */
-    children?: React.ReactNode;
+    children?: React$1.ReactNode;
     /** A short list of causes, capped by `maxItems`. A banner is not an error log. */
-    items?: React.ReactNode[];
+    items?: React$1.ReactNode[];
     /**
      * How many `items` render before the overflow line appears.
      * @default 3
      */
     maxItems?: number;
     /** Rendered in place of the hidden items. Receives how many were dropped. */
-    renderMoreItems?: (hiddenCount: number) => React.ReactNode;
+    renderMoreItems?: (hiddenCount: number) => React$1.ReactNode;
     /** Primary action. Vertically centred beside the copy. */
     action?: BannerAction;
     /** Secondary action, rendered after the primary one. */
@@ -1863,7 +2191,7 @@ interface BannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"
      */
     actionPlacement?: "inline" | "below";
     /** Override the default variant icon. Pass `null` to hide without `showIcon={false}`. */
-    icon?: React.ReactNode;
+    icon?: React$1.ReactNode;
     /**
      * Whether to render the leading icon.
      * @default true
@@ -1891,11 +2219,11 @@ interface BannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"
      */
     progress?: number | true;
     /** Caption under the progress bar, e.g. `264 of 412 · about 40 seconds left`. */
-    progressLabel?: React.ReactNode;
+    progressLabel?: React$1.ReactNode;
     /** Bottom rule shown as a percentage, independent of `autoDismiss`. */
     expiryProgress?: number;
     /** Overrides the tone-derived `role` (`alert` for danger/error, `status` otherwise). */
-    role?: React.AriaRole;
+    role?: React$1.AriaRole;
     /** Custom background color (CSS value). Overrides the variant palette. */
     backgroundColor?: string;
     /** Custom border color (CSS value). Overrides the variant palette. */
@@ -1911,7 +2239,7 @@ interface BannerStackItem extends BannerProps {
     /** Stable key. Also used as the `dismissId` when none is given. */
     id: string;
 }
-interface BannerStackProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+interface BannerStackProps extends Omit<React$1.HTMLAttributes<HTMLDivElement>, "children"> {
     banners: BannerStackItem[];
     /**
      * How many banners render in full. The rest collapse behind a counter.
@@ -1932,31 +2260,31 @@ interface BannerStackProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "c
     /** Gap between stacked banners, in px. @default 8 */
     gap?: number;
     /** Label for the collapsed counter. Receives the hidden count. */
-    moreLabel?: (hiddenCount: number) => React.ReactNode;
+    moreLabel?: (hiddenCount: number) => React$1.ReactNode;
 }
 
 /** Clears a remembered dismissal so the banner can come back. */
 declare function resetBannerDismissal(dismissId: string): void;
-declare const Banner: React.ForwardRefExoticComponent<BannerProps & React.RefAttributes<HTMLDivElement>>;
+declare const Banner: React$1.ForwardRefExoticComponent<BannerProps & React$1.RefAttributes<HTMLDivElement>>;
 
 /**
  * Several notices at once — show the most severe in full, and collapse the rest
  * behind a counter carrying their tone dots.
  */
-declare const BannerStack: React.ForwardRefExoticComponent<BannerStackProps & React.RefAttributes<HTMLDivElement>>;
+declare const BannerStack: React$1.ForwardRefExoticComponent<BannerStackProps & React$1.RefAttributes<HTMLDivElement>>;
 
-interface SectionHeaderProps extends React.ComponentProps<"div"> {
+interface SectionHeaderProps extends React$1.ComponentProps<"div"> {
     /** Icon element shown to the left of the title. */
-    icon?: React.ReactNode;
+    icon?: React$1.ReactNode;
     /** Main heading text. */
     title: string;
     /** Optional subtitle/description rendered below the title. */
-    description?: React.ReactNode;
+    description?: React$1.ReactNode;
     /** Slot for action buttons, rendered at the trailing end of the header. */
-    action?: React.ReactNode;
+    action?: React$1.ReactNode;
 }
 declare function SectionHeader({ icon, title, description, action, className, ...props }: SectionHeaderProps): react_jsx_runtime.JSX.Element;
-interface SectionDividerProps extends Omit<React.ComponentProps<"div">, "children"> {
+interface SectionDividerProps extends Omit<React$1.ComponentProps<"div">, "children"> {
     /** Label shown inline with a horizontal divider. Ignored when orientation="vertical". */
     label?: string;
     /**
@@ -1971,10 +2299,10 @@ interface SectionDividerProps extends Omit<React.ComponentProps<"div">, "childre
     height?: string;
 }
 declare function SectionDivider({ label, orientation, height, className, ...props }: SectionDividerProps): react_jsx_runtime.JSX.Element;
-interface SectionContentProps extends React.ComponentProps<"div"> {
+interface SectionContentProps extends React$1.ComponentProps<"div"> {
 }
 declare function SectionContent({ className, children, ...props }: SectionContentProps): react_jsx_runtime.JSX.Element;
-interface SectionSubsectionProps extends React.ComponentProps<"div"> {
+interface SectionSubsectionProps extends React$1.ComponentProps<"div"> {
     /** Title shown above this subsection. */
     title?: string;
     /**ClassName applied to the title element for full style customisation. */
@@ -1987,7 +2315,7 @@ interface SectionSubsectionProps extends React.ComponentProps<"div"> {
     separatorLabel?: string;
 }
 declare function SectionSubsection({ title, titleClassName, description, separator, separatorLabel, className, children, ...props }: SectionSubsectionProps): react_jsx_runtime.JSX.Element;
-interface SectionRowProps extends React.ComponentProps<"div"> {
+interface SectionRowProps extends React$1.ComponentProps<"div"> {
     /**
      * Number of equal columns. Defaults to 3.
      * Accepts 1–4 or a raw CSS grid-template-columns string.
@@ -2001,12 +2329,12 @@ interface SectionRowProps extends React.ComponentProps<"div"> {
     dividers?: boolean;
 }
 declare function SectionRow({ columns, dividers, className, style, children, ...props }: SectionRowProps): react_jsx_runtime.JSX.Element;
-interface SectionFieldProps extends React.ComponentProps<"div"> {
+interface SectionFieldProps extends React$1.ComponentProps<"div"> {
     /** Column span inside a SectionRow grid (1–4). */
     span?: 1 | 2 | 3 | 4;
 }
 declare function SectionField({ span, className, ...props }: SectionFieldProps): react_jsx_runtime.JSX.Element;
-interface SectionTableContentProps extends React.ComponentProps<"div"> {
+interface SectionTableContentProps extends React$1.ComponentProps<"div"> {
     /**
      * Show a thin separator line between the section header and the table.
      * Defaults to true.
@@ -2014,7 +2342,7 @@ interface SectionTableContentProps extends React.ComponentProps<"div"> {
     divider?: boolean;
 }
 declare function SectionTableContent({ divider, className, children, ...props }: SectionTableContentProps): react_jsx_runtime.JSX.Element;
-interface SectionGroupProps extends React.ComponentProps<"div"> {
+interface SectionGroupProps extends React$1.ComponentProps<"div"> {
     /**
      * Index of the section that is initially open.
      * Pass `null` to start with all sections closed.
@@ -2026,7 +2354,7 @@ declare function SectionGroup({ defaultOpen, className, children, ...props }: Se
 declare namespace SectionGroup {
     var displayName: string;
 }
-interface SectionProps extends React.ComponentProps<"div"> {
+interface SectionProps extends React$1.ComponentProps<"div"> {
     /** When true, removes the card border/background and renders a bare container. */
     bare?: boolean;
     /** Enables the collapse/expand toggle. A chevron button appears in the header. */
@@ -2209,7 +2537,7 @@ interface FileUploadProps {
     onReplace?: (item: FileUploadItem, index: number) => void;
     /** Open the crop tool for an image whose dimensions do not match. */
     onCrop?: (item: FileUploadItem, index: number) => void;
-    label?: React.ReactNode;
+    label?: React$1.ReactNode;
     required?: boolean;
     /** Shown below the field in red. Also shown for internal validation errors. */
     error?: string;
@@ -2267,13 +2595,13 @@ interface FileUploadProps {
      * image or avatar preview. Useful for camera, edit, or brand indicators.
      * Not rendered in the file variant or on empty-state dropzones.
      */
-    icon?: React.ReactNode;
+    icon?: React$1.ReactNode;
     /** Applied to the outermost wrapper div. */
     className?: string;
     /** Applied to the dropzone area (not used in avatar variant). */
     dropzoneClassName?: string;
     /** Ref forwarded to the hidden <input type="file"> element. */
-    inputRef?: React.Ref<HTMLInputElement>;
+    inputRef?: React$1.Ref<HTMLInputElement>;
 }
 declare function FileUpload({ variant, size, tone, accept, multiple, disabled, readOnly, name, id, maxSize, maxFiles, allowedFiles, formats, value, items, onChange, onFilesChange, onRemove, onRemoveFile, onValidationError, onRetry, onRetryAll, onSkip, onReplace, onCrop, label, required, error, helperText, placeholder, description, browseHint, dragAndDrop, showLocalPreview, clearable, changeable, showStatusBadge, showEmptyListHint, showDropzone, batchSummary, batchCaption, initials, galleryColumns, coverBadge, icon, className, dropzoneClassName, inputRef: externalInputRef, }: FileUploadProps): react_jsx_runtime.JSX.Element;
 declare namespace FileUpload {
@@ -2301,4 +2629,4 @@ interface ChipProps extends ChipVariants {
 }
 declare function Chip({ label, variant, size, icon, iconPosition, bgColor, textColor, className, }: ChipProps): react_jsx_runtime.JSX.Element;
 
-export { ACCORDION_SIZES, Accordion, type AccordionAppearance, type AccordionChevronPosition, type AccordionChipTone, type AccordionContentVariants, type AccordionItem, type AccordionItemState, type AccordionItemVariants, type AccordionPalette, type AccordionRootVariants, type AccordionSize, type AccordionSizeSpec, type AccordionSummaryTone, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerAction, type BannerActionVariant, BannerAppearance, type BannerLayout, BannerPlacement, type BannerProps, BannerSize, BannerStack, type BannerStackItem, type BannerStackProps, BannerTone, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DateRange, DesignTabs, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, TABS_SIZES, type TabItem, TabPanel, type TabPanelProps, type TabTriggerVariants, Table, type TableBodyRowVariants, type TableCellProps, type TableHeaderCellProps, type TableHeaderRowVariants, type TableSkeletonProps, type TableWrapperVariants, Tabs, type TabsActivation, TabsActiveValueContext, type TabsAppearance, type TabsDesignVariant, type TabsOverflowMode, type TabsPalette, type TabsSize, type TabsSizeSpec, type TabsVariant, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getAccordionChip, getAccordionPalette, getTabsPalette, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
+export { ACCORDION_SIZES, Accordion, type AccordionAppearance, type AccordionChevronPosition, type AccordionChipTone, type AccordionContentVariants, type AccordionItem, type AccordionItemState, type AccordionItemVariants, type AccordionPalette, type AccordionRootVariants, type AccordionSize, type AccordionSizeSpec, type AccordionSummaryTone, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerAction, type BannerActionVariant, BannerAppearance, type BannerLayout, BannerPlacement, type BannerProps, BannerSize, BannerStack, type BannerStackItem, type BannerStackProps, BannerTone, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DateRange, DesignTabs, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, TABLE_COLORS, TABLE_EMPTY_CELL, TABLE_SIZES, TABLE_STATUS_TONES, TABS_SIZES, type TabItem, TabPanel, type TabPanelProps, type TabTriggerVariants, Table, TableActionButton, type TableActionButtonProps, type TableBodyRowVariants, type TableBulkAction, type TableCellProps, TableCheckbox, type TableCheckboxProps, type TableEmptyConfig, TableEmptyState, type TableEmptyStateProps, TableEmptyValue, type TableErrorConfig, TableErrorState, type TableErrorStateProps, type TableHeaderCellProps, type TableHeaderRowVariants, TableIdentityCell, type TableIdentityCellProps, TablePaginationBar, type TablePaginationBarProps, type TablePaginationConfig, type TableRowState, type TableRowStateSpec, TableSelectionBar, type TableSelectionBarProps, type TableSelectionMode, type TableSize, type TableSizeSpec, type TableSkeletonProps, type TableSortDirection, type TableSortState, TableStatusCell, type TableStatusCellProps, type TableStatusTone, type TableStatusToneSpec, type TableWrapperVariants, Tabs, type TabsActivation, TabsActiveValueContext, type TabsAppearance, type TabsDesignVariant, type TabsOverflowMode, type TabsPalette, type TabsSize, type TabsSizeSpec, type TabsVariant, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, buildPageWindow, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getAccordionChip, getAccordionPalette, getTableRowStateSpec, getTabsPalette, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableShimmerStyle, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };

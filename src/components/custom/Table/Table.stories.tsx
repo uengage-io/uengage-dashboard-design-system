@@ -3,17 +3,36 @@ import type { Meta, StoryObj } from "@storybook/react";
 import {
   Clock,
   CreditCard,
+  Eye,
   MapPin,
+  MoreVertical,
   Phone,
   User,
 } from "lucide-react";
 import { Table } from "./Table";
+import {
+  TableActionButton,
+  TableIdentityCell,
+  TableStatusCell,
+} from "./TableCells";
 import { StatusBadge } from "../StatusBadge";
-import type { ColumnDef, CustomTableProps } from "../../../types/table";
+import { TABLE_COLORS } from "./tableTokens";
+import type {
+  ColumnDef,
+  CustomTableProps,
+  TableSize,
+  TableStatusTone,
+} from "../../../types/table";
 
 /* ── Mock data ────────────────────────────────────────────────── */
 
-type Status = "Allocated" | "Redeemed";
+type Status =
+  | "Allocated"
+  | "Redeemed"
+  | "Delivered"
+  | "Dispatched"
+  | "Preparing"
+  | "Cancelled";
 
 interface OrderRow {
   id: string;
@@ -25,6 +44,8 @@ interface OrderRow {
   address: string;
   orderId: string;
   remarks: string;
+  channel: string;
+  tat: string;
 }
 
 const BASE: Omit<OrderRow, "id" | "status" | "amount"> = {
@@ -34,6 +55,8 @@ const BASE: Omit<OrderRow, "id" | "status" | "amount"> = {
   address: "505 Willow Dr, Rio de Janeiro, Rio de Janeiro, Greater Kailash",
   orderId: "3102790000",
   remarks: "505 Willow Dr, Rio de Janeiro, Rio de Janeiro, Greater",
+  channel: "Website",
+  tat: "24 min",
 };
 
 const ROWS: OrderRow[] = [
@@ -156,7 +179,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Generic, typed table built on shadcn Table. CVA-driven size/border variants, built-in sort (asc → desc → cleared), sticky header (bounded scroll box or full page scroll), loading and empty states, responsive column hiding, optional row click handling, and a `hover` prop (default `true`) to control row highlight on hover.\n\n**Sticky header — two modes:**\n- `stickyHeader` + `maxHeight` — header sticks within a fixed-height, internally scrolling box.\n- `stickyHeader` alone (no `maxHeight`) — header sticks to the top of the viewport as the whole page scrolls.\n\n**Per-column props of note:**\n- `verticalAlign?: 'top' | 'middle'` — controls vertical alignment of cell content. Defaults to `'top'`. Use `'middle'` on columns that render a single badge, toggle, or button so they stay centred when adjacent cells are taller.",
+          "Generic, typed table built on shadcn Table. Built-in sort (asc → desc → cleared), row selection with bulk actions, per-row lifecycle states, hover-revealed row actions, a pinned identifier column, sticky header (bounded scroll box or full page scroll), loading / empty / error states, responsive column hiding, an in-shell pagination footer, and full keyboard navigation.\n\n**A table is read by scanning down a column, not across a row.** Everything follows from that: numbers right-align on tabular figures, only horizontal rules exist (no vertical grid lines, no zebra striping), and the hover wash spans the whole row.\n\n**Sizes** — `sm` (36px rows, drops the secondary line under a name), `md` (48px, the default) and `lg` (58px).\n\n**Sticky header — two modes:**\n- `stickyHeader` + `maxHeight` — header sticks within a fixed-height, internally scrolling box.\n- `stickyHeader` alone (no `maxHeight`) — header sticks to the top of the viewport as the whole page scrolls.\n\n**Keyboard** — ↑↓ moves the focused row, Space selects it, ⇧+↑↓ and ⇧-click extend the selection, ⌘/Ctrl+A selects the page, ↵ opens the focused row, Esc clears. On by default whenever rows are selectable or clickable; force it with `keyboardNavigation`.\n\n**Per-column props of note:**\n- `verticalAlign?: 'top' | 'middle'` — defaults to `'middle'`, since rows have a fixed height. Use `'top'` on columns that stack several lines.\n- `tabular?: boolean` — tabular figures. Defaults to `true` on right-aligned columns.\n- `identifier?: boolean` — semibold, never truncated, and the column that pins under `stickyFirstColumn`. Inferred for the first column.",
       },
     },
   },
@@ -187,12 +210,18 @@ const meta = {
         "| `width` | `string` | — | Explicit CSS width, overrides flex |\n" +
         "| `minWidth` | `number` | — | Min width in px |\n" +
         "| `align` | `'left' \\| 'center' \\| 'right'` | `'left'` | Horizontal text alignment |\n" +
-        "| `verticalAlign` | `'top' \\| 'middle'` | `'top'` | Vertical cell alignment — use `'middle'` for single-item cells (badges, toggles, buttons) inside tall rows |\n" +
+        "| `verticalAlign` | `'top' \\| 'middle'` | `'middle'` | Vertical cell alignment — use `'top'` for cells that stack several lines |\n" +
         "| `render` | `(value, row, index) => ReactNode` | — | Custom cell renderer |\n" +
         "| `sortable` | `boolean` | — | Enables click-to-sort on the header |\n" +
+        "| `sortFn` | `(a, b) => number` | — | Custom comparator for that column |\n" +
+        "| `tabular` | `boolean` | right-aligned | Tabular figures, so digits stack |\n" +
+        "| `identifier` | `boolean` | first column | Semibold, never truncated, pins under `stickyFirstColumn` |\n" +
         "| `hideOnMobile` | `boolean` | — | Hides column below `md` breakpoint |\n" +
         "| `className` | `string` | — | Extra Tailwind classes for `<th>` and `<td>` |",
     },
+    selectable: { control: "radio", options: ["none", "single", "multiple"] },
+    stickyFirstColumn: { control: "boolean" },
+    alwaysShowRowActions: { control: "boolean" },
   },
   args: {
     hover: true,
@@ -415,3 +444,529 @@ export const Clickable: Story = {
     bordered: true,
   },
 };
+
+/* ── Design-system columns ────────────────────────────────────── */
+
+const DS_COLUMNS: ColumnDef<OrderRow>[] = [
+  {
+    key: "id",
+    header: "Order Id",
+    width: "112px",
+    minWidth: 112,
+    sortable: true,
+    identifier: true,
+    render: (_v, row) => row.orderId,
+  },
+  {
+    key: "customerName",
+    header: "Customer",
+    flex: 2,
+    minWidth: 200,
+    sortable: true,
+    render: (_v, row) => (
+      <TableIdentityCell name={row.customerName} meta={row.phone} />
+    ),
+  },
+  { key: "date", header: "Placed", flex: 1.2, minWidth: 150 },
+  {
+    key: "amount",
+    header: "Amount",
+    width: "112px",
+    minWidth: 112,
+    align: "right",
+    sortable: true,
+    render: (v: number) => formatINR(v),
+  },
+  {
+    key: "status",
+    header: "Status",
+    width: "130px",
+    minWidth: 130,
+    render: (v: Status) => (
+      <TableStatusCell tone={v === "Redeemed" ? "success" : "info"}>{v}</TableStatusCell>
+    ),
+  },
+];
+
+const DS_ROW_ACTIONS = () => (
+  <>
+    <TableActionButton label="View order">
+      <Eye className="h-[13px] w-[13px]" />
+    </TableActionButton>
+    <TableActionButton label="More actions">
+      <MoreVertical className="h-[13px] w-[13px]" />
+    </TableActionButton>
+  </>
+);
+
+/* ── Design-system stories ────────────────────────────────────── */
+
+export const Selectable: Story = {
+  name: "Selectable + bulk actions",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`selectable=\"multiple\"` adds the checkbox column and a tri-state header box. The moment a row is picked, the bulk-action bar slides in above the header. Keyboard: ↑↓ move, Space selects, ⇧+↑↓ or ⇧-click extends, ⌘/Ctrl+A selects the page, Esc clears.",
+      },
+    },
+  },
+  render: (args) => {
+    const [keys, setKeys] = useState<string[]>([]);
+    return (
+      <Table
+        {...args}
+        selectable="multiple"
+        selectedKeys={keys}
+        onSelectionChange={setKeys}
+        bulkActions={[
+          { label: "Mark redeemed", onClick: (rows) => console.log(rows) },
+          { label: "Export", onClick: (rows) => console.log(rows) },
+          { label: "Cancel orders", tone: "danger", onClick: (rows) => console.log(rows) },
+        ]}
+      />
+    );
+  },
+  args: {
+    columns: DS_COLUMNS,
+    data: ROWS,
+    keyField: "id",
+    bordered: true,
+  },
+};
+
+export const RowActions: Story = {
+  name: "Row actions",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Icon buttons live in a right-aligned last column and fade in on row hover or focus. Pass `alwaysShowRowActions` to keep them visible.",
+      },
+    },
+  },
+  args: {
+    columns: DS_COLUMNS,
+    data: ROWS,
+    keyField: "id",
+    bordered: true,
+    rowActions: DS_ROW_ACTIONS,
+  },
+};
+
+export const RowStates: Story = {
+  name: "Row states",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`rowState` tints a row for its lifecycle. A saving row greys; a deleted row greys and strikes for one beat before it leaves. Both stop responding to hover, click and selection.",
+      },
+    },
+  },
+  args: {
+    columns: DS_COLUMNS,
+    data: ROWS,
+    keyField: "id",
+    bordered: true,
+    selectable: "multiple",
+    rowState: (row) =>
+      row.id === "r3" ? "saving" : row.id === "r4" ? "deleted" : row.id === "r5" ? "disabled" : "default",
+  },
+};
+
+export const RichEmpty: Story = {
+  name: "Empty — rich",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The `empty` config replaces the plain `emptyMessage` with an icon, a title, an explanation of what was filtered out, and the actions that undo it.",
+      },
+    },
+  },
+  args: {
+    columns: DS_COLUMNS,
+    data: [],
+    keyField: "id",
+    bordered: true,
+    empty: {
+      title: "No orders in this window",
+      description:
+        "Nothing matched Channel = Zomato between 12 and 19 March. Widen the range or clear the channel filter.",
+    },
+  },
+};
+
+export const ErrorState: Story = {
+  name: "Error",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An error keeps the filters and says so, and carries the request id so it can be read out over a call.",
+      },
+    },
+  },
+  args: {
+    columns: DS_COLUMNS,
+    data: ROWS,
+    keyField: "id",
+    bordered: true,
+    error: {
+      title: "Could not load orders",
+      description:
+        "The orders service timed out after 30 seconds. Your filters are still applied — retrying will keep them.",
+      requestId: "req_8f21c4 · 14:32:07 IST",
+      onRetry: () => console.log("retry"),
+    },
+  },
+};
+
+export const WithPagination: Story = {
+  name: "Pagination footer",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "First, last and a window of three around the current page. Above `jumpThreshold` pages (20 by default) a \"Go to\" box appears. Omit `pageCount` for cursor-style paging against an unknown total.",
+      },
+    },
+  },
+  render: (args) => {
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(25);
+    return (
+      <Table
+        {...args}
+        pagination={{
+          page,
+          pageCount: 64,
+          pageSize,
+          pageSizes: [10, 25, 50],
+          total: 1584,
+          itemLabel: "orders",
+          onPageChange: setPage,
+          onPageSizeChange: (n) => {
+            setPageSize(n);
+            setPage(1);
+          },
+        }}
+      />
+    );
+  },
+  args: {
+    columns: DS_COLUMNS,
+    data: ROWS,
+    keyField: "id",
+    bordered: true,
+  },
+};
+
+export const StickyFirstColumn: Story = {
+  name: "Pinned first column",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The identifier column pins with a soft right shadow so the row is never lost while scrolling sideways. The checkbox pins with it.",
+      },
+    },
+  },
+  render: (args) => (
+    <div className="max-w-[560px]">
+      <Table {...args} />
+    </div>
+  ),
+  args: {
+    columns: DS_COLUMNS,
+    data: ROWS,
+    keyField: "id",
+    bordered: true,
+    stickyFirstColumn: true,
+    selectable: "multiple",
+  },
+};
+
+/* â”€â”€ Live demo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+const STATUS_TONE: Record<Status, TableStatusTone> = {
+  Delivered: "success",
+  Redeemed: "success",
+  Dispatched: "info",
+  Allocated: "info",
+  Preparing: "warning",
+  Cancelled: "danger",
+};
+
+const LIVE_ROWS: OrderRow[] = (
+  [
+    ["UE-90412", "Ananya Verma", "+91 95011 74711", "Website", 1240, "24 min", "Dispatched"],
+    ["UE-90411", "Rohit Malhotra", "+91 98140 22317", "Zomato", 640, "31 min", "Delivered"],
+    ["UE-90409", "Simran Kaur", "+91 99150 88204", "Dine-in", 2180, "18 min", "Preparing"],
+    ["UE-90405", "Karan Bedi", "+91 90411 63550", "Swiggy", 410, "52 min", "Cancelled"],
+    ["UE-90402", "Meera Iyer", "+91 97800 12094", "Website", 3050, "22 min", "Delivered"],
+    ["UE-90398", "Arjun Nair", "+91 96540 71183", "Zomato", 890, "35 min", "Delivered"],
+    ["UE-90394", "Priya Chawla", "+91 93110 45027", "ONDC", 1560, "41 min", "Dispatched"],
+  ] as const
+).map(([id, customerName, phone, channel, amount, tat, status]) => ({
+  ...BASE,
+  id,
+  orderId: id,
+  customerName,
+  phone,
+  channel,
+  amount,
+  tat,
+  status: status as Status,
+}));
+
+/** Rebuilt per size so the identity cell picks up the matching avatar scale. */
+const liveColumns = (size: TableSize): ColumnDef<OrderRow>[] => [
+  {
+    key: "id",
+    header: "Order Id",
+    width: "112px",
+    minWidth: 112,
+    sortable: true,
+    identifier: true,
+  },
+  {
+    key: "customerName",
+    header: "Customer",
+    flex: 2,
+    minWidth: 200,
+    sortable: true,
+    render: (_v, row) => (
+      <TableIdentityCell name={row.customerName} meta={row.phone} size={size} />
+    ),
+  },
+  { key: "channel", header: "Channel", width: "110px", minWidth: 110, sortable: true },
+  {
+    key: "amount",
+    header: "Amount",
+    width: "112px",
+    minWidth: 112,
+    align: "right",
+    sortable: true,
+    render: (v: number) => formatINR(v),
+  },
+  { key: "tat", header: "TAT", width: "86px", minWidth: 86, align: "right", sortable: true },
+  {
+    key: "status",
+    header: "Status",
+    width: "130px",
+    minWidth: 130,
+    render: (v: Status) => (
+      <TableStatusCell tone={STATUS_TONE[v]}>{v}</TableStatusCell>
+    ),
+  },
+];
+
+type DemoView = "data" | "loading" | "empty" | "error";
+
+function DemoSegButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="cursor-pointer rounded-md border-0 px-[11px] py-1.5 text-[11px] font-semibold leading-none transition-all duration-[120ms]"
+      style={{
+        background: active ? "#FFFFFF" : "transparent",
+        color: active ? TABLE_COLORS.brand : TABLE_COLORS.fg2,
+        boxShadow: active ? "2px 2px 4px rgba(0,0,0,.06)" : "none",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function DemoButton({
+  onClick,
+  children,
+  tone = "default",
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  tone?: "default" | "danger" | "primary";
+}) {
+  if (tone === "primary") {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="h-8 cursor-pointer rounded-lg border-0 px-3 text-[11px] font-semibold leading-none text-white"
+        style={{
+          backgroundColor: TABLE_COLORS.brand,
+          backgroundImage: TABLE_COLORS.brandGradient,
+        }}
+      >
+        {children}
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="h-8 cursor-pointer rounded-lg border bg-white px-3 text-[11px] font-semibold leading-none transition-all duration-[120ms]"
+      style={{
+        borderColor: TABLE_COLORS.border,
+        color: tone === "danger" ? TABLE_COLORS.danger : TABLE_COLORS.fg2,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+export const LiveDemo: Story = {
+  name: "Live demo",
+  parameters: {
+    layout: "fullscreen",
+    docs: {
+      description: {
+        story:
+          "The whole component in one place: click a header to sort, pick rows to raise the bulk-action bar, page through the footer, and switch size or state from the controls. The identifier column is pinned, so scrolling sideways never loses the row.",
+      },
+    },
+  },
+  render: () => {
+    const [size, setSize] = useState<TableSize>("md");
+    const [view, setView] = useState<DemoView>("data");
+    const [selected, setSelected] = useState<string[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(25);
+
+    const columns = liveColumns(size);
+    const runLoading = () => {
+      setView("loading");
+      setTimeout(() => setView("data"), 1500);
+    };
+
+    return (
+      <div className="p-6" style={{ background: "#FAFAFA" }}>
+        <section
+          className="overflow-hidden rounded-xl border bg-white shadow-[2px_2px_4px_rgba(0,0,0,.04)]"
+          style={{ borderColor: TABLE_COLORS.border }}
+        >
+          <div className="flex flex-wrap items-start gap-[14px] px-5 pb-[15px] pt-[18px]">
+            <div className="min-w-[230px] flex-1">
+              <h2
+                className="m-0 text-base font-bold leading-tight"
+                style={{ color: TABLE_COLORS.fg1 }}
+              >
+                Live table
+              </h2>
+              <p
+                className="mt-1 text-[13px] leading-normal"
+                style={{ color: TABLE_COLORS.fg2 }}
+              >
+                Keyboard: â†‘â†“ to move, Space to select, â‡§-click to range-select, âŒ˜/Ctrl+A to
+                select the page, â†µ to open, Esc to clear.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <div
+                className="flex gap-0.5 rounded-lg p-[3px]"
+                style={{ background: TABLE_COLORS.subtle }}
+              >
+                {(["sm", "md", "lg"] as TableSize[]).map((s) => (
+                  <DemoSegButton key={s} active={size === s} onClick={() => setSize(s)}>
+                    {s}
+                  </DemoSegButton>
+                ))}
+              </div>
+              <DemoButton onClick={runLoading}>Loading</DemoButton>
+              <DemoButton onClick={() => setView("empty")}>Empty</DemoButton>
+              <DemoButton tone="danger" onClick={() => setView("error")}>
+                Error
+              </DemoButton>
+              <DemoButton tone="primary" onClick={() => setView("data")}>
+                Data
+              </DemoButton>
+            </div>
+          </div>
+
+          <Table
+            columns={columns}
+            data={view === "empty" ? [] : LIVE_ROWS}
+            keyField="id"
+            size={size}
+            loading={view === "loading"}
+            stickyHeader
+            maxHeight="430px"
+            stickyFirstColumn
+            selectable="multiple"
+            selectedKeys={selected}
+            onSelectionChange={setSelected}
+            rowActions={DS_ROW_ACTIONS}
+            onRowClick={(row) => console.log("open", row.id)}
+            defaultSort={{ key: "id", direction: "desc" }}
+            bulkActions={[
+              { label: "Mark delivered", onClick: (rows) => console.log("deliver", rows) },
+              { label: "Export", onClick: (rows) => console.log("export", rows) },
+              {
+                label: "Cancel orders",
+                tone: "danger",
+                onClick: (rows) => console.log("cancel", rows),
+              },
+            ]}
+            empty={{
+              title: "No orders in this window",
+              description:
+                "Nothing matched Channel = Zomato between 12 and 19 March. Widen the range or clear the channel filter.",
+              actions: (
+                <>
+                  <DemoButton onClick={() => setView("data")}>Widen to 30 days</DemoButton>
+                  <DemoButton tone="primary" onClick={() => setView("data")}>
+                    Clear filters
+                  </DemoButton>
+                </>
+              ),
+            }}
+            error={
+              view === "error"
+                ? {
+                    title: "Could not load orders",
+                    description:
+                      "The orders service timed out after 30 seconds. Your filters are still applied â€” retrying will keep them.",
+                    requestId: "req_8f21c4 Â· 14:32:07 IST",
+                    onRetry: runLoading,
+                  }
+                : null
+            }
+            pagination={{
+              page,
+              pageCount: 64,
+              pageSize,
+              pageSizes: [10, 25, 50],
+              total: 1584,
+              itemLabel: "orders",
+              onPageChange: setPage,
+              onPageSizeChange: (n) => {
+                setPageSize(n);
+                setPage(1);
+              },
+            }}
+          />
+        </section>
+      </div>
+    );
+  },
+  args: {
+    columns: DS_COLUMNS,
+    data: LIVE_ROWS,
+    keyField: "id",
+  },
+};
+

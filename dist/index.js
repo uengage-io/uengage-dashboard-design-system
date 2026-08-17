@@ -1,12 +1,12 @@
 "use client";
 import * as React10 from 'react';
-import { useMemo, useState, useRef, useLayoutEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import { cva } from 'class-variance-authority';
 import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Separator$1, Dialog, Slot, Popover as Popover$1, RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Accordion as Accordion$1, Collapsible, Tabs as Tabs$1 } from 'radix-ui';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { X, ChevronDown, Info, Check, CircleX, TriangleAlert, Search, Clock, CircleAlert, ArrowUpAZ, ArrowDownAZ, Lock, Plus, EyeOff, Eye, CalendarIcon, ChevronUp, ChevronsUpDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, SlidersHorizontal, Loader2, ImageIcon, Upload, Camera, Video, Play, HelpCircle, AlertTriangle } from 'lucide-react';
+import { X, ChevronDown, Info, Check, CircleX, TriangleAlert, Search, Clock, CircleAlert, ArrowUpAZ, ArrowDownAZ, Lock, Plus, EyeOff, Eye, CalendarIcon, ArrowUp, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, ListFilter, AlertCircle, SlidersHorizontal, Loader2, ImageIcon, Upload, Camera, Video, Play, HelpCircle, AlertTriangle } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
@@ -6936,20 +6936,10 @@ function TableCell({ className, ...props }) {
     }
   );
 }
-function Skeleton({ className, ...props }) {
-  return /* @__PURE__ */ jsx(
-    "div",
-    {
-      "data-slot": "skeleton",
-      className: cn("animate-pulse rounded-md bg-accent", className),
-      ...props
-    }
-  );
-}
-var tableWrapperVariants = cva("w-full", {
+var tableWrapperVariants = cva("w-full bg-white", {
   variants: {
     bordered: {
-      true: "border rounded-lg",
+      true: "border border-[#E2E2E2] rounded-xl shadow-[2px_2px_4px_rgba(0,0,0,.04)]",
       false: ""
     }
   },
@@ -6958,13 +6948,13 @@ var tableWrapperVariants = cva("w-full", {
   }
 });
 var tableHeaderRowVariants = cva(
-  "bg-slate-50 text-gray-500 text-xs font-medium",
+  "bg-[#F3F5F9] text-[#595959] text-[11px] font-semibold uppercase tracking-[0.05em]",
   {
     variants: {
       size: {
-        sm: "py-1.5 sm:py-2",
-        md: "py-2 sm:py-3",
-        lg: "py-3 sm:py-4"
+        sm: "h-[34px]",
+        md: "h-[38px]",
+        lg: "h-[42px]"
       }
     },
     defaultVariants: {
@@ -6972,19 +6962,20 @@ var tableHeaderRowVariants = cva(
     }
   }
 );
-var tableBodyRowVariants = cva("transition-colors", {
+var tableBodyRowVariants = cva("transition-colors duration-[120ms]", {
   variants: {
     size: {
-      sm: "py-1.5 sm:py-2 text-xs",
-      md: "py-2 sm:py-3 text-sm",
-      lg: "py-3 sm:py-4 text-sm sm:text-base"
+      sm: "text-[12px]",
+      md: "text-[13px]",
+      lg: "text-[13px]"
     },
     clickable: {
       true: "cursor-pointer",
       false: ""
     },
     hover: {
-      true: "hover:bg-gray-50",
+      // A full-row wash, so the eye never loses its line.
+      true: "hover:bg-[#FAFFF7]",
       false: "hover:bg-transparent"
     }
   },
@@ -7016,6 +7007,117 @@ var statusBadgeVariants = cva(
     }
   }
 );
+
+// src/components/custom/Table/tableTokens.ts
+var TABLE_SIZES = {
+  sm: {
+    name: "Compact",
+    rowHeight: 36,
+    headerHeight: 34,
+    fontSize: 12,
+    avatar: 22,
+    avatarFontSize: 8,
+    showMeta: false,
+    cellPadX: 12,
+    edgePad: 16,
+    rowsPerScreen: "~18 rows",
+    use: "Reconciliation and audit screens where volume beats detail"
+  },
+  md: {
+    name: "Cosy",
+    rowHeight: 48,
+    headerHeight: 38,
+    fontSize: 13,
+    avatar: 28,
+    avatarFontSize: 10,
+    showMeta: true,
+    cellPadX: 14,
+    edgePad: 20,
+    rowsPerScreen: "~13 rows",
+    use: "The default. Fits an avatar and a secondary line"
+  },
+  lg: {
+    name: "Roomy",
+    rowHeight: 58,
+    headerHeight: 42,
+    fontSize: 13,
+    avatar: 32,
+    avatarFontSize: 11,
+    showMeta: true,
+    cellPadX: 16,
+    edgePad: 22,
+    rowsPerScreen: "~11 rows",
+    use: "Short lists with thumbnails \u2014 menus, outlets, offers"
+  }
+};
+var TABLE_COLORS = {
+  surface: "#FFFFFF",
+  headerBg: "#F3F5F9",
+  headerFg: "#595959",
+  headerActiveFg: "#003C1B",
+  /** Hairline under the header — one shade darker than the body rules. */
+  headerRule: "#E2E2E2",
+  /** Hairline between body rows. */
+  rowRule: "#F3F5F9",
+  /** Full-row wash on hover, 120ms. */
+  hoverBg: "#FAFFF7",
+  /** Selected rows tint — never an outline. */
+  selectedBg: "#DCF3CE",
+  selectedRule: "#CDE3C0",
+  fg1: "#161616",
+  fg2: "#595959",
+  fg3: "#9C9C9C",
+  fgDisabled: "#C6C6C6",
+  border: "#E2E2E2",
+  subtle: "#F3F5F9",
+  brand: "#003C1B",
+  brandSoft: "#1F5E2C",
+  brandTint: "#DCF3CE",
+  brandFaint: "#F5FFF0",
+  brandRule: "#D5E8CA",
+  brandGradient: "linear-gradient(180deg,#0A5A2C,#003C1B)",
+  danger: "#A8000F",
+  dangerDeep: "#7A0009",
+  dangerTint: "#FBE9EA",
+  dangerRule: "#F2C8CC",
+  /** Focus ring shared with the rest of the kit. */
+  ring: "0 0 0 3px rgba(140,196,42,.28)",
+  /** Soft right shadow on the pinned identifier column. */
+  pinShadow: "6px 0 8px -6px rgba(0,0,0,.18)",
+  /** Shimmer sweep used by the loading skeleton. */
+  shimmer: "linear-gradient(90deg,#F3F5F9 0px,#E9EDF2 130px,#F3F5F9 260px)"
+};
+var TABLE_STATUS_TONES = {
+  success: { bg: "#DCF3CE", fg: "#003C1B", dot: "#00A86B" },
+  info: { bg: "#E4F2FB", fg: "#0B4A6F", dot: "#4BADE3" },
+  warning: { bg: "#FFF6D6", fg: "#6A5300", dot: "#F5C518" },
+  danger: { bg: "#FBE9EA", fg: "#7A0009", dot: "#A8000F" },
+  neutral: { bg: "#F3F5F9", fg: "#595959", dot: "#9C9C9C" }
+};
+function getTableRowStateSpec(state = "default") {
+  switch (state) {
+    case "saving":
+      return { bg: TABLE_COLORS.surface, fg: TABLE_COLORS.fg3, strike: false, inert: true };
+    case "deleted":
+      return {
+        bg: TABLE_COLORS.subtle,
+        fg: TABLE_COLORS.fgDisabled,
+        strike: true,
+        inert: true
+      };
+    case "disabled":
+      return {
+        bg: TABLE_COLORS.subtle,
+        fg: TABLE_COLORS.fgDisabled,
+        strike: false,
+        inert: true,
+        opacity: 0.7
+      };
+    default:
+      return { strike: false, inert: false };
+  }
+}
+var TABLE_EMPTY_CELL = "\u2014";
 var alignClass = {
   left: "text-left",
   center: "text-center",
@@ -7024,11 +7126,24 @@ var alignClass = {
 function TableCell2({
   size = "md",
   align = "left",
-  verticalAlign = "top",
+  verticalAlign = "middle",
+  tabular = false,
+  identifier = false,
+  color,
+  strike = false,
+  height,
+  sticky = false,
+  stickyOffset = 0,
+  stickyBackground,
+  stickyShadow = true,
+  padX,
   className,
   children,
+  style,
   ...props
 }) {
+  const spec = TABLE_SIZES[size];
+  const pad = padX ?? spec.cellPadX;
   return /* @__PURE__ */ jsx(
     TableCell,
     {
@@ -7039,10 +7154,206 @@ function TableCell2({
         // force the column wider than its flex-allocated share.
         "whitespace-normal break-words [hyphens:none]",
         verticalAlign === "middle" ? "align-middle" : "align-top",
+        tabular && "ue-tabular",
         className
       ),
+      style: {
+        height,
+        paddingLeft: pad,
+        paddingRight: pad,
+        paddingTop: 0,
+        paddingBottom: 0,
+        fontSize: spec.fontSize,
+        // Horizontal rules only — no vertical grid lines, ever.
+        borderBottom: `1px solid ${TABLE_COLORS.rowRule}`,
+        color: color ?? (identifier ? TABLE_COLORS.fg1 : void 0),
+        fontWeight: identifier ? 600 : void 0,
+        textDecoration: strike ? "line-through" : void 0,
+        fontVariantNumeric: tabular ? "tabular-nums" : void 0,
+        ...sticky ? {
+          position: "sticky",
+          left: stickyOffset,
+          zIndex: 2,
+          background: stickyBackground,
+          boxShadow: stickyShadow ? TABLE_COLORS.pinShadow : void 0
+        } : null,
+        ...style
+      },
       ...props,
-      children: /* @__PURE__ */ jsx("div", { className: "min-w-0 w-full", children })
+      children: /* @__PURE__ */ jsx("div", { className: cn("min-w-0 w-full", identifier && "whitespace-nowrap"), children })
+    }
+  );
+}
+function TableStatusCell({
+  children,
+  tone = "neutral",
+  showDot = true,
+  className
+}) {
+  const spec = TABLE_STATUS_TONES[tone];
+  return /* @__PURE__ */ jsxs(
+    "span",
+    {
+      className: cn("inline-flex items-center gap-1.5 whitespace-nowrap", className),
+      style: {
+        padding: "4px 10px",
+        borderRadius: 999,
+        fontSize: 10,
+        fontWeight: 600,
+        lineHeight: 1.3,
+        background: spec.bg,
+        color: spec.fg
+      },
+      children: [
+        showDot ? /* @__PURE__ */ jsx(
+          "span",
+          {
+            "aria-hidden": "true",
+            style: { width: 5, height: 5, borderRadius: "50%", background: spec.dot }
+          }
+        ) : null,
+        children
+      ]
+    }
+  );
+}
+function deriveInitials(name) {
+  if (typeof name !== "string") return "";
+  return name.trim().split(/\s+/).slice(0, 2).map((word) => word[0] ?? "").join("").toUpperCase();
+}
+function TableIdentityCell({
+  name,
+  meta,
+  initials,
+  avatar,
+  size = "md",
+  className
+}) {
+  const spec = TABLE_SIZES[size];
+  const text = initials ?? deriveInitials(name);
+  return /* @__PURE__ */ jsxs("span", { className: cn("flex items-center gap-[9px] min-w-0", className), children: [
+    avatar ?? /* @__PURE__ */ jsx(
+      "span",
+      {
+        "aria-hidden": "true",
+        className: "flex items-center justify-center",
+        style: {
+          flex: "none",
+          width: spec.avatar,
+          height: spec.avatar,
+          borderRadius: 8,
+          background: TABLE_COLORS.brandTint,
+          color: TABLE_COLORS.brand,
+          fontWeight: 700,
+          fontSize: spec.avatarFontSize
+        },
+        children: text
+      }
+    ),
+    /* @__PURE__ */ jsxs("span", { className: "flex min-w-0 flex-col", children: [
+      /* @__PURE__ */ jsx(
+        "span",
+        {
+          className: "truncate",
+          style: { fontWeight: 600, color: TABLE_COLORS.fg1, fontSize: spec.fontSize },
+          children: name
+        }
+      ),
+      spec.showMeta && meta ? /* @__PURE__ */ jsx(
+        "span",
+        {
+          className: "ue-tabular truncate",
+          style: { fontSize: 11, fontWeight: 500, lineHeight: 1.3, color: TABLE_COLORS.fg3 },
+          children: meta
+        }
+      ) : null
+    ] })
+  ] });
+}
+function TableActionButton({
+  label,
+  children,
+  className,
+  onClick,
+  style,
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(
+    "button",
+    {
+      type: "button",
+      "aria-label": label,
+      title: label,
+      className: cn(
+        "flex items-center justify-center transition-colors duration-[120ms]",
+        className
+      ),
+      onClick: (event) => {
+        event.stopPropagation();
+        onClick?.(event);
+      },
+      style: {
+        width: 26,
+        height: 26,
+        flex: "none",
+        borderRadius: 6,
+        border: `1px solid ${TABLE_COLORS.border}`,
+        background: TABLE_COLORS.surface,
+        color: TABLE_COLORS.fg2,
+        cursor: "pointer",
+        ...style
+      },
+      ...props,
+      children
+    }
+  );
+}
+function TableEmptyValue() {
+  return /* @__PURE__ */ jsx("span", { "aria-label": "No value", style: { color: TABLE_COLORS.fgDisabled }, children: TABLE_EMPTY_CELL });
+}
+function TableCheckbox({
+  checked,
+  indeterminate = false,
+  disabled = false,
+  label,
+  onChange,
+  className
+}) {
+  const on = checked || indeterminate;
+  return /* @__PURE__ */ jsx(
+    "button",
+    {
+      type: "button",
+      role: "checkbox",
+      "aria-checked": indeterminate ? "mixed" : checked,
+      "aria-label": label,
+      disabled,
+      onClick: (event) => {
+        event.stopPropagation();
+        onChange(event);
+      },
+      className: cn(
+        "flex items-center justify-center transition-colors duration-[120ms]",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
+        className
+      ),
+      style: {
+        width: 17,
+        height: 17,
+        flex: "none",
+        borderRadius: 4,
+        padding: 0,
+        background: disabled ? TABLE_COLORS.subtle : on ? TABLE_COLORS.brand : TABLE_COLORS.surface,
+        border: `1.5px solid ${disabled ? TABLE_COLORS.fgDisabled : on ? TABLE_COLORS.brand : "#C6C6C6"}`,
+        opacity: disabled ? 0.6 : 1
+      },
+      children: indeterminate ? /* @__PURE__ */ jsx(
+        "span",
+        {
+          "aria-hidden": "true",
+          style: { width: 8, height: 2.2, borderRadius: 2, background: "#fff" }
+        }
+      ) : checked ? /* @__PURE__ */ jsx(Check, { "aria-hidden": "true", size: 10, strokeWidth: 3.4, color: "#fff" }) : null
     }
   );
 }
@@ -7062,11 +7373,16 @@ function TableHeaderCell({
   sortable = false,
   sorted = null,
   onSort,
+  sticky = false,
+  stickyOffset = 0,
+  stickyShadow = true,
   className,
   children,
+  style,
   ...props
 }) {
-  const Icon = sorted === "asc" ? ChevronUp : sorted === "desc" ? ChevronDown : ChevronsUpDown;
+  const spec = TABLE_SIZES[size];
+  const active = sorted !== null;
   const handleClick = sortable ? onSort : void 0;
   return /* @__PURE__ */ jsx(
     TableHead,
@@ -7076,33 +7392,576 @@ function TableHeaderCell({
       className: cn(
         tableHeaderRowVariants({ size }),
         alignClass2[align],
-        "whitespace-normal break-words [hyphens:none] align-middle",
-        sortable && "cursor-pointer select-none hover:text-gray-700",
+        "whitespace-nowrap align-middle",
+        sortable && "cursor-pointer select-none",
         className
       ),
+      style: {
+        height: spec.headerHeight,
+        paddingLeft: spec.cellPadX,
+        paddingRight: spec.cellPadX,
+        background: TABLE_COLORS.headerBg,
+        borderBottom: `1px solid ${TABLE_COLORS.headerRule}`,
+        ...sticky ? {
+          position: "sticky",
+          left: stickyOffset,
+          zIndex: 4,
+          boxShadow: stickyShadow ? TABLE_COLORS.pinShadow : void 0
+        } : null,
+        ...style
+      },
       ...props,
-      children: /* @__PURE__ */ jsxs("div", { className: cn("flex items-center gap-1 min-w-0", justifyClass[align]), children: [
-        /* @__PURE__ */ jsx("span", { className: "min-w-0 break-words [hyphens:none]", children }),
-        sortable ? /* @__PURE__ */ jsx(Icon, { className: "h-3.5 w-3.5 shrink-0", "aria-hidden": "true" }) : null
-      ] })
+      children: /* @__PURE__ */ jsxs(
+        "span",
+        {
+          className: cn(
+            "flex items-center gap-[5px] min-w-0",
+            justifyClass[align],
+            // On a right-aligned column the arrow belongs on the label's left, so
+            // the header's last glyph still lines up with the digits below it.
+            align === "right" && "flex-row-reverse"
+          ),
+          style: {
+            fontSize: 11,
+            fontWeight: 600,
+            lineHeight: 1.3,
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
+            color: active ? TABLE_COLORS.headerActiveFg : TABLE_COLORS.headerFg,
+            transition: "color 120ms linear"
+          },
+          children: [
+            /* @__PURE__ */ jsx("span", { className: "min-w-0 truncate", children }),
+            sortable ? /* @__PURE__ */ jsx(
+              ArrowUp,
+              {
+                "aria-hidden": "true",
+                size: 11,
+                strokeWidth: 2.4,
+                style: {
+                  flex: "none",
+                  opacity: active ? 1 : 0.28,
+                  transform: sorted === "desc" ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 120ms linear, opacity 120ms linear"
+                }
+              }
+            ) : null
+          ]
+        }
+      )
     }
   );
 }
-var SKELETON_WIDTHS = ["w-3/4", "w-2/3", "w-4/5", "w-1/2", "w-5/6"];
+function buildPageWindow(page, pageCount) {
+  const window2 = [];
+  if (pageCount <= 0) return window2;
+  if (page > 2) window2.push(1);
+  if (page > 3) window2.push("ellipsis");
+  for (let p = Math.max(1, page - 1); p <= Math.min(pageCount, page + 1); p++) {
+    window2.push(p);
+  }
+  if (page < pageCount - 2) window2.push("ellipsis");
+  if (page < pageCount - 1) window2.push(pageCount);
+  return window2;
+}
+function NavButton({
+  label,
+  disabled,
+  onClick,
+  children
+}) {
+  return /* @__PURE__ */ jsx(
+    "button",
+    {
+      type: "button",
+      "aria-label": label,
+      disabled,
+      onClick,
+      className: "flex items-center justify-center transition-all duration-[120ms] disabled:cursor-not-allowed",
+      style: {
+        width: 30,
+        height: 30,
+        borderRadius: 7,
+        border: `1px solid ${TABLE_COLORS.border}`,
+        background: TABLE_COLORS.surface,
+        color: disabled ? TABLE_COLORS.fgDisabled : TABLE_COLORS.fg2,
+        cursor: disabled ? "not-allowed" : "pointer"
+      },
+      onMouseEnter: (e) => {
+        if (disabled) return;
+        e.currentTarget.style.borderColor = TABLE_COLORS.brandSoft;
+        e.currentTarget.style.color = TABLE_COLORS.brand;
+      },
+      onMouseLeave: (e) => {
+        e.currentTarget.style.borderColor = TABLE_COLORS.border;
+        e.currentTarget.style.color = disabled ? TABLE_COLORS.fgDisabled : TABLE_COLORS.fg2;
+      },
+      children
+    }
+  );
+}
+function TablePaginationBar({
+  page,
+  pageCount,
+  pageSize = 25,
+  pageSizes = [10, 25, 50],
+  total,
+  onPageChange,
+  onPageSizeChange,
+  label,
+  itemLabel = "rows",
+  jumpThreshold = 20,
+  padX
+}) {
+  const [jump, setJump] = useState(String(page));
+  useEffect(() => setJump(String(page)), [page]);
+  const knownTotal = typeof pageCount === "number" && pageCount > 0;
+  const go = (next) => {
+    const clamped = knownTotal ? Math.min(Math.max(1, next), pageCount) : Math.max(1, next);
+    if (clamped !== page) onPageChange?.(clamped);
+  };
+  const from = (page - 1) * pageSize + 1;
+  const to = typeof total === "number" ? Math.min(page * pageSize, total) : page * pageSize;
+  const generatedLabel = typeof total === "number" ? `Showing ${from.toLocaleString("en-IN")}\u2013${to.toLocaleString("en-IN")} of ${total.toLocaleString("en-IN")} ${itemLabel}` : `Showing ${from.toLocaleString("en-IN")}\u2013${to.toLocaleString("en-IN")}`;
+  const pages = knownTotal ? buildPageWindow(page, pageCount) : [];
+  const showJump = knownTotal && pageCount > jumpThreshold;
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: "flex flex-wrap items-center gap-3",
+      style: {
+        padding: `12px ${padX}px`,
+        borderTop: `1px solid ${TABLE_COLORS.rowRule}`
+      },
+      children: [
+        pageSizes.length > 0 ? /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsx(
+            "span",
+            {
+              style: { fontSize: 12, fontWeight: 500, lineHeight: 1.4, color: TABLE_COLORS.fg3 },
+              children: "Rows"
+            }
+          ),
+          /* @__PURE__ */ jsx(
+            "span",
+            {
+              className: "flex gap-px",
+              style: { padding: 2, background: TABLE_COLORS.subtle, borderRadius: 7 },
+              children: pageSizes.map((n) => {
+                const active = n === pageSize;
+                return /* @__PURE__ */ jsx(
+                  "button",
+                  {
+                    type: "button",
+                    "aria-pressed": active,
+                    onClick: () => onPageSizeChange?.(n),
+                    className: "ue-tabular transition-all duration-[120ms]",
+                    style: {
+                      border: 0,
+                      cursor: "pointer",
+                      padding: "5px 9px",
+                      borderRadius: 5,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      background: active ? TABLE_COLORS.surface : "transparent",
+                      color: active ? TABLE_COLORS.brand : TABLE_COLORS.fg2,
+                      boxShadow: active ? "1px 1px 3px rgba(0,0,0,.1)" : "none"
+                    },
+                    children: n
+                  },
+                  n
+                );
+              })
+            }
+          )
+        ] }) : null,
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            className: "ue-tabular",
+            style: { fontSize: 12, fontWeight: 500, lineHeight: 1.4, color: TABLE_COLORS.fg3 },
+            children: label ?? generatedLabel
+          }
+        ),
+        showJump ? /* @__PURE__ */ jsxs("span", { className: "flex items-center gap-[7px]", children: [
+          /* @__PURE__ */ jsx("span", { style: { fontSize: 11, fontWeight: 500, color: TABLE_COLORS.fg3 }, children: "Go to" }),
+          /* @__PURE__ */ jsx(
+            "input",
+            {
+              "aria-label": "Go to page",
+              className: "ue-tabular",
+              value: jump,
+              onChange: (e) => setJump(e.target.value.replace(/[^0-9]/g, "")),
+              onBlur: (e) => {
+                e.currentTarget.style.borderColor = TABLE_COLORS.border;
+                e.currentTarget.style.boxShadow = "none";
+                const next = Number(jump);
+                if (Number.isFinite(next) && next > 0) go(next);
+                else setJump(String(page));
+              },
+              onKeyDown: (e) => {
+                if (e.key === "Enter") e.currentTarget.blur();
+              },
+              style: {
+                width: 54,
+                height: 28,
+                padding: "0 8px",
+                borderRadius: 7,
+                border: `1px solid ${TABLE_COLORS.border}`,
+                background: TABLE_COLORS.surface,
+                color: TABLE_COLORS.fg1,
+                fontSize: 12,
+                fontWeight: 600,
+                textAlign: "center",
+                outline: "none"
+              },
+              onFocus: (e) => {
+                e.currentTarget.style.borderColor = TABLE_COLORS.brandSoft;
+                e.currentTarget.style.boxShadow = TABLE_COLORS.ring;
+              }
+            }
+          )
+        ] }) : null,
+        /* @__PURE__ */ jsxs("div", { className: "ml-auto flex items-center gap-[5px]", children: [
+          /* @__PURE__ */ jsx(NavButton, { label: "First page", disabled: page <= 1, onClick: () => go(1), children: /* @__PURE__ */ jsx(ChevronsLeft, { size: 13, strokeWidth: 2.4 }) }),
+          /* @__PURE__ */ jsx(NavButton, { label: "Previous page", disabled: page <= 1, onClick: () => go(page - 1), children: /* @__PURE__ */ jsx(ChevronLeft, { size: 13, strokeWidth: 2.4 }) }),
+          pages.map(
+            (p, i) => p === "ellipsis" ? /* @__PURE__ */ jsx(
+              "span",
+              {
+                "aria-hidden": "true",
+                style: {
+                  minWidth: 20,
+                  textAlign: "center",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: TABLE_COLORS.fg3
+                },
+                children: "\u2026"
+              },
+              `gap-${i}`
+            ) : /* @__PURE__ */ jsx(
+              "button",
+              {
+                type: "button",
+                "aria-current": p === page ? "page" : void 0,
+                onClick: () => go(p),
+                className: "ue-tabular transition-all duration-[120ms]",
+                style: {
+                  minWidth: 30,
+                  height: 30,
+                  padding: "0 8px",
+                  borderRadius: 7,
+                  cursor: "pointer",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  background: p === page ? TABLE_COLORS.brand : TABLE_COLORS.surface,
+                  color: p === page ? "#FFFFFF" : TABLE_COLORS.fg2,
+                  border: `1px solid ${p === page ? TABLE_COLORS.brand : TABLE_COLORS.border}`
+                },
+                children: p
+              },
+              p
+            )
+          ),
+          /* @__PURE__ */ jsx(
+            NavButton,
+            {
+              label: "Next page",
+              disabled: knownTotal ? page >= pageCount : false,
+              onClick: () => go(page + 1),
+              children: /* @__PURE__ */ jsx(ChevronRight, { size: 13, strokeWidth: 2.4 })
+            }
+          ),
+          knownTotal ? /* @__PURE__ */ jsx(
+            NavButton,
+            {
+              label: "Last page",
+              disabled: page >= pageCount,
+              onClick: () => go(pageCount),
+              children: /* @__PURE__ */ jsx(ChevronsRight, { size: 13, strokeWidth: 2.4 })
+            }
+          ) : null
+        ] })
+      ]
+    }
+  );
+}
+function TableSelectionBar({
+  count,
+  rows,
+  keys,
+  actions,
+  onClear,
+  itemLabel = "row",
+  padX
+}) {
+  if (count === 0) return null;
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: "flex flex-wrap items-center gap-3",
+      style: {
+        padding: `10px ${padX}px`,
+        background: TABLE_COLORS.brandTint,
+        borderTop: `1px solid ${TABLE_COLORS.selectedRule}`,
+        borderBottom: `1px solid ${TABLE_COLORS.selectedRule}`,
+        animation: "ue-table-pop 140ms ease-out"
+      },
+      role: "status",
+      "aria-live": "polite",
+      children: [
+        /* @__PURE__ */ jsxs(
+          "span",
+          {
+            style: {
+              font: "600 12px/1.3 inherit",
+              fontWeight: 600,
+              fontSize: 12,
+              lineHeight: 1.3,
+              color: TABLE_COLORS.brand
+            },
+            children: [
+              count,
+              " ",
+              count === 1 ? itemLabel : `${itemLabel}s`,
+              " selected"
+            ]
+          }
+        ),
+        actions && actions.length > 0 ? /* @__PURE__ */ jsx(
+          "span",
+          {
+            "aria-hidden": "true",
+            style: { width: 1, height: 16, background: "#BFD6C6" }
+          }
+        ) : null,
+        actions?.map((action, index) => /* @__PURE__ */ jsx(
+          "button",
+          {
+            type: "button",
+            disabled: action.disabled,
+            onClick: () => action.onClick(rows, keys),
+            className: "rounded-md transition-colors duration-[120ms] disabled:cursor-not-allowed disabled:opacity-50",
+            style: {
+              border: 0,
+              background: "transparent",
+              fontSize: 12,
+              fontWeight: 600,
+              lineHeight: 1.3,
+              padding: "4px 6px",
+              cursor: action.disabled ? "not-allowed" : "pointer",
+              color: action.tone === "danger" ? TABLE_COLORS.danger : TABLE_COLORS.brandSoft
+            },
+            onMouseEnter: (e) => {
+              if (action.disabled) return;
+              e.currentTarget.style.background = action.tone === "danger" ? TABLE_COLORS.dangerTint : "rgba(0,60,27,.08)";
+            },
+            onMouseLeave: (e) => {
+              e.currentTarget.style.background = "transparent";
+            },
+            children: action.label
+          },
+          index
+        )),
+        /* @__PURE__ */ jsx(
+          "button",
+          {
+            type: "button",
+            onClick: onClear,
+            style: {
+              marginLeft: "auto",
+              border: 0,
+              background: "transparent",
+              fontSize: 12,
+              fontWeight: 600,
+              lineHeight: 1.3,
+              color: TABLE_COLORS.fg3,
+              cursor: "pointer",
+              padding: "4px 6px"
+            },
+            children: "Clear"
+          }
+        )
+      ]
+    }
+  );
+}
+var SKELETON_WIDTHS = ["75%", "66%", "82%", "50%", "88%"];
+var tableShimmerStyle = {
+  background: TABLE_COLORS.shimmer,
+  backgroundSize: "640px 100%",
+  animation: "ue-shimmer 1.3s linear infinite",
+  borderRadius: 8,
+  display: "block"
+};
 function TableSkeleton({
-  rows = 5,
+  rows = 6,
   columns,
+  size = "md",
   className
 }) {
-  return /* @__PURE__ */ jsx(TableBody, { className, children: Array.from({ length: rows }).map((_, rowIndex) => /* @__PURE__ */ jsx(TableRow, { children: Array.from({ length: columns }).map((__, colIndex) => /* @__PURE__ */ jsx(TableCell, { className: cn("py-3 align-middle"), children: /* @__PURE__ */ jsx(
-    Skeleton,
+  const spec = TABLE_SIZES[size];
+  const barHeight = Math.max(12, Math.round(spec.rowHeight * 0.42));
+  return /* @__PURE__ */ jsx(TableBody, { className, children: Array.from({ length: rows }).map((_, rowIndex) => /* @__PURE__ */ jsx(TableRow, { className: "hover:bg-transparent", children: Array.from({ length: columns }).map((__, colIndex) => /* @__PURE__ */ jsx(
+    TableCell,
     {
-      className: cn(
-        "h-4",
-        SKELETON_WIDTHS[(rowIndex * columns + colIndex) % SKELETON_WIDTHS.length]
+      className: cn("align-middle"),
+      style: {
+        height: spec.rowHeight,
+        paddingTop: 0,
+        paddingBottom: 0,
+        paddingLeft: spec.cellPadX,
+        paddingRight: spec.cellPadX,
+        borderBottom: `1px solid ${TABLE_COLORS.rowRule}`
+      },
+      children: /* @__PURE__ */ jsx(
+        "span",
+        {
+          "aria-hidden": "true",
+          style: {
+            ...tableShimmerStyle,
+            height: barHeight,
+            width: SKELETON_WIDTHS[(rowIndex * columns + colIndex) % SKELETON_WIDTHS.length]
+          }
+        }
       )
+    },
+    colIndex
+  )) }, rowIndex)) });
+}
+function StatePanel({ tone, icon, title, description, meta, actions }) {
+  const danger = tone === "danger";
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: "flex flex-col items-center gap-[11px] text-center",
+      style: {
+        padding: "46px 20px 54px",
+        borderTop: `1px solid ${TABLE_COLORS.rowRule}`
+      },
+      children: [
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            "aria-hidden": "true",
+            className: "flex items-center justify-center",
+            style: {
+              width: 50,
+              height: 50,
+              borderRadius: 15,
+              background: danger ? TABLE_COLORS.dangerTint : TABLE_COLORS.brandFaint,
+              border: `1px solid ${danger ? TABLE_COLORS.dangerRule : TABLE_COLORS.brandRule}`,
+              color: danger ? TABLE_COLORS.danger : TABLE_COLORS.brandSoft
+            },
+            children: icon
+          }
+        ),
+        /* @__PURE__ */ jsx(
+          "h3",
+          {
+            style: {
+              margin: 0,
+              fontSize: 15,
+              fontWeight: 600,
+              lineHeight: 1.3,
+              color: TABLE_COLORS.fg1
+            },
+            children: title
+          }
+        ),
+        description ? /* @__PURE__ */ jsx(
+          "p",
+          {
+            style: {
+              margin: 0,
+              maxWidth: "42ch",
+              fontSize: 13,
+              lineHeight: 1.5,
+              color: TABLE_COLORS.fg2
+            },
+            children: description
+          }
+        ) : null,
+        meta,
+        actions ? /* @__PURE__ */ jsx("div", { className: "flex flex-wrap justify-center gap-2", style: { marginTop: 4 }, children: actions }) : null
+      ]
     }
-  ) }, colIndex)) }, rowIndex)) });
+  );
+}
+function TableEmptyState({
+  icon,
+  title,
+  description,
+  actions,
+  message = "No results"
+}) {
+  return /* @__PURE__ */ jsx(
+    StatePanel,
+    {
+      tone: "brand",
+      icon: icon ?? /* @__PURE__ */ jsx(ListFilter, { size: 22, strokeWidth: 1.8 }),
+      title: title ?? message,
+      description,
+      actions
+    }
+  );
+}
+function TableErrorState({
+  title = "Something went wrong",
+  description,
+  requestId,
+  onRetry,
+  retryLabel = "Retry"
+}) {
+  return /* @__PURE__ */ jsx(
+    StatePanel,
+    {
+      tone: "danger",
+      icon: /* @__PURE__ */ jsx(AlertCircle, { size: 22, strokeWidth: 1.9 }),
+      title,
+      description,
+      meta: requestId ? /* @__PURE__ */ jsx(
+        "span",
+        {
+          className: "ue-tabular",
+          style: {
+            fontSize: 11,
+            fontWeight: 500,
+            lineHeight: 1.4,
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+            color: TABLE_COLORS.fg3
+          },
+          children: requestId
+        }
+      ) : null,
+      actions: onRetry ? /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          onClick: onRetry,
+          style: {
+            height: 34,
+            padding: "0 15px",
+            border: 0,
+            borderRadius: 8,
+            backgroundColor: TABLE_COLORS.brand,
+            backgroundImage: TABLE_COLORS.brandGradient,
+            color: "#fff",
+            fontSize: 12,
+            fontWeight: 600,
+            lineHeight: 1,
+            cursor: "pointer"
+          },
+          children: retryLabel
+        }
+      ) : null
+    }
+  );
+}
+var NO_SORT = { key: null, direction: null };
+function isBlank(value) {
+  return value === null || value === void 0 || value === "";
 }
 function Table2({
   columns,
@@ -7118,12 +7977,46 @@ function Table2({
   size = "md",
   mobileLayout = "scroll",
   className,
-  hover = true
+  hover = true,
+  sort,
+  onSortChange,
+  defaultSort,
+  manualSort = false,
+  selectable = "none",
+  selectedKeys,
+  defaultSelectedKeys,
+  onSelectionChange,
+  isRowSelectable,
+  bulkActions,
+  rowActions,
+  alwaysShowRowActions = false,
+  rowState,
+  empty,
+  error,
+  stickyFirstColumn = false,
+  pagination,
+  keyboardNavigation,
+  loadingRows = 6
 }) {
-  const [sortKey, setSortKey] = useState(null);
-  const [sortDir, setSortDir] = useState(null);
+  const spec = TABLE_SIZES[size];
+  const [internalSort, setInternalSort] = useState(
+    defaultSort ?? NO_SORT
+  );
+  const activeSort = sort ?? internalSort;
+  const sortKey = activeSort.key;
+  const sortDir = activeSort.direction;
+  const columnByKey = useMemo(() => {
+    const map = /* @__PURE__ */ new Map();
+    columns.forEach((col) => map.set(String(col.key), col));
+    return map;
+  }, [columns]);
   const sortedData = useMemo(() => {
-    if (!sortKey || !sortDir) return data;
+    if (manualSort || !sortKey || !sortDir) return data;
+    const col = columnByKey.get(sortKey);
+    if (col?.sortFn) {
+      const rows = [...data].sort(col.sortFn);
+      return sortDir === "asc" ? rows : rows.reverse();
+    }
     return [...data].sort((a, b) => {
       const av = a[sortKey];
       const bv = b[sortKey];
@@ -7134,213 +8027,595 @@ function Table2({
       if (av > bv) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
-  }, [data, sortKey, sortDir]);
+  }, [data, sortKey, sortDir, manualSort, columnByKey]);
   const toggleSort = (key) => {
+    let next;
     if (sortKey !== key) {
-      setSortKey(key);
-      setSortDir("asc");
+      next = { key, direction: "asc" };
+    } else if (sortDir === "asc") {
+      next = { key, direction: "desc" };
+    } else if (sortDir === "desc") {
+      next = NO_SORT;
+    } else {
+      next = { key, direction: "asc" };
+    }
+    if (sort === void 0) setInternalSort(next);
+    onSortChange?.(next);
+  };
+  const selectionOn = selectable !== "none";
+  const getKey = useCallback(
+    (row, index) => String(row[keyField] ?? index),
+    [keyField]
+  );
+  const [internalSelection, setInternalSelection] = useState(
+    defaultSelectedKeys ?? []
+  );
+  const selection = selectedKeys ?? internalSelection;
+  const selectionSet = useMemo(() => new Set(selection), [selection]);
+  const commitSelection = useCallback(
+    (keys) => {
+      if (selectedKeys === void 0) setInternalSelection(keys);
+      if (onSelectionChange) {
+        const wanted = new Set(keys);
+        const rows = sortedData.filter(
+          (row, index) => wanted.has(getKey(row, index))
+        );
+        onSelectionChange(keys, rows);
+      }
+    },
+    [selectedKeys, onSelectionChange, sortedData, getKey]
+  );
+  const canSelectRow = useCallback(
+    (row) => {
+      if (!selectionOn) return false;
+      if (getTableRowStateSpec(rowState?.(row)).inert) return false;
+      return isRowSelectable ? isRowSelectable(row) : true;
+    },
+    [selectionOn, rowState, isRowSelectable]
+  );
+  const selectableKeys = useMemo(
+    () => sortedData.reduce((keys, row, index) => {
+      if (canSelectRow(row)) keys.push(getKey(row, index));
+      return keys;
+    }, []),
+    [sortedData, canSelectRow, getKey]
+  );
+  const selectedCount = selection.length;
+  const allSelected = selectableKeys.length > 0 && selectableKeys.every((key) => selectionSet.has(key));
+  const someSelected = selectedCount > 0 && !allSelected;
+  const toggleRow = (key, row) => {
+    if (!canSelectRow(row)) return;
+    if (selectable === "single") {
+      commitSelection(selectionSet.has(key) ? [] : [key]);
       return;
     }
-    if (sortDir === "asc") {
-      setSortDir("desc");
-    } else if (sortDir === "desc") {
-      setSortKey(null);
-      setSortDir(null);
-    } else {
-      setSortDir("asc");
+    commitSelection(
+      selectionSet.has(key) ? selection.filter((k) => k !== key) : [...selection, key]
+    );
+  };
+  const toggleAll = () => {
+    if (selectable !== "multiple") return;
+    commitSelection(allSelected ? [] : selectableKeys);
+  };
+  const anchorRef = useRef(null);
+  const selectRange = (from, to) => {
+    if (selectable !== "multiple") return;
+    const [start, end] = from <= to ? [from, to] : [to, from];
+    const keys = new Set(selection);
+    for (let i = start; i <= end; i++) {
+      const row = sortedData[i];
+      if (row && canSelectRow(row)) keys.add(getKey(row, i));
+    }
+    commitSelection([...keys]);
+  };
+  const [hoverKey, setHoverKey] = useState(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const scrollRef = useRef(null);
+  const keyboardOn = keyboardNavigation ?? (selectionOn || Boolean(onRowClick));
+  const focusRow = (index) => {
+    const clamped = Math.min(Math.max(0, index), sortedData.length - 1);
+    if (clamped < 0) return;
+    setFocusedIndex(clamped);
+    scrollRef.current?.querySelectorAll("tbody > tr")[clamped]?.focus();
+  };
+  const handleKeyDown = (event) => {
+    if (!keyboardOn || sortedData.length === 0) return;
+    const target = event.target;
+    if (target?.closest(
+      "input, textarea, select, button, a, [contenteditable='true']"
+    )) {
+      return;
+    }
+    const index = focusedIndex;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const next = index < 0 ? 0 : index + (event.key === "ArrowDown" ? 1 : -1);
+      if (event.shiftKey && selectable === "multiple") {
+        if (anchorRef.current === null) anchorRef.current = index < 0 ? 0 : index;
+        selectRange(anchorRef.current, Math.min(Math.max(0, next), sortedData.length - 1));
+      } else {
+        anchorRef.current = null;
+      }
+      focusRow(next);
+      return;
+    }
+    if (event.key === "Escape") {
+      if (selectedCount === 0) return;
+      event.preventDefault();
+      anchorRef.current = null;
+      commitSelection([]);
+      return;
+    }
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "a") {
+      if (selectable !== "multiple") return;
+      event.preventDefault();
+      commitSelection(selectableKeys);
+      return;
+    }
+    if (index < 0) return;
+    const row = sortedData[index];
+    if (!row) return;
+    if (event.key === " " || event.key === "Spacebar") {
+      if (!selectionOn) return;
+      event.preventDefault();
+      anchorRef.current = index;
+      toggleRow(getKey(row, index), row);
+      return;
+    }
+    if (event.key === "Enter") {
+      if (!onRowClick) return;
+      event.preventDefault();
+      if (!getTableRowStateSpec(rowState?.(row)).inert) onRowClick(row);
     }
   };
+  const selectColWidth = spec.edgePad + 24;
+  const actionsColWidth = spec.edgePad + 36;
+  const hasActions = Boolean(rowActions);
   const scrollStyle = stickyHeader && maxHeight ? { maxHeight } : void 0;
   const visibleColumns = columns.filter((col) => !col.hideOnMobile);
   const totalFlex = columns.reduce((sum, col) => sum + (col.flex ?? 1), 0);
   const colWidths = columns.map(
     (col) => col.width ?? `${((col.flex ?? 1) / totalFlex * 100).toFixed(2)}%`
   );
-  const tableMinWidth = columns.reduce((sum, col) => sum + (col.minWidth ?? 0), 0);
+  const columnsMinWidth = columns.reduce(
+    (sum, col) => sum + (col.minWidth ?? 0),
+    0
+  );
+  const tableMinWidth = columnsMinWidth > 0 ? columnsMinWidth + (selectionOn ? selectColWidth : 0) + (hasActions ? actionsColWidth : 0) : 0;
+  const cellPadding = (colIndex) => ({
+    paddingLeft: colIndex === 0 && !selectionOn ? spec.edgePad : colIndex === 0 ? 0 : spec.cellPadX,
+    paddingRight: colIndex === columns.length - 1 && !hasActions ? spec.edgePad : spec.cellPadX
+  });
+  const isIdentifier = (col, colIndex) => col.identifier ?? colIndex === 0;
+  const pinnedOffset = (colIndex) => colIndex === 0 && selectionOn ? selectColWidth : 0;
+  const isPinned = (colIndex) => stickyFirstColumn && colIndex === 0;
+  const showError = Boolean(error);
+  const isEmpty = !loading && !showError && sortedData.length === 0;
+  const selectedRows = useMemo(
+    () => sortedData.filter((row, index) => selectionSet.has(getKey(row, index))),
+    [sortedData, selectionSet, getKey]
+  );
+  const headerRow = /* @__PURE__ */ jsx(
+    TableHeader,
+    {
+      className: cn(
+        "[&_tr]:border-b-0",
+        stickyHeader && "sticky top-0 z-10"
+      ),
+      children: /* @__PURE__ */ jsxs(TableRow, { className: "border-0 hover:bg-transparent", children: [
+        selectionOn ? /* @__PURE__ */ jsx(
+          TableHeaderCell,
+          {
+            size,
+            sticky: stickyFirstColumn,
+            stickyOffset: 0,
+            stickyShadow: false,
+            style: {
+              width: selectColWidth,
+              paddingLeft: spec.edgePad,
+              paddingRight: 0,
+              top: stickyHeader ? 0 : void 0
+            },
+            children: selectable === "multiple" ? /* @__PURE__ */ jsx(
+              TableCheckbox,
+              {
+                checked: allSelected,
+                indeterminate: someSelected,
+                disabled: selectableKeys.length === 0,
+                label: "Select all rows",
+                onChange: toggleAll
+              }
+            ) : /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Select" })
+          }
+        ) : null,
+        columns.map((col, colIndex) => {
+          const colKey = String(col.key);
+          return /* @__PURE__ */ jsx(
+            TableHeaderCell,
+            {
+              size,
+              align: col.align ?? "left",
+              sortable: col.sortable,
+              sorted: sortKey === colKey ? sortDir : null,
+              onSort: () => toggleSort(colKey),
+              sticky: isPinned(colIndex),
+              stickyOffset: pinnedOffset(colIndex),
+              className: cn(
+                col.hideOnMobile && "hidden md:table-cell",
+                col.className
+              ),
+              style: {
+                ...cellPadding(colIndex),
+                top: stickyHeader ? 0 : void 0
+              },
+              children: col.header
+            },
+            colKey
+          );
+        }),
+        hasActions ? /* @__PURE__ */ jsx(
+          TableHeaderCell,
+          {
+            size,
+            align: "right",
+            style: {
+              width: actionsColWidth,
+              paddingLeft: 8,
+              paddingRight: spec.edgePad,
+              top: stickyHeader ? 0 : void 0
+            },
+            children: /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Actions" })
+          }
+        ) : null
+      ] })
+    }
+  );
+  const totalColumns = columns.length + (selectionOn ? 1 : 0) + (hasActions ? 1 : 0);
+  const tableView = /* @__PURE__ */ jsx(
+    "div",
+    {
+      className: cn(
+        "scroll-smooth",
+        // Any non-"visible" overflow-x forces overflow-y to compute to "auto"
+        // too, which would make this div the sticky positioning container
+        // instead of the viewport. So when stickyHeader is used without a
+        // maxHeight (page-scroll mode), skip overflow-x-auto entirely —
+        // the header needs to stick against the real viewport, not this box.
+        !(stickyHeader && !maxHeight) && "overflow-x-auto",
+        stickyHeader && maxHeight && "overflow-y-auto scroll-smooth",
+        mobileLayout === "cards" && "hidden md:block"
+      ),
+      ref: scrollRef,
+      style: scrollStyle,
+      onKeyDown: keyboardOn ? handleKeyDown : void 0,
+      children: /* @__PURE__ */ jsxs(
+        Table,
+        {
+          className: "w-full",
+          containerClassName: stickyHeader && !maxHeight ? "overflow-visible" : void 0,
+          style: tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px`, borderCollapse: "collapse" } : { minWidth: "max-content", borderCollapse: "collapse" },
+          children: [
+            /* @__PURE__ */ jsxs("colgroup", { children: [
+              selectionOn ? /* @__PURE__ */ jsx("col", { style: { width: selectColWidth } }) : null,
+              columns.map((col, i) => /* @__PURE__ */ jsx(
+                "col",
+                {
+                  style: {
+                    width: colWidths[i],
+                    minWidth: col.minWidth ? `${col.minWidth}px` : void 0
+                  }
+                },
+                String(col.key)
+              )),
+              hasActions ? /* @__PURE__ */ jsx("col", { style: { width: actionsColWidth } }) : null
+            ] }),
+            headerRow,
+            loading ? /* @__PURE__ */ jsx(
+              TableSkeleton,
+              {
+                columns: totalColumns,
+                rows: loadingRows,
+                size
+              }
+            ) : /* @__PURE__ */ jsx(TableBody, { children: sortedData.map((row, rowIndex) => {
+              const rowKey = getKey(row, rowIndex);
+              const state = rowState?.(row);
+              const stateSpec = getTableRowStateSpec(state);
+              const selected = selectionSet.has(rowKey);
+              const hovered = hover && hoverKey === rowKey && !stateSpec.inert;
+              const focused = focusedIndex === rowIndex;
+              const clickable = Boolean(onRowClick) && !stateSpec.inert;
+              const background = selected ? TABLE_COLORS.selectedBg : stateSpec.bg ?? (hovered || focused && keyboardOn ? TABLE_COLORS.hoverBg : "transparent");
+              const opaqueBackground = background === "transparent" ? TABLE_COLORS.surface : background;
+              const actionsVisible = alwaysShowRowActions || hovered || selected || focused;
+              return /* @__PURE__ */ jsxs(
+                TableRow,
+                {
+                  tabIndex: keyboardOn ? focused || focusedIndex < 0 && rowIndex === 0 ? 0 : -1 : void 0,
+                  "aria-selected": selectionOn ? selected : void 0,
+                  "data-state": selected ? "selected" : void 0,
+                  onFocus: keyboardOn ? () => setFocusedIndex(rowIndex) : void 0,
+                  onMouseEnter: () => setHoverKey(rowKey),
+                  onMouseLeave: () => setHoverKey(null),
+                  onClick: (event) => {
+                    if (stateSpec.inert) return;
+                    if (event.shiftKey && selectable === "multiple") {
+                      event.preventDefault();
+                      selectRange(anchorRef.current ?? rowIndex, rowIndex);
+                      return;
+                    }
+                    anchorRef.current = rowIndex;
+                    onRowClick?.(row);
+                  },
+                  className: cn(
+                    "border-0 outline-none",
+                    tableBodyRowVariants({
+                      size,
+                      clickable,
+                      hover: false
+                    }),
+                    keyboardOn && "focus-visible:ring-2 focus-visible:ring-[#8CC42A]/55 focus-visible:ring-inset",
+                    rowClassName?.(row)
+                  ),
+                  style: {
+                    // Left unset in the resting state so a background supplied
+                    // through `rowClassName` still shows; hover and selection
+                    // paint inline and therefore win over it.
+                    background: background === "transparent" ? void 0 : background,
+                    opacity: stateSpec.opacity,
+                    cursor: clickable ? "pointer" : void 0
+                  },
+                  children: [
+                    selectionOn ? /* @__PURE__ */ jsx(
+                      TableCell2,
+                      {
+                        size,
+                        height: spec.rowHeight,
+                        sticky: stickyFirstColumn,
+                        stickyOffset: 0,
+                        stickyBackground: opaqueBackground,
+                        stickyShadow: false,
+                        style: { paddingLeft: spec.edgePad, paddingRight: 0 },
+                        children: /* @__PURE__ */ jsx(
+                          TableCheckbox,
+                          {
+                            checked: selected,
+                            disabled: !canSelectRow(row),
+                            label: `Select row ${rowKey}`,
+                            onChange: (event) => {
+                              if (event.shiftKey && selectable === "multiple") {
+                                selectRange(anchorRef.current ?? rowIndex, rowIndex);
+                                return;
+                              }
+                              anchorRef.current = rowIndex;
+                              toggleRow(rowKey, row);
+                            }
+                          }
+                        )
+                      }
+                    ) : null,
+                    columns.map((col, colIndex) => {
+                      const colKey = String(col.key);
+                      const rawValue = row[colKey];
+                      const align = col.align ?? "left";
+                      const identifier = isIdentifier(col, colIndex);
+                      const content = col.render ? col.render(rawValue, row, rowIndex) : isBlank(rawValue) ? /* @__PURE__ */ jsx(TableEmptyValue, {}) : rawValue;
+                      const pinned = isPinned(colIndex);
+                      return /* @__PURE__ */ jsx(
+                        TableCell2,
+                        {
+                          size,
+                          align,
+                          verticalAlign: col.verticalAlign,
+                          tabular: col.tabular ?? align === "right",
+                          identifier,
+                          color: stateSpec.fg,
+                          strike: stateSpec.strike,
+                          height: spec.rowHeight,
+                          sticky: pinned,
+                          stickyOffset: pinnedOffset(colIndex),
+                          stickyBackground: opaqueBackground,
+                          className: cn(
+                            col.hideOnMobile && "hidden md:table-cell",
+                            col.className
+                          ),
+                          style: cellPadding(colIndex),
+                          children: content
+                        },
+                        colKey
+                      );
+                    }),
+                    hasActions ? /* @__PURE__ */ jsx(
+                      TableCell2,
+                      {
+                        size,
+                        align: "right",
+                        height: spec.rowHeight,
+                        style: { paddingLeft: 8, paddingRight: spec.edgePad },
+                        children: /* @__PURE__ */ jsx(
+                          "span",
+                          {
+                            className: "inline-flex justify-end gap-[3px] transition-opacity duration-[120ms]",
+                            style: {
+                              opacity: actionsVisible ? 1 : 0,
+                              // visibility (not just opacity) so hidden actions are
+                              // also out of the tab order.
+                              visibility: actionsVisible ? "visible" : "hidden"
+                            },
+                            children: rowActions?.(row, rowIndex)
+                          }
+                        )
+                      }
+                    ) : null
+                  ]
+                },
+                rowKey
+              );
+            }) })
+          ]
+        }
+      )
+    }
+  );
+  const mobileCards = mobileLayout === "cards" ? /* @__PURE__ */ jsx("div", { className: "md:hidden", children: loading ? /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3", children: Array.from({ length: 4 }).map((_, i) => /* @__PURE__ */ jsx(
+    "div",
+    {
+      className: "space-y-2.5 rounded-xl border p-3 sm:p-4",
+      style: { borderColor: TABLE_COLORS.rowRule },
+      children: visibleColumns.map((__, j) => /* @__PURE__ */ jsxs("div", { className: "flex justify-between gap-3", children: [
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            style: {
+              height: 12,
+              width: "25%",
+              borderRadius: 6,
+              background: TABLE_COLORS.shimmer,
+              backgroundSize: "640px 100%",
+              animation: "ue-shimmer 1.3s linear infinite"
+            }
+          }
+        ),
+        /* @__PURE__ */ jsx(
+          "span",
+          {
+            style: {
+              height: 12,
+              width: "40%",
+              borderRadius: 6,
+              background: TABLE_COLORS.shimmer,
+              backgroundSize: "640px 100%",
+              animation: "ue-shimmer 1.3s linear infinite"
+            }
+          }
+        )
+      ] }, j))
+    },
+    i
+  )) }) : /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3", children: sortedData.map((row, rowIndex) => {
+    const rowKey = getKey(row, rowIndex);
+    const stateSpec = getTableRowStateSpec(rowState?.(row));
+    const selected = selectionSet.has(rowKey);
+    const clickable = Boolean(onRowClick) && !stateSpec.inert;
+    return /* @__PURE__ */ jsxs(
+      "div",
+      {
+        onClick: clickable ? () => onRowClick?.(row) : void 0,
+        className: cn(
+          "overflow-hidden rounded-xl border transition-colors",
+          clickable && "cursor-pointer",
+          rowClassName?.(row)
+        ),
+        style: {
+          borderColor: selected ? TABLE_COLORS.selectedRule : TABLE_COLORS.border,
+          background: selected ? TABLE_COLORS.selectedBg : stateSpec.bg ?? TABLE_COLORS.surface,
+          opacity: stateSpec.opacity
+        },
+        children: [
+          selectionOn || hasActions ? /* @__PURE__ */ jsxs(
+            "div",
+            {
+              className: "flex items-center justify-between gap-3 px-3 py-2 sm:px-4",
+              style: { borderBottom: `1px solid ${TABLE_COLORS.rowRule}` },
+              children: [
+                selectionOn ? /* @__PURE__ */ jsx(
+                  TableCheckbox,
+                  {
+                    checked: selected,
+                    disabled: !canSelectRow(row),
+                    label: `Select row ${rowKey}`,
+                    onChange: () => toggleRow(rowKey, row)
+                  }
+                ) : /* @__PURE__ */ jsx("span", {}),
+                hasActions ? /* @__PURE__ */ jsx("span", { className: "inline-flex gap-[3px]", children: rowActions?.(row, rowIndex) }) : null
+              ]
+            }
+          ) : null,
+          visibleColumns.map((col, colIndex) => {
+            const colKey = String(col.key);
+            const rawValue = row[colKey];
+            const content = col.render ? col.render(rawValue, row, rowIndex) : isBlank(rawValue) ? /* @__PURE__ */ jsx(TableEmptyValue, {}) : rawValue;
+            const isLast = colIndex === visibleColumns.length - 1;
+            const alignment = col.mobileAlign ?? col.align;
+            return /* @__PURE__ */ jsxs(
+              "div",
+              {
+                className: "flex items-start justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2.5",
+                style: isLast ? void 0 : { borderBottom: `1px solid ${TABLE_COLORS.rowRule}` },
+                children: [
+                  /* @__PURE__ */ jsx(
+                    "span",
+                    {
+                      className: "min-w-[72px] max-w-[40%] shrink-0 pt-0.5",
+                      style: {
+                        fontSize: 11,
+                        fontWeight: 600,
+                        letterSpacing: "0.05em",
+                        textTransform: "uppercase",
+                        color: TABLE_COLORS.fg3
+                      },
+                      children: col.header
+                    }
+                  ),
+                  /* @__PURE__ */ jsx(
+                    "div",
+                    {
+                      className: cn(
+                        "flex min-w-0 flex-1 items-center justify-end",
+                        alignment === "left" && "justify-start",
+                        alignment === "center" && "justify-center",
+                        (col.tabular ?? col.align === "right") && "ue-tabular"
+                      ),
+                      style: {
+                        fontSize: spec.fontSize,
+                        fontWeight: 500,
+                        color: stateSpec.fg ?? TABLE_COLORS.fg1,
+                        textDecoration: stateSpec.strike ? "line-through" : void 0
+                      },
+                      children: content
+                    }
+                  )
+                ]
+              },
+              colKey
+            );
+          })
+        ]
+      },
+      rowKey
+    );
+  }) }) }) : null;
   return /* @__PURE__ */ jsxs(
     "div",
     {
       className: cn(
         tableWrapperVariants({ bordered }),
+        // Clips the header and footer to the rounded shell — but `overflow`
+        // makes this div a scroll container, which would stop a page-scroll
+        // sticky header from sticking against the viewport. So it is skipped
+        // in exactly that mode.
+        !(stickyHeader && !maxHeight) && "overflow-hidden",
         // Strip wrapper border on mobile when card view owns its own borders
-        mobileLayout === "cards" && bordered && "max-md:border-0 max-md:rounded-none",
+        mobileLayout === "cards" && bordered && "max-md:border-0 max-md:rounded-none max-md:shadow-none",
         className
       ),
       children: [
-        mobileLayout === "cards" && /* @__PURE__ */ jsx("div", { className: "md:hidden", children: loading ? /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3", children: Array.from({ length: 4 }).map((_, i) => /* @__PURE__ */ jsxs(
-          "div",
+        selectionOn && !showError ? /* @__PURE__ */ jsx(
+          TableSelectionBar,
           {
-            className: "rounded-xl border border-gray-100 bg-white p-3 sm:p-4 shadow-sm space-y-2.5",
-            children: [
-              /* @__PURE__ */ jsx(Skeleton, { className: "h-3 w-1/3" }),
-              visibleColumns.map((_2, j) => /* @__PURE__ */ jsxs("div", { className: "flex justify-between gap-3", children: [
-                /* @__PURE__ */ jsx(Skeleton, { className: "h-3.5 w-1/4" }),
-                /* @__PURE__ */ jsx(Skeleton, { className: "h-3.5 w-2/5" })
-              ] }, j))
-            ]
-          },
-          i
-        )) }) : sortedData.length === 0 ? /* @__PURE__ */ jsx("p", { className: "py-10 text-center text-sm text-gray-500", children: emptyMessage }) : /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3", children: sortedData.map((row, rowIndex) => {
-          const rowKey = String(
-            row[keyField] ?? rowIndex
-          );
-          return /* @__PURE__ */ jsx(
-            "div",
-            {
-              onClick: onRowClick ? () => onRowClick(row) : void 0,
-              className: cn(
-                "rounded-xl border border-gray-100 bg-white shadow-sm",
-                "transition-colors overflow-hidden",
-                hover && onRowClick && "hover:bg-gray-50 active:bg-gray-100",
-                onRowClick && "cursor-pointer",
-                rowClassName?.(row)
-              ),
-              children: visibleColumns.map((col, colIndex) => {
-                const colKey = String(col.key);
-                const rawValue = row[colKey];
-                const content = col.render ? col.render(rawValue, row, rowIndex) : rawValue;
-                const isLast = colIndex === visibleColumns.length - 1;
-                return /* @__PURE__ */ jsxs(
-                  "div",
-                  {
-                    className: cn(
-                      "flex items-start justify-between gap-3 px-3 sm:px-4 py-2 sm:py-2.5",
-                      !isLast && "border-b border-gray-50"
-                    ),
-                    children: [
-                      /* @__PURE__ */ jsx("span", { className: "shrink-0 text-xs font-medium text-gray-400 pt-0.5 min-w-[72px] max-w-[40%]", children: col.header }),
-                      /* @__PURE__ */ jsx(
-                        "div",
-                        {
-                          className: cn(
-                            "text-sm text-gray-800 font-medium flex-1 min-w-0",
-                            "flex justify-end items-center",
-                            (col.mobileAlign ?? col.align) === "left" && "justify-start",
-                            (col.mobileAlign ?? col.align) === "center" && "justify-center"
-                          ),
-                          children: content
-                        }
-                      )
-                    ]
-                  },
-                  colKey
-                );
-              })
-            },
-            rowKey
-          );
-        }) }) }),
-        /* @__PURE__ */ jsx(
-          "div",
-          {
-            className: cn(
-              "scroll-smooth",
-              // Any non-"visible" overflow-x forces overflow-y to compute to "auto"
-              // too, which would make this div the sticky positioning container
-              // instead of the viewport. So when stickyHeader is used without a
-              // maxHeight (page-scroll mode), skip overflow-x-auto entirely —
-              // the header needs to stick against the real viewport, not this box.
-              !(stickyHeader && !maxHeight) && "overflow-x-auto",
-              // Clip table cells to the rounded corners — overflow:auto on this
-              // element also clips to border-radius, so no parent overflow-hidden needed.
-              bordered && "rounded-lg",
-              stickyHeader && maxHeight && "overflow-y-auto scroll-smooth",
-              mobileLayout === "cards" && "hidden md:block"
-            ),
-            style: scrollStyle,
-            children: /* @__PURE__ */ jsxs(
-              Table,
-              {
-                className: "w-full",
-                containerClassName: stickyHeader && !maxHeight ? "overflow-visible" : void 0,
-                style: tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : { minWidth: "max-content" },
-                children: [
-                  /* @__PURE__ */ jsx("colgroup", { children: columns.map((col, i) => /* @__PURE__ */ jsx(
-                    "col",
-                    {
-                      style: {
-                        width: colWidths[i],
-                        minWidth: col.minWidth ? `${col.minWidth}px` : void 0
-                      }
-                    },
-                    String(col.key)
-                  )) }),
-                  /* @__PURE__ */ jsx(
-                    TableHeader,
-                    {
-                      className: cn(stickyHeader && "sticky top-0 z-10 bg-slate-50"),
-                      children: /* @__PURE__ */ jsx(TableRow, { children: columns.map((col) => {
-                        const colKey = String(col.key);
-                        return /* @__PURE__ */ jsx(
-                          TableHeaderCell,
-                          {
-                            size,
-                            align: col.align ?? "left",
-                            sortable: col.sortable,
-                            sorted: sortKey === colKey ? sortDir : null,
-                            onSort: () => toggleSort(colKey),
-                            className: cn(
-                              col.hideOnMobile && "hidden md:table-cell",
-                              col.className
-                            ),
-                            children: col.header
-                          },
-                          colKey
-                        );
-                      }) })
-                    }
-                  ),
-                  loading ? /* @__PURE__ */ jsx(TableSkeleton, { columns: columns.length }) : sortedData.length === 0 ? /* @__PURE__ */ jsx(TableBody, { children: /* @__PURE__ */ jsx(TableRow, { children: /* @__PURE__ */ jsx(
-                    TableCell,
-                    {
-                      colSpan: columns.length,
-                      className: "py-10 text-center text-sm text-gray-500",
-                      children: emptyMessage
-                    }
-                  ) }) }) : /* @__PURE__ */ jsx(TableBody, { children: sortedData.map((row, rowIndex) => {
-                    const rowKey = String(
-                      row[keyField] ?? rowIndex
-                    );
-                    return /* @__PURE__ */ jsx(
-                      TableRow,
-                      {
-                        onClick: onRowClick ? () => onRowClick(row) : void 0,
-                        className: cn(
-                          tableBodyRowVariants({
-                            size,
-                            clickable: Boolean(onRowClick),
-                            hover
-                          }),
-                          rowClassName?.(row)
-                        ),
-                        children: columns.map((col) => {
-                          const colKey = String(col.key);
-                          const rawValue = row[colKey];
-                          const content = col.render ? col.render(rawValue, row, rowIndex) : rawValue;
-                          return /* @__PURE__ */ jsx(
-                            TableCell2,
-                            {
-                              size,
-                              align: col.align ?? "left",
-                              verticalAlign: col.verticalAlign,
-                              className: cn(
-                                col.hideOnMobile && "hidden md:table-cell",
-                                col.className
-                              ),
-                              children: content
-                            },
-                            colKey
-                          );
-                        })
-                      },
-                      rowKey
-                    );
-                  }) })
-                ]
-              }
-            )
+            count: selectedCount,
+            rows: selectedRows,
+            keys: selection,
+            actions: bulkActions,
+            onClear: () => commitSelection([]),
+            padX: spec.edgePad
           }
-        )
+        ) : null,
+        showError ? /* @__PURE__ */ jsx(TableErrorState, { ...error ?? {} }) : isEmpty ? /* @__PURE__ */ jsx(TableEmptyState, { ...empty ?? {}, message: emptyMessage }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+          mobileCards,
+          tableView
+        ] }),
+        pagination && !showError ? /* @__PURE__ */ jsx(TablePaginationBar, { ...pagination, padX: spec.edgePad }) : null
       ]
     }
   );
@@ -11543,7 +12818,7 @@ function getDefaultAccept(variant) {
 function makeId() {
   return Math.random().toString(36).slice(2, 9);
 }
-function deriveInitials(source) {
+function deriveInitials2(source) {
   if (!source) return null;
   const parts = source.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return null;
@@ -12572,7 +13847,7 @@ function FileUpload({
     const previewUrl = item ? item.kind === "url" ? item.url : item.localFile.previewUrl : null;
     const avatarState = disabled ? "disabled" : previewUrl ? "filled" : "empty";
     const title = placeholder ?? (typeof label === "string" ? label : void 0) ?? PLACEHOLDER_TEXT.avatar;
-    const fallbackInitials = initials ?? deriveInitials(typeof label === "string" ? label : placeholder);
+    const fallbackInitials = initials ?? deriveInitials2(typeof label === "string" ? label : placeholder);
     return /* @__PURE__ */ jsxs(
       "div",
       {
@@ -12953,6 +14228,6 @@ function Chip({
   );
 }
 
-export { ACCORDION_SIZES, Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, BannerStack, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, DesignTabs, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, ModalZIndexProvider, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, SidebarZIndexProvider, StatusBadge, SubHeader, SweetAlertProvider, TABS_SIZES, TabPanel, Table2 as Table, Tabs2 as Tabs, TabsActiveValueContext, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getAccordionChip, getAccordionPalette, getTabsPalette, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
+export { ACCORDION_SIZES, Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, BannerStack, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, DesignTabs, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, ModalZIndexProvider, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, SidebarZIndexProvider, StatusBadge, SubHeader, SweetAlertProvider, TABLE_COLORS, TABLE_EMPTY_CELL, TABLE_SIZES, TABLE_STATUS_TONES, TABS_SIZES, TabPanel, Table2 as Table, TableActionButton, TableCheckbox, TableEmptyState, TableEmptyValue, TableErrorState, TableIdentityCell, TablePaginationBar, TableSelectionBar, TableStatusCell, Tabs2 as Tabs, TabsActiveValueContext, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buildPageWindow, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getAccordionChip, getAccordionPalette, getTableRowStateSpec, getTabsPalette, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableShimmerStyle, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map
