@@ -41,9 +41,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <TablePreview/> */}
     {/* <TogglePreview/> */}
     {/* <TabsPreview/> */}
-    {/* <TablePreview /> */}
+    <TablePreview />
     {/* <ButtonPreview /> */}
-    <SidebarMultiSelectPreview />
+    {/* <SidebarMultiSelectPreview /> */}
     {/* <SelectPreview /> */}
     {/* <FilterGroupDatePickerPreview /> */}
   </React.StrictMode>,

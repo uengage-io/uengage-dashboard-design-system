@@ -33,6 +33,13 @@ const ITEMS = [
   { value: "10", label: "Cold Coffee" },
   { value: "11", label: "Amritsari Kulcha with Chole and Pickle" },
   { value: "12", label: "Butter Naan" },
+  { value: "13", label: "Dal Makhani Special" },
+  { value: "14", label: "Shahi Paneer Handi Family Pack Serves Four People" },
+  { value: "15", label: "Veg Biryani" },
+  { value: "16", label: "Gulab Jamun (2 pcs)" },
+  { value: "17", label: "Cold Coffee" },
+  { value: "18", label: "Amritsari Kulcha with Chole and Pickle" },
+  { value: "19", label: "Butter Naan" },
 ];
 
 const SECTIONS = [
@@ -112,7 +119,7 @@ export default function SidebarMultiSelectPreview() {
         collapse into a <code>+N</code> counter that stays visible.
       </p>
 
-      <Button onClick={() => setOpen(true)}>Open “Create tag” sidebar</Button>
+      <Button onClick={() => setOpen(true)}>Open sidebar</Button>
 
       <Sidebar
         open={open}
@@ -122,6 +129,7 @@ export default function SidebarMultiSelectPreview() {
         heading="Create tag"
         closeIcon
         divider
+        sizePercent={30}
         closeOnOutsideClick
       >
         <div className="flex flex-col h-full">

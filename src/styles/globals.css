@@ -687,3 +687,33 @@
   align-items: center;
   justify-content: center;
 }
+
+/* ── Table ──────────────────────────────────────────────────────────────── */
+
+/* Digits stack down a column, so magnitudes compare without reading a digit. */
+.ue-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Sweep used by the table's loading skeleton. */
+@keyframes ue-shimmer {
+  0% {
+    background-position: -260px 0;
+  }
+  100% {
+    background-position: 260px 0;
+  }
+}
+
+/* The bulk-action bar drops in when the first row is picked. */
+@keyframes ue-table-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

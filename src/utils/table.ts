@@ -1,9 +1,9 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-export const tableWrapperVariants = cva("w-full", {
+export const tableWrapperVariants = cva("w-full bg-white", {
   variants: {
     bordered: {
-      true: "border rounded-lg",
+      true: "border border-[#E2E2E2] rounded-xl shadow-[2px_2px_4px_rgba(0,0,0,.04)]",
       false: "",
     },
   },
@@ -12,14 +12,15 @@ export const tableWrapperVariants = cva("w-full", {
   },
 });
 
+/** 11px uppercase on a #F3F5F9 fill — the header never competes with the data. */
 export const tableHeaderRowVariants = cva(
-  "bg-slate-50 text-gray-500 text-xs font-medium",
+  "bg-[#F3F5F9] text-[#595959] text-[11px] font-semibold uppercase tracking-[0.05em]",
   {
     variants: {
       size: {
-        sm: "py-1.5 sm:py-2",
-        md: "py-2 sm:py-3",
-        lg: "py-3 sm:py-4",
+        sm: "h-[34px]",
+        md: "h-[38px]",
+        lg: "h-[42px]",
       },
     },
     defaultVariants: {
@@ -28,19 +29,20 @@ export const tableHeaderRowVariants = cva(
   },
 );
 
-export const tableBodyRowVariants = cva("transition-colors", {
+export const tableBodyRowVariants = cva("transition-colors duration-[120ms]", {
   variants: {
     size: {
-      sm: "py-1.5 sm:py-2 text-xs",
-      md: "py-2 sm:py-3 text-sm",
-      lg: "py-3 sm:py-4 text-sm sm:text-base",
+      sm: "text-[12px]",
+      md: "text-[13px]",
+      lg: "text-[13px]",
     },
     clickable: {
       true: "cursor-pointer",
       false: "",
     },
     hover: {
-      true: "hover:bg-gray-50",
+      // A full-row wash, so the eye never loses its line.
+      true: "hover:bg-[#FAFFF7]",
       false: "hover:bg-transparent",
     },
   },

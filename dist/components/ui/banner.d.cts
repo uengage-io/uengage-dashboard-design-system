@@ -66,7 +66,7 @@ declare const BANNER_TONE_SEVERITY: Record<BannerToneKey, number>;
 /** Small dot colour used by the collapsed-stack counter. */
 declare const BANNER_TONE_DOT: Record<BannerToneKey, string>;
 declare const bannerVariants: (props?: ({
-    variant?: "success" | "warning" | "error" | "danger" | "info" | "neutral" | null | undefined;
+    variant?: "success" | "warning" | "error" | "info" | "danger" | "neutral" | null | undefined;
     size?: "sm" | "lg" | "md" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 interface BannerRootProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "color">, VariantProps<typeof bannerVariants> {
