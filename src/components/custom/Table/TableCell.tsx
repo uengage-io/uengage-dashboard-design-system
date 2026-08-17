@@ -33,6 +33,8 @@ export interface TableCellProps extends ComponentProps<"td"> {
   stickyShadow?: boolean;
   /** Horizontal padding override, px. Falls back to the size scale. */
   padX?: number;
+  /** Vertical padding override, px. Falls back to the size scale. */
+  padY?: number;
 }
 
 const alignClass = {
@@ -55,6 +57,7 @@ export function TableCell({
   stickyBackground,
   stickyShadow = true,
   padX,
+  padY,
   className,
   children,
   style,
@@ -62,6 +65,10 @@ export function TableCell({
 }: TableCellProps) {
   const spec = TABLE_SIZES[size];
   const pad = padX ?? spec.cellPadX;
+  // border-box means this sits inside `height`, so a single-line row keeps its
+  // exact size and only a stacked cell grows — with room around the content
+  // instead of pressing against the rules.
+  const padVertical = padY ?? spec.cellPadY;
 
   return (
     <ShadcnTableCell
@@ -77,10 +84,13 @@ export function TableCell({
       )}
       style={{
         height,
+        // Stated rather than inherited from a preflight the consumer may not
+        // load — it is what keeps `height` and the vertical padding agreeing.
+        boxSizing: "border-box",
         paddingLeft: pad,
         paddingRight: pad,
-        paddingTop: 0,
-        paddingBottom: 0,
+        paddingTop: padVertical,
+        paddingBottom: padVertical,
         fontSize: spec.fontSize,
         // Horizontal rules only — no vertical grid lines, ever.
         borderBottom: `1px solid ${TABLE_COLORS.rowRule}`,

@@ -42,8 +42,9 @@ export function TableSkeleton({
               className={cn("align-middle")}
               style={{
                 height: spec.rowHeight,
-                paddingTop: 0,
-                paddingBottom: 0,
+                boxSizing: "border-box",
+                paddingTop: spec.cellPadY,
+                paddingBottom: spec.cellPadY,
                 paddingLeft: spec.cellPadX,
                 paddingRight: spec.cellPadX,
                 borderBottom: `1px solid ${TABLE_COLORS.rowRule}`,

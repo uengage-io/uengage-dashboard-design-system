@@ -7044,6 +7044,7 @@ var TABLE_SIZES = {
     avatarFontSize: 8,
     showMeta: false,
     cellPadX: 12,
+    cellPadY: 6,
     edgePad: 16,
     rowsPerScreen: "~18 rows",
     use: "Reconciliation and audit screens where volume beats detail"
@@ -7057,6 +7058,7 @@ var TABLE_SIZES = {
     avatarFontSize: 10,
     showMeta: true,
     cellPadX: 14,
+    cellPadY: 10,
     edgePad: 20,
     rowsPerScreen: "~13 rows",
     use: "The default. Fits an avatar and a secondary line"
@@ -7070,6 +7072,7 @@ var TABLE_SIZES = {
     avatarFontSize: 11,
     showMeta: true,
     cellPadX: 16,
+    cellPadY: 12,
     edgePad: 22,
     rowsPerScreen: "~11 rows",
     use: "Short lists with thumbnails \u2014 menus, outlets, offers"
@@ -7162,6 +7165,7 @@ function TableCell2({
   stickyBackground,
   stickyShadow = true,
   padX,
+  padY,
   className,
   children,
   style,
@@ -7169,6 +7173,7 @@ function TableCell2({
 }) {
   const spec = TABLE_SIZES[size];
   const pad = padX ?? spec.cellPadX;
+  const padVertical = padY ?? spec.cellPadY;
   return /* @__PURE__ */ jsxRuntime.jsx(
     TableCell,
     {
@@ -7184,10 +7189,13 @@ function TableCell2({
       ),
       style: {
         height,
+        // Stated rather than inherited from a preflight the consumer may not
+        // load — it is what keeps `height` and the vertical padding agreeing.
+        boxSizing: "border-box",
         paddingLeft: pad,
         paddingRight: pad,
-        paddingTop: 0,
-        paddingBottom: 0,
+        paddingTop: padVertical,
+        paddingBottom: padVertical,
         fontSize: spec.fontSize,
         // Horizontal rules only — no vertical grid lines, ever.
         borderBottom: `1px solid ${TABLE_COLORS.rowRule}`,
@@ -7423,6 +7431,7 @@ function TableHeaderCell({
       ),
       style: {
         height: spec.headerHeight,
+        boxSizing: "border-box",
         paddingLeft: spec.cellPadX,
         paddingRight: spec.cellPadX,
         background: TABLE_COLORS.headerBg,
@@ -7834,8 +7843,9 @@ function TableSkeleton({
       className: cn("align-middle"),
       style: {
         height: spec.rowHeight,
-        paddingTop: 0,
-        paddingBottom: 0,
+        boxSizing: "border-box",
+        paddingTop: spec.cellPadY,
+        paddingBottom: spec.cellPadY,
         paddingLeft: spec.cellPadX,
         paddingRight: spec.cellPadX,
         borderBottom: `1px solid ${TABLE_COLORS.rowRule}`
