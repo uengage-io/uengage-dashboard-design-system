@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
 import { Switch, Label as Label$1, AlertDialog as AlertDialog$1, Separator as Separator$1, Dialog, Slot, Popover as Popover$1, RadioGroup as RadioGroup$1, Checkbox as Checkbox$1, Accordion as Accordion$1, Collapsible, Tabs as Tabs$1 } from 'radix-ui';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { X, ChevronDown, Info, Check, CircleX, TriangleAlert, Search, Clock, CircleAlert, ArrowUpAZ, ArrowDownAZ, Lock, Plus, EyeOff, Eye, CalendarIcon, ArrowUp, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, ListFilter, AlertCircle, SlidersHorizontal, Loader2, ImageIcon, Upload, Camera, Video, Play, HelpCircle, AlertTriangle } from 'lucide-react';
+import { X, ChevronDown, Info, Check, CircleX, TriangleAlert, Search, Clock, CircleAlert, ArrowUpAZ, ArrowDownAZ, Lock, Plus, EyeOff, Eye, CalendarIcon, ArrowUp, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, ListFilter, AlertCircle, ArrowDown, SlidersHorizontal, Loader2, ImageIcon, Upload, Camera, Video, Play, HelpCircle, AlertTriangle } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CommandList as CommandList$1, Command as Command$1, CommandInput as CommandInput$1, CommandEmpty as CommandEmpty$1, CommandGroup as CommandGroup$1, CommandItem as CommandItem$1, CommandSeparator as CommandSeparator$1 } from 'cmdk';
 import { DayPicker } from 'react-day-picker';
@@ -3196,32 +3196,32 @@ var TABS_SIZES = {
   sm: {
     name: "Small",
     fs: 12,
-    gap: 16,
-    underPad: "0 0 8px",
-    segPad: "6px 11px",
+    gap: 10,
+    underPad: "3px 9px 7px",
+    segPad: "5px 12px",
     pillPad: "5px 11px",
     icon: 13,
-    spec: "12px \xB7 pad 8 \xB7 gap 16"
+    spec: "12px \xB7 pad 9 \xB7 gap 10"
   },
   md: {
     name: "Medium",
     fs: 13,
-    gap: 22,
-    underPad: "0 0 11px",
-    segPad: "8px 14px",
+    gap: 12,
+    underPad: "4px 11px 9px",
+    segPad: "6px 15px",
     pillPad: "7px 14px",
     icon: 15,
-    spec: "13px \xB7 pad 11 \xB7 gap 22"
+    spec: "13px \xB7 pad 11 \xB7 gap 12"
   },
   lg: {
     name: "Large",
     fs: 15,
-    gap: 28,
-    underPad: "0 0 14px",
-    segPad: "10px 17px",
+    gap: 14,
+    underPad: "5px 13px 12px",
+    segPad: "8px 18px",
     pillPad: "9px 17px",
     icon: 17,
-    spec: "15px \xB7 pad 14 \xB7 gap 28"
+    spec: "15px \xB7 pad 13 \xB7 gap 14"
   }
 };
 var LIGHT = {
@@ -3231,10 +3231,13 @@ var LIGHT = {
   fgActive: FOREST,
   fgDisabled: "#C6C6C6",
   bar: FOREST,
-  segTrack: "#F3F5F9",
-  segActiveBg: "#FFFFFF",
-  segActiveShadow: "0 1px 3px rgba(0,0,0,.12)",
-  segHoverBg: "#EFF3F0",
+  underActiveBg: "#F2FAEC",
+  segTrack: "#FFFFFF",
+  segTrackBorder: "#E2E2E2",
+  segActiveBg: FOREST,
+  segActiveFg: "#FFFFFF",
+  segActiveShadow: "none",
+  segHoverBg: "#F5FFF0",
   pillBg: "#FFFFFF",
   pillFg: "#161616",
   pillBorder: "#E2E2E2",
@@ -3263,10 +3266,13 @@ var DARK = {
   fgActive: "#8CC42A",
   fgDisabled: "#4A5C51",
   bar: "#8CC42A",
-  segTrack: "#141C17",
-  segActiveBg: "#1B3423",
+  underActiveBg: "#18251D",
+  segTrack: "transparent",
+  segTrackBorder: "#2C4A38",
+  segActiveBg: "#8CC42A",
+  segActiveFg: "#0C1712",
   segActiveShadow: "none",
-  segHoverBg: "#18251D",
+  segHoverBg: "#1B3423",
   pillBg: "transparent",
   pillFg: "#DCF3CE",
   pillBorder: "#2C4A38",
@@ -3435,10 +3441,17 @@ function CountBadge({
     }
   );
 }
+var SLIDE_TRANSITION = (animate) => animate ? "transform 260ms cubic-bezier(.2,.8,.3,1), width 260ms cubic-bezier(.2,.8,.3,1), height 260ms cubic-bezier(.2,.8,.3,1), opacity 120ms linear" : "opacity 120ms linear";
 function useSlidingIndicator(enabled, activeValue, signature) {
   const innerRef = React10.useRef(null);
   const settled = React10.useRef(false);
-  const [indicator, setIndicator] = React10.useState({ left: 0, width: 0, ready: false });
+  const [indicator, setIndicator] = React10.useState({
+    left: 0,
+    width: 0,
+    top: 0,
+    height: 0,
+    ready: false
+  });
   const measure = React10.useCallback(() => {
     const inner = innerRef.current;
     if (!inner || !activeValue) return;
@@ -3455,6 +3468,8 @@ function useSlidingIndicator(enabled, activeValue, signature) {
     setIndicator({
       left: btnRect.left - innerRect.left,
       width: btnRect.width,
+      top: btnRect.top - innerRect.top,
+      height: btnRect.height,
       ready: true
     });
   }, [activeValue]);
@@ -3635,7 +3650,7 @@ function OverflowMenu({
     )
   ] });
 }
-function UnderlineTrigger({ tab, active, palette, spec, fitted }) {
+function UnderlineTrigger({ tab, active, palette, spec, fitted, sliding }) {
   const [hover, setHover] = React10.useState(false);
   const fg = tab.disabled ? palette.fgDisabled : active ? palette.fgActive : hover ? palette.fgHover : palette.fg;
   return /* @__PURE__ */ jsxs(
@@ -3649,8 +3664,8 @@ function UnderlineTrigger({ tab, active, palette, spec, fitted }) {
       onMouseLeave: () => setHover(false),
       className: cn(
         TRIGGER_RESET,
-        // The underline is a border-bottom — any radius would bow it into an arc.
-        "rounded-none",
+        // Radius is set inline: top corners only, so the wash rounds while the
+        // border-bottom underline stays a straight line.
         "inline-flex items-center justify-center gap-2 whitespace-nowrap",
         "transition-all duration-[160ms] ease-[cubic-bezier(.2,.8,.3,1)]",
         "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
@@ -3660,26 +3675,35 @@ function UnderlineTrigger({ tab, active, palette, spec, fitted }) {
       style: {
         padding: spec.underPad,
         fontSize: spec.fs,
-        fontWeight: 600,
+        // The selected label carries the weight as well as the colour.
+        fontWeight: active ? 700 : 600,
         color: fg,
-        // The bar itself is a single sliding span in the strip — this only
-        // reserves the 2px it occupies so the label never shifts.
-        borderBottom: "2px solid transparent",
+        // Both the wash and the bar are single sliding spans in the strip; when
+        // they have not measured yet the trigger paints its own so the selection
+        // is never invisible.
+        background: active && !sliding ? palette.underActiveBg : "transparent",
+        borderRadius: "7px 7px 0 0",
+        // The bar is a sliding span too — this only reserves the 3px it
+        // occupies so the label never shifts.
+        borderBottom: "3px solid transparent",
         marginBottom: -1,
-        opacity: tab.disabled ? 0.5 : 1
+        opacity: tab.disabled ? 0.5 : 1,
+        // Sit above the sliding wash so the label stays readable while it travels.
+        position: "relative",
+        zIndex: 1
       },
       children: [
         tab.icon && /* @__PURE__ */ jsx(TabIcon, { icon: tab.icon, size: spec.icon }),
         tab.label,
         tab.dirty && /* @__PURE__ */ jsx(DirtyDot, { color: palette.dirty }),
-        tab.count !== void 0 && tab.count !== null && /* @__PURE__ */ jsx(CountBadge, { count: tab.count, active, palette, radius: 6, padding: "2px 7px" })
+        tab.count !== void 0 && tab.count !== null && /* @__PURE__ */ jsx(CountBadge, { count: tab.count, active, palette, radius: 99, padding: "2px 8px" })
       ]
     }
   );
 }
-function SegmentedTrigger({ tab, active, palette, spec, fitted }) {
+function SegmentedTrigger({ tab, active, palette, spec, fitted, sliding }) {
   const [hover, setHover] = React10.useState(false);
-  const fg = tab.disabled ? palette.fgDisabled : active ? palette.fgActive : hover ? palette.fgHover : palette.fg;
+  const fg = tab.disabled ? palette.fgDisabled : active ? palette.segActiveFg : hover ? palette.fgHover : palette.fg;
   return /* @__PURE__ */ jsxs(
     TabsTrigger,
     {
@@ -3691,8 +3715,10 @@ function SegmentedTrigger({ tab, active, palette, spec, fitted }) {
       onMouseLeave: () => setHover(false),
       className: cn(
         TRIGGER_RESET,
-        "inline-flex items-center justify-center gap-[7px] whitespace-nowrap rounded-[7px]",
-        "transition-all duration-[160ms] ease-[cubic-bezier(.2,.8,.3,1)]",
+        "inline-flex items-center justify-center gap-[7px] whitespace-nowrap rounded-full",
+        // 220ms so the label crossfade tracks the sliding pill rather than
+        // flipping to white before it arrives.
+        "transition-all duration-[220ms] ease-[cubic-bezier(.2,.8,.3,1)]",
         "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
         fitted && "flex-1",
         tab.disabled ? "cursor-not-allowed" : "cursor-pointer"
@@ -3702,15 +3728,18 @@ function SegmentedTrigger({ tab, active, palette, spec, fitted }) {
         fontSize: spec.fs,
         fontWeight: 600,
         color: fg,
-        background: active ? palette.segActiveBg : hover && !tab.disabled ? palette.segHoverBg : "transparent",
-        boxShadow: active ? palette.segActiveShadow : "none",
-        opacity: tab.disabled ? 0.5 : 1
+        background: active && !sliding ? palette.segActiveBg : !active && hover && !tab.disabled ? palette.segHoverBg : "transparent",
+        boxShadow: active && !sliding ? palette.segActiveShadow : "none",
+        opacity: tab.disabled ? 0.5 : 1,
+        // Sit above the sliding pill so the label stays readable while it travels.
+        position: "relative",
+        zIndex: 1
       },
       children: [
         tab.icon && /* @__PURE__ */ jsx(TabIcon, { icon: tab.icon, size: spec.icon }),
         tab.label,
         tab.dirty && /* @__PURE__ */ jsx(DirtyDot, { color: palette.dirty }),
-        tab.count !== void 0 && tab.count !== null && /* @__PURE__ */ jsx(CountBadge, { count: tab.count, active, palette, radius: 5, padding: "2px 6px" })
+        tab.count !== void 0 && tab.count !== null && /* @__PURE__ */ jsx(CountBadge, { count: tab.count, active, palette, radius: 99, padding: "2px 7px" })
       ]
     }
   );
@@ -3849,11 +3878,13 @@ function DesignTabs({
   );
   const scrollable = !useMenu && variant !== "vertical" && variant !== "pill";
   const { ref: scrollRef, edges, scrollBy } = useEdgeScroll(scrollable, activeValue);
+  const slides = variant === "underline" || variant === "segmented";
   const { innerRef, indicator, animate } = useSlidingIndicator(
-    variant === "underline",
+    slides,
     activeValue,
-    `${size}|${visibleTabs.map((t) => t.value).join(",")}`
+    `${size}|${fitted ? "fit" : "auto"}|${visibleTabs.map((t) => t.value).join(",")}`
   );
+  const slidingFill = slides && indicator.ready;
   const renderTriggers = (list2) => list2.map((tab) => /* @__PURE__ */ jsx(
     Trigger,
     {
@@ -3861,7 +3892,8 @@ function DesignTabs({
       active: tab.value === activeValue,
       palette,
       spec,
-      fitted
+      fitted,
+      sliding: slidingFill
     },
     tab.value
   ));
@@ -3937,10 +3969,37 @@ function DesignTabs({
           style: {
             padding: 3,
             background: palette.segTrack,
-            borderRadius: 10,
+            border: `1px solid ${palette.segTrackBorder}`,
+            // Fully rounded so the track hugs the pill-shaped segments inside it.
+            borderRadius: 999,
             width: fitted ? "100%" : "fit-content"
           },
-          children: list
+          children: /* @__PURE__ */ jsxs(
+            "div",
+            {
+              ref: innerRef,
+              className: cn("relative flex", fitted ? "w-full" : "w-max"),
+              children: [
+                /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    "aria-hidden": "true",
+                    className: "pointer-events-none absolute left-0 top-0",
+                    style: {
+                      width: indicator.width,
+                      height: indicator.height,
+                      borderRadius: 999,
+                      background: palette.segActiveBg,
+                      opacity: indicator.ready ? 1 : 0,
+                      transform: `translate(${indicator.left}px, ${indicator.top}px)`,
+                      transition: SLIDE_TRANSITION(animate)
+                    }
+                  }
+                ),
+                list
+              ]
+            }
+          )
         }
       ),
       menuNode
@@ -3962,6 +4021,22 @@ function DesignTabs({
               className: "relative flex w-max items-end",
               style: { gap: spec.gap },
               children: [
+                /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    "aria-hidden": "true",
+                    className: "pointer-events-none absolute left-0 top-0",
+                    style: {
+                      width: indicator.width,
+                      height: indicator.height,
+                      borderRadius: "7px 7px 0 0",
+                      background: palette.underActiveBg,
+                      opacity: indicator.ready ? 1 : 0,
+                      transform: `translate(${indicator.left}px, ${indicator.top}px)`,
+                      transition: SLIDE_TRANSITION(animate)
+                    }
+                  }
+                ),
                 list,
                 menuNode,
                 /* @__PURE__ */ jsx(
@@ -3971,12 +4046,12 @@ function DesignTabs({
                     className: "pointer-events-none absolute left-0 rounded-full",
                     style: {
                       bottom: -1,
-                      height: 2,
+                      height: 3,
                       width: indicator.width,
                       background: palette.bar,
                       opacity: indicator.ready ? 1 : 0,
                       transform: `translateX(${indicator.left}px)`,
-                      transition: animate ? "transform 260ms cubic-bezier(.2,.8,.3,1), width 260ms cubic-bezier(.2,.8,.3,1), opacity 120ms linear" : "opacity 120ms linear"
+                      transition: SLIDE_TRANSITION(animate)
                     }
                   }
                 )
@@ -9558,19 +9633,20 @@ function PaginationContent({
 function PaginationItem({ ...props }) {
   return /* @__PURE__ */ jsx("li", { "data-slot": "pagination-item", ...props });
 }
+var FOCUS = "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]";
 var pageButtonVariants = cva(
-  `relative z-10 inline-flex items-center justify-center leading-none rounded-full transition-colors duration-150 ease-in-out outline-none ${FOCUS_RING}`,
+  `relative z-10 inline-flex items-center justify-center border leading-none font-semibold outline-none transition-all duration-[120ms] focus-visible:z-20 ${FOCUS}`,
   {
     variants: {
       size: {
-        sm: "min-w-7 h-7 px-1.5 text-sm",
-        md: "min-w-7 h-7 px-1.5 text-sm sm:min-w-10 sm:h-10 sm:px-2 sm:text-base",
-        lg: "min-w-10 h-10 px-2 text-base sm:min-w-12 sm:h-12 sm:px-3 sm:text-lg"
+        sm: "min-w-7 h-7 px-[7px] text-[11px] rounded-[7px]",
+        md: "min-w-8 h-8 px-[9px] text-[12px] rounded-lg",
+        lg: "min-w-[38px] h-[38px] px-[11px] text-[13px] rounded-lg"
       },
       state: {
-        default: "bg-transparent text-[#202020] font-semibold hover:bg-[#EFF8EA] cursor-pointer",
-        active: "bg-transparent text-white font-bold cursor-pointer",
-        disabled: "text-gray-300 pointer-events-none cursor-default"
+        default: "cursor-pointer border-[#E2E2E2] bg-white text-[#595959] hover:border-[#1F5E2C] hover:bg-[#F5FFF0] hover:text-[#003C1B] focus-visible:border-[#1F5E2C] focus-visible:text-[#003C1B]",
+        active: "cursor-pointer border-[#003C1B] bg-[#003C1B] text-white",
+        disabled: "pointer-events-none cursor-default border-[#E2E2E2] bg-[#F3F5F9] text-[#C6C6C6]"
       }
     },
     defaultVariants: {
@@ -9580,17 +9656,38 @@ var pageButtonVariants = cva(
   }
 );
 var chevronButtonVariants = cva(
-  `inline-flex items-center justify-center rounded-full transition-colors outline-none ${FOCUS_RING}`,
+  `inline-flex items-center justify-center border bg-white outline-none transition-all duration-[120ms] focus-visible:z-20 ${FOCUS}`,
   {
     variants: {
       size: {
-        sm: "w-7 h-7 text-sm",
-        md: "w-7 h-7 text-sm sm:w-10 sm:h-10 sm:text-base",
-        lg: "w-10 h-10 text-base sm:w-12 sm:h-12 sm:text-lg"
+        sm: "w-7 h-7 rounded-[7px]",
+        md: "w-8 h-8 rounded-lg",
+        lg: "w-[38px] h-[38px] rounded-lg"
       },
       state: {
-        default: "text-gray-400 hover:bg-[#EFF8EA] cursor-pointer",
-        disabled: "text-gray-200 pointer-events-none cursor-default"
+        default: "cursor-pointer border-[#E2E2E2] text-[#1F5E2C] hover:border-[#1F5E2C] hover:bg-[#F5FFF0] focus-visible:border-[#1F5E2C]",
+        disabled: "pointer-events-none cursor-not-allowed border-[#E2E2E2] text-[#C6C6C6] opacity-55"
+      }
+    },
+    defaultVariants: {
+      size: "md",
+      state: "default"
+    }
+  }
+);
+var paginationLabelButtonVariants = cva(
+  `inline-flex items-center gap-[7px] border font-semibold leading-none outline-none transition-all duration-[120ms] ${FOCUS}`,
+  {
+    variants: {
+      size: {
+        sm: "h-7 px-[9px] text-[11px] rounded-[7px]",
+        md: "h-8 px-[11px] text-[12px] rounded-lg",
+        lg: "h-[38px] px-[13px] text-[13px] rounded-lg"
+      },
+      state: {
+        default: "cursor-pointer border-[#E2E2E2] bg-white text-[#1F5E2C] hover:border-[#1F5E2C] hover:bg-[#F5FFF0] hover:text-[#003C1B]",
+        primary: "cursor-pointer border-[#003C1B] bg-[#003C1B] text-white hover:bg-[#00331A]",
+        disabled: "pointer-events-none cursor-not-allowed border-[#E2E2E2] bg-white text-[#C6C6C6] opacity-55"
       }
     },
     defaultVariants: {
@@ -9602,28 +9699,358 @@ var chevronButtonVariants = cva(
 function usePagination({
   currentPage,
   totalPages,
-  siblingCount = 1
+  siblingCount = 1,
+  boundaryCount = 1
 }) {
   if (totalPages <= 1) return [1];
-  const siblingStart = Math.max(2, currentPage - siblingCount);
-  const siblingEnd = Math.min(totalPages - 1, currentPage + siblingCount);
-  const pages = [1];
-  if (siblingStart > 2) {
-    pages.push("...");
+  const maxWithoutGaps = boundaryCount * 2 + siblingCount * 2 + 3;
+  if (totalPages <= maxWithoutGaps) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
-  for (let i = siblingStart; i <= siblingEnd; i++) {
-    pages.push(i);
-  }
-  if (siblingEnd < totalPages - 1) {
-    pages.push("...");
-  }
-  pages.push(totalPages);
+  const head = Array.from({ length: boundaryCount }, (_, i) => i + 1);
+  const tail = Array.from(
+    { length: boundaryCount },
+    (_, i) => totalPages - boundaryCount + 1 + i
+  );
+  const siblingStart = Math.max(
+    boundaryCount + 1,
+    Math.min(
+      currentPage - siblingCount,
+      totalPages - boundaryCount - siblingCount * 2 - 1
+    )
+  );
+  const siblingEnd = Math.min(
+    totalPages - boundaryCount,
+    Math.max(currentPage + siblingCount, boundaryCount + siblingCount * 2 + 2)
+  );
+  const pages = [...head];
+  if (siblingStart > boundaryCount + 1) pages.push("...");
+  for (let i = siblingStart; i <= siblingEnd; i++) pages.push(i);
+  if (siblingEnd < totalPages - boundaryCount) pages.push("...");
+  pages.push(...tail);
   return pages;
 }
-var ellipsisSizeClass = {
-  sm: "w-7 h-7 text-sm",
-  md: "w-7 h-7 text-sm sm:w-10 sm:h-10 sm:text-base",
-  lg: "w-10 h-10 text-base sm:w-12 sm:h-12 sm:text-lg"
+
+// src/components/custom/Pagination/paginationTokens.ts
+var PAGINATION_SIZES = {
+  sm: {
+    name: "Compact",
+    control: 28,
+    icon: 12,
+    fontSize: 11,
+    padX: 7,
+    gap: 5,
+    radius: 7,
+    rowPadY: 10,
+    rowPadX: 13,
+    spec: "ctl 28 \xB7 pad 10/13",
+    use: "Dense tables, nested panels"
+  },
+  md: {
+    name: "Default",
+    control: 32,
+    icon: 14,
+    fontSize: 12,
+    padX: 9,
+    gap: 6,
+    radius: 8,
+    rowPadY: 14,
+    rowPadX: 16,
+    spec: "ctl 32 \xB7 pad 14/16",
+    use: "The standard table footer"
+  },
+  lg: {
+    name: "Large",
+    control: 38,
+    icon: 16,
+    fontSize: 13,
+    padX: 11,
+    gap: 7,
+    radius: 8,
+    rowPadY: 18,
+    rowPadX: 18,
+    spec: "ctl 38 \xB7 pad 18/18",
+    use: "Touch surfaces, tablet dashboards"
+  }
+};
+var PAGINATION_COLORS = {
+  surface: "#FFFFFF",
+  border: "#E2E2E2",
+  subtle: "#F3F5F9",
+  rule: "#F3F5F9",
+  fg1: "#161616",
+  fg2: "#595959",
+  fg3: "#9C9C9C",
+  fgDisabled: "#C6C6C6",
+  brand: "#003C1B",
+  brandSoft: "#1F5E2C",
+  /** Mint wash under a hovered control. */
+  hoverBg: "#F5FFF0",
+  /** Border of the "Load more" button — softer than the brand line. */
+  loadMoreBorder: "#BFD6C6",
+  /** Lime halo on focus. */
+  ring: "0 0 0 3px rgba(140,196,42,.38)",
+  menuShadow: "2px 2px 12px rgba(0,0,0,.12)",
+  /** Disabled arrows keep their shape but fade. */
+  disabledOpacity: 0.55
+};
+var PAGINATION_CONTROL_STATES = [
+  { name: "Default", bg: "#FFFFFF", border: "1px solid #E2E2E2", fg: "#595959", note: "Reachable page" },
+  { name: "Hover", bg: "#F5FFF0", border: "1px solid #1F5E2C", fg: "#003C1B", note: "Mint wash" },
+  { name: "Current", bg: "#003C1B", border: "1px solid #003C1B", fg: "#FFFFFF", note: "Filled, aria-current" },
+  {
+    name: "Focus",
+    bg: "#FFFFFF",
+    border: "1px solid #1F5E2C",
+    fg: "#003C1B",
+    ring: PAGINATION_COLORS.ring,
+    note: "Lime halo"
+  },
+  { name: "Loading", bg: "#003C1B", border: "1px solid #003C1B", fg: "#FFFFFF", note: "Page in flight" },
+  { name: "Disabled", bg: "#F3F5F9", border: "1px solid #E2E2E2", fg: "#C6C6C6", note: "At the first page" },
+  { name: "Ellipsis", bg: "transparent", border: "1px solid transparent", fg: "#9C9C9C", note: "Never clickable" }
+];
+function formatPaginationRange({
+  currentPage,
+  perPage,
+  total,
+  itemLabel = "items",
+  locale = "en-IN"
+}) {
+  const n = (v) => v.toLocaleString(locale);
+  const first = (currentPage - 1) * perPage + 1;
+  if (typeof total !== "number") {
+    return `Showing ${n(perPage)} ${itemLabel}`;
+  }
+  if (total === 0) return `No ${itemLabel}`;
+  const last = Math.min(currentPage * perPage, total);
+  return `${n(Math.min(first, total))}\u2013${n(last)} of ${n(total)} ${itemLabel}`;
+}
+function PageJumper({
+  currentPage,
+  totalPages,
+  onJump,
+  size = "md",
+  disabled = false,
+  label = "Go to",
+  className
+}) {
+  const spec = PAGINATION_SIZES[size];
+  const [draft, setDraft] = useState(String(currentPage));
+  useEffect(() => setDraft(String(currentPage)), [currentPage]);
+  const commit = () => {
+    const next = Number(draft);
+    if (Number.isFinite(next) && next > 0) {
+      onJump(Math.min(Math.max(1, next), totalPages));
+    } else {
+      setDraft(String(currentPage));
+    }
+  };
+  return /* @__PURE__ */ jsxs("span", { className: cn("flex items-center gap-[7px]", className), children: [
+    label ? /* @__PURE__ */ jsx(
+      "span",
+      {
+        style: {
+          fontSize: 12,
+          fontWeight: 500,
+          lineHeight: 1,
+          color: PAGINATION_COLORS.fg3
+        },
+        children: label
+      }
+    ) : null,
+    /* @__PURE__ */ jsx(
+      "input",
+      {
+        "aria-label": `Go to page, 1 to ${totalPages}`,
+        inputMode: "numeric",
+        disabled,
+        value: draft,
+        onChange: (event) => setDraft(event.target.value.replace(/[^0-9]/g, "")),
+        onBlur: commit,
+        onKeyDown: (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            commit();
+            return;
+          }
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.stopPropagation();
+          }
+        },
+        className: "ue-tabular border bg-white text-center outline-none transition-all duration-[120ms] hover:border-[#C6C6C6] focus:border-[#1F5E2C] focus:shadow-[0_0_0_3px_rgba(140,196,42,.28)] disabled:pointer-events-none disabled:opacity-55",
+        style: {
+          width: 58,
+          height: spec.control,
+          borderRadius: spec.radius,
+          borderColor: PAGINATION_COLORS.border,
+          color: PAGINATION_COLORS.fg1,
+          fontSize: 12,
+          fontWeight: 600
+        }
+      }
+    ),
+    /* @__PURE__ */ jsxs(
+      "span",
+      {
+        className: "ue-tabular whitespace-nowrap",
+        style: {
+          fontSize: 12,
+          fontWeight: 500,
+          lineHeight: 1,
+          color: PAGINATION_COLORS.fg3
+        },
+        children: [
+          "/ ",
+          totalPages.toLocaleString("en-IN")
+        ]
+      }
+    )
+  ] });
+}
+function PageSizeSelect({
+  value,
+  options,
+  onChange,
+  size = "md",
+  disabled = false,
+  label = "Rows",
+  className
+}) {
+  const spec = PAGINATION_SIZES[size];
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event) => {
+      if (!rootRef.current?.contains(event.target)) setOpen(false);
+    };
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown, true);
+    };
+  }, [open]);
+  return /* @__PURE__ */ jsxs("span", { className: cn("flex items-center gap-[7px]", className), children: [
+    label ? /* @__PURE__ */ jsx(
+      "span",
+      {
+        style: {
+          fontSize: 12,
+          fontWeight: 500,
+          lineHeight: 1,
+          color: PAGINATION_COLORS.fg3
+        },
+        children: label
+      }
+    ) : null,
+    /* @__PURE__ */ jsxs("span", { ref: rootRef, className: "relative", children: [
+      /* @__PURE__ */ jsxs(
+        "button",
+        {
+          type: "button",
+          disabled,
+          "aria-haspopup": "listbox",
+          "aria-expanded": open,
+          "aria-label": "Rows per page",
+          onClick: () => setOpen((v) => !v),
+          className: "flex items-center gap-[7px] border bg-white outline-none transition-all duration-[120ms] hover:border-[#1F5E2C] focus-visible:border-[#1F5E2C] focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)] disabled:pointer-events-none disabled:opacity-55",
+          style: {
+            height: spec.control,
+            padding: "0 10px",
+            borderRadius: spec.radius,
+            borderColor: PAGINATION_COLORS.border,
+            cursor: disabled ? "not-allowed" : "pointer"
+          },
+          children: [
+            /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: "ue-tabular",
+                style: {
+                  fontSize: 12,
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  color: PAGINATION_COLORS.fg1
+                },
+                children: value
+              }
+            ),
+            /* @__PURE__ */ jsx(
+              ChevronDown,
+              {
+                "aria-hidden": "true",
+                size: 12,
+                strokeWidth: 2.2,
+                color: PAGINATION_COLORS.fg3,
+                style: {
+                  transition: "transform 120ms linear",
+                  transform: open ? "rotate(180deg)" : "rotate(0deg)"
+                }
+              }
+            )
+          ]
+        }
+      ),
+      open ? /* @__PURE__ */ jsx(
+        "span",
+        {
+          role: "listbox",
+          "aria-label": "Rows per page",
+          className: "absolute left-0 z-20 flex flex-col gap-0.5",
+          style: {
+            bottom: "calc(100% + 5px)",
+            minWidth: 78,
+            padding: 4,
+            background: PAGINATION_COLORS.surface,
+            border: `1px solid ${PAGINATION_COLORS.border}`,
+            borderRadius: 8,
+            boxShadow: PAGINATION_COLORS.menuShadow,
+            animation: "ue-table-pop 140ms ease-out"
+          },
+          children: options.map((option) => {
+            const selected = option === value;
+            return /* @__PURE__ */ jsx(
+              "button",
+              {
+                type: "button",
+                role: "option",
+                "aria-selected": selected,
+                onClick: () => {
+                  onChange(option);
+                  setOpen(false);
+                },
+                className: cn(
+                  "ue-tabular cursor-pointer rounded-md border-0 px-[9px] py-[7px] text-left text-xs transition-colors duration-[120ms]",
+                  !selected && "hover:bg-[#FAFFF7]"
+                ),
+                style: {
+                  background: selected ? PAGINATION_COLORS.brand : "transparent",
+                  color: selected ? "#FFFFFF" : PAGINATION_COLORS.fg1,
+                  fontWeight: selected ? 600 : 500
+                },
+                children: option
+              },
+              option
+            );
+          })
+        }
+      ) : null
+    ] })
+  ] });
+}
+var alignClass3 = {
+  center: "justify-center",
+  between: "justify-between",
+  start: "justify-start",
+  end: "justify-end"
 };
 function Pagination2({
   currentPage,
@@ -9633,11 +10060,42 @@ function Pagination2({
   showFirstLast = false,
   size = "md",
   disabled = false,
-  className
+  className,
+  variant = "numbered",
+  boundaryCount = 1,
+  total,
+  perPage,
+  itemLabel = "items",
+  rangeLabel,
+  showRange,
+  perPageOptions,
+  onPerPageChange,
+  anchorOnPerPageChange = true,
+  showJumper,
+  hideOnSinglePage = false,
+  loading = false,
+  align = "auto",
+  attached = false,
+  keyboardNavigation = true,
+  hasPrev,
+  hasNext,
+  onPrev,
+  onNext,
+  prevLabel,
+  nextLabel,
+  onLoadMore,
+  loadedCount,
+  loadMoreLabel
 }) {
-  const pages = usePagination({ currentPage, totalPages, siblingCount });
-  const isPrevDisabled = disabled || currentPage === 1;
-  const isNextDisabled = disabled || currentPage === totalPages;
+  const spec = PAGINATION_SIZES[size];
+  const pages = usePagination({
+    currentPage,
+    totalPages,
+    siblingCount,
+    boundaryCount
+  });
+  const isPrevDisabled = disabled || loading || currentPage <= 1;
+  const isNextDisabled = disabled || loading || currentPage >= totalPages;
   const containerRef = useRef(null);
   const buttonRefs = useRef(/* @__PURE__ */ new Map());
   const [pill, setPill] = useState(null);
@@ -9647,7 +10105,10 @@ function Pagination2({
     if (!container) return;
     const measurePill = (animated) => {
       const btn = buttonRefs.current.get(currentPage);
-      if (!btn) return;
+      if (!btn) {
+        setPill(null);
+        return;
+      }
       const cRect = container.getBoundingClientRect();
       const bRect = btn.getBoundingClientRect();
       setPill({
@@ -9664,122 +10125,417 @@ function Pagination2({
     const observer = new ResizeObserver(() => measurePill(false));
     observer.observe(container);
     return () => observer.disconnect();
-  }, [currentPage, totalPages, siblingCount]);
-  return /* @__PURE__ */ jsx(Pagination, { className: cn("mx-auto flex w-full justify-center", className), children: /* @__PURE__ */ jsxs(
-    PaginationContent,
+  }, [currentPage, totalPages, siblingCount, boundaryCount, size, variant]);
+  const goTo = (page) => {
+    if (disabled || loading) return;
+    const next = Math.min(Math.max(1, page), Math.max(1, totalPages));
+    if (next !== currentPage) onPageChange(next);
+  };
+  const goPrev = () => onPrev ? onPrev() : goTo(currentPage - 1);
+  const goNext = () => onNext ? onNext() : goTo(currentPage + 1);
+  const sizeOptions = perPageOptions ?? [];
+  const perPageOn = sizeOptions.length > 0 && typeof perPage === "number" && Boolean(onPerPageChange);
+  const jumperOn = (showJumper ?? variant === "jumper") && totalPages > 1;
+  const resolvedRange = rangeLabel ?? (variant === "compact" && typeof total !== "number" ? `Page ${currentPage.toLocaleString("en-IN")} of ${totalPages.toLocaleString("en-IN")}` : typeof perPage === "number" ? formatPaginationRange({ currentPage, perPage, total, itemLabel }) : null);
+  const rangeOn = showRange ?? resolvedRange !== null;
+  const changePerPage = (next) => {
+    if (!onPerPageChange) return;
+    onPerPageChange(next);
+    if (anchorOnPerPageChange && typeof perPage === "number") {
+      const anchor = (currentPage - 1) * perPage;
+      onPageChange(Math.floor(anchor / next) + 1);
+    } else if (currentPage !== 1) {
+      onPageChange(1);
+    }
+  };
+  if (hideOnSinglePage && totalPages <= 1 && variant !== "cursor" && variant !== "loadMore") {
+    return null;
+  }
+  const handleKeyDown = (event) => {
+    if (!keyboardNavigation || disabled || loading) return;
+    if (event.target?.closest("input, textarea, select")) {
+      return;
+    }
+    const jump = event.metaKey || event.ctrlKey;
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        jump ? goTo(1) : goPrev();
+        break;
+      case "ArrowRight":
+        event.preventDefault();
+        jump ? goTo(totalPages) : goNext();
+        break;
+      case "Home":
+        event.preventDefault();
+        goTo(1);
+        break;
+      case "End":
+        event.preventDefault();
+        goTo(totalPages);
+        break;
+    }
+  };
+  const rangeNode = rangeOn ? /* @__PURE__ */ jsx(
+    "span",
     {
-      ref: containerRef,
-      className: "relative flex flex-row flex-wrap items-center justify-center gap-1",
+      className: "ue-tabular",
+      role: "status",
+      "aria-live": "polite",
+      style: {
+        fontSize: 12,
+        fontWeight: 500,
+        lineHeight: 1.4,
+        color: PAGINATION_COLORS.fg3
+      },
+      children: resolvedRange
+    }
+  ) : null;
+  const leadingNodes = /* @__PURE__ */ jsxs(Fragment, { children: [
+    rangeNode,
+    perPageOn ? /* @__PURE__ */ jsx(
+      PageSizeSelect,
+      {
+        value: perPage,
+        options: sizeOptions,
+        onChange: changePerPage,
+        size,
+        disabled: disabled || loading
+      }
+    ) : null,
+    jumperOn ? /* @__PURE__ */ jsx(
+      PageJumper,
+      {
+        currentPage,
+        totalPages,
+        onJump: goTo,
+        size,
+        disabled: disabled || loading
+      }
+    ) : null
+  ] });
+  const hasLeading = Boolean(rangeNode) || perPageOn || jumperOn;
+  const resolvedAlign = align === "auto" ? hasLeading ? "between" : "center" : align;
+  const spinner = /* @__PURE__ */ jsx(
+    "span",
+    {
+      "aria-hidden": "true",
+      className: "animate-spin",
+      style: {
+        width: spec.icon,
+        height: spec.icon,
+        borderRadius: "50%",
+        border: "2px solid rgba(255,255,255,.35)",
+        borderTopColor: "#FFFFFF"
+      }
+    }
+  );
+  const labelButton = (direction, label, isDisabled, tone, onClick) => /* @__PURE__ */ jsxs(
+    "button",
+    {
+      type: "button",
+      onClick,
+      disabled: isDisabled,
+      "aria-label": direction === "prev" ? "Go to previous page" : "Go to next page",
+      className: paginationLabelButtonVariants({
+        size,
+        state: isDisabled ? "disabled" : tone
+      }),
       children: [
-        pill && /* @__PURE__ */ jsx(
-          "span",
-          {
-            "aria-hidden": true,
-            style: {
-              position: "absolute",
-              left: 0,
-              top: 0,
-              transform: `translate(${pill.x}px, ${pill.y}px)`,
-              width: pill.w,
-              height: pill.h,
-              background: "#003C1B",
-              borderRadius: "9999px",
-              transition: pill.animated ? "transform 300ms cubic-bezier(0.4, 0, 0.2, 1), width 300ms cubic-bezier(0.4, 0, 0.2, 1), height 300ms cubic-bezier(0.4, 0, 0.2, 1)" : "none",
-              pointerEvents: "none",
-              zIndex: 0
-            }
-          }
-        ),
-        showFirstLast && /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
-          "button",
-          {
-            type: "button",
-            "aria-label": "Go to first page",
-            onClick: () => onPageChange(1),
-            className: chevronButtonVariants({
-              size,
-              state: isPrevDisabled ? "disabled" : "default"
-            }),
-            disabled: isPrevDisabled,
-            children: /* @__PURE__ */ jsx(ChevronsLeft, { className: "size-4" })
-          }
-        ) }),
-        /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
-          "button",
-          {
-            type: "button",
-            "aria-label": "Go to previous page",
-            onClick: () => onPageChange(currentPage - 1),
-            className: chevronButtonVariants({
-              size,
-              state: isPrevDisabled ? "disabled" : "default"
-            }),
-            disabled: isPrevDisabled,
-            children: /* @__PURE__ */ jsx(ChevronLeft, { className: "size-4" })
-          }
-        ) }),
-        pages.map(
-          (page, index) => page === "..." ? /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
-            "span",
-            {
-              "aria-hidden": true,
-              className: cn(
-                "inline-flex items-center justify-center text-gray-400 select-none",
-                ellipsisSizeClass[size ?? "md"]
-              ),
-              children: "..."
-            }
-          ) }, `ellipsis-${index}`) : /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
-            "button",
-            {
-              ref: (el) => {
-                if (el) buttonRefs.current.set(page, el);
-                else buttonRefs.current.delete(page);
-              },
-              type: "button",
-              "aria-label": `Go to page ${page}`,
-              "aria-current": page === currentPage ? "page" : void 0,
-              onClick: () => onPageChange(page),
-              className: pageButtonVariants({
-                size,
-                state: disabled ? "disabled" : page === currentPage ? "active" : "default"
-              }),
-              disabled,
-              children: page
-            }
-          ) }, page)
-        ),
-        /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
-          "button",
-          {
-            type: "button",
-            "aria-label": "Go to next page",
-            onClick: () => onPageChange(currentPage + 1),
-            className: chevronButtonVariants({
-              size,
-              state: isNextDisabled ? "disabled" : "default"
-            }),
-            disabled: isNextDisabled,
-            children: /* @__PURE__ */ jsx(ChevronRight, { className: "size-4" })
-          }
-        ) }),
-        showFirstLast && /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
-          "button",
-          {
-            type: "button",
-            "aria-label": "Go to last page",
-            onClick: () => onPageChange(totalPages),
-            className: chevronButtonVariants({
-              size,
-              state: isNextDisabled ? "disabled" : "default"
-            }),
-            disabled: isNextDisabled,
-            children: /* @__PURE__ */ jsx(ChevronsRight, { className: "size-4" })
-          }
-        ) })
+        direction === "prev" ? /* @__PURE__ */ jsx(ChevronLeft, { size: spec.icon, strokeWidth: 2.4, "aria-hidden": "true" }) : null,
+        label,
+        direction === "next" ? /* @__PURE__ */ jsx(ChevronRight, { size: spec.icon, strokeWidth: 2.4, "aria-hidden": "true" }) : null
       ]
     }
-  ) });
+  );
+  if (variant === "loadMore") {
+    const exhausted = typeof total === "number" && typeof loadedCount === "number" && loadedCount >= total;
+    return /* @__PURE__ */ jsxs(
+      "nav",
+      {
+        "aria-label": "Pagination",
+        className: cn(
+          "flex w-full flex-col items-center gap-[9px]",
+          attached ? "border-t" : "",
+          className
+        ),
+        style: {
+          padding: `${spec.rowPadY}px ${spec.rowPadX}px`,
+          borderTopColor: attached ? PAGINATION_COLORS.rule : void 0
+        },
+        children: [
+          /* @__PURE__ */ jsx(
+            "span",
+            {
+              "aria-hidden": "true",
+              className: "h-px w-full",
+              style: { background: PAGINATION_COLORS.rule }
+            }
+          ),
+          /* @__PURE__ */ jsxs(
+            "button",
+            {
+              type: "button",
+              onClick: onLoadMore,
+              disabled: disabled || loading || exhausted || !onLoadMore,
+              className: cn(
+                "inline-flex items-center gap-2 border bg-white font-semibold leading-none outline-none transition-all duration-[120ms]",
+                "hover:bg-[#F5FFF0] focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
+                "disabled:pointer-events-none disabled:opacity-55"
+              ),
+              style: {
+                height: spec.control + 4,
+                padding: "0 14px",
+                borderRadius: spec.radius,
+                borderColor: PAGINATION_COLORS.loadMoreBorder,
+                color: PAGINATION_COLORS.brand,
+                fontSize: spec.fontSize,
+                cursor: "pointer"
+              },
+              children: [
+                loading ? /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    "aria-hidden": "true",
+                    className: "animate-spin",
+                    style: {
+                      width: spec.icon,
+                      height: spec.icon,
+                      borderRadius: "50%",
+                      border: `2px solid rgba(0,60,27,.25)`,
+                      borderTopColor: PAGINATION_COLORS.brandSoft
+                    }
+                  }
+                ) : /* @__PURE__ */ jsx(ArrowDown, { size: spec.icon, strokeWidth: 2.4, "aria-hidden": "true" }),
+                loadMoreLabel ?? (exhausted ? "All loaded" : `Load ${(perPage ?? 25).toLocaleString("en-IN")} more`)
+              ]
+            }
+          ),
+          typeof loadedCount === "number" ? /* @__PURE__ */ jsxs(
+            "span",
+            {
+              className: "ue-tabular",
+              role: "status",
+              "aria-live": "polite",
+              style: {
+                fontSize: 11,
+                fontWeight: 500,
+                lineHeight: 1.4,
+                color: PAGINATION_COLORS.fg3
+              },
+              children: [
+                loadedCount.toLocaleString("en-IN"),
+                typeof total === "number" ? ` of ${total.toLocaleString("en-IN")}` : "",
+                " loaded"
+              ]
+            }
+          ) : null
+        ]
+      }
+    );
+  }
+  if (variant === "cursor" || variant === "compact") {
+    const cursor = variant === "cursor";
+    const prevOff = cursor ? disabled || loading || hasPrev === false : isPrevDisabled;
+    const nextOff = cursor ? disabled || loading || hasNext === false : isNextDisabled;
+    return /* @__PURE__ */ jsxs(
+      "nav",
+      {
+        "aria-label": "Pagination",
+        onKeyDown: handleKeyDown,
+        className: cn(
+          "flex w-full flex-wrap items-center gap-[14px]",
+          alignClass3[resolvedAlign],
+          attached ? "border-t" : "",
+          className
+        ),
+        style: {
+          padding: `${spec.rowPadY}px ${spec.rowPadX}px`,
+          borderTopColor: attached ? PAGINATION_COLORS.rule : void 0
+        },
+        children: [
+          leadingNodes,
+          /* @__PURE__ */ jsxs(
+            "span",
+            {
+              className: "flex items-center",
+              style: { gap: spec.gap, marginLeft: hasLeading ? "auto" : void 0 },
+              children: [
+                labelButton(
+                  "prev",
+                  prevLabel ?? (cursor ? "Newer" : "Prev"),
+                  prevOff,
+                  "default",
+                  goPrev
+                ),
+                labelButton(
+                  "next",
+                  nextLabel ?? (cursor ? "Older" : "Next"),
+                  nextOff,
+                  cursor ? "primary" : "default",
+                  goNext
+                )
+              ]
+            }
+          )
+        ]
+      }
+    );
+  }
+  return /* @__PURE__ */ jsxs(
+    Pagination,
+    {
+      "aria-label": "Pagination",
+      onKeyDown: handleKeyDown,
+      className: cn(
+        "flex w-full flex-wrap items-center gap-[14px]",
+        alignClass3[resolvedAlign],
+        // The bare control keeps its original centred layout.
+        !hasLeading && !attached && "mx-auto",
+        attached ? "border-t" : "",
+        className
+      ),
+      style: {
+        padding: hasLeading || attached ? `${spec.rowPadY}px ${spec.rowPadX}px` : void 0,
+        borderTopColor: attached ? PAGINATION_COLORS.rule : void 0
+      },
+      children: [
+        leadingNodes,
+        /* @__PURE__ */ jsxs(
+          PaginationContent,
+          {
+            ref: containerRef,
+            className: "relative flex flex-row flex-wrap items-center justify-center",
+            style: {
+              gap: spec.gap,
+              marginLeft: hasLeading ? "auto" : void 0
+            },
+            children: [
+              pill && /* @__PURE__ */ jsx(
+                "span",
+                {
+                  "aria-hidden": true,
+                  style: {
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    transform: `translate(${pill.x}px, ${pill.y}px)`,
+                    width: pill.w,
+                    height: pill.h,
+                    background: PAGINATION_COLORS.brand,
+                    borderRadius: spec.radius,
+                    transition: pill.animated ? "transform 300ms cubic-bezier(0.4, 0, 0.2, 1), width 300ms cubic-bezier(0.4, 0, 0.2, 1), height 300ms cubic-bezier(0.4, 0, 0.2, 1)" : "none",
+                    pointerEvents: "none",
+                    zIndex: 0
+                  }
+                }
+              ),
+              showFirstLast && /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  "aria-label": "Go to first page",
+                  onClick: () => goTo(1),
+                  className: chevronButtonVariants({
+                    size,
+                    state: isPrevDisabled ? "disabled" : "default"
+                  }),
+                  disabled: isPrevDisabled,
+                  children: /* @__PURE__ */ jsx(ChevronsLeft, { size: spec.icon, strokeWidth: 2.4 })
+                }
+              ) }),
+              /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  "aria-label": "Go to previous page",
+                  onClick: goPrev,
+                  className: chevronButtonVariants({
+                    size,
+                    state: isPrevDisabled ? "disabled" : "default"
+                  }),
+                  disabled: isPrevDisabled,
+                  children: /* @__PURE__ */ jsx(ChevronLeft, { size: spec.icon, strokeWidth: 2.4 })
+                }
+              ) }),
+              pages.map(
+                (page, index) => page === "..." ? /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
+                  "span",
+                  {
+                    "aria-hidden": true,
+                    className: "ue-tabular inline-flex select-none items-end justify-center",
+                    style: {
+                      minWidth: spec.control,
+                      height: spec.control,
+                      fontSize: spec.fontSize,
+                      fontWeight: 600,
+                      lineHeight: 1.6,
+                      color: PAGINATION_COLORS.fg3
+                    },
+                    children: "\u2026"
+                  }
+                ) }, `ellipsis-${index}`) : /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
+                  "button",
+                  {
+                    ref: (el) => {
+                      if (el) buttonRefs.current.set(page, el);
+                      else buttonRefs.current.delete(page);
+                    },
+                    type: "button",
+                    "aria-label": `Go to page ${page}`,
+                    "aria-current": page === currentPage ? "page" : void 0,
+                    onClick: () => goTo(page),
+                    className: cn(
+                      "ue-tabular",
+                      pageButtonVariants({
+                        size,
+                        state: disabled ? "disabled" : page === currentPage ? "active" : "default"
+                      })
+                    ),
+                    style: (
+                      // While the pill is mounted it paints the fill, so the button
+                      // underneath must not paint a second one.
+                      page === currentPage && pill ? { background: "transparent", borderColor: "transparent" } : void 0
+                    ),
+                    disabled: disabled || loading,
+                    children: page === currentPage && loading ? spinner : page
+                  }
+                ) }, page)
+              ),
+              /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  "aria-label": "Go to next page",
+                  onClick: goNext,
+                  className: chevronButtonVariants({
+                    size,
+                    state: isNextDisabled ? "disabled" : "default"
+                  }),
+                  disabled: isNextDisabled,
+                  children: /* @__PURE__ */ jsx(ChevronRight, { size: spec.icon, strokeWidth: 2.4 })
+                }
+              ) }),
+              showFirstLast && /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  "aria-label": "Go to last page",
+                  onClick: () => goTo(totalPages),
+                  className: chevronButtonVariants({
+                    size,
+                    state: isNextDisabled ? "disabled" : "default"
+                  }),
+                  disabled: isNextDisabled,
+                  children: /* @__PURE__ */ jsx(ChevronsRight, { size: spec.icon, strokeWidth: 2.4 })
+                }
+              ) })
+            ]
+          }
+        )
+      ]
+    }
+  );
 }
 function UengageProvider({ children, className }) {
   return /* @__PURE__ */ jsx("div", { className: cn("uengage-ui", className), children });
@@ -14238,6 +14994,6 @@ function Chip({
   );
 }
 
-export { ACCORDION_SIZES, Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, BannerStack, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, DesignTabs, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, ModalZIndexProvider, MonthPickerCalendar, PATTERN_REGEX, PageContainer, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, SidebarZIndexProvider, StatusBadge, SubHeader, SweetAlertProvider, TABLE_COLORS, TABLE_EMPTY_CELL, TABLE_SIZES, TABLE_STATUS_TONES, TABS_SIZES, TabPanel, Table2 as Table, TableActionButton, TableCheckbox, TableEmptyState, TableEmptyValue, TableErrorState, TableIdentityCell, TablePaginationBar, TableSelectionBar, TableStatusCell, Tabs2 as Tabs, TabsActiveValueContext, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buildPageWindow, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getAccordionChip, getAccordionPalette, getTableRowStateSpec, getTabsPalette, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableShimmerStyle, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
+export { ACCORDION_SIZES, Accordion, AlertDialog2 as AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger, AppHeader, AppSidebar, Banner, BannerStack, Button2 as Button, Card2 as Card, CardAction, CardContent2 as CardContent, CardDescription, CardFooter2 as CardFooter, CardHeader2 as CardHeader, CardTitle2 as CardTitle, Checkbox, CheckboxGroup, Chip, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, TableCell2 as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, TableSkeleton as CustomTableSkeleton, CustomTabsTrigger, DatePicker, DatePickerCalendar, DesignTabs, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger, FileUpload, FilterGroup, FilterGroupMobileContext, Grid, Input2 as Input, InputHelper, InputLabel, LAYOUT, Label, Loader, Modal, ModalZIndexProvider, MonthPickerCalendar, PAGINATION_COLORS, PAGINATION_CONTROL_STATES, PAGINATION_SIZES, PATTERN_REGEX, PageContainer, PageJumper, PageSizeSelect, Pagination2 as Pagination, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, SearchBar, Section, SectionContent, SectionDivider, SectionField, SectionGroup, SectionHeader, SectionRow, SectionSubsection, SectionTableContent, Select, Separator, Sidebar, SidebarZIndexProvider, StatusBadge, SubHeader, SweetAlertProvider, TABLE_COLORS, TABLE_EMPTY_CELL, TABLE_SIZES, TABLE_STATUS_TONES, TABS_SIZES, TabPanel, Table2 as Table, TableActionButton, TableCheckbox, TableEmptyState, TableEmptyValue, TableErrorState, TableIdentityCell, TablePaginationBar, TableSelectionBar, TableStatusCell, Tabs2 as Tabs, TabsActiveValueContext, Toggle, TopHeader, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, brand, buildPageWindow, buttonVariants, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, cn, buttonVariants2 as customButtonVariants, triggerVariants2 as datePickerTriggerVariants, dayCellVariants, dropzoneVariants, formatDate, formatMonthYear, formatPaginationRange, formatRange, getAccordionChip, getAccordionPalette, getTableRowStateSpec, getTabsPalette, iconWrapperVariants, Input as input, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, paginationLabelButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableShimmerStyle, tableWrapperVariants, thumbVariants, toCssSize, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map
