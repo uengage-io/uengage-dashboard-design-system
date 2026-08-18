@@ -202,10 +202,22 @@ function CountBadge({
  * Measures the active trigger so a single bar can slide between tabs instead of
  * each tab snapping its own border on and off.
  */
+/** One easing for every sliding span, so wash, bar and pill travel together. */
+const SLIDE_TRANSITION = (animate: boolean) =>
+  animate
+    ? "transform 260ms cubic-bezier(.2,.8,.3,1), width 260ms cubic-bezier(.2,.8,.3,1), height 260ms cubic-bezier(.2,.8,.3,1), opacity 120ms linear"
+    : "opacity 120ms linear";
+
 function useSlidingIndicator(enabled: boolean, activeValue: string, signature: string) {
   const innerRef = React.useRef<HTMLDivElement>(null);
   const settled = React.useRef(false);
-  const [indicator, setIndicator] = React.useState({ left: 0, width: 0, ready: false });
+  const [indicator, setIndicator] = React.useState({
+    left: 0,
+    width: 0,
+    top: 0,
+    height: 0,
+    ready: false,
+  });
 
   const measure = React.useCallback(() => {
     const inner = innerRef.current;
@@ -221,9 +233,13 @@ function useSlidingIndicator(enabled: boolean, activeValue: string, signature: s
     }
     const innerRect = inner.getBoundingClientRect();
     const btnRect = btn.getBoundingClientRect();
+    // top/height only matter to the segmented pill, which fills the whole
+    // trigger box; the underline bar reads left/width and pins itself to the rule.
     setIndicator({
       left: btnRect.left - innerRect.left,
       width: btnRect.width,
+      top: btnRect.top - innerRect.top,
+      height: btnRect.height,
       ready: true,
     });
   }, [activeValue]);
@@ -442,9 +458,15 @@ interface TriggerProps {
   palette: TabsPalette;
   spec: TabsSizeSpec;
   fitted?: boolean;
+  /**
+   * The strip is painting a single pill that slides between triggers, so this
+   * trigger must not paint its own selected fill. False until the pill has
+   * measured, which keeps the selection visible on the first paint.
+   */
+  sliding?: boolean;
 }
 
-function UnderlineTrigger({ tab, active, palette, spec, fitted }: TriggerProps) {
+function UnderlineTrigger({ tab, active, palette, spec, fitted, sliding }: TriggerProps) {
   const [hover, setHover] = React.useState(false);
   const fg = tab.disabled
     ? palette.fgDisabled
@@ -464,8 +486,8 @@ function UnderlineTrigger({ tab, active, palette, spec, fitted }: TriggerProps) 
       onMouseLeave={() => setHover(false)}
       className={cn(
         TRIGGER_RESET,
-        // The underline is a border-bottom — any radius would bow it into an arc.
-        "rounded-none",
+        // Radius is set inline: top corners only, so the wash rounds while the
+        // border-bottom underline stays a straight line.
         "inline-flex items-center justify-center gap-2 whitespace-nowrap",
         "transition-all duration-[160ms] ease-[cubic-bezier(.2,.8,.3,1)]",
         "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
@@ -475,31 +497,42 @@ function UnderlineTrigger({ tab, active, palette, spec, fitted }: TriggerProps) 
       style={{
         padding: spec.underPad,
         fontSize: spec.fs,
-        fontWeight: 600,
+        // The selected label carries the weight as well as the colour.
+        fontWeight: active ? 700 : 600,
         color: fg,
-        // The bar itself is a single sliding span in the strip — this only
-        // reserves the 2px it occupies so the label never shifts.
-        borderBottom: "2px solid transparent",
+        // Both the wash and the bar are single sliding spans in the strip; when
+        // they have not measured yet the trigger paints its own so the selection
+        // is never invisible.
+        background: active && !sliding ? palette.underActiveBg : "transparent",
+        borderRadius: "7px 7px 0 0",
+        // The bar is a sliding span too — this only reserves the 3px it
+        // occupies so the label never shifts.
+        borderBottom: "3px solid transparent",
         marginBottom: -1,
         opacity: tab.disabled ? 0.5 : 1,
+        // Sit above the sliding wash so the label stays readable while it travels.
+        position: "relative",
+        zIndex: 1,
       }}
     >
       {tab.icon && <TabIcon icon={tab.icon} size={spec.icon} />}
       {tab.label}
       {tab.dirty && <DirtyDot color={palette.dirty} />}
       {tab.count !== undefined && tab.count !== null && (
-        <CountBadge count={tab.count} active={active} palette={palette} radius={6} padding="2px 7px" />
+        <CountBadge count={tab.count} active={active} palette={palette} radius={99} padding="2px 8px" />
       )}
     </TabsTrigger>
   );
 }
 
-function SegmentedTrigger({ tab, active, palette, spec, fitted }: TriggerProps) {
+function SegmentedTrigger({ tab, active, palette, spec, fitted, sliding }: TriggerProps) {
   const [hover, setHover] = React.useState(false);
+  // The selected segment carries the forest fill, so its label flips to the
+  // on-fill colour rather than staying forest-on-white like the other variants.
   const fg = tab.disabled
     ? palette.fgDisabled
     : active
-      ? palette.fgActive
+      ? palette.segActiveFg
       : hover
         ? palette.fgHover
         : palette.fg;
@@ -514,8 +547,10 @@ function SegmentedTrigger({ tab, active, palette, spec, fitted }: TriggerProps) 
       onMouseLeave={() => setHover(false)}
       className={cn(
         TRIGGER_RESET,
-        "inline-flex items-center justify-center gap-[7px] whitespace-nowrap rounded-[7px]",
-        "transition-all duration-[160ms] ease-[cubic-bezier(.2,.8,.3,1)]",
+        "inline-flex items-center justify-center gap-[7px] whitespace-nowrap rounded-full",
+        // 220ms so the label crossfade tracks the sliding pill rather than
+        // flipping to white before it arrives.
+        "transition-all duration-[220ms] ease-[cubic-bezier(.2,.8,.3,1)]",
         "focus-visible:shadow-[0_0_0_3px_rgba(140,196,42,.38)]",
         fitted && "flex-1",
         tab.disabled ? "cursor-not-allowed" : "cursor-pointer",
@@ -525,20 +560,24 @@ function SegmentedTrigger({ tab, active, palette, spec, fitted }: TriggerProps) 
         fontSize: spec.fs,
         fontWeight: 600,
         color: fg,
-        background: active
-          ? palette.segActiveBg
-          : hover && !tab.disabled
-            ? palette.segHoverBg
-            : "transparent",
-        boxShadow: active ? palette.segActiveShadow : "none",
+        background:
+          active && !sliding
+            ? palette.segActiveBg
+            : !active && hover && !tab.disabled
+              ? palette.segHoverBg
+              : "transparent",
+        boxShadow: active && !sliding ? palette.segActiveShadow : "none",
         opacity: tab.disabled ? 0.5 : 1,
+        // Sit above the sliding pill so the label stays readable while it travels.
+        position: "relative",
+        zIndex: 1,
       }}
     >
       {tab.icon && <TabIcon icon={tab.icon} size={spec.icon} />}
       {tab.label}
       {tab.dirty && <DirtyDot color={palette.dirty} />}
       {tab.count !== undefined && tab.count !== null && (
-        <CountBadge count={tab.count} active={active} palette={palette} radius={5} padding="2px 6px" />
+        <CountBadge count={tab.count} active={active} palette={palette} radius={99} padding="2px 7px" />
       )}
     </TabsTrigger>
   );
@@ -724,11 +763,14 @@ export function DesignTabs({
   const scrollable = !useMenu && variant !== "vertical" && variant !== "pill";
   const { ref: scrollRef, edges, scrollBy } = useEdgeScroll(scrollable, activeValue);
 
+  // Underline slides a 2px bar; segmented slides the whole selected pill.
+  const slides = variant === "underline" || variant === "segmented";
   const { innerRef, indicator, animate } = useSlidingIndicator(
-    variant === "underline",
+    slides,
     activeValue,
-    `${size}|${visibleTabs.map((t) => t.value).join(",")}`,
+    `${size}|${fitted ? "fit" : "auto"}|${visibleTabs.map((t) => t.value).join(",")}`,
   );
+  const slidingFill = slides && indicator.ready;
 
   const renderTriggers = (list: TabItem[]) =>
     list.map((tab) => (
@@ -739,6 +781,7 @@ export function DesignTabs({
         palette={palette}
         spec={spec}
         fitted={fitted}
+        sliding={slidingFill}
       />
     ));
 
@@ -818,11 +861,33 @@ export function DesignTabs({
           style={{
             padding: 3,
             background: palette.segTrack,
-            borderRadius: 10,
+            border: `1px solid ${palette.segTrackBorder}`,
+            // Fully rounded so the track hugs the pill-shaped segments inside it.
+            borderRadius: 999,
             width: fitted ? "100%" : "fit-content",
           }}
         >
-          {list}
+          <div
+            ref={innerRef}
+            className={cn("relative flex", fitted ? "w-full" : "w-max")}
+          >
+            {/* One pill for the whole strip: it travels to the new segment
+                instead of the fill blinking from one trigger to the next. */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-0 top-0"
+              style={{
+                width: indicator.width,
+                height: indicator.height,
+                borderRadius: 999,
+                background: palette.segActiveBg,
+                opacity: indicator.ready ? 1 : 0,
+                transform: `translate(${indicator.left}px, ${indicator.top}px)`,
+                transition: SLIDE_TRANSITION(animate),
+              }}
+            />
+            {list}
+          </div>
         </div>
         {menuNode}
       </div>
@@ -844,6 +909,21 @@ export function DesignTabs({
             className="relative flex w-max items-end"
             style={{ gap: spec.gap }}
           >
+            {/* The wash travels with the bar, so the selection moves as one
+                block instead of the tint blinking between tabs. */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-0 top-0"
+              style={{
+                width: indicator.width,
+                height: indicator.height,
+                borderRadius: "7px 7px 0 0",
+                background: palette.underActiveBg,
+                opacity: indicator.ready ? 1 : 0,
+                transform: `translate(${indicator.left}px, ${indicator.top}px)`,
+                transition: SLIDE_TRANSITION(animate),
+              }}
+            />
             {list}
             {menuNode}
             <span
@@ -851,14 +931,12 @@ export function DesignTabs({
               className="pointer-events-none absolute left-0 rounded-full"
               style={{
                 bottom: -1,
-                height: 2,
+                height: 3,
                 width: indicator.width,
                 background: palette.bar,
                 opacity: indicator.ready ? 1 : 0,
                 transform: `translateX(${indicator.left}px)`,
-                transition: animate
-                  ? "transform 260ms cubic-bezier(.2,.8,.3,1), width 260ms cubic-bezier(.2,.8,.3,1), opacity 120ms linear"
-                  : "opacity 120ms linear",
+                transition: SLIDE_TRANSITION(animate),
               }}
             />
           </div>

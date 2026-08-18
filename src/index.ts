@@ -310,14 +310,33 @@ export { useFuzzySearch } from "./utils/useFuzzySearch";
 export { Modal, type ModalProps } from "./components/custom/Modal";
 
 // Pagination
-export { Pagination } from "./components/custom/Pagination";
-export type { CustomPaginationProps } from "./types/pagination";
+export {
+  Pagination,
+  PageSizeSelect,
+  type PageSizeSelectProps,
+  PageJumper,
+  type PageJumperProps,
+  PAGINATION_SIZES,
+  PAGINATION_COLORS,
+  PAGINATION_CONTROL_STATES,
+  formatPaginationRange,
+  type PaginationSizeSpec,
+  type PaginationControlState,
+} from "./components/custom/Pagination";
+export type {
+  CustomPaginationProps,
+  PaginationSize,
+  PaginationVariant,
+  PaginationAlign,
+} from "./types/pagination";
 export {
   pageButtonVariants,
   chevronButtonVariants,
+  paginationLabelButtonVariants,
   usePagination,
   type PageButtonVariants,
   type ChevronButtonVariants,
+  type PaginationLabelButtonVariants,
 } from "./utils/pagination";
 
 // Provider
