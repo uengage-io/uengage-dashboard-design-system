@@ -725,11 +725,17 @@ interface TabsPalette {
     fgActive: string;
     /** Disabled label. */
     fgDisabled: string;
-    /** The 2px underline / the 2px vertical marker. */
+    /** The underline / the 2px vertical marker. */
     bar: string;
+    /** Soft wash filling the selected underline tab, above the bar. */
+    underActiveBg: string;
     /** Segmented track. */
     segTrack: string;
+    /** 1px rule around the segmented track. */
+    segTrackBorder: string;
     segActiveBg: string;
+    /** Label inside the selected segment — it sits on `segActiveBg`, not the track. */
+    segActiveFg: string;
     segActiveShadow: string;
     segHoverBg: string;
     pillBg: string;
@@ -1792,19 +1798,200 @@ interface ModalProps extends VariantProps<typeof modalSizeVariants> {
 }
 declare function Modal({ isOpen, onClose, title, children, size, showCloseButton, closeIcon, headerClassName, bodyClassName, modalClassName, }: ModalProps): React$1.ReactPortal | null;
 
+type PaginationSize = "sm" | "md" | "lg";
+/**
+ * Chosen by how big the set is and whether the backend can count it.
+ * - "numbered"  — (default) known total under ~10k rows. Operators jump to a
+ *                 remembered page number, so give them numbers.
+ * - "compact"   — prev / next only, for drawers and containers under ~520px.
+ *                 The labels stay: an arrow on its own is a mystery button.
+ * - "cursor"    — unknown total, where `COUNT(*)` is too expensive. Newer /
+ *                 Older, never page numbers — the set shifts under you.
+ * - "loadMore"  — appends in place, for card grids and mobile lists where
+ *                 losing scroll position hurts.
+ * - "jumper"    — numbered controls plus a go-to box, over ~1,000 pages.
+ */
+type PaginationVariant = "numbered" | "compact" | "cursor" | "loadMore" | "jumper";
+/** How the row distributes its content. */
+type PaginationAlign = "auto" | "center" | "between" | "start" | "end";
 interface CustomPaginationProps {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
+    /** Pages shown either side of the current one. */
     siblingCount?: number;
+    /** Show double-chevron first/last page jumps. */
     showFirstLast?: boolean;
-    size?: "sm" | "md" | "lg";
+    size?: PaginationSize;
     disabled?: boolean;
     className?: string;
+    variant?: PaginationVariant;
+    /** Pages always pinned at each end of the window. Defaults to 1. */
+    boundaryCount?: number;
+    /** Total row count. Supply it with `perPage` to get "6–10 of 1,284 orders". */
+    total?: number;
+    /** Rows per page. Drives the range label and the page-size control. */
+    perPage?: number;
+    /** The noun being counted — "orders", not "records". */
+    itemLabel?: string;
+    /** Replaces the generated range label outright. */
+    rangeLabel?: ReactNode;
+    /** Force the range label on or off. Defaults to on whenever it can be built. */
+    showRange?: boolean;
+    /** Choices offered by the "Rows" menu. Omit or pass `[]` to hide it. */
+    perPageOptions?: number[];
+    onPerPageChange?: (perPage: number) => void;
+    /**
+     * Keep the first visible row in view when the page size changes, instead of
+     * snapping back to page 1. On by default.
+     */
+    anchorOnPerPageChange?: boolean;
+    /** Show the "Go to" box. Implied by `variant="jumper"`. */
+    showJumper?: boolean;
+    /** Render nothing when there is only one page. */
+    hideOnSinglePage?: boolean;
+    /** A page is in flight — the current control spins and the row goes inert. */
+    loading?: boolean;
+    /**
+     * Layout of the row. "auto" (default) centres a bare numbered control and
+     * spreads the row once there is a range label, page size or jumper.
+     */
+    align?: PaginationAlign;
+    /**
+     * Sits inside a table card: a top rule, no border and no radius, so it
+     * shares the card's bottom edge.
+     */
+    attached?: boolean;
+    /** ←/→, Home/End and ⌘/Ctrl+← page from anywhere in the control. On by default. */
+    keyboardNavigation?: boolean;
+    hasPrev?: boolean;
+    hasNext?: boolean;
+    onPrev?: () => void;
+    onNext?: () => void;
+    /** Defaults to "Newer" in cursor mode and "Prev" in compact mode. */
+    prevLabel?: ReactNode;
+    /** Defaults to "Older" in cursor mode and "Next" in compact mode. */
+    nextLabel?: ReactNode;
+    onLoadMore?: () => void;
+    /** How many rows are already loaded — prints "50 of 1,284 loaded". */
+    loadedCount?: number;
+    /** Defaults to "Load {perPage} more". */
+    loadMoreLabel?: ReactNode;
 }
 
-declare function Pagination({ currentPage, totalPages, onPageChange, siblingCount, showFirstLast, size, disabled, className, }: CustomPaginationProps): react_jsx_runtime.JSX.Element;
+declare function Pagination({ currentPage, totalPages, onPageChange, siblingCount, showFirstLast, size, disabled, className, variant, boundaryCount, total, perPage, itemLabel, rangeLabel, showRange, perPageOptions, onPerPageChange, anchorOnPerPageChange, showJumper, hideOnSinglePage, loading, align, attached, keyboardNavigation, hasPrev, hasNext, onPrev, onNext, prevLabel, nextLabel, onLoadMore, loadedCount, loadMoreLabel, }: CustomPaginationProps): react_jsx_runtime.JSX.Element | null;
 
+interface PageSizeSelectProps {
+    value: number;
+    options: number[];
+    onChange: (perPage: number) => void;
+    size?: PaginationSize;
+    disabled?: boolean;
+    /** Text before the control. Pass `null` to drop it. */
+    label?: React.ReactNode;
+    className?: string;
+}
+/**
+ * A menu rather than a segmented control: four page sizes as segments would
+ * out-weigh the pager beside them, and the choice is set once and forgotten.
+ * Opens upward, because the footer sits at the bottom of a table.
+ */
+declare function PageSizeSelect({ value, options, onChange, size, disabled, label, className, }: PageSizeSelectProps): react_jsx_runtime.JSX.Element;
+
+interface PageJumperProps {
+    currentPage: number;
+    totalPages: number;
+    onJump: (page: number) => void;
+    size?: PaginationSize;
+    disabled?: boolean;
+    /** Text before the box. Pass `null` to drop it. */
+    label?: React.ReactNode;
+    className?: string;
+}
+/**
+ * Over ~1,000 pages a numbered window is meaningless, so the operator types
+ * the page instead. Pairs with the numbered controls — it never replaces the
+ * range label.
+ */
+declare function PageJumper({ currentPage, totalPages, onJump, size, disabled, label, className, }: PageJumperProps): react_jsx_runtime.JSX.Element;
+
+/**
+ * Match the table the footer belongs to — a compact table under a default
+ * footer looks bolted on.
+ *
+ * These map to the design system's compact / default / large control sizes.
+ */
+interface PaginationSizeSpec {
+    /** Label used by docs and stories. */
+    name: string;
+    /** Square control box (arrows) and minimum width of a page button, px. */
+    control: number;
+    /** Chevron glyph, px. */
+    icon: number;
+    /** Label size on the controls, px. */
+    fontSize: number;
+    /** Horizontal padding inside a page button, px. */
+    padX: number;
+    /** Gap between controls, px. */
+    gap: number;
+    radius: number;
+    /** Padding of the footer row itself — `${y}px ${x}px`. */
+    rowPadY: number;
+    rowPadX: number;
+    spec: string;
+    use: string;
+}
+declare const PAGINATION_SIZES: Record<PaginationSize, PaginationSizeSpec>;
+/**
+ * The current page is the only filled control on the row — everything else is
+ * an outline, so the eye lands on "where am I" first.
+ */
+declare const PAGINATION_COLORS: {
+    readonly surface: "#FFFFFF";
+    readonly border: "#E2E2E2";
+    readonly subtle: "#F3F5F9";
+    readonly rule: "#F3F5F9";
+    readonly fg1: "#161616";
+    readonly fg2: "#595959";
+    readonly fg3: "#9C9C9C";
+    readonly fgDisabled: "#C6C6C6";
+    readonly brand: "#003C1B";
+    readonly brandSoft: "#1F5E2C";
+    /** Mint wash under a hovered control. */
+    readonly hoverBg: "#F5FFF0";
+    /** Border of the "Load more" button — softer than the brand line. */
+    readonly loadMoreBorder: "#BFD6C6";
+    /** Lime halo on focus. */
+    readonly ring: "0 0 0 3px rgba(140,196,42,.38)";
+    readonly menuShadow: "2px 2px 12px rgba(0,0,0,.12)";
+    /** Disabled arrows keep their shape but fade. */
+    readonly disabledOpacity: 0.55;
+};
+interface PaginationControlState {
+    name: string;
+    bg: string;
+    border: string;
+    fg: string;
+    ring?: string;
+    note: string;
+}
+declare const PAGINATION_CONTROL_STATES: PaginationControlState[];
+/**
+ * "6–10 of 1,284 orders" — a range with a noun, never just "Page 2". An
+ * operator checking whether their filter worked reads this first.
+ */
+declare function formatPaginationRange({ currentPage, perPage, total, itemLabel, locale, }: {
+    currentPage: number;
+    perPage: number;
+    total?: number;
+    itemLabel?: string;
+    locale?: string;
+}): string;
+
+/**
+ * A page control: an outlined box that fills solid `#003C1B` when it is the
+ * page you are on — the only filled control on the row.
+ */
 declare const pageButtonVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
     state?: "default" | "disabled" | "active" | null | undefined;
@@ -1813,12 +2000,26 @@ declare const chevronButtonVariants: (props?: ({
     size?: "sm" | "lg" | "md" | null | undefined;
     state?: "default" | "disabled" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
+/** Prev / Next and Newer / Older — a label beside the arrow, never bare. */
+declare const paginationLabelButtonVariants: (props?: ({
+    size?: "sm" | "lg" | "md" | null | undefined;
+    state?: "default" | "disabled" | "primary" | null | undefined;
+} & class_variance_authority_types.ClassProp) | undefined) => string;
 type PageButtonVariants = VariantProps<typeof pageButtonVariants>;
 type ChevronButtonVariants = VariantProps<typeof chevronButtonVariants>;
-declare function usePagination({ currentPage, totalPages, siblingCount, }: {
+type PaginationLabelButtonVariants = VariantProps<typeof paginationLabelButtonVariants>;
+/**
+ * The page window: `boundaryCount` pages pinned at each end, `siblingCount`
+ * either side of the current page, ellipses for the rest.
+ *
+ * The width never changes as you page — that is the point, so the control does
+ * not jump under the cursor.
+ */
+declare function usePagination({ currentPage, totalPages, siblingCount, boundaryCount, }: {
     currentPage: number;
     totalPages: number;
     siblingCount?: number;
+    boundaryCount?: number;
 }): (number | "...")[];
 
 interface UengageProviderProps {
@@ -2638,4 +2839,4 @@ interface ChipProps extends ChipVariants {
 }
 declare function Chip({ label, variant, size, icon, iconPosition, bgColor, textColor, className, }: ChipProps): react_jsx_runtime.JSX.Element;
 
-export { ACCORDION_SIZES, Accordion, type AccordionAppearance, type AccordionChevronPosition, type AccordionChipTone, type AccordionContentVariants, type AccordionItem, type AccordionItemState, type AccordionItemVariants, type AccordionPalette, type AccordionRootVariants, type AccordionSize, type AccordionSizeSpec, type AccordionSummaryTone, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerAction, type BannerActionVariant, BannerAppearance, type BannerLayout, BannerPlacement, type BannerProps, BannerSize, BannerStack, type BannerStackItem, type BannerStackProps, BannerTone, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DateRange, DesignTabs, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, Pagination, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, TABLE_COLORS, TABLE_EMPTY_CELL, TABLE_SIZES, TABLE_STATUS_TONES, TABS_SIZES, type TabItem, TabPanel, type TabPanelProps, type TabTriggerVariants, Table, TableActionButton, type TableActionButtonProps, type TableBodyRowVariants, type TableBulkAction, type TableCellProps, TableCheckbox, type TableCheckboxProps, type TableEmptyConfig, TableEmptyState, type TableEmptyStateProps, TableEmptyValue, type TableErrorConfig, TableErrorState, type TableErrorStateProps, type TableHeaderCellProps, type TableHeaderRowVariants, TableIdentityCell, type TableIdentityCellProps, TablePaginationBar, type TablePaginationBarProps, type TablePaginationConfig, type TableRowState, type TableRowStateSpec, TableSelectionBar, type TableSelectionBarProps, type TableSelectionMode, type TableSize, type TableSizeSpec, type TableSkeletonProps, type TableSortDirection, type TableSortState, TableStatusCell, type TableStatusCellProps, type TableStatusTone, type TableStatusToneSpec, type TableWrapperVariants, Tabs, type TabsActivation, TabsActiveValueContext, type TabsAppearance, type TabsDesignVariant, type TabsOverflowMode, type TabsPalette, type TabsSize, type TabsSizeSpec, type TabsVariant, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, buildPageWindow, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, dropzoneVariants, formatDate, formatMonthYear, formatRange, getAccordionChip, getAccordionPalette, getTableRowStateSpec, getTabsPalette, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableShimmerStyle, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
+export { ACCORDION_SIZES, Accordion, type AccordionAppearance, type AccordionChevronPosition, type AccordionChipTone, type AccordionContentVariants, type AccordionItem, type AccordionItemState, type AccordionItemVariants, type AccordionPalette, type AccordionRootVariants, type AccordionSize, type AccordionSizeSpec, type AccordionSummaryTone, type AccordionTriggerVariants, type AccordionVariant, AlertDialog, type AlertDialogIconProp, type AlertDialogInput, type AlertDialogOptions, type AlertDialogProps, type AlertDialogSize, type AlertDialogVariant, type AllowPattern, AppHeader, type AppHeaderProps, AppSidebar, type AppSidebarModule, type AppSidebarProduct, type AppSidebarProps, Banner, type BannerAction, type BannerActionVariant, BannerAppearance, type BannerLayout, BannerPlacement, type BannerProps, BannerSize, BannerStack, type BannerStackItem, type BannerStackProps, BannerTone, type BannerVariant, Button, type ButtonState, Card, CardContent, CardFooter, CardHeader, type CardProps, CardTitle, Checkbox, type CheckboxBoxVariants, CheckboxGroup, type CheckboxLabelVariants, type CheckboxOption, type ChevronButtonVariants, Chip, type ChipProps, type ChipVariants, type ColorVariant, type ColumnDef, CssSize, type CustomAccordionProps, type ButtonProps as CustomButtonProps, type CustomCheckboxGroupProps, type CustomCheckboxProps, type CustomInputProps, type CustomPaginationProps, type CustomRadioGroupProps, type CustomRadioItemProps, TableCell as CustomTableCell, TableHeaderCell as CustomTableHeaderCell, type CustomTableProps, TableSkeleton as CustomTableSkeleton, type CustomTabsProps, CustomTabsTrigger, type CustomTabsTriggerProps, DatePicker, type DatePickerMode, type DatePickerProps, type DateRange, DesignTabs, FileUpload, type FileUploadLocalFile, type FileUploadProps, type FileUploadSize, type FileUploadVariant, FilterGroup, FilterGroupMobileContext, type FilterGroupProps, Grid, type GridColumns, type GridLimit, type GridProps, Input, type InputFieldVariants, InputHelper, type InputHelperProps, type InputHelperSize, type InputIconSlotVariants, InputLabel, type InputLabelProps, type InputLabelSize, type InputType, type InputWrapperVariants, Label, Loader, Modal, type ModalProps, ModalZIndexProvider, PAGINATION_COLORS, PAGINATION_CONTROL_STATES, PAGINATION_SIZES, PATTERN_REGEX, type PageButtonVariants, PageContainer, type PageContainerProps, PageJumper, type PageJumperProps, PageSizeSelect, type PageSizeSelectProps, Pagination, type PaginationAlign, type PaginationControlState, type PaginationLabelButtonVariants, type PaginationSize, type PaginationSizeSpec, type PaginationVariant, Radio, type RadioCircleVariants, type RadioDotVariants, RadioGroup, type RadioLabelVariants, type RadioOption, SearchBar, type SearchBarProps, type SearchBarSize, type SearchValueType, Section, SectionContent, type SectionContentProps, SectionDivider, type SectionDividerProps, SectionField, type SectionFieldProps, SectionGroup, type SectionGroupProps, SectionHeader, type SectionHeaderProps, type SectionProps, SectionRow, type SectionRowProps, SectionSubsection, type SectionSubsectionProps, SectionTableContent, type SectionTableContentProps, Select, type SelectMode, type SelectOption, type SelectProps, type SelectStatus, Sidebar, type SidebarContentVariants, type SidebarProps, type SidebarSide, type SidebarSize, SidebarZIndexProvider, type SortDirection, StatusBadge, type StatusBadgeProps, type StatusBadgeVariants, SubHeader, type SubHeaderAlign, type SubHeaderProps, SweetAlertProvider, type SweetAlertResult, TABLE_COLORS, TABLE_EMPTY_CELL, TABLE_SIZES, TABLE_STATUS_TONES, TABS_SIZES, type TabItem, TabPanel, type TabPanelProps, type TabTriggerVariants, Table, TableActionButton, type TableActionButtonProps, type TableBodyRowVariants, type TableBulkAction, type TableCellProps, TableCheckbox, type TableCheckboxProps, type TableEmptyConfig, TableEmptyState, type TableEmptyStateProps, TableEmptyValue, type TableErrorConfig, TableErrorState, type TableErrorStateProps, type TableHeaderCellProps, type TableHeaderRowVariants, TableIdentityCell, type TableIdentityCellProps, TablePaginationBar, type TablePaginationBarProps, type TablePaginationConfig, type TableRowState, type TableRowStateSpec, TableSelectionBar, type TableSelectionBarProps, type TableSelectionMode, type TableSize, type TableSizeSpec, type TableSkeletonProps, type TableSortDirection, type TableSortState, TableStatusCell, type TableStatusCellProps, type TableStatusTone, type TableStatusToneSpec, type TableWrapperVariants, Tabs, type TabsActivation, TabsActiveValueContext, type TabsAppearance, type TabsDesignVariant, type TabsOverflowMode, type TabsPalette, type TabsSize, type TabsSizeSpec, type TabsVariant, type ThumbVariants, Toggle, type ToggleProps, type ToggleVariantSize, TopHeader, type TopHeaderProps, type TrackVariants, type TriggerSize, type TriggerState, type TriggerVariants, UengageProvider, accordionContentVariants, accordionItemVariants, accordionRootVariants, accordionTriggerVariants, iconBadgeVariants as alertDialogIconBadgeVariants, avatarContainerVariants, buildPageWindow, checkboxBoxVariants, checkboxLabelVariants, chevronButtonVariants, chipVariants, buttonVariants as customButtonVariants, dropzoneVariants, formatDate, formatMonthYear, formatPaginationRange, formatRange, getAccordionChip, getAccordionPalette, getTableRowStateSpec, getTabsPalette, iconWrapperVariants, inputFieldVariants, inputIconSlotVariants, inputWrapperVariants, isSameDay, pageButtonVariants, paginationLabelButtonVariants, radioCircleVariants, radioDotVariants, radioLabelVariants, resetBannerDismissal, sidebarContentVariants, sidebarPersistentVariants, statusBadgeVariants, tabTriggerVariants, tableBodyRowVariants, tableHeaderRowVariants, tableShimmerStyle, tableWrapperVariants, thumbVariants, trackVariants, triggerVariants, useFuzzySearch, usePagination, useSweetAlert };
