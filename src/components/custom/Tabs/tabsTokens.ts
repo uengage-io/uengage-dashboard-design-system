@@ -25,32 +25,32 @@ export const TABS_SIZES: Record<TabsSize, TabsSizeSpec> = {
   sm: {
     name: "Small",
     fs: 12,
-    gap: 16,
-    underPad: "0 0 8px",
-    segPad: "6px 11px",
+    gap: 10,
+    underPad: "3px 9px 7px",
+    segPad: "5px 12px",
     pillPad: "5px 11px",
     icon: 13,
-    spec: "12px · pad 8 · gap 16",
+    spec: "12px · pad 9 · gap 10",
   },
   md: {
     name: "Medium",
     fs: 13,
-    gap: 22,
-    underPad: "0 0 11px",
-    segPad: "8px 14px",
+    gap: 12,
+    underPad: "4px 11px 9px",
+    segPad: "6px 15px",
     pillPad: "7px 14px",
     icon: 15,
-    spec: "13px · pad 11 · gap 22",
+    spec: "13px · pad 11 · gap 12",
   },
   lg: {
     name: "Large",
     fs: 15,
-    gap: 28,
-    underPad: "0 0 14px",
-    segPad: "10px 17px",
+    gap: 14,
+    underPad: "5px 13px 12px",
+    segPad: "8px 18px",
     pillPad: "9px 17px",
     icon: 17,
-    spec: "15px · pad 14 · gap 28",
+    spec: "15px · pad 13 · gap 14",
   },
 };
 
@@ -65,12 +65,18 @@ export interface TabsPalette {
   fgActive: string;
   /** Disabled label. */
   fgDisabled: string;
-  /** The 2px underline / the 2px vertical marker. */
+  /** The underline / the 2px vertical marker. */
   bar: string;
+  /** Soft wash filling the selected underline tab, above the bar. */
+  underActiveBg: string;
 
   /** Segmented track. */
   segTrack: string;
+  /** 1px rule around the segmented track. */
+  segTrackBorder: string;
   segActiveBg: string;
+  /** Label inside the selected segment — it sits on `segActiveBg`, not the track. */
+  segActiveFg: string;
   segActiveShadow: string;
   segHoverBg: string;
 
@@ -111,11 +117,14 @@ const LIGHT: TabsPalette = {
   fgActive: FOREST,
   fgDisabled: "#C6C6C6",
   bar: FOREST,
+  underActiveBg: "#F2FAEC",
 
-  segTrack: "#F3F5F9",
-  segActiveBg: "#FFFFFF",
-  segActiveShadow: "0 1px 3px rgba(0,0,0,.12)",
-  segHoverBg: "#EFF3F0",
+  segTrack: "#FFFFFF",
+  segTrackBorder: "#E2E2E2",
+  segActiveBg: FOREST,
+  segActiveFg: "#FFFFFF",
+  segActiveShadow: "none",
+  segHoverBg: "#F5FFF0",
 
   pillBg: "#FFFFFF",
   pillFg: "#161616",
@@ -143,7 +152,7 @@ const LIGHT: TabsPalette = {
   surface: "#FFFFFF",
 };
 
-/** Lime replaces forest for the active bar; segmented's selected pill fills #1B3423. */
+/** Lime replaces forest for the active bar and for the selected segment's fill. */
 const DARK: TabsPalette = {
   strip: "#2C4A38",
   fg: "#8FB79C",
@@ -151,11 +160,14 @@ const DARK: TabsPalette = {
   fgActive: "#8CC42A",
   fgDisabled: "#4A5C51",
   bar: "#8CC42A",
+  underActiveBg: "#18251D",
 
-  segTrack: "#141C17",
-  segActiveBg: "#1B3423",
+  segTrack: "transparent",
+  segTrackBorder: "#2C4A38",
+  segActiveBg: "#8CC42A",
+  segActiveFg: "#0C1712",
   segActiveShadow: "none",
-  segHoverBg: "#18251D",
+  segHoverBg: "#1B3423",
 
   pillBg: "transparent",
   pillFg: "#DCF3CE",
