@@ -7255,9 +7255,10 @@ function TableCell2({
       className: cn(
         tableBodyRowVariants({ size, hover: false }),
         alignClass[align],
-        // Allow content to wrap and break long words/URLs that would otherwise
-        // force the column wider than its flex-allocated share.
-        "whitespace-normal break-words [hyphens:none]",
+        // Wrap inside the column. `anywhere` rather than `break-word` so an
+        // unbroken run — a URL, an id, a hash — folds at the column edge
+        // instead of pushing the track wider than its allocated share.
+        "whitespace-normal [overflow-wrap:anywhere] [hyphens:none]",
         verticalAlign === "middle" ? "align-middle" : "align-top",
         tabular && "ue-tabular",
         className
@@ -7288,7 +7289,7 @@ function TableCell2({
         ...style
       },
       ...props,
-      children: /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("min-w-0 w-full", identifier && "whitespace-nowrap"), children })
+      children: /* @__PURE__ */ jsxRuntime.jsx("div", { className: "min-w-0 w-full", children })
     }
   );
 }
@@ -8070,6 +8071,18 @@ function TableErrorState({
   );
 }
 var NO_SORT = { key: null, direction: null };
+function useIsBelowMd(breakpoint = 768) {
+  const [below, setBelow] = React10.useState(false);
+  React10.useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const media = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const sync = () => setBelow(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, [breakpoint]);
+  return below;
+}
 function isBlank(value) {
   return value === null || value === void 0 || value === "";
 }
@@ -8283,11 +8296,13 @@ function Table2({
   const hasActions = Boolean(rowActions);
   const scrollStyle = stickyHeader && maxHeight ? { maxHeight } : void 0;
   const visibleColumns = columns.filter((col) => !col.hideOnMobile);
-  const totalFlex = columns.reduce((sum, col) => sum + (col.flex ?? 1), 0);
-  const colWidths = columns.map(
-    (col) => col.width ?? `${((col.flex ?? 1) / totalFlex * 100).toFixed(2)}%`
+  const belowMd = useIsBelowMd();
+  const layoutColumns = belowMd ? visibleColumns : columns;
+  const totalFlex = layoutColumns.reduce((sum, col) => sum + (col.flex ?? 1), 0);
+  const colWidths = layoutColumns.map(
+    (col) => col.width ?? `${((col.flex ?? 1) / (totalFlex || 1) * 100).toFixed(2)}%`
   );
-  const columnsMinWidth = columns.reduce(
+  const columnsMinWidth = layoutColumns.reduce(
     (sum, col) => sum + (col.minWidth ?? 0),
     0
   );
@@ -8403,11 +8418,21 @@ function Table2({
         {
           className: "w-full",
           containerClassName: stickyHeader && !maxHeight ? "overflow-visible" : void 0,
-          style: tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px`, borderCollapse: "collapse" } : { minWidth: "max-content", borderCollapse: "collapse" },
+          style: {
+            width: "100%",
+            borderCollapse: "collapse",
+            // `fixed` is what keeps a long value inside its own column: track
+            // widths come from the <colgroup> alone, never from the content, so
+            // one wordy cell wraps down instead of stealing its neighbours' room.
+            tableLayout: "fixed",
+            // Only pinned wider than the container when the columns ask for it —
+            // then the wrapper scrolls sideways rather than crushing them.
+            ...tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : null
+          },
           children: [
             /* @__PURE__ */ jsxRuntime.jsxs("colgroup", { children: [
               selectionOn ? /* @__PURE__ */ jsxRuntime.jsx("col", { style: { width: selectColWidth } }) : null,
-              columns.map((col, i) => /* @__PURE__ */ jsxRuntime.jsx(
+              layoutColumns.map((col, i) => /* @__PURE__ */ jsxRuntime.jsx(
                 "col",
                 {
                   style: {
