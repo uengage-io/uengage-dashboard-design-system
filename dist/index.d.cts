@@ -1227,7 +1227,7 @@ interface TableCellProps extends ComponentProps<"td"> {
     verticalAlign?: "top" | "middle";
     /** Render digits on tabular figures so they stack down the column. */
     tabular?: boolean;
-    /** The identifier column: semibold, and never truncated. */
+    /** The identifier column: semibold. Wraps like every other cell. */
     identifier?: boolean;
     /** Text colour override — row states (saving, deleted) drive this. */
     color?: string;

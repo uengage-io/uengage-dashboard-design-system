@@ -15,7 +15,7 @@ export interface TableCellProps extends ComponentProps<"td"> {
   verticalAlign?: "top" | "middle";
   /** Render digits on tabular figures so they stack down the column. */
   tabular?: boolean;
-  /** The identifier column: semibold, and never truncated. */
+  /** The identifier column: semibold. Wraps like every other cell. */
   identifier?: boolean;
   /** Text colour override — row states (saving, deleted) drive this. */
   color?: string;
@@ -75,9 +75,10 @@ export function TableCell({
       className={cn(
         tableBodyRowVariants({ size, hover: false }),
         alignClass[align],
-        // Allow content to wrap and break long words/URLs that would otherwise
-        // force the column wider than its flex-allocated share.
-        "whitespace-normal break-words [hyphens:none]",
+        // Wrap inside the column. `anywhere` rather than `break-word` so an
+        // unbroken run — a URL, an id, a hash — folds at the column edge
+        // instead of pushing the track wider than its allocated share.
+        "whitespace-normal [overflow-wrap:anywhere] [hyphens:none]",
         verticalAlign === "middle" ? "align-middle" : "align-top",
         tabular && "ue-tabular",
         className,
@@ -113,9 +114,7 @@ export function TableCell({
     >
       {/* Inner div constrains content to the cell width so overflow-wrap works
           correctly inside table cells across all browsers. */}
-      <div className={cn("min-w-0 w-full", identifier && "whitespace-nowrap")}>
-        {children}
-      </div>
+      <div className="min-w-0 w-full">{children}</div>
     </ShadcnTableCell>
   );
 }

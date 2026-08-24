@@ -74,6 +74,52 @@ const LONG_ROWS: OrderRow[] = Array.from({ length: 10 }).map((_, i) => ({
   amount: i % 2 === 0 ? 12000 : 6000,
 }));
 
+/**
+ * One column carrying far more text than its neighbours — including an
+ * unbroken URL and a long id — so the wrapping rule can be seen doing its job.
+ */
+const WORDY_NOTE =
+  "Customer called twice about the missing cutlery and asked that the rider " +
+  "be told to use the service lift at the rear of the building; the previous " +
+  "delivery was left with the security desk and went cold before it reached " +
+  "them, so please confirm hand-to-hand delivery on this one. Reference " +
+  "https://support.uengage.in/tickets/ORD-3102790000-escalation-thread-2025-03-19 " +
+  "and internal note id NOTE_9f2c41ab7de0453e8c15b6a2f7d3e9c0.";
+
+const LONG_CONTENT_ROWS: OrderRow[] = [
+  {
+    ...BASE,
+    id: "lc1",
+    status: "Allocated",
+    amount: 12000,
+    remarks: WORDY_NOTE,
+  },
+  {
+    ...BASE,
+    id: "lc2",
+    status: "Redeemed",
+    amount: 6000,
+    remarks: "Ring the bell once. Leave at the door.",
+  },
+  {
+    ...BASE,
+    id: "lc3",
+    status: "Dispatched",
+    amount: 8400,
+    remarks:
+      "Gate pass required — vehicle number must be shared with the guard " +
+      "before entry, and the rider should carry a photo ID. " +
+      "SUPERCALIFRAGILISTICEXPIALIDOCIOUSORDERREFERENCE0000123456789",
+  },
+  {
+    ...BASE,
+    id: "lc4",
+    status: "Preparing",
+    amount: 4200,
+    remarks: "—",
+  },
+];
+
 const formatINR = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
 /* ── Column renderers ─────────────────────────────────────────── */
@@ -179,7 +225,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Generic, typed table built on shadcn Table. Built-in sort (asc → desc → cleared), row selection with bulk actions, per-row lifecycle states, hover-revealed row actions, a pinned identifier column, sticky header (bounded scroll box or full page scroll), loading / empty / error states, responsive column hiding, an in-shell pagination footer, and full keyboard navigation.\n\n**A table is read by scanning down a column, not across a row.** Everything follows from that: numbers right-align on tabular figures, only horizontal rules exist (no vertical grid lines, no zebra striping), and the hover wash spans the whole row.\n\n**Sizes** — `sm` (36px rows, drops the secondary line under a name), `md` (48px, the default) and `lg` (58px).\n\n**Sticky header — two modes:**\n- `stickyHeader` + `maxHeight` — header sticks within a fixed-height, internally scrolling box.\n- `stickyHeader` alone (no `maxHeight`) — header sticks to the top of the viewport as the whole page scrolls.\n\n**Keyboard** — ↑↓ moves the focused row, Space selects it, ⇧+↑↓ and ⇧-click extend the selection, ⌘/Ctrl+A selects the page, ↵ opens the focused row, Esc clears. On by default whenever rows are selectable or clickable; force it with `keyboardNavigation`.\n\n**Per-column props of note:**\n- `verticalAlign?: 'top' | 'middle'` — defaults to `'middle'`, since rows have a fixed height. Use `'top'` on columns that stack several lines.\n- `tabular?: boolean` — tabular figures. Defaults to `true` on right-aligned columns.\n- `identifier?: boolean` — semibold, never truncated, and the column that pins under `stickyFirstColumn`. Inferred for the first column.",
+          "Generic, typed table built on shadcn Table. Built-in sort (asc → desc → cleared), row selection with bulk actions, per-row lifecycle states, hover-revealed row actions, a pinned identifier column, sticky header (bounded scroll box or full page scroll), loading / empty / error states, responsive column hiding, an in-shell pagination footer, and full keyboard navigation.\n\n**A table is read by scanning down a column, not across a row.** Everything follows from that: column widths are fixed (`flex` shares, or an explicit `width`) so long content wraps inside its own column instead of spilling into the next, numbers right-align on tabular figures, only horizontal rules exist (no vertical grid lines, no zebra striping), and the hover wash spans the whole row.\n\n**Sizes** — `sm` (36px rows, drops the secondary line under a name), `md` (48px, the default) and `lg` (58px).\n\n**Sticky header — two modes:**\n- `stickyHeader` + `maxHeight` — header sticks within a fixed-height, internally scrolling box.\n- `stickyHeader` alone (no `maxHeight`) — header sticks to the top of the viewport as the whole page scrolls.\n\n**Keyboard** — ↑↓ moves the focused row, Space selects it, ⇧+↑↓ and ⇧-click extend the selection, ⌘/Ctrl+A selects the page, ↵ opens the focused row, Esc clears. On by default whenever rows are selectable or clickable; force it with `keyboardNavigation`.\n\n**Per-column props of note:**\n- `verticalAlign?: 'top' | 'middle'` — defaults to `'middle'`, since rows have a fixed height. Use `'top'` on columns that stack several lines.\n- `tabular?: boolean` — tabular figures. Defaults to `true` on right-aligned columns.\n- `identifier?: boolean` — semibold, and the column that pins under `stickyFirstColumn`. Inferred for the first column.",
       },
     },
   },
@@ -215,7 +261,7 @@ const meta = {
         "| `sortable` | `boolean` | — | Enables click-to-sort on the header |\n" +
         "| `sortFn` | `(a, b) => number` | — | Custom comparator for that column |\n" +
         "| `tabular` | `boolean` | right-aligned | Tabular figures, so digits stack |\n" +
-        "| `identifier` | `boolean` | first column | Semibold, never truncated, pins under `stickyFirstColumn` |\n" +
+        "| `identifier` | `boolean` | first column | Semibold, pins under `stickyFirstColumn` |\n" +
         "| `hideOnMobile` | `boolean` | — | Hides column below `md` breakpoint |\n" +
         "| `className` | `string` | — | Extra Tailwind classes for `<th>` and `<td>` |",
     },
@@ -365,6 +411,66 @@ export const ResponsiveHideOnMobile: Story = {
           "Columns marked `hideOnMobile: true` collapse below the Tailwind `md` breakpoint (≤768px). Resize the Storybook viewport to observe.",
       },
     },
+  },
+};
+
+export const LongContentColumn: Story = {
+  name: "Long content in one column",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The table lays out on `table-layout: fixed`, so every column keeps the width the `<colgroup>` gives it (from `flex`, or from an explicit `width`). A cell with far more text than its neighbours wraps down inside its own column and grows the row — it never widens its track, pushes the columns beside it, or spills the table past its container. Unbroken runs (URLs, hashes, long ids) break at the column edge rather than forcing a horizontal scrollbar.",
+      },
+    },
+  },
+  args: {
+    columns: [
+      {
+        key: "orderId",
+        header: "Order Id",
+        flex: 0.7,
+        verticalAlign: "top",
+      },
+      {
+        key: "customerName",
+        header: "Customer",
+        flex: 0.8,
+        verticalAlign: "top",
+      },
+      {
+        key: "remarks",
+        header: "Remarks",
+        // The wordy one. Given the largest share, but a share all the same.
+        flex: 2,
+        verticalAlign: "top",
+      },
+      {
+        key: "status",
+        header: "Status",
+        flex: 0.6,
+        align: "center",
+        verticalAlign: "middle",
+        render: (_: unknown, row: OrderRow) => (
+          <StatusBadge
+            variant={row.status === "Allocated" ? "success" : "warning"}
+            label={row.status}
+          />
+        ),
+      },
+      {
+        key: "amount",
+        header: "Amount",
+        flex: 0.6,
+        align: "right",
+        verticalAlign: "top",
+        render: (_: unknown, row: OrderRow) => formatINR(row.amount),
+      },
+    ] satisfies ColumnDef<OrderRow>[],
+    data: LONG_CONTENT_ROWS,
+    keyField: "id",
+    bordered: true,
+    size: "md",
   },
 };
 
