@@ -1,13 +1,15 @@
+import * as React from "react";
+
 export interface DateRange {
   from: Date;
   to: Date;
 }
 
-export type DatePickerMode = "single" | "range";
+export type DatePickerMode = "single" | "range" | "month";
 
 export interface DatePickerProps {
   mode?: DatePickerMode;
-  value?: Date | DateRange | null;
+  value?: Date | DateRange  |null;
   onChange?: (value: Date | DateRange | null) => void;
   placeholder?: string;
   /** Controls the trigger height via a preset. */
@@ -25,4 +27,30 @@ export interface DatePickerProps {
   maxDate?: Date;
   /** Fires once the first time the trigger is blurred after interacting (Angular-style `touched`). */
   onTouch?: () => void;
+  /** When true, shows a clear button to reset the selected value. Defaults to false. */
+  clearable?: boolean;
+  /** Field label rendered above the trigger. */
+  label?: React.ReactNode;
+  /** When true, appends a red asterisk directly after the label text. */
+  required?: boolean;
+  /** Helper text rendered below the trigger. */
+  helperText?: string;
+  /** Error message rendered below the trigger; takes priority over helperText. */
+  error?: string;
+  /** When true, the trigger shows the current value but the calendar cannot be opened. */
+  readOnly?: boolean;
+  /**
+   * Controlled open state. When provided, the popover open/close is driven
+   * externally — e.g. triggered by a "Custom date" option in a dashboard dropdown.
+   * Pair with `onOpenChange` to sync state back.
+   */
+  open?: boolean;
+  /** Called whenever the popover wants to open or close. Mirror this back into `open` to stay in sync. */
+  onOpenChange?: (open: boolean) => void;
+  /**
+   * When true and `mode` is `"single"`, shows an hour/minute/AM-PM picker
+   * alongside the calendar. The selected date and time are committed together
+   * via an Apply button (same pattern as range mode). Ignored for other modes.
+   */
+  showTime?: boolean;
 }

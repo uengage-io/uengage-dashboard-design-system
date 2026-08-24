@@ -1,0 +1,101 @@
+"use client";
+'use strict';
+
+var clsx = require('clsx');
+var tailwindMerge = require('tailwind-merge');
+var jsxRuntime = require('react/jsx-runtime');
+
+// src/lib/utils.ts
+function cn(...inputs) {
+  return tailwindMerge.twMerge(clsx.clsx(inputs));
+}
+function Card({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "card",
+      className: cn(
+        "uengage-ui",
+        "flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm min-w-0 break-all",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function CardHeader({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "card-header",
+      className: cn(
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 min-w-0 break-all",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function CardTitle({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "card-title",
+      className: cn("leading-none font-semibold break-all min-w-0", className),
+      ...props
+    }
+  );
+}
+function CardDescription({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "card-description",
+      className: cn("text-sm text-muted-foreground break-all min-w-0", className),
+      ...props
+    }
+  );
+}
+function CardAction({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "card-action",
+      className: cn(
+        "col-start-2 row-span-2 row-start-1 self-start justify-self-end min-w-0 break-all",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function CardContent({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "card-content",
+      className: cn("px-6 min-w-0 break-all", className),
+      ...props
+    }
+  );
+}
+function CardFooter({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "div",
+    {
+      "data-slot": "card-footer",
+      className: cn("flex items-center px-6 [.border-t]:pt-6 min-w-0 break-all", className),
+      ...props
+    }
+  );
+}
+
+exports.Card = Card;
+exports.CardAction = CardAction;
+exports.CardContent = CardContent;
+exports.CardDescription = CardDescription;
+exports.CardFooter = CardFooter;
+exports.CardHeader = CardHeader;
+exports.CardTitle = CardTitle;
+//# sourceMappingURL=card.cjs.map
+//# sourceMappingURL=card.cjs.map

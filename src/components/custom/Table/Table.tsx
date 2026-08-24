@@ -28,6 +28,7 @@ export function Table<T>({
   size = "md",
   mobileLayout = "scroll",
   className,
+  hover = true,
 }: CustomTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDirection>(null);
@@ -90,68 +91,82 @@ export function Table<T>({
     >
       {/* ── Mobile card view ─────────────────────────────────────────── */}
       {mobileLayout === "cards" && (
-        <div className="flex flex-col gap-2 sm:gap-3 md:hidden">
+        <div className="md:hidden">
           {loading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-lg border bg-white p-3 sm:p-4 space-y-2 sm:space-y-3">
-                {visibleColumns.map((_, j) => (
-                  <Skeleton key={j} className="h-4 w-full" />
-                ))}
-              </div>
-            ))
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-gray-100 bg-white p-3 sm:p-4 shadow-sm space-y-2.5"
+                >
+                  <Skeleton className="h-3 w-1/3" />
+                  {visibleColumns.map((_, j) => (
+                    <div key={j} className="flex justify-between gap-3">
+                      <Skeleton className="h-3.5 w-1/4" />
+                      <Skeleton className="h-3.5 w-2/5" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           ) : sortedData.length === 0 ? (
-            <p className="py-8 text-center text-sm text-gray-500">
+            <p className="py-10 text-center text-sm text-gray-500">
               {emptyMessage}
             </p>
           ) : (
-            sortedData.map((row, rowIndex) => {
-              const rowKey = String(
-                (row as Record<string, unknown>)[keyField as string] ??
-                  rowIndex,
-              );
-              return (
-                <div
-                  key={rowKey}
-                  onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  className={cn(
-                    "rounded-lg border border-gray-200 bg-white p-3 sm:p-4",
-                    onRowClick &&
-                      "cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors",
-                    rowClassName?.(row),
-                  )}
-                >
-                  {visibleColumns.map((col) => {
-                    const colKey = String(col.key);
-                    const rawValue = (row as Record<string, unknown>)[colKey];
-                    const content = col.render
-                      ? col.render(rawValue, row, rowIndex)
-                      : (rawValue as React.ReactNode);
-                    return (
-                      <div
-                        key={colKey}
-                        className="flex items-start justify-between gap-3 sm:gap-4 border-b border-gray-100 py-1.5 sm:py-2 first:pt-0 last:border-0 last:pb-0"
-                      >
-                        <span className="shrink-0 text-xs font-medium text-gray-500">
-                          {col.header}
-                        </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              {sortedData.map((row, rowIndex) => {
+                const rowKey = String(
+                  (row as Record<string, unknown>)[keyField as string] ??
+                    rowIndex,
+                );
+                return (
+                  <div
+                    key={rowKey}
+                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                    className={cn(
+                      "rounded-xl border border-gray-100 bg-white shadow-sm",
+                      "transition-colors overflow-hidden",
+                      hover && onRowClick && "hover:bg-gray-50 active:bg-gray-100",
+                      onRowClick && "cursor-pointer",
+                      rowClassName?.(row),
+                    )}
+                  >
+                    {visibleColumns.map((col, colIndex) => {
+                      const colKey = String(col.key);
+                      const rawValue = (row as Record<string, unknown>)[colKey];
+                      const content = col.render
+                        ? col.render(rawValue, row, rowIndex)
+                        : (rawValue as React.ReactNode);
+                      const isLast = colIndex === visibleColumns.length - 1;
+                      return (
                         <div
+                          key={colKey}
                           className={cn(
-                            "text-sm flex-1 min-w-0",
-                            col.align === "center"
-                              ? "text-center"
-                              : col.align === "right"
-                                ? "text-right"
-                                : "text-left",
+                            "flex items-start justify-between gap-3 px-3 sm:px-4 py-2 sm:py-2.5",
+                            !isLast && "border-b border-gray-50",
                           )}
                         >
-                          {content}
+                          <span className="shrink-0 text-xs font-medium text-gray-400 pt-0.5 min-w-[72px] max-w-[40%]">
+                            {col.header}
+                          </span>
+                          <div
+                            className={cn(
+                              "text-sm text-gray-800 font-medium flex-1 min-w-0",
+                              "flex justify-end items-center",
+                              (col.mobileAlign ?? col.align) === "left" && "justify-start",
+                              (col.mobileAlign ?? col.align) === "center" && "justify-center",
+                            )}
+                          >
+                            {content}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       )}
@@ -159,17 +174,30 @@ export function Table<T>({
       {/* ── Table view (always on "scroll"; md+ only on "cards") ──────── */}
       <div
         className={cn(
-          "overflow-x-auto",
+          "scroll-smooth",
+          // Any non-"visible" overflow-x forces overflow-y to compute to "auto"
+          // too, which would make this div the sticky positioning container
+          // instead of the viewport. So when stickyHeader is used without a
+          // maxHeight (page-scroll mode), skip overflow-x-auto entirely —
+          // the header needs to stick against the real viewport, not this box.
+          !(stickyHeader && !maxHeight) && "overflow-x-auto",
           // Clip table cells to the rounded corners — overflow:auto on this
           // element also clips to border-radius, so no parent overflow-hidden needed.
           bordered && "rounded-lg",
-          stickyHeader && "overflow-y-auto",
+          stickyHeader && maxHeight && "overflow-y-auto scroll-smooth",
           mobileLayout === "cards" && "hidden md:block",
         )}
         style={scrollStyle}
       >
         <T
           className="w-full"
+          // shadcn's Table wraps <table> in its own "overflow-x-auto" div —
+          // in page-scroll sticky mode that div would also force overflow-y
+          // to compute to "auto" and hijack the sticky containing block, so
+          // it needs to be neutralized here too, not just on our own wrapper.
+          containerClassName={
+            stickyHeader && !maxHeight ? "overflow-visible" : undefined
+          }
           style={
             tableMinWidth > 0
               ? { minWidth: `${tableMinWidth}px` }
@@ -248,6 +276,7 @@ export function Table<T>({
                       tableBodyRowVariants({
                         size,
                         clickable: Boolean(onRowClick),
+                        hover,
                       }),
                       rowClassName?.(row),
                     )}
@@ -263,6 +292,7 @@ export function Table<T>({
                           key={colKey}
                           size={size}
                           align={col.align ?? "left"}
+                          verticalAlign={col.verticalAlign}
                           className={cn(
                             col.hideOnMobile && "hidden md:table-cell",
                             col.className,

@@ -8,42 +8,40 @@ import SelectPreview from "./components/Select";
 import CheckboxPreview from "./components/Checkbox";
 import RadioPreview from "./components/Radio";
 import TabsPreview from "./components/Tabs";
-import BadgePreview from "./components/Badge";
-import DatePickerPreview from "./components/DatePicker";
+// import BadgePreview from "./components/Badge";
 import TogglePreview from "./Toggle";
 import AlertDialogPreview from "./components/AlertDialog";
 import PageContainerDemo from "./components/PageContainer";
-import SidebarDemo from "./components/Sidebar";
 import TablePreview from "./components/Table";
 import ModalPreview from "./components/Modal";
 import Dialog from "./components/Dialog";
-import Modalprev from "./components/ModalPreview";
-import Demo from "./components/Alert";
+import SidebarPreview from "./components/Sidebar";
 import PaginationPreview from "./components/Pagination";
 import FuzzySearchPreview from "./components/FuzzySearch";
+import Loader from "./components/Loader";
+import LayoutPreview from "./components/Layout";
+import AccordionPreview from "./components/Accordion";
+import InputPreview from "./components/Input";
+import DatePickerPreview from "./components/DatePicker";
+import PrevDemo from "./components/Prev";
+import AppLayoutPreview from "./components/AppLayout";
+import Demo from "./components/Demo";
+import FilterGroupPreview from "./components/FilterGroup"
+import FilterGroupDatePickerPreview from "./components/FilterGroupDatePicker"
+import BannerPreview from "./components/Banner"
+import DemoPage from "./components/DemoPage"
+import LayoutDemo from "./components/LayoutDemo";
+import FileUploadPreview from "./components/FileUpload";
+import SectionPreview from "./components/Section";
+import BadgePreview from "./components/Badge";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* <FuzzySearchPreview /> */}
-    {/* <PaginationPreview /> */}
-    
-    {/* <Dialog/> */}
-    {/* <Demo/> */}
-    {/* <ButtonPreview /> */}
-    {/* <Modalprev/> */}
-    {/* <SearchPreview /> */}
-    {/* <SelectPreview /> */}
-    {/* <CheckboxPreview /> */}
-    {/* <RadioPreview /> */}
     {/* <TabsPreview /> */}
-    {/* <BadgePreview /> */}
-    {/* <DatePickerPreview /> */}
-    {/* <br /> */}
-    {/* <TogglePreview /> */}
-    {/* <AlertDialogPreview /> */}
-    {/* <PageContainerDemo /> */}
-    <SidebarDemo />
     {/* <TablePreview/> */}
-    {/* <ModalPreview /> */}
-    {/* <PaginationPrev /> */}
+    {/* <TogglePreview/> */}
+    {/* <TabsPreview/> */}
+    {/* <TablePreview /> */}
+    <SectionPreview />
+    {/* <FilterGroupDatePickerPreview /> */}
   </React.StrictMode>,
 );

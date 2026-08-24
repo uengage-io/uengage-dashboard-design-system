@@ -1,5 +1,5 @@
 export { DatePicker } from "./DatePicker";
-export { DatePickerCalendar } from "../../ui/DatePickerCalendar";
+export { DatePickerCalendar, MonthPickerCalendar } from "../../ui/DatePickerCalendar";
 export type {
   DatePickerProps,
   DateRange,

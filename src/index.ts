@@ -1,3 +1,6 @@
+// Z-index providers
+export { ModalZIndexProvider, SidebarZIndexProvider } from "./lib/zIndexContext";
+
 // Base (shadcn) components
 export * from "./components/ui/button";
 export * from "./components/ui/alert-dialog";
@@ -153,6 +156,7 @@ export {
 export {
   DatePicker,
   DatePickerCalendar,
+  MonthPickerCalendar,
   type DatePickerProps,
   type DateRange,
   type DatePickerMode,
@@ -165,6 +169,7 @@ export {
 } from "./components/custom/DatePicker/datepickerVariants";
 export {
   formatDate,
+  formatMonthYear,
   formatRange,
   isSameDay,
 } from "./components/custom/DatePicker/dateHelpers";
@@ -196,9 +201,12 @@ export {
   type StatusBadgeVariants,
 } from "./utils/table";
 
-export {Toggle} from "./components/custom/Toggle/Toggle"
+export { Toggle } from "./components/custom/Toggle/Toggle";
 export type { ToggleProps } from "./components/custom/Toggle/Toggle";
-export { trackVariants, thumbVariants } from "./components/custom/Toggle/toggleVariants";
+export {
+  trackVariants,
+  thumbVariants,
+} from "./components/custom/Toggle/toggleVariants";
 export type {
   ToggleVariantSize,
   TrackVariants,
@@ -240,6 +248,9 @@ export { brand, type BrandGreen } from "./utils/colors";
 
 export { cn } from "./lib/utils";
 
+// Fuzzy search hook
+export { useFuzzySearch } from "./utils/useFuzzySearch";
+
 // Modal
 export { Modal, type ModalProps } from "./components/custom/Modal";
 
@@ -256,3 +267,90 @@ export {
 
 // Provider
 export { UengageProvider } from "./components/custom/Provider";
+
+// Loader
+export { Loader } from "./components/custom/Loader";
+
+// AppHeader
+export { AppHeader, type AppHeaderProps } from "./components/custom/AppHeader";
+
+// AppSidebar
+export {
+  AppSidebar,
+  type AppSidebarProps,
+  type AppSidebarProduct,
+  type AppSidebarModule,
+} from "./components/custom/AppSidebar";
+
+// Accordion
+export {
+  Accordion,
+  type AccordionItem,
+  type CustomAccordionProps,
+  type AccordionVariant,
+  type AccordionSize,
+  accordionRootVariants,
+  accordionItemVariants,
+  accordionTriggerVariants,
+  accordionContentVariants,
+  type AccordionRootVariants,
+  type AccordionItemVariants,
+  type AccordionTriggerVariants,
+  type AccordionContentVariants,
+} from "./components/custom/Accordion";
+
+// FilterGroup
+export {
+  FilterGroup,
+  type FilterGroupProps,
+} from "./components/custom/FilterGroup";
+export { FilterGroupMobileContext } from "./lib/filterGroupContext";
+
+// Banner
+export {
+  Banner,
+  type BannerProps,
+  type BannerVariant,
+} from "./components/custom/Banner";
+
+// Section
+export {
+  Section,
+  SectionGroup,
+  SectionHeader,
+  SectionContent,
+  SectionSubsection,
+  SectionRow,
+  SectionField,
+  SectionDivider,
+  SectionTableContent,
+  type SectionProps,
+  type SectionGroupProps,
+  type SectionHeaderProps,
+  type SectionContentProps,
+  type SectionSubsectionProps,
+  type SectionRowProps,
+  type SectionFieldProps,
+  type SectionDividerProps,
+  type SectionTableContentProps,
+} from "./components/custom/Section";
+
+// FileUpload
+export {
+  FileUpload,
+  type FileUploadProps,
+  type FileUploadVariant,
+  type FileUploadSize,
+  type FileUploadLocalFile,
+  dropzoneVariants,
+  iconWrapperVariants,
+  avatarContainerVariants,
+} from "./components/custom/FileUpload";
+
+// Chip
+export {
+  Chip,
+  chipVariants,
+  type ChipProps,
+  type ChipVariants,
+} from "./components/custom/Chip";

@@ -13,8 +13,8 @@ export const checkboxBoxVariants = cva(
       },
       state: {
         unchecked: "bg-white border-gray-300",
-        checked: "bg-[#006F42] border-[#006F42] text-white",
-        indeterminate: "bg-[#006F42] border-[#006F42] text-white",
+        checked: "bg-[#007A4D] border-[#007A4D] text-white",
+        indeterminate: "bg-[#007A4D] border-[#007A4D] text-white",
         disabled: "bg-gray-100 border-gray-200 opacity-60 cursor-not-allowed",
         error: "bg-white border-red-500",
       },
@@ -35,7 +35,7 @@ export const checkboxLabelVariants = cva("select-none transition-colors", {
     },
     state: {
       default: "text-gray-700",
-      checked: "text-gray-900",
+      checked: "text-[#0F8055]",
       disabled: "text-gray-400 cursor-not-allowed",
     },
   },

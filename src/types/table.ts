@@ -14,6 +14,10 @@ export interface ColumnDef<T> {
   /** Minimum column width in pixels — prevents the column from shrinking below this on mobile scroll. */
   minWidth?: number;
   align?: "left" | "center" | "right";
+  /** Alignment override for mobile card layout only. Falls back to `align` when not set. */
+  mobileAlign?: "left" | "center" | "right";
+  /** Vertical alignment of cell content. Defaults to "top". Use "middle" to center content vertically within the row. */
+  verticalAlign?: "top" | "middle";
   render?: (value: any, row: T, index: number) => ReactNode;
   sortable?: boolean;
   hideOnMobile?: boolean;
@@ -36,8 +40,15 @@ export interface CustomTableProps<T> {
   className?: string;
   /**
    * How the table renders on small screens (< md / 768px).
-   * - "scroll"  — horizontal scroll (default, existing behaviour)
-   * - "cards"   — each row becomes a labelled card; columns with hideOnMobile are omitted
+   * - "scroll" — (default) horizontal scroll; preserves side-by-side column comparison.
+   * - "cards"  — each row becomes a labelled card; 1-col on xs, 2-col grid at sm.
+   *              Columns with hideOnMobile are omitted. Recommended for mobile-first UIs.
    */
   mobileLayout?: "scroll" | "cards";
+
+  /**
+   * When `true` (default), rows highlight on hover.
+   * Set to `false` to disable the hover effect entirely.
+   */
+  hover?: boolean;
 }

@@ -20,12 +20,20 @@ export type AllowPattern =
 export interface CustomInputProps
   extends Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
-    "size" | "width" | "height"
+    "size" | "width" | "height" | "onChange"
   > {
   size?: "sm" | "md" | "lg";
+  /**
+   * `"default"` renders the usual bordered box. `"underline"` drops the box
+   * entirely — transparent background, no side/top border, just a bottom
+   * rule that turns solid on focus. Matches borderless title-style fields
+   * (e.g. a "New ticket" modal's title input) where the placeholder should
+   * read directly on the surface behind it.
+   */
+  variant?: "default" | "underline";
   inputType?: InputType;
   allowPattern?: AllowPattern;
-  label?: string;
+  label?: React.ReactNode;
   helperText?: string;
   error?: string;
   leftIcon?: React.ReactNode;
@@ -49,4 +57,15 @@ export interface CustomInputProps
   suggestions?: Array<{ label: string; value: string }>;
   /** Fires when the user picks a suggestion. Receives the item's `value` field. */
   onSuggestionSelect?: (value: string) => void;
+  /** Shows an X button to clear the input value. Turns red on hover. */
+  clearable?: boolean;
+  /** Fires when the clear button is clicked. */
+  onClear?: () => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
+  /** Renders a <textarea> instead of <input>. Incompatible with inputType="password" and suggestions. */
+  multiline?: boolean;
+  /** Number of visible text rows. Only used when multiline=true. */
+  rows?: number;
+  /** Controls CSS resize handle. Only used when multiline=true. Defaults to "vertical". */
+  resize?: "none" | "vertical" | "horizontal" | "both";
 }

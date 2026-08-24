@@ -36,13 +36,18 @@ export const tableBodyRowVariants = cva("transition-colors", {
       lg: "py-3 sm:py-4 text-sm sm:text-base",
     },
     clickable: {
-      true: "hover:bg-gray-50 cursor-pointer",
+      true: "cursor-pointer",
       false: "",
+    },
+    hover: {
+      true: "hover:bg-gray-50",
+      false: "hover:bg-transparent",
     },
   },
   defaultVariants: {
     size: "md",
     clickable: false,
+    hover: true,
   },
 });
 

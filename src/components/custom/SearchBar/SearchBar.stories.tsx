@@ -22,7 +22,10 @@ const meta = {
       options: ["string", "number", "alphanumeric"],
     },
     disabled: { control: "boolean" },
+    readOnly: { control: "boolean" },
     placeholder: { control: "text" },
+    label: { control: "text" },
+    required: { control: "boolean" },
     width: { control: "text" },
     fallbackText: { control: "text" },
     onChange: { action: "change" },
@@ -36,6 +39,8 @@ const meta = {
     placeholder: "Search…",
     width: "w-full sm:w-80",
     disabled: false,
+    readOnly: false,
+    required: false,
   },
 } satisfies Meta<typeof SearchBar>;
 
@@ -56,6 +61,26 @@ export const Alphanumeric: Story = {
 };
 
 export const Disabled: Story = { args: { disabled: true } };
+
+export const ReadOnly: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The input shows a fixed value with the `bg-gray-50` read-only surface. The text field, search button, and clear button are all non-interactive.",
+      },
+    },
+  },
+  render: (args) => (
+    <SearchBar
+      {...args}
+      label="Order reference"
+      value="ORD-20240512"
+      readOnly
+    />
+  ),
+  args: {},
+};
 
 const CITIES = [
   "Chandigarh",
@@ -119,4 +144,41 @@ export const Controlled: Story = {
     );
   },
   args: { placeholder: "Type something…" },
+};
+
+export const WithLabel: Story = {
+  args: {
+    label: "Search Orders",
+    placeholder: "Search…",
+  },
+};
+
+export const WithLabelRequired: Story = {
+  args: {
+    label: "Search Orders",
+    required: true,
+    placeholder: "Search…",
+  },
+};
+
+export const WithLabelAndDropdown: Story = {
+  render: (args) => {
+    const drivers = [
+      { id: "DR-001", name: "Rahul Sharma", zone: "Sector 17" },
+      { id: "DR-002", name: "Aman Kaur", zone: "Sector 22" },
+      { id: "DR-003", name: "Priya Singh", zone: "Phase 8B" },
+    ];
+    return (
+      <SearchBar
+        {...args}
+        label="Search Drivers"
+        required
+        placeholder="Search by name…"
+        dropdownItems={drivers}
+        getLabel={(d) => `${d.name} · ${d.zone}`}
+        getValue={(d) => d.id}
+      />
+    );
+  },
+  args: { width: "w-full md:w-96" },
 };

@@ -177,7 +177,7 @@ function InputExamples() {
           icon="warning"
           title="Provide rejection reason"
           input="textarea"
-          inputPlaceholder="Type your reason here…"
+          inputPlaceholder="Type yourx reason here…"
           showCancelButton
           confirmButtonText="Submit"
           inputValidator={(v) =>

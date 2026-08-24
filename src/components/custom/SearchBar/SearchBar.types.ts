@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export type SearchValueType = "string" | "number" | "alphanumeric";
 
 export type SearchBarSize = "sm" | "md" | "lg";
@@ -7,6 +9,10 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   defaultValue?: T;
   valueType?: SearchValueType;
   size?: SearchBarSize;
+  /** Label displayed above the search bar. */
+  label?: React.ReactNode;
+  /** When `true`, appends a red asterisk to the label. */
+  required?: boolean;
   placeholder?: string;
   /**
    * Tailwind width class(es) applied to the outer wrapper. Use any responsive
@@ -18,6 +24,8 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   
   /** Extra classes merged onto the outer wrapper — use this for layout/width. */
   className?: string;
+  /** When true, the input shows its current value but cannot be edited or searched. */
+  readOnly?: boolean;
   inputClassName?: string;
   dropdownClassName?: string;
   disabled?: boolean;
@@ -30,6 +38,8 @@ export interface SearchBarProps<T extends string | number = string, TItem = unkn
   onTouch?: () => void;
   /** Toggle the browser's native spell-check. Defaults to `true`. */
   spellCheck?: boolean;
+  /** Show the X clear button when the input has a value. Defaults to `false`. */
+  clearable?: boolean;
 
   // ── Static string list (simple case) ──────────────────────────
   /** Pre-mapped string list. Component auto-filters with fuzzy matching. */

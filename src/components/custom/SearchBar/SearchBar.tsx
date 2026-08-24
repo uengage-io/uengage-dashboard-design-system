@@ -4,6 +4,7 @@ import { cn } from "../../../lib/utils";
 import { Input } from "../../ui/input";
 import { useFuzzySearch } from "@/utils/useFuzzySearch";
 import type { SearchBarProps, SearchBarSize } from "./SearchBar.types";
+import { InputLabel } from "@/components/custom/Input/InputLabel";
 
 const SIZE_HEIGHT_CLASSES: Record<SearchBarSize, string> = {
   sm: "h-8",
@@ -46,16 +47,20 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   defaultValue,
   valueType = "string",
   size = "md",
+  label,
+  required,
   placeholder,
   width,
   className,
   inputClassName,
   disabled = false,
+  readOnly = false,
   spellCheck = true,
   onChange,
   onSearch,
   onClear,
   onTouch,
+  clearable = false,
   dropdownClassName,
   dropdownItems,
   getLabel,
@@ -76,7 +81,11 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
   const displayValue = internal;
 
-  type ResolvedItem = { label: string; value: string; raw: TItem | null | undefined };
+  type ResolvedItem = {
+    label: string;
+    value: string;
+    raw: TItem | null | undefined;
+  };
 
   const resolvedItems = React.useMemo<ResolvedItem[]>(() => {
     if (dropdownItems && getLabel) {
@@ -89,13 +98,14 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
     return [];
   }, [dropdownItems, getLabel, getValue]);
 
-  // Fuse.js fuzzy search — replaces the hand-rolled levenshtein filter
+  // Fuse.js fuzzy search — operates on the resolved list
   const fuseResults = useFuzzySearch(resolvedItems, displayValue);
   // Only surface results when the user has actually typed something
   const filteredItems = displayValue.trim() ? fuseResults : [];
 
   const hasDropdown = dropdownItems != null;
-  const castValue = (v: string) => (valueType === "number" ? Number(v) : v) as T;
+  const castValue = (v: string) =>
+    (valueType === "number" ? Number(v) : v) as T;
 
   const handleSelect = (item: ResolvedItem) => {
     setInternal(item.label);
@@ -104,6 +114,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (readOnly) return;
     const filtered = filterValue(e.target.value, valueType);
     setInternal(filtered);
     onChange?.(castValue(filtered));
@@ -114,7 +125,10 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      if (!hasQuery) { onClear?.(); return; }
+      if (!hasQuery) {
+        onClear?.();
+        return;
+      }
       if (filteredItems.length > 0) {
         handleSelect(filteredItems[0]!);
       } else {
@@ -126,15 +140,21 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   };
 
   const handleSearchClick = () => {
-    if (disabled) return;
-    if (!hasQuery) { onClear?.(); return; }
-    if (filteredItems.length > 0) { handleSelect(filteredItems[0]!); return; }
+    if (disabled || readOnly) return;
+    if (!hasQuery) {
+      onClear?.();
+      return;
+    }
+    if (filteredItems.length > 0) {
+      handleSelect(filteredItems[0]!);
+      return;
+    }
     onSearch?.(castValue(displayValue));
     setDropdownOpen(false);
   };
 
   const handleClear = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setInternal("");
     onClear?.();
     setDropdownOpen(false);
@@ -143,91 +163,119 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   const handleBlur = (e: React.FocusEvent) => {
     if (!wrapperRef.current?.contains(e.relatedTarget as Node)) {
       setDropdownOpen(false);
-      if (!touchedRef.current) { touchedRef.current = true; onTouch?.(); }
+      if (!touchedRef.current) {
+        touchedRef.current = true;
+        onTouch?.();
+      }
     }
   };
 
-  const showClear = displayValue.length > 0;
+  const showClear = clearable && displayValue.length > 0;
   const iconSize = ICON_SIZES[size];
   const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
 
   return (
     <div
-      ref={wrapperRef}
-      className={cn("uengage-ui relative block w-full", width, className)}
-      onBlur={handleBlur}
+      className={cn(
+        "uengage-ui flex flex-col gap-1.5 min-w-0",
+        width,
+        className,
+      )}
     >
+      {label && (
+        <InputLabel
+          size={size === "lg" ? "lg" : size === "sm" ? "sm" : "md"}
+          required={required}
+        >
+          {label}
+        </InputLabel>
+      )}
       <div
-        className={cn(
-          "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
-          !disabled && "hover:border-gray-500 hover:shadow-sm",
-          SIZE_TEXT_CLASSES[size],
-          SIZE_HEIGHT_CLASSES[size],
-          disabled && "pointer-events-none opacity-50",
-        )}
+        ref={wrapperRef}
+        className="relative block min-w-0"
+        onBlur={handleBlur}
       >
-        <Input
-          value={displayValue}
-          placeholder={placeholder}
-          disabled={disabled}
-          spellCheck={spellCheck}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          className={cn(
-            "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[#C4C9D2]",
-            SIZE_PLACEHOLDER_CLASSES[size],
-            inputClassName,
-          )}
-        />
-
-        <div className="flex shrink-0 items-center gap-1.5 pr-2.5">
-          {showClear && (
-            <button
-              type="button"
-              onClick={handleClear}
-              disabled={disabled}
-              className="flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label="Clear search"
-            >
-              <X className="hover:text-red-500" strokeWidth={2} size={iconSize} />
-            </button>
-          )}
-          <div className={cn("w-px bg-gray-400", DIVIDER_CLASSES[size])} />
-          <button
-            type="button"
-            onClick={handleSearchClick}
-            disabled={disabled}
-            className="flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-            aria-label="Search"
-          >
-            <Search strokeWidth={2} size={iconSize} />
-          </button>
-        </div>
-      </div>
-
-      {isDropdownVisible && (
         <div
           className={cn(
-            "absolute left-0 top-full z-50 mt-1 w-full overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg max-h-48",
-            dropdownClassName,
+            "flex w-full items-center rounded-[4px] border border-gray-400 bg-white transition-colors",
+            !disabled && !readOnly && "hover:border-gray-500 hover:shadow-sm",
+            SIZE_TEXT_CLASSES[size],
+            SIZE_HEIGHT_CLASSES[size],
+            disabled && "pointer-events-none opacity-50",
+            readOnly &&
+              "bg-gray-50 border-gray-300 text-gray-700 cursor-default",
           )}
         >
-          {filteredItems.length > 0 ? (
-            filteredItems.map((item) => (
+          <Input
+            value={displayValue}
+            placeholder={placeholder}
+            disabled={disabled}
+            readOnly={readOnly}
+            spellCheck={spellCheck}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            className={cn(
+              "border-0 bg-transparent shadow-none outline-none focus-visible:ring-0 h-full flex-1 min-w-0 rounded-[4px] placeholder:text-[#C4C9D2]",
+              SIZE_PLACEHOLDER_CLASSES[size],
+              inputClassName,
+            )}
+          />
+
+          <div className="flex shrink-0 items-center gap-1.5 pr-2.5">
+            {showClear && (
               <button
-                key={item.value}
                 type="button"
-                className="w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors"
-                onClick={() => handleSelect(item)}
+                onClick={handleClear}
+                disabled={disabled}
+                className="flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Clear search"
               >
-                {item.label}
+                <X
+                  className="hover:text-red-500"
+                  strokeWidth={2}
+                  size={iconSize}
+                />
               </button>
-            ))
-          ) : (
-            <div className="px-3 py-2 text-sm text-[#9CA3AF]">{fallbackText}</div>
-          )}
+            )}
+            <div className={cn("w-px bg-gray-400", DIVIDER_CLASSES[size])} />
+            <button
+              type="button"
+              onClick={handleSearchClick}
+              disabled={disabled}
+              className="flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              aria-label="Search"
+            >
+              <Search strokeWidth={2} size={iconSize} />
+            </button>
+          </div>
         </div>
-      )}
+
+        {isDropdownVisible && (
+          <div
+            className={cn(
+              "absolute left-0 top-full z-50 mt-1 w-full overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg max-h-48",
+              dropdownClassName,
+            )}
+          >
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
+                <button
+                  key={item.value}
+                  type="button"
+                  className="w-full text-left px-3 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors"
+                  onClick={() => handleSelect(item)}
+                >
+                  {item.label}
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-sm text-[#9CA3AF]">
+                {fallbackText}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

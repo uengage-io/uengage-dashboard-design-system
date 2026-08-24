@@ -14,7 +14,7 @@ const meta = {
   argTypes: {
     side: {
       control: { type: "select" },
-      options: ["left", "right", "top", "bottom"],
+      options: ["left", "right", "right-slide", "top", "bottom"],
     },
     size: {
       control: { type: "select" },
@@ -25,6 +25,9 @@ const meta = {
     overlay: { control: "boolean" },
     closeOnOutsideClick: { control: "boolean" },
     persistentOnDesktop: { control: "boolean" },
+    heading: { control: "text" },
+    closeIcon: { control: "boolean" },
+    divider: { control: "boolean" },
   },
   args: {
     side: "left",
@@ -33,6 +36,9 @@ const meta = {
     overlay: true,
     closeOnOutsideClick: true,
     persistentOnDesktop: false,
+    heading: "",
+    closeIcon: false,
+    divider: false,
   },
 } satisfies Meta<typeof Sidebar>
 
@@ -70,6 +76,13 @@ export const RightSidebar: Story = {
   render: Default.render,
 }
 
+export const RightSlideSidebar: Story = {
+  args: {
+    side: "right-slide",
+  },
+  render: Default.render,
+}
+
 export const TopDrawer: Story = {
   args: {
     side: "top",
@@ -80,6 +93,24 @@ export const TopDrawer: Story = {
 export const BottomDrawer: Story = {
   args: {
     side: "bottom",
+  },
+  render: Default.render,
+}
+
+export const WithHeadingAndClose: Story = {
+  args: {
+    heading: "Navigation",
+    closeIcon: true,
+    divider: true,
+  },
+  render: Default.render,
+}
+
+export const HeadingOnly: Story = {
+  args: {
+    heading: "Navigation",
+    closeIcon: false,
+    divider: true,
   },
   render: Default.render,
 }

@@ -18,7 +18,7 @@ export default function RadioPreview() {
     getDisabled={(item)=>item.disabled}
     // value={tab}
     // defaultValue="tickets"
-    size="sm"
+    size="lg"
     layout="vertical"
     onChange={(val)=>console.log("changing",val)}
     label={"Choose an option"}
