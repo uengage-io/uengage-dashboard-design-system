@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Table as TableRoot,
   TableBody,
@@ -23,6 +23,29 @@ import {
 } from "./tableTokens";
 
 const NO_SORT: TableSortState = { key: null, direction: null };
+
+/**
+ * Tracks the Tailwind `md` breakpoint so the <colgroup> can drop the <col> of a
+ * `hideOnMobile` column. Under `table-layout: fixed` a <col> keeps reserving its
+ * width even when every cell in it is `display: none`, so the colgroup has to
+ * agree with the CSS rather than be left to the browser.
+ * Starts as desktop: the wide layout is the common case, and the effect
+ * corrects it on the first paint.
+ */
+function useIsBelowMd(breakpoint = 768): boolean {
+  const [below, setBelow] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const media = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const sync = () => setBelow(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, [breakpoint]);
+
+  return below;
+}
 
 function isBlank(value: unknown): boolean {
   return value === null || value === undefined || value === "";
@@ -290,19 +313,27 @@ export function Table<T>({
 
   const scrollStyle = stickyHeader && maxHeight ? { maxHeight } : undefined;
   const visibleColumns = columns.filter((col) => !col.hideOnMobile);
+  const belowMd = useIsBelowMd();
 
-  // Compute proportional percentage widths from flex weights; col.width overrides when set
-  const totalFlex = columns.reduce((sum, col) => sum + (col.flex ?? 1), 0);
-  const colWidths = columns.map((col) =>
-    col.width ?? `${(((col.flex ?? 1) / totalFlex) * 100).toFixed(2)}%`,
+  // Columns that actually occupy a track right now. Below `md` the
+  // `hideOnMobile` ones are `display: none`, so they must not be given a <col>
+  // either — otherwise their width is reserved and never reclaimed.
+  const layoutColumns = belowMd ? visibleColumns : columns;
+
+  // Proportional percentage widths from flex weights; col.width overrides when
+  // set. Shared out only among the columns on screen, so the row always adds up
+  // to the full table width.
+  const totalFlex = layoutColumns.reduce((sum, col) => sum + (col.flex ?? 1), 0);
+  const colWidths = layoutColumns.map((col) =>
+    col.width ?? `${(((col.flex ?? 1) / (totalFlex || 1)) * 100).toFixed(2)}%`,
   );
 
-  // Sum minWidth values across all columns — used as the table's minimum width
-  // so that on narrow viewports the overflow-x-auto wrapper scrolls rather than
-  // letting columns crush each other.
-  // Left at 0 when no column declares a minWidth, so the table still falls back
-  // to "max-content" rather than being pinned to the extra columns alone.
-  const columnsMinWidth = columns.reduce(
+  // Sum minWidth values across the on-screen columns — used as the table's
+  // minimum width so that on narrow viewports the overflow-x-auto wrapper
+  // scrolls rather than letting columns crush each other.
+  // Left at 0 when no column declares a minWidth, in which case the table just
+  // fills its container and every cell wraps in place.
+  const columnsMinWidth = layoutColumns.reduce(
     (sum, col) => sum + (col.minWidth ?? 0),
     0,
   );
@@ -452,22 +483,27 @@ export function Table<T>({
         containerClassName={
           stickyHeader && !maxHeight ? "overflow-visible" : undefined
         }
-        style={
-          tableMinWidth > 0
-            ? { minWidth: `${tableMinWidth}px`, borderCollapse: "collapse" }
-            : { minWidth: "max-content", borderCollapse: "collapse" }
-        }
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          // `fixed` is what keeps a long value inside its own column: track
+          // widths come from the <colgroup> alone, never from the content, so
+          // one wordy cell wraps down instead of stealing its neighbours' room.
+          tableLayout: "fixed",
+          // Only pinned wider than the container when the columns ask for it —
+          // then the wrapper scrolls sideways rather than crushing them.
+          ...(tableMinWidth > 0 ? { minWidth: `${tableMinWidth}px` } : null),
+        }}
       >
         {/*
-         * colgroup sets proportional width hints (flex-derived %).
-         * table-auto (the default) is intentional: with table-fixed, CSS
-         * display:none on a <td> does NOT reclaim its <col> width, so
-         * hideOnMobile columns leave dead space. table-auto correctly
-         * collapses hidden columns and treats <col> widths as hints.
+         * Under `table-layout: fixed` the colgroup is the sole source of column
+         * widths (flex-derived %, or col.width). `hideOnMobile` columns are
+         * dropped from it below `md` — a <col> for a display:none column would
+         * reserve width nothing can use.
          */}
         <colgroup>
           {selectionOn ? <col style={{ width: selectColWidth }} /> : null}
-          {columns.map((col, i) => (
+          {layoutColumns.map((col, i) => (
             <col
               key={String(col.key)}
               style={{
