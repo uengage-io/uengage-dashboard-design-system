@@ -558,6 +558,19 @@ function Select<TItem = unknown>({
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (!disabled && !readOnly && !loading) setOpen((o) => !o);
+              } else if (e.key === "ArrowDown") {
+                // ArrowDown opens the menu (chevron flips up); once open the
+                // Command list owns arrow navigation.
+                if (!open) {
+                  e.preventDefault();
+                  if (!disabled && !readOnly && !loading) setOpen(true);
+                }
+              } else if (e.key === "ArrowUp") {
+                // ArrowUp collapses the menu (chevron flips back down).
+                if (open) {
+                  e.preventDefault();
+                  setOpen(false);
+                }
               } else if (e.key === "Escape") {
                 setOpen(false);
               }
@@ -756,6 +769,14 @@ function Select<TItem = unknown>({
           className="max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none"
           collisionPadding={{ top: 64 }}
           style={{ width: "var(--radix-popover-trigger-width)" }}
+          onKeyDown={(e) => {
+            // Alt+ArrowUp collapses the menu; plain ArrowUp stays with the list
+            // so cmdk can keep moving the highlight.
+            if (e.key === "ArrowUp" && e.altKey) {
+              e.preventDefault();
+              setOpen(false);
+            }
+          }}
         >
           <div
             style={{
