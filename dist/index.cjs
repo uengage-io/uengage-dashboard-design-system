@@ -1,7 +1,7 @@
 "use client";
 'use strict';
 
-var React10 = require('react');
+var React8 = require('react');
 var jsxRuntime = require('react/jsx-runtime');
 var classVarianceAuthority = require('class-variance-authority');
 var radixUi = require('radix-ui');
@@ -33,14 +33,14 @@ function _interopNamespace(e) {
   return Object.freeze(n);
 }
 
-var React10__namespace = /*#__PURE__*/_interopNamespace(React10);
+var React8__namespace = /*#__PURE__*/_interopNamespace(React8);
 var Fuse__default = /*#__PURE__*/_interopDefault(Fuse);
 var ReactDOM__namespace = /*#__PURE__*/_interopNamespace(ReactDOM);
 
 // src/lib/zIndexContext.tsx
-var ZIndexContext = React10__namespace.createContext({ popover: 20 });
+var ZIndexContext = React8__namespace.createContext({ popover: 20 });
 function useZIndex() {
-  return React10__namespace.useContext(ZIndexContext);
+  return React8__namespace.useContext(ZIndexContext);
 }
 function SidebarZIndexProvider({
   children
@@ -648,9 +648,9 @@ function Button2({
   onBlur,
   ...props
 }) {
-  const [hovered, setHovered] = React10__namespace.useState(false);
-  const [pressed, setPressed] = React10__namespace.useState(false);
-  const [focused, setFocused] = React10__namespace.useState(false);
+  const [hovered, setHovered] = React8__namespace.useState(false);
+  const [pressed, setPressed] = React8__namespace.useState(false);
+  const [focused, setFocused] = React8__namespace.useState(false);
   const interactionBlocked = disabled || loading;
   const state = disabled ? "disabled" : pressed ? "pressed" : hovered ? "hover" : focused ? "focused" : "default";
   const gradientStyle = getButtonStyle(variant, state, size, loading);
@@ -810,7 +810,7 @@ function TopHeader({
                   className: "flex min-w-0 flex-1 items-center overflow-hidden",
                   style: { gap: toCssSize(titleGap), minWidth: "160px" },
                   children: [
-                    React10__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
+                    React8__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h1", { className: "truncate text-base font-semibold leading-tight text-foreground sm:text-[18px]", children: title }),
                     helper != null && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "shrink-0 text-xs leading-none sm:text-sm", children: helper })
                   ]
                 }
@@ -894,8 +894,8 @@ function SubHeader({
                   },
                   children: [
                     hasHeading && /* @__PURE__ */ jsxRuntime.jsxs("div", { "data-slot": "sub-header-heading", children: [
-                      title != null && (React10__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
-                      subtitle != null && (React10__namespace.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
+                      title != null && (React8__namespace.isValidElement(title) ? title : /* @__PURE__ */ jsxRuntime.jsx("h2", { className: "text-sm font-semibold leading-tight text-foreground sm:text-base", children: title })),
+                      subtitle != null && (React8__namespace.isValidElement(subtitle) ? subtitle : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-0.5 text-[12px] leading-tight text-muted-foreground sm:text-[13px]", children: subtitle }))
                     ] }),
                     children != null && /* @__PURE__ */ jsxRuntime.jsx("div", { "data-slot": "sub-header-content", children })
                   ]
@@ -1121,7 +1121,7 @@ function Input({ className, type, ...props }) {
   );
 }
 function useFuzzySearch(items, query) {
-  const fuse = React10.useMemo(
+  const fuse = React8.useMemo(
     () => new Fuse__default.default(items, {
       keys: ["label"],
       threshold: 0.35,
@@ -1131,7 +1131,7 @@ function useFuzzySearch(items, query) {
     }),
     [items]
   );
-  return React10.useMemo(() => {
+  return React8.useMemo(() => {
     const q = query.trim();
     if (!q) return items;
     return fuse.search(q).map((r) => r.item);
@@ -1615,23 +1615,25 @@ function SearchBar({
   debounce = 0,
   onDebouncedChange
 }) {
-  const [internal, setInternal] = React10__namespace.useState(
+  const [internal, setInternal] = React8__namespace.useState(
     String(controlledValue ?? defaultValue ?? "")
   );
-  const [dropdownOpen, setDropdownOpen] = React10__namespace.useState(false);
-  const [focused, setFocused] = React10__namespace.useState(false);
-  const [hovered, setHovered] = React10__namespace.useState(false);
-  const wrapperRef = React10__namespace.useRef(null);
-  const touchedRef = React10__namespace.useRef(false);
-  const debounceRef = React10__namespace.useRef(
+  const [dropdownOpen, setDropdownOpen] = React8__namespace.useState(false);
+  const [focused, setFocused] = React8__namespace.useState(false);
+  const [hovered, setHovered] = React8__namespace.useState(false);
+  const wrapperRef = React8__namespace.useRef(null);
+  const panelRef = React8__namespace.useRef(null);
+  const [activeValue, setActiveValue] = React8__namespace.useState(null);
+  const touchedRef = React8__namespace.useRef(false);
+  const debounceRef = React8__namespace.useRef(
     void 0
   );
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (controlledValue !== void 0) setInternal(String(controlledValue));
   }, [controlledValue]);
-  React10__namespace.useEffect(() => () => clearTimeout(debounceRef.current), []);
+  React8__namespace.useEffect(() => () => clearTimeout(debounceRef.current), []);
   const displayValue = internal;
-  const resolvedItems = React10__namespace.useMemo(() => {
+  const resolvedItems = React8__namespace.useMemo(() => {
     if (dropdownItems && getLabel) {
       return dropdownItems.map((item) => ({
         label: getLabel(item),
@@ -1671,8 +1673,56 @@ function SearchBar({
     if (hasDropdown) setDropdownOpen(true);
   };
   const hasQuery = displayValue.trim().length > 0;
+  const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
+  const isRecentsVisible = !isDropdownVisible && focused && !hasQuery && !disabled && !readOnly && (recents?.length ?? 0) > 0;
+  const navValues = isDropdownVisible ? filteredItems.map((item) => item.value) : isRecentsVisible ? recents : [];
+  const navKey = navValues.join("|");
+  React8__namespace.useEffect(() => {
+    setActiveValue((cur) => cur && navValues.includes(cur) ? cur : null);
+  }, [navKey]);
+  const scrollActiveIntoView = (val) => {
+    requestAnimationFrame(() => {
+      panelRef.current?.querySelector(`[data-nav-value="${CSS.escape(val)}"]`)?.scrollIntoView({ block: "nearest" });
+    });
+  };
+  const moveActive = (delta) => {
+    if (navValues.length === 0) return;
+    const cur = activeValue ? navValues.indexOf(activeValue) : -1;
+    const next = cur === -1 ? delta > 0 ? 0 : navValues.length - 1 : (cur + delta + navValues.length) % navValues.length;
+    const val = navValues[next];
+    setActiveValue(val);
+    scrollActiveIntoView(val);
+  };
+  const commitActive = () => {
+    if (!activeValue) return false;
+    if (isRecentsVisible) {
+      handleRecentPick(activeValue);
+      setActiveValue(null);
+      return true;
+    }
+    const item = filteredItems.find((i) => i.value === activeValue);
+    if (!item) return false;
+    handleSelect(item);
+    setActiveValue(null);
+    return true;
+  };
   const handleKeyDown = (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (hasDropdown && hasQuery && !dropdownOpen) {
+        e.preventDefault();
+        setDropdownOpen(true);
+        return;
+      }
+      if (navValues.length === 0) return;
+      e.preventDefault();
+      moveActive(e.key === "ArrowDown" ? 1 : -1);
+      return;
+    }
     if (e.key === "Enter") {
+      if (commitActive()) {
+        e.preventDefault();
+        return;
+      }
       if (!hasQuery) {
         onClear?.();
         return;
@@ -1684,7 +1734,10 @@ function SearchBar({
         setDropdownOpen(false);
       }
     }
-    if (e.key === "Escape") setDropdownOpen(false);
+    if (e.key === "Escape") {
+      setActiveValue(null);
+      setDropdownOpen(false);
+    }
   };
   const handleSearchClick = () => {
     if (disabled || readOnly) return;
@@ -1738,8 +1791,6 @@ function SearchBar({
   const box = getSearchBarBoxStyle(state);
   const iconColor = getSearchBarIconColor(state);
   const messageColor = getSearchBarMessageColor(state);
-  const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
-  const isRecentsVisible = !isDropdownVisible && focused && !hasQuery && !disabled && !readOnly && (recents?.length ?? 0) > 0;
   const showShortcut = Boolean(shortcut) && !hasQuery && !showClear;
   const resolvedMessage = (() => {
     if (message != null) return message;
@@ -1917,6 +1968,7 @@ function SearchBar({
               isRecentsVisible && /* @__PURE__ */ jsxRuntime.jsxs(
                 "div",
                 {
+                  ref: panelRef,
                   className: cn(
                     "absolute left-0 top-full z-50 mt-1.5 w-full overflow-hidden",
                     dropdownClassName
@@ -1940,18 +1992,16 @@ function SearchBar({
                     recents.map((entry) => /* @__PURE__ */ jsxRuntime.jsxs(
                       "div",
                       {
+                        "data-nav-value": entry,
                         className: "flex items-center transition-colors",
                         style: {
                           gap: 9,
                           padding: "7px 10px",
-                          borderRadius: 6
+                          borderRadius: 6,
+                          background: activeValue === entry ? SEARCHBAR_COLORS.hoverTint : "transparent"
                         },
-                        onMouseEnter: (e) => {
-                          e.currentTarget.style.background = SEARCHBAR_COLORS.hoverTint;
-                        },
-                        onMouseLeave: (e) => {
-                          e.currentTarget.style.background = "transparent";
-                        },
+                        onMouseEnter: () => setActiveValue(entry),
+                        onMouseLeave: () => setActiveValue((cur) => cur === entry ? null : cur),
                         children: [
                           /* @__PURE__ */ jsxRuntime.jsxs(
                             "button",
@@ -2009,6 +2059,7 @@ function SearchBar({
               isDropdownVisible && /* @__PURE__ */ jsxRuntime.jsx(
                 "div",
                 {
+                  ref: panelRef,
                   className: cn(
                     "absolute left-0 top-full z-50 mt-1.5 max-h-48 w-full overflow-y-auto",
                     dropdownClassName
@@ -2018,20 +2069,18 @@ function SearchBar({
                     "button",
                     {
                       type: "button",
+                      "data-nav-value": item.value,
                       className: "flex w-full items-center text-left font-medium transition-colors",
                       style: {
                         padding: "7px 10px",
                         borderRadius: 6,
                         fontSize: 11,
                         lineHeight: 1.3,
-                        color: SEARCHBAR_COLORS.value
+                        color: SEARCHBAR_COLORS.value,
+                        background: activeValue === item.value ? SEARCHBAR_COLORS.hoverTint : "transparent"
                       },
-                      onMouseEnter: (e) => {
-                        e.currentTarget.style.background = SEARCHBAR_COLORS.hoverTint;
-                      },
-                      onMouseLeave: (e) => {
-                        e.currentTarget.style.background = "transparent";
-                      },
+                      onMouseEnter: () => setActiveValue(item.value),
+                      onMouseLeave: () => setActiveValue((cur) => cur === item.value ? null : cur),
                       onClick: () => handleSelect(item),
                       children: item.label
                     },
@@ -2070,8 +2119,8 @@ function SearchBar({
   );
 }
 SearchBar.displayName = "SearchBar";
-var FilterGroupMobileContext = React10__namespace.createContext(false);
-var FilterGroupDrawerCalendarContext = React10__namespace.createContext(null);
+var FilterGroupMobileContext = React8__namespace.createContext(false);
+var FilterGroupDrawerCalendarContext = React8__namespace.createContext(null);
 function Popover({
   ...props
 }) {
@@ -2173,7 +2222,7 @@ function CommandInput({ className, ...props }) {
     }
   ) });
 }
-var CommandList = React10__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+var CommandList = React8__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
   cmdk.CommandList,
   {
     ref,
@@ -2245,7 +2294,7 @@ var MENU = {
   background: INPUT_COLORS.surface,
   shadow: "2px 2px 4px rgba(0,0,0,.12)",
   /** Hover wash on an option row. */
-  optionHover: "#FAFFF7",
+  optionHover: "#E3F1D6",
   /** Selected row: mint fill with a check, never a blue bar. */
   selectedBg: "#DCF3CE",
   selectedInk: "#003C1B",
@@ -2402,13 +2451,13 @@ function Select({
   emptyState,
   placement = "auto"
 }) {
-  const isMobileDrawer = React10__namespace.useContext(FilterGroupMobileContext);
-  const touchedRef = React10__namespace.useRef(false);
-  const interactedRef = React10__namespace.useRef(false);
+  const isMobileDrawer = React8__namespace.useContext(FilterGroupMobileContext);
+  const touchedRef = React8__namespace.useRef(false);
+  const interactedRef = React8__namespace.useRef(false);
   const resolvedMode = multiple ? "multi" : mode;
   const searchEnabled = searchable ?? searchProp;
   const spec = SELECT_SIZES[size];
-  const resolvedOptions = React10__namespace.useMemo(() => {
+  const resolvedOptions = React8__namespace.useMemo(() => {
     if (items && getLabel && getValue) {
       return items.map((item) => ({
         label: getLabel(item),
@@ -2418,23 +2467,23 @@ function Select({
     }
     return options ?? [];
   }, [items, getLabel, getValue, getDisabled, options]);
-  const [open, setOpen] = React10__namespace.useState(false);
-  const [hovered, setHovered] = React10__namespace.useState(false);
-  const [searchQuery, setSearchQuery] = React10__namespace.useState("");
-  const [sortOrder, setSortOrder] = React10__namespace.useState("asc");
-  const listRef = React10__namespace.useRef(null);
-  const [activeValue, setActiveValue] = React10__namespace.useState(null);
-  React10__namespace.useEffect(() => {
+  const [open, setOpen] = React8__namespace.useState(false);
+  const [hovered, setHovered] = React8__namespace.useState(false);
+  const [searchQuery, setSearchQuery] = React8__namespace.useState("");
+  const [sortOrder, setSortOrder] = React8__namespace.useState("asc");
+  const listRef = React8__namespace.useRef(null);
+  const [activeValue, setActiveValue] = React8__namespace.useState(null);
+  React8__namespace.useEffect(() => {
     listRef.current?.scrollTo({ top: 0 });
   }, [sortOrder]);
-  const sortedOptions = React10__namespace.useMemo(() => {
+  const sortedOptions = React8__namespace.useMemo(() => {
     if (!sorting) return resolvedOptions;
     return [...resolvedOptions].sort(
       (a, b) => sortOrder === "asc" ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)
     );
   }, [resolvedOptions, sorting, sortOrder]);
   const fuseFilteredOptions = useFuzzySearch(sortedOptions, searchQuery);
-  const visibleOptions = React10__namespace.useMemo(() => {
+  const visibleOptions = React8__namespace.useMemo(() => {
     if (!searchEnabled) return sortedOptions;
     const q = searchQuery.trim();
     if (indexing && /^\d+$/.test(q)) {
@@ -2444,10 +2493,10 @@ function Select({
     }
     return fuseFilteredOptions;
   }, [searchEnabled, searchQuery, indexing, sortedOptions, fuseFilteredOptions]);
-  const [selected, setSelected] = React10__namespace.useState(
+  const [selected, setSelected] = React8__namespace.useState(
     controlledValue ?? defaultValue ?? (resolvedMode === "multi" ? [] : "")
   );
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = resolvedMode === "multi" ? Array.isArray(selected) ? selected : [] : [];
@@ -2483,10 +2532,10 @@ function Select({
     e.stopPropagation();
     commit(resolvedMode === "multi" ? [] : "");
   };
-  const pillsContainerRef = React10__namespace.useRef(null);
-  const [visibleCount, setVisibleCount] = React10__namespace.useState(null);
-  const [rowWidth, setRowWidth] = React10__namespace.useState(0);
-  React10__namespace.useLayoutEffect(() => {
+  const pillsContainerRef = React8__namespace.useRef(null);
+  const [visibleCount, setVisibleCount] = React8__namespace.useState(null);
+  const [rowWidth, setRowWidth] = React8__namespace.useState(0);
+  React8__namespace.useLayoutEffect(() => {
     const container = pillsContainerRef.current;
     if (!container || resolvedMode !== "multi") return;
     const measure = () => setRowWidth(container.getBoundingClientRect().width);
@@ -2497,15 +2546,15 @@ function Select({
     return () => observer.disconnect();
   }, [resolvedMode]);
   const badgeReserve = 20 + 7 * String(selectedArr.length).length + PILL_GAP;
-  const pillMaxWidth = React10__namespace.useMemo(() => {
+  const pillMaxWidth = React8__namespace.useMemo(() => {
     if (rowWidth === 0) return PILL_MAX_WIDTH;
     const budget = selectedArr.length <= 1 ? rowWidth : rowWidth - badgeReserve;
     return Math.max(PILL_MIN_WIDTH, Math.min(PILL_MAX_WIDTH, Math.floor(budget)));
   }, [rowWidth, selectedArr.length, badgeReserve]);
-  React10__namespace.useLayoutEffect(() => {
+  React8__namespace.useLayoutEffect(() => {
     if (resolvedMode === "multi") setVisibleCount(null);
   }, [selectedArr.join(","), resolvedMode, rowWidth]);
-  React10__namespace.useLayoutEffect(() => {
+  React8__namespace.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     if (maxChips !== void 0) {
       setVisibleCount(Math.min(maxChips, selectedArr.length));
@@ -2593,7 +2642,7 @@ function Select({
   );
   const showCreate = creatable && query.length > 0 && !exactMatch;
   const showEmpty = visibleOptions.length === 0 && !showCreate;
-  const groups = React10__namespace.useMemo(() => {
+  const groups = React8__namespace.useMemo(() => {
     const out = [];
     for (const opt of visibleOptions) {
       const name = opt.group ?? null;
@@ -2603,23 +2652,32 @@ function Select({
     }
     return out;
   }, [visibleOptions]);
-  const navValues = React10__namespace.useMemo(() => {
+  const navValues = React8__namespace.useMemo(() => {
     const vals = visibleOptions.filter((o) => !o.disabled).map((o) => o.value);
     if (showCreate) vals.push(CREATE_VALUE);
     return vals;
   }, [visibleOptions, showCreate]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!open) {
       setActiveValue(null);
       return;
     }
+    const picked = resolvedMode === "multi" ? navValues.find((v) => selectedArr.includes(v)) : typeof selected === "string" && selected ? selected : void 0;
+    const anchor = picked && navValues.includes(picked) ? picked : navValues[0] ?? null;
+    setActiveValue(anchor);
+    if (anchor) scrollActiveIntoView(anchor);
+  }, [open]);
+  React8__namespace.useEffect(() => {
+    if (!open) return;
     setActiveValue(
       (cur) => cur && navValues.includes(cur) ? cur : navValues[0] ?? null
     );
   }, [open, navValues]);
   const scrollActiveIntoView = (val) => {
     requestAnimationFrame(() => {
-      listRef.current?.querySelector(`[data-opt-value="${CSS.escape(val)}"]`)?.scrollIntoView({ block: "nearest" });
+      requestAnimationFrame(() => {
+        listRef.current?.querySelector(`[data-opt-value="${CSS.escape(val)}"]`)?.scrollIntoView({ block: "nearest" });
+      });
     });
   };
   const moveActive = (delta) => {
@@ -2684,9 +2742,7 @@ function Select({
           borderRadius: MENU.optionRadius,
           fontSize: spec.font,
           lineHeight: 1.3,
-          // Inline styles win over the class-based hover, so the keyboard
-          // highlight has to be resolved here too or it would never show.
-          background: checked ? isMulti ? MENU.multiSelectedBg : MENU.selectedBg : active ? MENU.optionHover : "transparent",
+          background: checked && !isMulti ? MENU.selectedBg : active ? MENU.optionHover : checked ? MENU.multiSelectedBg : "transparent",
           boxShadow: active && checked ? `inset 0 0 0 1px ${MENU.selectedInk}` : void 0,
           color: checked && !isMulti ? MENU.selectedInk : INPUT_COLORS.value,
           fontWeight: checked && !isMulti ? 600 : 500,
@@ -3414,7 +3470,7 @@ var DARK = {
 function getTabsPalette(appearance = "light") {
   return appearance === "dark" ? DARK : LIGHT;
 }
-var TabsActiveValueContext = React10__namespace.createContext(null);
+var TabsActiveValueContext = React8__namespace.createContext(null);
 var TRIGGER_RESET = [
   "relative h-auto w-auto flex-none border-0 bg-transparent shadow-none outline-none",
   "after:hidden after:content-none",
@@ -3422,6 +3478,7 @@ var TRIGGER_RESET = [
   "focus-visible:border-transparent focus-visible:ring-0 focus-visible:outline-none",
   "disabled:pointer-events-auto"
 ].join(" ");
+var EDGE_CONTROL_GAP = 6;
 var SCROLLBAR_HIDDEN = "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden";
 function firstEnabled(tabs) {
   return tabs.find((t) => !t.disabled)?.value ?? tabs[0]?.value ?? "";
@@ -3443,7 +3500,7 @@ function useDesignTabValue({
   onBeforeChange,
   syncToUrl
 }) {
-  const [uncontrolled, setUncontrolled] = React10__namespace.useState(() => {
+  const [uncontrolled, setUncontrolled] = React8__namespace.useState(() => {
     if (syncToUrl && typeof window !== "undefined") {
       const fromUrl = new URLSearchParams(window.location.search).get(
         paramNameOf(syncToUrl)
@@ -3455,26 +3512,26 @@ function useDesignTabValue({
     return value ?? defaultValue ?? firstEnabled(tabs);
   });
   const activeValue = value ?? uncontrolled;
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (value !== void 0) return;
     if (tabs.some((t) => t.value === uncontrolled)) return;
     setUncontrolled(defaultValue ?? firstEnabled(tabs));
   }, [defaultValue, tabs, uncontrolled, value]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!syncToUrl || typeof window === "undefined" || !activeValue) return;
     const url = new URL(window.location.href);
     if (url.searchParams.get(paramNameOf(syncToUrl)) === activeValue) return;
     url.searchParams.set(paramNameOf(syncToUrl), activeValue);
     window.history.replaceState(window.history.state, "", url.toString());
   }, [activeValue, syncToUrl]);
-  const commit = React10__namespace.useCallback(
+  const commit = React8__namespace.useCallback(
     (next) => {
       if (value === void 0) setUncontrolled(next);
       onChange?.(next);
     },
     [onChange, value]
   );
-  const handleChange = React10__namespace.useCallback(
+  const handleChange = React8__namespace.useCallback(
     (next) => {
       if (!tabs.some((t) => t.value === next && !t.disabled)) return;
       if (next === activeValue) return;
@@ -3560,16 +3617,16 @@ function CountBadge({
 }
 var SLIDE_TRANSITION = (animate) => animate ? "transform 260ms cubic-bezier(.2,.8,.3,1), width 260ms cubic-bezier(.2,.8,.3,1), height 260ms cubic-bezier(.2,.8,.3,1), opacity 120ms linear" : "opacity 120ms linear";
 function useSlidingIndicator(enabled, activeValue, signature) {
-  const innerRef = React10__namespace.useRef(null);
-  const settled = React10__namespace.useRef(false);
-  const [indicator, setIndicator] = React10__namespace.useState({
+  const innerRef = React8__namespace.useRef(null);
+  const settled = React8__namespace.useRef(false);
+  const [indicator, setIndicator] = React8__namespace.useState({
     left: 0,
     width: 0,
     top: 0,
     height: 0,
     ready: false
   });
-  const measure = React10__namespace.useCallback(() => {
+  const measure = React8__namespace.useCallback(() => {
     const inner = innerRef.current;
     if (!inner || !activeValue) return;
     const btn = inner.querySelector(
@@ -3590,11 +3647,11 @@ function useSlidingIndicator(enabled, activeValue, signature) {
       ready: true
     });
   }, [activeValue]);
-  React10__namespace.useLayoutEffect(() => {
+  React8__namespace.useLayoutEffect(() => {
     if (!enabled) return;
     measure();
   }, [enabled, measure, signature]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!enabled) return;
     const inner = innerRef.current;
     if (!inner) return;
@@ -3612,9 +3669,9 @@ function useSlidingIndicator(enabled, activeValue, signature) {
   return { innerRef, indicator, animate };
 }
 function useEdgeScroll(enabled, activeValue) {
-  const ref = React10__namespace.useRef(null);
-  const [edges, setEdges] = React10__namespace.useState({ left: false, right: false });
-  const measure = React10__namespace.useCallback(() => {
+  const ref = React8__namespace.useRef(null);
+  const [edges, setEdges] = React8__namespace.useState({ left: false, right: false });
+  const measure = React8__namespace.useCallback(() => {
     const el = ref.current;
     if (!el) return;
     setEdges({
@@ -3622,7 +3679,7 @@ function useEdgeScroll(enabled, activeValue) {
       right: el.scrollLeft + el.clientWidth < el.scrollWidth - 1
     });
   }, []);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!enabled) return;
     const el = ref.current;
     if (!el) return;
@@ -3635,7 +3692,7 @@ function useEdgeScroll(enabled, activeValue) {
       ro.disconnect();
     };
   }, [enabled, measure]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!enabled) return;
     const el = ref.current;
     if (!el || !activeValue) return;
@@ -3644,7 +3701,7 @@ function useEdgeScroll(enabled, activeValue) {
     );
     btn?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
   }, [activeValue, enabled]);
-  const scrollBy = React10__namespace.useCallback((delta) => {
+  const scrollBy = React8__namespace.useCallback((delta) => {
     ref.current?.scrollBy({ left: delta, behavior: "smooth" });
   }, []);
   return { ref, edges, scrollBy };
@@ -3652,39 +3709,28 @@ function useEdgeScroll(enabled, activeValue) {
 function EdgeControl({
   side,
   palette,
+  disabled,
   onClick
 }) {
   const Icon = side === "left" ? lucideReact.ChevronLeft : lucideReact.ChevronRight;
-  return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntime.jsx(
-      "span",
-      {
-        "aria-hidden": "true",
-        className: "pointer-events-none absolute inset-y-0 w-11",
-        style: {
-          [side]: 0,
-          background: `linear-gradient(${side === "left" ? "270deg" : "90deg"}, rgba(0,0,0,0), ${palette.surface} 62%)`
-        }
-      }
-    ),
-    /* @__PURE__ */ jsxRuntime.jsx(
-      "button",
-      {
-        type: "button",
-        tabIndex: -1,
-        "aria-hidden": "true",
-        onClick,
-        className: "absolute top-1/2 flex h-[22px] w-[22px] -translate-y-1/2 cursor-pointer items-center justify-center rounded-md",
-        style: {
-          [side]: 2,
-          background: palette.surface,
-          border: `1px solid ${palette.strip}`,
-          color: palette.fg
-        },
-        children: /* @__PURE__ */ jsxRuntime.jsx(Icon, { size: 11, strokeWidth: 2.6 })
-      }
-    )
-  ] });
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    "button",
+    {
+      type: "button",
+      tabIndex: -1,
+      "aria-hidden": "true",
+      disabled,
+      onClick,
+      className: "flex h-[22px] w-[22px] shrink-0 cursor-pointer items-center justify-center self-center rounded-md disabled:cursor-default disabled:opacity-35",
+      style: {
+        background: palette.surface,
+        border: `1px solid ${palette.strip}`,
+        color: palette.fg,
+        [side === "left" ? "marginRight" : "marginLeft"]: EDGE_CONTROL_GAP
+      },
+      children: /* @__PURE__ */ jsxRuntime.jsx(Icon, { size: 11, strokeWidth: 2.6 })
+    }
+  );
 }
 function OverflowMenu({
   overflowTabs,
@@ -3695,7 +3741,7 @@ function OverflowMenu({
   spec,
   padding
 }) {
-  const [open, setOpen] = React10__namespace.useState(false);
+  const [open, setOpen] = React8__namespace.useState(false);
   if (overflowTabs.length === 0) return null;
   const holdsActive = overflowTabs.some((t) => t.value === activeValue);
   return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: setOpen, children: [
@@ -3768,7 +3814,7 @@ function OverflowMenu({
   ] });
 }
 function UnderlineTrigger({ tab, active, palette, spec, fitted, sliding }) {
-  const [hover, setHover] = React10__namespace.useState(false);
+  const [hover, setHover] = React8__namespace.useState(false);
   const fg = tab.disabled ? palette.fgDisabled : active ? palette.fgActive : hover ? palette.fgHover : palette.fg;
   return /* @__PURE__ */ jsxRuntime.jsxs(
     TabsTrigger,
@@ -3819,7 +3865,7 @@ function UnderlineTrigger({ tab, active, palette, spec, fitted, sliding }) {
   );
 }
 function SegmentedTrigger({ tab, active, palette, spec, fitted, sliding }) {
-  const [hover, setHover] = React10__namespace.useState(false);
+  const [hover, setHover] = React8__namespace.useState(false);
   const fg = tab.disabled ? palette.fgDisabled : active ? palette.segActiveFg : hover ? palette.fgHover : palette.fg;
   return /* @__PURE__ */ jsxRuntime.jsxs(
     TabsTrigger,
@@ -3862,7 +3908,7 @@ function SegmentedTrigger({ tab, active, palette, spec, fitted, sliding }) {
   );
 }
 function PillTrigger({ tab, active, palette, spec, fitted }) {
-  const [hover, setHover] = React10__namespace.useState(false);
+  const [hover, setHover] = React8__namespace.useState(false);
   const bg = active ? palette.pillActiveBg : hover && !tab.disabled ? palette.pillHoverBg : palette.pillBg;
   const border = active ? palette.pillActiveBorder : hover && !tab.disabled ? palette.pillHoverBorder : palette.pillBorder;
   const fg = active ? palette.pillActiveFg : tab.disabled ? palette.fgDisabled : palette.pillFg;
@@ -3902,7 +3948,7 @@ function PillTrigger({ tab, active, palette, spec, fitted }) {
   );
 }
 function VerticalTrigger({ tab, active, palette, spec }) {
-  const [hover, setHover] = React10__namespace.useState(false);
+  const [hover, setHover] = React8__namespace.useState(false);
   const fg = tab.disabled ? palette.fgDisabled : active ? palette.fgActive : hover ? palette.fgHover : palette.fg;
   return /* @__PURE__ */ jsxRuntime.jsxs(
     TabsTrigger,
@@ -3989,12 +4035,13 @@ function DesignTabs({
     syncToUrl
   });
   const useMenu = (overflow === "menu" || visibleTabLimit !== void 0) && variant !== "vertical" && variant !== "pill";
-  const { visibleTabs, overflowTabs } = React10__namespace.useMemo(
+  const { visibleTabs, overflowTabs } = React8__namespace.useMemo(
     () => useMenu ? splitOverflow(tabs, activeValue, visibleTabLimit ?? 2) : { visibleTabs: tabs, overflowTabs: [] },
     [activeValue, tabs, useMenu, visibleTabLimit]
   );
   const scrollable = !useMenu && variant !== "vertical" && variant !== "pill";
   const { ref: scrollRef, edges, scrollBy } = useEdgeScroll(scrollable, activeValue);
+  const hasEdgeOverflow = scrollable && (edges.left || edges.right);
   const slides = variant === "underline" || variant === "segmented";
   const { innerRef, indicator, animate } = useSlidingIndicator(
     slides,
@@ -4124,62 +4171,84 @@ function DesignTabs({
   } else if (variant === "pill") {
     strip = list;
   } else {
-    strip = /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
-      /* @__PURE__ */ jsxRuntime.jsx(
-        "div",
-        {
-          ref: scrollRef,
-          className: cn("overflow-x-auto overflow-y-hidden", SCROLLBAR_HIDDEN),
-          style: { borderBottom: showBottomBorder ? `1px solid ${palette.strip}` : void 0 },
-          children: /* @__PURE__ */ jsxRuntime.jsxs(
+    strip = /* @__PURE__ */ jsxRuntime.jsxs(
+      "div",
+      {
+        className: "flex items-stretch",
+        style: { borderBottom: showBottomBorder ? `1px solid ${palette.strip}` : void 0 },
+        children: [
+          hasEdgeOverflow && /* @__PURE__ */ jsxRuntime.jsx(
+            EdgeControl,
+            {
+              side: "left",
+              palette,
+              disabled: !edges.left,
+              onClick: () => scrollBy(-180)
+            }
+          ),
+          /* @__PURE__ */ jsxRuntime.jsx(
             "div",
             {
-              ref: innerRef,
-              className: "relative flex w-max items-end",
-              style: { gap: spec.gap },
-              children: [
-                /* @__PURE__ */ jsxRuntime.jsx(
-                  "span",
-                  {
-                    "aria-hidden": "true",
-                    className: "pointer-events-none absolute left-0 top-0",
-                    style: {
-                      width: indicator.width,
-                      height: indicator.height,
-                      borderRadius: "7px 7px 0 0",
-                      background: palette.underActiveBg,
-                      opacity: indicator.ready ? 1 : 0,
-                      transform: `translate(${indicator.left}px, ${indicator.top}px)`,
-                      transition: SLIDE_TRANSITION(animate)
-                    }
-                  }
-                ),
-                list,
-                menuNode,
-                /* @__PURE__ */ jsxRuntime.jsx(
-                  "span",
-                  {
-                    "aria-hidden": "true",
-                    className: "pointer-events-none absolute left-0 rounded-full",
-                    style: {
-                      bottom: -1,
-                      height: 3,
-                      width: indicator.width,
-                      background: palette.bar,
-                      opacity: indicator.ready ? 1 : 0,
-                      transform: `translateX(${indicator.left}px)`,
-                      transition: SLIDE_TRANSITION(animate)
-                    }
-                  }
-                )
-              ]
+              ref: scrollRef,
+              className: cn("min-w-0 flex-1 overflow-x-auto overflow-y-hidden", SCROLLBAR_HIDDEN),
+              children: /* @__PURE__ */ jsxRuntime.jsxs(
+                "div",
+                {
+                  ref: innerRef,
+                  className: "relative flex w-max items-end",
+                  style: { gap: spec.gap },
+                  children: [
+                    /* @__PURE__ */ jsxRuntime.jsx(
+                      "span",
+                      {
+                        "aria-hidden": "true",
+                        className: "pointer-events-none absolute left-0 top-0",
+                        style: {
+                          width: indicator.width,
+                          height: indicator.height,
+                          borderRadius: "7px 7px 0 0",
+                          background: palette.underActiveBg,
+                          opacity: indicator.ready ? 1 : 0,
+                          transform: `translate(${indicator.left}px, ${indicator.top}px)`,
+                          transition: SLIDE_TRANSITION(animate)
+                        }
+                      }
+                    ),
+                    list,
+                    menuNode,
+                    /* @__PURE__ */ jsxRuntime.jsx(
+                      "span",
+                      {
+                        "aria-hidden": "true",
+                        className: "pointer-events-none absolute left-0 rounded-full",
+                        style: {
+                          bottom: -1,
+                          height: 3,
+                          width: indicator.width,
+                          background: palette.bar,
+                          opacity: indicator.ready ? 1 : 0,
+                          transform: `translateX(${indicator.left}px)`,
+                          transition: SLIDE_TRANSITION(animate)
+                        }
+                      }
+                    )
+                  ]
+                }
+              )
+            }
+          ),
+          hasEdgeOverflow && /* @__PURE__ */ jsxRuntime.jsx(
+            EdgeControl,
+            {
+              side: "right",
+              palette,
+              disabled: !edges.right,
+              onClick: () => scrollBy(180)
             }
           )
-        }
-      ),
-      scrollable && edges.left && /* @__PURE__ */ jsxRuntime.jsx(EdgeControl, { side: "left", palette, onClick: () => scrollBy(-180) }),
-      scrollable && edges.right && /* @__PURE__ */ jsxRuntime.jsx(EdgeControl, { side: "right", palette, onClick: () => scrollBy(180) })
-    ] });
+        ]
+      }
+    );
   }
   return /* @__PURE__ */ jsxRuntime.jsx(TabsActiveValueContext.Provider, { value: activeValue, children: /* @__PURE__ */ jsxRuntime.jsxs(
     Tabs,
@@ -4206,16 +4275,16 @@ function escapeTabValue(value) {
   return value.replace(/["\\]/g, "\\$&");
 }
 function useTabValue(tabs, value, defaultValue, onChange) {
-  const [uncontrolledValue, setUncontrolledValue] = React10__namespace.useState(
+  const [uncontrolledValue, setUncontrolledValue] = React8__namespace.useState(
     () => getInitialValue(tabs, value, defaultValue)
   );
   const activeValue = value ?? uncontrolledValue;
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (value !== void 0) return;
     if (tabs.some((tab) => tab.value === uncontrolledValue)) return;
     setUncontrolledValue(getInitialValue(tabs, value, defaultValue));
   }, [defaultValue, tabs, uncontrolledValue, value]);
-  const handleChange = React10__namespace.useCallback(
+  const handleChange = React8__namespace.useCallback(
     (nextValue) => {
       if (!tabs.some((tab) => tab.value === nextValue && !tab.disabled)) return;
       if (value === void 0) setUncontrolledValue(nextValue);
@@ -4277,7 +4346,7 @@ function OverflowTabsSelect({
   onChange,
   className
 }) {
-  const [open, setOpen] = React10__namespace.useState(false);
+  const [open, setOpen] = React8__namespace.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
@@ -4356,7 +4425,7 @@ function LineTabsOverflow({
   activeValue,
   onChange
 }) {
-  const [open, setOpen] = React10__namespace.useState(false);
+  const [open, setOpen] = React8__namespace.useState(false);
   if (overflowTabs.length === 0) return null;
   return /* @__PURE__ */ jsxRuntime.jsxs(Popover, { open, onOpenChange: setOpen, children: [
     /* @__PURE__ */ jsxRuntime.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntime.jsxs(
@@ -4449,25 +4518,25 @@ function SecondaryTabs({
   showBottomBorder = true,
   className
 }) {
-  const outerRef = React10__namespace.useRef(null);
-  const measureRef = React10__namespace.useRef(null);
-  const wrapperRef = React10__namespace.useRef(null);
+  const outerRef = React8__namespace.useRef(null);
+  const measureRef = React8__namespace.useRef(null);
+  const wrapperRef = React8__namespace.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [indicator, setIndicator] = React10__namespace.useState({ left: 0, width: 0, ready: false });
-  const [containerWidth, setContainerWidth] = React10__namespace.useState(0);
-  const [tabWidths, setTabWidths] = React10__namespace.useState([]);
-  const [moreButtonWidth, setMoreButtonWidth] = React10__namespace.useState(120);
-  React10__namespace.useLayoutEffect(() => {
+  const [indicator, setIndicator] = React8__namespace.useState({ left: 0, width: 0, ready: false });
+  const [containerWidth, setContainerWidth] = React8__namespace.useState(0);
+  const [tabWidths, setTabWidths] = React8__namespace.useState([]);
+  const [moreButtonWidth, setMoreButtonWidth] = React8__namespace.useState(120);
+  React8__namespace.useLayoutEffect(() => {
     const el = outerRef.current;
     if (!el) return;
     setContainerWidth(el.getBoundingClientRect().width);
   }, []);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     const el = outerRef.current;
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
@@ -4477,7 +4546,7 @@ function SecondaryTabs({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  React10__namespace.useLayoutEffect(() => {
+  React8__namespace.useLayoutEffect(() => {
     if (containerWidth === 0) return;
     const el = measureRef.current;
     if (!el) return;
@@ -4488,7 +4557,7 @@ function SecondaryTabs({
     const moreBtn = el.querySelector("[data-measure-more]");
     if (moreBtn) setMoreButtonWidth(moreBtn.getBoundingClientRect().width);
   }, [containerWidth, tabs, overflowLabel]);
-  const dynamicLimit = React10__namespace.useMemo(() => {
+  const dynamicLimit = React8__namespace.useMemo(() => {
     if (visibleTabLimit !== void 0) return visibleTabLimit;
     if (containerWidth === 0 || tabWidths.length === 0) return void 0;
     const GAP = 8;
@@ -4511,11 +4580,11 @@ function SecondaryTabs({
     }
     return count > 0 ? count : 1;
   }, [visibleTabLimit, containerWidth, tabWidths, tabs, moreButtonWidth]);
-  const { visibleTabs, overflowTabs } = React10__namespace.useMemo(
+  const { visibleTabs, overflowTabs } = React8__namespace.useMemo(
     () => getVisibleTabs(tabs, activeValue, dynamicLimit),
     [activeValue, tabs, dynamicLimit]
   );
-  const measureIndicator = React10__namespace.useCallback(() => {
+  const measureIndicator = React8__namespace.useCallback(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper || !activeValue) return;
     const btn = wrapper.querySelector(
@@ -4533,14 +4602,14 @@ function SecondaryTabs({
       ready: true
     });
   }, [activeValue]);
-  React10__namespace.useLayoutEffect(() => {
+  React8__namespace.useLayoutEffect(() => {
     measureIndicator();
   }, [
     measureIndicator,
     visibleTabs.length,
     visibleTabs.map((t) => t.value + t.label).join("|")
   ]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     window.addEventListener("resize", measureIndicator);
     return () => window.removeEventListener("resize", measureIndicator);
   }, [measureIndicator]);
@@ -4649,19 +4718,19 @@ function TertiaryTabs({
   overflowLabel = "More Options",
   className
 }) {
-  const listRef = React10__namespace.useRef(null);
+  const listRef = React8__namespace.useRef(null);
   const { activeValue, handleChange } = useTabValue(
     tabs,
     value,
     defaultValue,
     onChange
   );
-  const [chip, setChip] = React10__namespace.useState({ left: 0, width: 0, ready: false });
-  const { visibleTabs, overflowTabs } = React10__namespace.useMemo(
+  const [chip, setChip] = React8__namespace.useState({ left: 0, width: 0, ready: false });
+  const { visibleTabs, overflowTabs } = React8__namespace.useMemo(
     () => getVisibleTabs(tabs, activeValue, visibleTabLimit),
     [activeValue, tabs, visibleTabLimit]
   );
-  const measureChip = React10__namespace.useCallback(() => {
+  const measureChip = React8__namespace.useCallback(() => {
     const list = listRef.current;
     if (!list || !activeValue) return;
     const btn = list.querySelector(
@@ -4679,14 +4748,14 @@ function TertiaryTabs({
       ready: true
     });
   }, [activeValue]);
-  React10__namespace.useLayoutEffect(() => {
+  React8__namespace.useLayoutEffect(() => {
     measureChip();
   }, [
     measureChip,
     visibleTabs.length,
     visibleTabs.map((t) => t.value + t.label).join("|")
   ]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     window.addEventListener("resize", measureChip);
     return () => window.removeEventListener("resize", measureChip);
   }, [measureChip]);
@@ -4772,10 +4841,10 @@ function TabPanel({
   children,
   ...rest
 }) {
-  const activeValue = React10__namespace.useContext(TabsActiveValueContext);
+  const activeValue = React8__namespace.useContext(TabsActiveValueContext);
   const isActive = activeValue === value;
-  const [seen, setSeen] = React10__namespace.useState(isActive);
-  React10__namespace.useEffect(() => {
+  const [seen, setSeen] = React8__namespace.useState(isActive);
+  React8__namespace.useEffect(() => {
     if (isActive) setSeen(true);
   }, [isActive]);
   const contextless = activeValue === null;
@@ -4874,24 +4943,24 @@ function Input2({
   resize = "vertical",
   ...rest
 }) {
-  const reactId = React10__namespace.useId();
+  const reactId = React8__namespace.useId();
   const inputId = id ?? reactId;
   const spec = INPUT_SIZES[size];
-  const [focused, setFocused] = React10__namespace.useState(false);
-  const [hovered, setHovered] = React10__namespace.useState(false);
-  const [showPassword, setShowPassword] = React10__namespace.useState(false);
-  const [internalError, setInternalError] = React10__namespace.useState(void 0);
-  const touchedRef = React10__namespace.useRef(false);
+  const [focused, setFocused] = React8__namespace.useState(false);
+  const [hovered, setHovered] = React8__namespace.useState(false);
+  const [showPassword, setShowPassword] = React8__namespace.useState(false);
+  const [internalError, setInternalError] = React8__namespace.useState(void 0);
+  const touchedRef = React8__namespace.useRef(false);
   const isControlled = rest.value !== void 0;
-  const [uncontrolledQuery, setUncontrolledQuery] = React10__namespace.useState(
+  const [uncontrolledQuery, setUncontrolledQuery] = React8__namespace.useState(
     String(rest.defaultValue ?? "")
   );
   const currentValue = isControlled ? String(rest.value ?? "") : uncontrolledQuery;
   const fuseResults = useFuzzySearch(suggestions ?? [], currentValue);
   const showSuggestions = !multiline && !!suggestions?.length && focused && fuseResults.length > 0 && currentValue.trim().length > 0;
-  const wrapperRef = React10__namespace.useRef(null);
-  const inputRef = React10__namespace.useRef(null);
-  const textareaRef = React10__namespace.useRef(null);
+  const wrapperRef = React8__namespace.useRef(null);
+  const inputRef = React8__namespace.useRef(null);
+  const textareaRef = React8__namespace.useRef(null);
   const runValidation = (el) => {
     if (!el.validity.valid) {
       return validationMessage ?? el.validationMessage ?? "Invalid value";
@@ -5358,14 +5427,14 @@ function Radio({
   textColor,
   ...rest
 }) {
-  const reactId = React10__namespace.useId();
+  const reactId = React8__namespace.useId();
   const itemId = id ?? reactId;
-  const itemRef = React10__namespace.useRef(null);
-  const [isChecked, setIsChecked] = React10__namespace.useState(false);
-  React10__namespace.useEffect(() => {
+  const itemRef = React8__namespace.useRef(null);
+  const [isChecked, setIsChecked] = React8__namespace.useState(false);
+  React8__namespace.useEffect(() => {
     validateLabelWordLimit(label, "Radio");
   }, [label]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     const el = itemRef.current;
     if (!el) return;
     setIsChecked(el.dataset.state === "checked");
@@ -5477,7 +5546,7 @@ function RadioGroup({
   textColor,
   readOnly
 }) {
-  const reactId = React10__namespace.useId();
+  const reactId = React8__namespace.useId();
   const groupId = `radio-group-${reactId}`;
   const describedById = error ? `${groupId}-error` : helperText ? `${groupId}-helper` : void 0;
   const gridColsMap = {
@@ -5638,13 +5707,13 @@ function Checkbox({
   textColor,
   ...rest
 }) {
-  const reactId = React10__namespace.useId();
+  const reactId = React8__namespace.useId();
   const itemId = rest.id ?? reactId;
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     validateLabelWordLimit(label, "CustomCheckbox");
   }, [label]);
   const isControlled = checked !== void 0;
-  const [internalChecked, setInternalChecked] = React10__namespace.useState(
+  const [internalChecked, setInternalChecked] = React8__namespace.useState(
     defaultChecked ?? false
   );
   const visualChecked = isControlled ? Boolean(checked) : internalChecked;
@@ -5756,10 +5825,10 @@ function CheckboxGroup({
   textColor,
   readOnly
 }) {
-  const reactId = React10__namespace.useId();
+  const reactId = React8__namespace.useId();
   const groupId = `checkbox-group-${reactId}`;
   const isControlled = value !== void 0;
-  const [internalValue, setInternalValue] = React10__namespace.useState([]);
+  const [internalValue, setInternalValue] = React8__namespace.useState([]);
   const currentValue = isControlled ? value : internalValue;
   const setValue = (next) => {
     if (!isControlled) setInternalValue(next);
@@ -6032,7 +6101,7 @@ function JumpCell({
   height,
   onClick
 }) {
-  const [hovered, setHovered] = React10__namespace.useState(false);
+  const [hovered, setHovered] = React8__namespace.useState(false);
   return /* @__PURE__ */ jsxRuntime.jsx(
     "button",
     {
@@ -6065,9 +6134,9 @@ function makeDayButton({ size }) {
     className,
     ...props
   }) {
-    const ref = React10__namespace.useRef(null);
-    const [hovered, setHovered] = React10__namespace.useState(false);
-    React10__namespace.useEffect(() => {
+    const ref = React8__namespace.useRef(null);
+    const [hovered, setHovered] = React8__namespace.useState(false);
+    React8__namespace.useEffect(() => {
       if (modifiers.focused) ref.current?.focus();
     }, [modifiers.focused]);
     const isEdge = !!(modifiers.range_start || modifiers.range_end);
@@ -6131,17 +6200,17 @@ function DatePickerCalendar({
   onDayMouseEnter,
   onDayMouseLeave
 }) {
-  const today = React10__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const today = React8__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
   const spec = DATEPICKER_SIZES[size];
   const clampedToday = maxDate && today > maxDate ? maxDate : minDate && today < minDate ? minDate : today;
   const initialMonth = defaultMonth ?? (selected instanceof Date ? selected : selected?.from) ?? clampedToday;
-  const [viewMonth, setViewMonth] = React10__namespace.useState(initialMonth);
+  const [viewMonth, setViewMonth] = React8__namespace.useState(initialMonth);
   const focusKey = focusDate ? focusDate.getFullYear() * 100 + focusDate.getMonth() : null;
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (focusKey === null) return;
     setViewMonth(new Date(Math.floor(focusKey / 100), focusKey % 100, 1));
   }, [focusKey]);
-  const yearOptions = React10__namespace.useMemo(
+  const yearOptions = React8__namespace.useMemo(
     () => buildYearOptions(
       today.getFullYear(),
       minDate?.getFullYear(),
@@ -6149,7 +6218,7 @@ function DatePickerCalendar({
     ),
     [today, minDate, maxDate]
   );
-  const monthOptions = React10__namespace.useMemo(() => {
+  const monthOptions = React8__namespace.useMemo(() => {
     const year = viewMonth.getFullYear();
     return MONTH_OPTIONS.map((opt) => {
       const month = Number(opt.value);
@@ -6159,7 +6228,7 @@ function DatePickerCalendar({
   }, [viewMonth, minDate, maxDate]);
   const handleMonthSelect = (val) => setViewMonth((prev) => new Date(prev.getFullYear(), Number(val), 1));
   const handleYearSelect = (val) => setViewMonth((prev) => new Date(Number(val), prev.getMonth(), 1));
-  const DayButtonComponent = React10__namespace.useMemo(() => makeDayButton({ size }), [size]);
+  const DayButtonComponent = React8__namespace.useMemo(() => makeDayButton({ size }), [size]);
   const gridStyle = {
     display: "grid",
     gridTemplateColumns: `repeat(7, ${spec.cell}px)`,
@@ -6278,11 +6347,11 @@ function MonthPickerCalendar({
   onSelect,
   className
 }) {
-  const today = React10__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
-  const [viewYear, setViewYear] = React10__namespace.useState(
+  const today = React8__namespace.useMemo(() => /* @__PURE__ */ new Date(), []);
+  const [viewYear, setViewYear] = React8__namespace.useState(
     selected?.getFullYear() ?? today.getFullYear()
   );
-  const yearOptions = React10__namespace.useMemo(
+  const yearOptions = React8__namespace.useMemo(
     () => buildYearOptions(
       today.getFullYear(),
       minDate?.getFullYear(),
@@ -6378,11 +6447,11 @@ function TimeColumn({
   selected,
   onSelect
 }) {
-  const containerRef = React10__namespace.useRef(null);
-  const settleTimeout = React10__namespace.useRef(
+  const containerRef = React8__namespace.useRef(null);
+  const settleTimeout = React8__namespace.useRef(
     void 0
   );
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     const index = items.findIndex((item) => item.value === selected);
     if (containerRef.current && index >= 0) {
       containerRef.current.scrollTop = index * ITEM_HEIGHT;
@@ -6569,22 +6638,22 @@ function DatePicker({
 }) {
   const isSingleWithTime = mode === "single" && showTime;
   const spec = DATEPICKER_SIZES[size];
-  const [hovered, setHovered] = React10__namespace.useState(false);
-  const [internalOpen, setInternalOpen] = React10__namespace.useState(false);
+  const [hovered, setHovered] = React8__namespace.useState(false);
+  const [internalOpen, setInternalOpen] = React8__namespace.useState(false);
   const open = controlledOpen !== void 0 ? controlledOpen : internalOpen;
-  const setOpen = React10__namespace.useCallback(
+  const setOpen = React8__namespace.useCallback(
     (next) => {
       if (controlledOpen === void 0) setInternalOpen(next);
       onOpenChangeProp?.(next);
     },
     [controlledOpen, onOpenChangeProp]
   );
-  const touchedRef = React10__namespace.useRef(false);
-  const interactedRef = React10__namespace.useRef(false);
-  const isMobileDrawer = React10__namespace.useContext(FilterGroupMobileContext);
-  const registerDrawerCalendar = React10__namespace.useContext(FilterGroupDrawerCalendarContext);
+  const touchedRef = React8__namespace.useRef(false);
+  const interactedRef = React8__namespace.useRef(false);
+  const isMobileDrawer = React8__namespace.useContext(FilterGroupMobileContext);
+  const registerDrawerCalendar = React8__namespace.useContext(FilterGroupDrawerCalendarContext);
   const isControlled = controlledOpen !== void 0;
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!isMobileDrawer || !isControlled || !registerDrawerCalendar) return;
     if (open) {
       registerDrawerCalendar({ mode, value: committed, onChange, onOpenChange: setOpen, minDate, maxDate });
@@ -6595,24 +6664,24 @@ function DatePicker({
       registerDrawerCalendar(null);
     };
   }, [open, isMobileDrawer, isControlled]);
-  const [committed, setCommitted] = React10__namespace.useState(
+  const [committed, setCommitted] = React8__namespace.useState(
     controlledValue !== void 0 ? controlledValue ?? null : null
   );
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (controlledValue !== void 0) setCommitted(controlledValue ?? null);
   }, [controlledValue]);
-  const [pendingFrom, setPendingFrom] = React10__namespace.useState(null);
-  const [draftRange, setDraftRange] = React10__namespace.useState(null);
-  const [hoverDate, setHoverDate] = React10__namespace.useState(null);
-  const [draftSingleDate, setDraftSingleDate] = React10__namespace.useState(
+  const [pendingFrom, setPendingFrom] = React8__namespace.useState(null);
+  const [draftRange, setDraftRange] = React8__namespace.useState(null);
+  const [hoverDate, setHoverDate] = React8__namespace.useState(null);
+  const [draftSingleDate, setDraftSingleDate] = React8__namespace.useState(
     null
   );
-  const [draftTime, setDraftTime] = React10__namespace.useState({
+  const [draftTime, setDraftTime] = React8__namespace.useState({
     hours: (/* @__PURE__ */ new Date()).getHours(),
     minutes: (/* @__PURE__ */ new Date()).getMinutes()
   });
-  const prevOpen = React10__namespace.useRef(false);
-  React10__namespace.useEffect(() => {
+  const prevOpen = React8__namespace.useRef(false);
+  React8__namespace.useEffect(() => {
     if (open && !prevOpen.current) {
       setPendingFrom(null);
       setHoverDate(null);
@@ -6636,13 +6705,13 @@ function DatePicker({
     }
     prevOpen.current = open;
   }, [open, committed, mode, isSingleWithTime]);
-  const calendarDisabled = React10__namespace.useMemo(() => {
+  const calendarDisabled = React8__namespace.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length > 0 ? m : void 0;
   }, [minDate, maxDate]);
-  const triggerLabel = React10__namespace.useMemo(() => {
+  const triggerLabel = React8__namespace.useMemo(() => {
     if (!committed) return null;
     if (mode === "single" && committed instanceof Date)
       return isSingleWithTime ? formatDateTime(committed) : formatDate(committed);
@@ -6652,7 +6721,7 @@ function DatePicker({
       return formatRange(committed.from, committed.to) ?? null;
     return null;
   }, [committed, mode, isSingleWithTime]);
-  const effectiveDisplayRange = React10__namespace.useMemo(() => {
+  const effectiveDisplayRange = React8__namespace.useMemo(() => {
     if (mode !== "range") return null;
     const existingRange = draftRange ?? (isDateRange(committed) ? committed : null);
     if (pendingFrom) {
@@ -6660,7 +6729,7 @@ function DatePicker({
     }
     return existingRange;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const calendarSelected = React10__namespace.useMemo(() => {
+  const calendarSelected = React8__namespace.useMemo(() => {
     if (mode === "single") {
       if (isSingleWithTime) {
         return draftSingleDate ?? (committed instanceof Date ? committed : void 0);
@@ -6669,7 +6738,7 @@ function DatePicker({
     }
     return effectiveDisplayRange ?? void 0;
   }, [mode, committed, effectiveDisplayRange, isSingleWithTime, draftSingleDate]);
-  const footerHint = React10__namespace.useMemo(() => {
+  const footerHint = React8__namespace.useMemo(() => {
     if (!isSingleWithTime) return "";
     return draftSingleDate ? formatDate(draftSingleDate) ?? "" : "No date";
   }, [isSingleWithTime, draftSingleDate]);
@@ -7715,8 +7784,8 @@ function TablePaginationBar({
   jumpThreshold = 20,
   padX
 }) {
-  const [jump, setJump] = React10.useState(String(page));
-  React10.useEffect(() => setJump(String(page)), [page]);
+  const [jump, setJump] = React8.useState(String(page));
+  React8.useEffect(() => setJump(String(page)), [page]);
   const knownTotal = typeof pageCount === "number" && pageCount > 0;
   const go = (next) => {
     const clamped = knownTotal ? Math.min(Math.max(1, next), pageCount) : Math.max(1, next);
@@ -8164,8 +8233,8 @@ function TableErrorState({
 }
 var NO_SORT = { key: null, direction: null };
 function useIsBelowMd(breakpoint = 768) {
-  const [below, setBelow] = React10.useState(false);
-  React10.useEffect(() => {
+  const [below, setBelow] = React8.useState(false);
+  React8.useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
     const media = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
     const sync = () => setBelow(media.matches);
@@ -8214,18 +8283,18 @@ function Table2({
   loadingRows = 6
 }) {
   const spec = TABLE_SIZES[size];
-  const [internalSort, setInternalSort] = React10.useState(
+  const [internalSort, setInternalSort] = React8.useState(
     defaultSort ?? NO_SORT
   );
   const activeSort = sort ?? internalSort;
   const sortKey = activeSort.key;
   const sortDir = activeSort.direction;
-  const columnByKey = React10.useMemo(() => {
+  const columnByKey = React8.useMemo(() => {
     const map = /* @__PURE__ */ new Map();
     columns.forEach((col) => map.set(String(col.key), col));
     return map;
   }, [columns]);
-  const sortedData = React10.useMemo(() => {
+  const sortedData = React8.useMemo(() => {
     if (manualSort || !sortKey || !sortDir) return data;
     const col = columnByKey.get(sortKey);
     if (col?.sortFn) {
@@ -8258,16 +8327,16 @@ function Table2({
     onSortChange?.(next);
   };
   const selectionOn = selectable !== "none";
-  const getKey = React10.useCallback(
+  const getKey = React8.useCallback(
     (row, index) => String(row[keyField] ?? index),
     [keyField]
   );
-  const [internalSelection, setInternalSelection] = React10.useState(
+  const [internalSelection, setInternalSelection] = React8.useState(
     defaultSelectedKeys ?? []
   );
   const selection = selectedKeys ?? internalSelection;
-  const selectionSet = React10.useMemo(() => new Set(selection), [selection]);
-  const commitSelection = React10.useCallback(
+  const selectionSet = React8.useMemo(() => new Set(selection), [selection]);
+  const commitSelection = React8.useCallback(
     (keys) => {
       if (selectedKeys === void 0) setInternalSelection(keys);
       if (onSelectionChange) {
@@ -8280,7 +8349,7 @@ function Table2({
     },
     [selectedKeys, onSelectionChange, sortedData, getKey]
   );
-  const canSelectRow = React10.useCallback(
+  const canSelectRow = React8.useCallback(
     (row) => {
       if (!selectionOn) return false;
       if (getTableRowStateSpec(rowState?.(row)).inert) return false;
@@ -8288,7 +8357,7 @@ function Table2({
     },
     [selectionOn, rowState, isRowSelectable]
   );
-  const selectableKeys = React10.useMemo(
+  const selectableKeys = React8.useMemo(
     () => sortedData.reduce((keys, row, index) => {
       if (canSelectRow(row)) keys.push(getKey(row, index));
       return keys;
@@ -8312,7 +8381,7 @@ function Table2({
     if (selectable !== "multiple") return;
     commitSelection(allSelected ? [] : selectableKeys);
   };
-  const anchorRef = React10.useRef(null);
+  const anchorRef = React8.useRef(null);
   const selectRange = (from, to) => {
     if (selectable !== "multiple") return;
     const [start, end] = from <= to ? [from, to] : [to, from];
@@ -8323,9 +8392,9 @@ function Table2({
     }
     commitSelection([...keys]);
   };
-  const [hoverKey, setHoverKey] = React10.useState(null);
-  const [focusedIndex, setFocusedIndex] = React10.useState(-1);
-  const scrollRef = React10.useRef(null);
+  const [hoverKey, setHoverKey] = React8.useState(null);
+  const [focusedIndex, setFocusedIndex] = React8.useState(-1);
+  const scrollRef = React8.useRef(null);
   const keyboardOn = keyboardNavigation ?? (selectionOn || Boolean(onRowClick));
   const focusRow = (index) => {
     const clamped = Math.min(Math.max(0, index), sortedData.length - 1);
@@ -8408,7 +8477,7 @@ function Table2({
   const isPinned = (colIndex) => stickyFirstColumn && colIndex === 0;
   const showError = Boolean(error);
   const isEmpty = !loading && !showError && sortedData.length === 0;
-  const selectedRows = React10.useMemo(
+  const selectedRows = React8.useMemo(
     () => sortedData.filter((row, index) => selectionSet.has(getKey(row, index))),
     [sortedData, selectionSet, getKey]
   );
@@ -8970,7 +9039,7 @@ var TITLE_TEXT = {
   md: "text-[13px]",
   lg: "text-[14px]"
 };
-var Toggle = React10__namespace.forwardRef(
+var Toggle = React8__namespace.forwardRef(
   ({
     size = "md",
     type = "default",
@@ -8989,7 +9058,7 @@ var Toggle = React10__namespace.forwardRef(
     bgColor,
     ...props
   }, ref) => {
-    const [internalChecked, setInternalChecked] = React10__namespace.useState(defaultChecked ?? false);
+    const [internalChecked, setInternalChecked] = React8__namespace.useState(defaultChecked ?? false);
     const isChecked = checked !== void 0 ? checked : internalChecked;
     const hasCustomColors = !!(borderColor || bgColor);
     const pillStyle = hasCustomColors ? {
@@ -9199,8 +9268,8 @@ var sidebarPersistentVariants = classVarianceAuthority.cva("bg-background border
   }
 });
 function useIsDesktop(breakpoint = 768) {
-  const [isDesktop, setIsDesktop] = React10__namespace.useState(false);
-  React10__namespace.useEffect(() => {
+  const [isDesktop, setIsDesktop] = React8__namespace.useState(false);
+  React8__namespace.useEffect(() => {
     const query = `(min-width: ${breakpoint}px)`;
     const media = window.matchMedia(query);
     const setFromMedia = () => setIsDesktop(media.matches);
@@ -9254,9 +9323,9 @@ function Sidebar({
 }) {
   const isDesktop = useIsDesktop();
   const isControlled = open !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React10__namespace.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React8__namespace.useState(defaultOpen);
   const resolvedOpen = isControlled ? open : uncontrolledOpen;
-  const handleOpenChange = React10__namespace.useCallback(
+  const handleOpenChange = React8__namespace.useCallback(
     (nextOpen) => {
       if (!isControlled) {
         setUncontrolledOpen(nextOpen);
@@ -9265,7 +9334,7 @@ function Sidebar({
     },
     [isControlled, onOpenChange]
   );
-  const customSizeStyle = React10__namespace.useMemo(() => {
+  const customSizeStyle = React8__namespace.useMemo(() => {
     if (sizePercent == null) return {};
     const pct = Math.min(100, Math.max(1, sizePercent));
     if (side === "top" || side === "bottom") {
@@ -9274,7 +9343,7 @@ function Sidebar({
     if (!isDesktop) return { width: "100vw", maxWidth: "100vw" };
     return { width: `${pct}vw`, maxWidth: "100vw" };
   }, [sizePercent, side, isDesktop]);
-  const animDurationStyle = React10__namespace.useMemo(() => {
+  const animDurationStyle = React8__namespace.useMemo(() => {
     if (sizePercent != null) {
       const pct = Math.min(100, Math.max(1, sizePercent));
       return {
@@ -9295,7 +9364,7 @@ function Sidebar({
     };
   }, [size, sizePercent]);
   const shouldRenderPersistent = persistentOnDesktop && isDesktop;
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!resolvedOpen || shouldRenderPersistent || !overlay) return;
     lockBodyScroll();
     return unlockBodyScroll;
@@ -9513,33 +9582,33 @@ function AlertDialog2({
   ...options
 }) {
   const isControlled = openProp !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = React10__namespace.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React8__namespace.useState(defaultOpen);
   const open = isControlled ? openProp : uncontrolledOpen;
-  const [inputValue, setInputValue] = React10__namespace.useState(defaultValue ?? "");
-  const [inputError, setInputError] = React10__namespace.useState(null);
-  const [submitError, setSubmitError] = React10__namespace.useState(null);
-  const [loading, setLoading] = React10__namespace.useState(false);
-  const setOpen = React10__namespace.useCallback(
+  const [inputValue, setInputValue] = React8__namespace.useState(defaultValue ?? "");
+  const [inputError, setInputError] = React8__namespace.useState(null);
+  const [submitError, setSubmitError] = React8__namespace.useState(null);
+  const [loading, setLoading] = React8__namespace.useState(false);
+  const setOpen = React8__namespace.useCallback(
     (next) => {
       if (!isControlled) setUncontrolledOpen(next);
       onOpenChange?.(next);
     },
     [isControlled, onOpenChange]
   );
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!open) return;
     setInputValue(defaultValue ?? "");
     setInputError(null);
     setSubmitError(null);
     setLoading(false);
   }, [open]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!open || !autoCloseMs || loading) return;
     const id = window.setTimeout(() => setOpen(false), autoCloseMs);
     return () => window.clearTimeout(id);
   }, [open, autoCloseMs, loading]);
-  const dismiss = React10__namespace.useCallback(() => setOpen(false), [setOpen]);
-  const confirm = React10__namespace.useCallback(async () => {
+  const dismiss = React8__namespace.useCallback(() => setOpen(false), [setOpen]);
+  const confirm = React8__namespace.useCallback(async () => {
     const validationError = inputValidator?.(inputValue);
     if (validationError) {
       setInputError(validationError);
@@ -9586,23 +9655,23 @@ function AlertDialog2({
     )
   ] });
 }
-var SweetAlertContext = React10__namespace.createContext(null);
+var SweetAlertContext = React8__namespace.createContext(null);
 function useSweetAlert() {
-  const ctx = React10__namespace.useContext(SweetAlertContext);
+  const ctx = React8__namespace.useContext(SweetAlertContext);
   if (!ctx) throw new Error("useSweetAlert must be used inside <SweetAlertProvider>");
   return ctx;
 }
 function SweetAlertProvider({ children }) {
-  const [queue, setQueue] = React10__namespace.useState([]);
-  const counter = React10__namespace.useRef(0);
-  const fire = React10__namespace.useCallback(
+  const [queue, setQueue] = React8__namespace.useState([]);
+  const counter = React8__namespace.useRef(0);
+  const fire = React8__namespace.useCallback(
     (options) => new Promise((resolve) => {
       counter.current += 1;
       setQueue((q) => [...q, { id: counter.current, options, resolve }]);
     }),
     []
   );
-  const ctx = React10__namespace.useMemo(() => ({ fire }), [fire]);
+  const ctx = React8__namespace.useMemo(() => ({ fire }), [fire]);
   return /* @__PURE__ */ jsxRuntime.jsxs(SweetAlertContext.Provider, { value: ctx, children: [
     children,
     queue[0] && /* @__PURE__ */ jsxRuntime.jsx(
@@ -9619,10 +9688,10 @@ function SweetAlertInstance({
   pending,
   onDone
 }) {
-  const [open, setOpen] = React10__namespace.useState(true);
-  const resolvedRef = React10__namespace.useRef(false);
-  const close = React10__namespace.useCallback(() => setOpen(false), []);
-  const handlePreConfirm = React10__namespace.useCallback(
+  const [open, setOpen] = React8__namespace.useState(true);
+  const resolvedRef = React8__namespace.useRef(false);
+  const close = React8__namespace.useCallback(() => setOpen(false), []);
+  const handlePreConfirm = React8__namespace.useCallback(
     async (value) => {
       await pending.options.preConfirm?.(value);
       resolvedRef.current = true;
@@ -9631,7 +9700,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  const handleOpenChange = React10__namespace.useCallback(
+  const handleOpenChange = React8__namespace.useCallback(
     (next) => {
       if (!next && !resolvedRef.current) {
         resolvedRef.current = true;
@@ -9641,7 +9710,7 @@ function SweetAlertInstance({
     },
     [pending, close]
   );
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (!open) {
       const id = window.setTimeout(onDone, 200);
       return () => window.clearTimeout(id);
@@ -9705,8 +9774,8 @@ function Modal({
   bodyClassName,
   modalClassName
 }) {
-  const mouseDownOnBackdropRef = React10__namespace.useRef(false);
-  React10__namespace.useEffect(() => {
+  const mouseDownOnBackdropRef = React8__namespace.useRef(false);
+  React8__namespace.useEffect(() => {
     if (!isOpen) return;
     lockBodyScroll();
     return unlockBodyScroll;
@@ -9978,8 +10047,8 @@ function PageJumper({
   className
 }) {
   const spec = PAGINATION_SIZES[size];
-  const [draft, setDraft] = React10.useState(String(currentPage));
-  React10.useEffect(() => setDraft(String(currentPage)), [currentPage]);
+  const [draft, setDraft] = React8.useState(String(currentPage));
+  React8.useEffect(() => setDraft(String(currentPage)), [currentPage]);
   const commit = () => {
     const next = Number(draft);
     if (Number.isFinite(next) && next > 0) {
@@ -10060,9 +10129,9 @@ function PageSizeSelect({
   className
 }) {
   const spec = PAGINATION_SIZES[size];
-  const [open, setOpen] = React10.useState(false);
-  const rootRef = React10.useRef(null);
-  React10.useEffect(() => {
+  const [open, setOpen] = React8.useState(false);
+  const rootRef = React8.useRef(null);
+  React8.useEffect(() => {
     if (!open) return;
     const onPointerDown = (event) => {
       if (!rootRef.current?.contains(event.target)) setOpen(false);
@@ -10238,11 +10307,11 @@ function Pagination2({
   });
   const isPrevDisabled = disabled || loading || currentPage <= 1;
   const isNextDisabled = disabled || loading || currentPage >= totalPages;
-  const containerRef = React10.useRef(null);
-  const buttonRefs = React10.useRef(/* @__PURE__ */ new Map());
-  const [pill, setPill] = React10.useState(null);
-  const firstRender = React10.useRef(true);
-  React10.useLayoutEffect(() => {
+  const containerRef = React8.useRef(null);
+  const buttonRefs = React8.useRef(/* @__PURE__ */ new Map());
+  const [pill, setPill] = React8.useState(null);
+  const firstRender = React8.useRef(true);
+  React8.useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     const measurePill = (animated) => {
@@ -10686,8 +10755,8 @@ function UengageProvider({ children, className }) {
 // src/assets/uEngage_icon.png
 var uEngage_icon_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPwAAAD7CAYAAABOrvnfAAAEHklEQVR4nO3d0U1jSRCG0WKFSIocCJYcSIoX9mE00uwsxjb4uqv6PyeCEre/rmujGaoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuMTD6gG+8vTy/LF6hku8v761/jnuott5mPjc2w7c7eGeM/HhT9L5PEx69v+sHgDO6Rz7NIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKHIIKnvffXt4fVM+xC8IzQNfquc53yuHoAuNS0uDqy4SGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CGI4CHI4+oB4BJPL88fq2f4zPvr28PqGa5hw8MPdL2IThE87U2LqjPBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDBQxDB34h/0cUEgocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggocggr8h/+vNMd5f3x5Wz3BK59k+87h6ALjEtLC6suEhiOBvzGs9nQkegggeggj+AF7r6UrwEKRt8H4NA7fXNvjpvNbTkeAhiOAPZMvTjeAPJno6aR28L+7gtloHvwtbni4EfyeipwPBQxDB35Etz2rtg9/tizvRs1L74HckelYR/CKiZ4URwe/2Wv+b6Lm3EcHvTPTck+AbED33IvgmRM89jPpsnBLFrt9ZsJ4N31DKxcb9jdskaTHY9tySDd9c2gXHsUZuj9QIbHt+yoYf5Onl+SP1suM2xm4MB/8XW59r2PDD2fpcY/R2cNC/Zvvzt9EHQvDHc2nsZfzDFD2rTLwMfYaHb5q4bMYHP/GWhVXGB18lerjUFsEDl9kmeFseztsm+CrRwzlbBQ98bbvgbXk4bbvgq0QPp2wZfJXo4TPbBg/839bB2/LwX1sHXyV6+NP2wVeJHn6LCL5K9FAVFHyV6CEq+CrRky0u+CrRkysy+CrRkyk2+CrRkyc6+CrRkyU++Kpf0QufBIL/g+jZneD/Inp2JvhPiJ5dCf4En+vZkeDPED47EfyFRM8OBH8F257pBP8Nwmcqwf+A6JlG8D9k2zOJg3qAiX83nO+Zdtnb8Aew9elK8AcSPt04jHfmdX8v0y70UcPuyAUwm+D5MZfAHILnEC6BfqbFXiV4rpBy6UwMGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDb+hd78es6KyZOZAAAAABJRU5ErkJggg==";
 function Loader(_props) {
-  const [mounted, setMounted] = React10__namespace.useState(false);
-  React10__namespace.useEffect(() => {
+  const [mounted, setMounted] = React8__namespace.useState(false);
+  React8__namespace.useEffect(() => {
     setMounted(true);
   }, []);
   if (!mounted) return null;
@@ -10892,7 +10961,7 @@ function AppSidebar({
                     className: "mt-2 flex-1 cursor-pointer overflow-y-auto",
                     children: modules.map((module, index) => {
                       const isActive = module.page === activeModulePage;
-                      return /* @__PURE__ */ jsxRuntime.jsxs(React10__namespace.Fragment, { children: [
+                      return /* @__PURE__ */ jsxRuntime.jsxs(React8__namespace.Fragment, { children: [
                         /* @__PURE__ */ jsxRuntime.jsx(
                           "button",
                           {
@@ -11110,9 +11179,9 @@ function Row({
   const state = item.state ?? "default";
   const disabled = !!item.disabled;
   const tint = getAccordionStateSpec(state, disabled, appearance);
-  const [hover, setHover] = React10__namespace.useState(false);
-  const [seen, setSeen] = React10__namespace.useState(open);
-  React10__namespace.useEffect(() => {
+  const [hover, setHover] = React8__namespace.useState(false);
+  const [seen, setSeen] = React8__namespace.useState(open);
+  React8__namespace.useEffect(() => {
     if (open) setSeen(true);
   }, [open]);
   const tileVisible = (showIconTile ?? spec.showTile) && !!item.icon;
@@ -11346,16 +11415,16 @@ function Accordion(props) {
   const openable = items.filter((i) => !i.disabled).map((i) => i.value);
   const isMultiple = props.type === "multiple";
   const collapsible = props.type === "multiple" ? void 0 : props.collapsible ?? true;
-  const [internalSingle, setInternalSingle] = React10__namespace.useState(
+  const [internalSingle, setInternalSingle] = React8__namespace.useState(
     () => props.type === "multiple" ? "" : props.defaultValue ?? ""
   );
-  const [internalMultiple, setInternalMultiple] = React10__namespace.useState(
+  const [internalMultiple, setInternalMultiple] = React8__namespace.useState(
     () => props.type === "multiple" ? props.defaultValue ?? [] : []
   );
   const singleValue = props.type === "multiple" ? "" : props.value ?? internalSingle;
   const multipleValue = props.type === "multiple" ? props.value ?? internalMultiple : [];
   const openValues = isMultiple ? multipleValue : singleValue ? [singleValue] : [];
-  const allowed = React10__namespace.useCallback(
+  const allowed = React8__namespace.useCallback(
     (next) => {
       if (!onBeforeToggle) return true;
       const opened = next.filter((v) => !openValues.includes(v));
@@ -11512,14 +11581,14 @@ var accordionContentVariants = classVarianceAuthority.cva(
   }
 );
 function findDatePickerInTree(node) {
-  if (!React10__namespace.isValidElement(node)) return null;
+  if (!React8__namespace.isValidElement(node)) return null;
   const props = node.props;
   if (node.type.displayName === "DatePicker" && props.open === void 0) {
     return node;
   }
   const children = props.children;
   if (!children) return null;
-  for (const child of React10__namespace.Children.toArray(children)) {
+  for (const child of React8__namespace.Children.toArray(children)) {
     const found = findDatePickerInTree(child);
     if (found) return found;
   }
@@ -11531,31 +11600,31 @@ function InlineDatePickerPanel({ child }) {
   const minDate = p.minDate;
   const maxDate = p.maxDate;
   const onChange = p.onChange;
-  const [committed, setCommitted] = React10__namespace.useState(
+  const [committed, setCommitted] = React8__namespace.useState(
     p.value ?? null
   );
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (p.value !== void 0) setCommitted(p.value ?? null);
   }, [p.value]);
-  const [pendingFrom, setPendingFrom] = React10__namespace.useState(null);
-  const [draftRange, setDraftRange] = React10__namespace.useState(null);
-  const [hoverDate, setHoverDate] = React10__namespace.useState(null);
+  const [pendingFrom, setPendingFrom] = React8__namespace.useState(null);
+  const [draftRange, setDraftRange] = React8__namespace.useState(null);
+  const [hoverDate, setHoverDate] = React8__namespace.useState(null);
   const isRange = (v) => !!v && typeof v === "object" && "from" in v;
   const orderedRange2 = (a, b) => a <= b ? { from: a, to: b } : { from: b, to: a };
-  const calendarDisabled = React10__namespace.useMemo(() => {
+  const calendarDisabled = React8__namespace.useMemo(() => {
     const m = [];
     if (minDate) m.push({ before: minDate });
     if (maxDate) m.push({ after: maxDate });
     return m.length ? m : void 0;
   }, [minDate, maxDate]);
-  const effectiveRange = React10__namespace.useMemo(() => {
+  const effectiveRange = React8__namespace.useMemo(() => {
     if (mode !== "range") return null;
     const existing = draftRange ?? (isRange(committed) ? committed : null);
     if (pendingFrom)
       return hoverDate ? orderedRange2(pendingFrom, hoverDate) : { from: pendingFrom };
     return existing;
   }, [mode, committed, pendingFrom, draftRange, hoverDate]);
-  const calendarSelected = React10__namespace.useMemo(() => {
+  const calendarSelected = React8__namespace.useMemo(() => {
     if (mode === "single") return committed instanceof Date ? committed : void 0;
     return effectiveRange ?? void 0;
   }, [mode, committed, effectiveRange]);
@@ -11641,10 +11710,10 @@ function FilterGroup({
   drawerClassName,
   forceDrawer = false
 }) {
-  const [open, setOpen] = React10__namespace.useState(false);
-  const [activeIndex, setActiveIndex] = React10__namespace.useState(0);
-  const programmaticClose = React10__namespace.useRef(false);
-  const childArray = React10__namespace.Children.toArray(children);
+  const [open, setOpen] = React8__namespace.useState(false);
+  const [activeIndex, setActiveIndex] = React8__namespace.useState(0);
+  const programmaticClose = React8__namespace.useRef(false);
+  const childArray = React8__namespace.Children.toArray(children);
   const items = childArray.map((child, i) => ({
     label: labels[i] ?? `Filter ${i + 1}`,
     content: child
@@ -11772,7 +11841,7 @@ function FilterGroup({
   ] });
   if (forceDrawer) return drawer;
   return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("hidden sm:flex items-center gap-2 flex-wrap", className), children: items.map((item, i) => /* @__PURE__ */ jsxRuntime.jsx(React10__namespace.Fragment, { children: item.content }, i)) }),
+    /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("hidden sm:flex items-center gap-2 flex-wrap", className), children: items.map((item, i) => /* @__PURE__ */ jsxRuntime.jsx(React8__namespace.Fragment, { children: item.content }, i)) }),
     /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex sm:hidden", children: drawer })
   ] });
 }
@@ -12004,7 +12073,7 @@ var bannerVariants = classVarianceAuthority.cva(
     defaultVariants: { variant: "info", size: "md" }
   }
 );
-var BannerRoot = React10__namespace.forwardRef(
+var BannerRoot = React8__namespace.forwardRef(
   ({ className, variant, size, appearance = "light", style, ...props }, ref) => {
     const spec = BANNER_SIZES[size ?? "md"];
     const palette = getBannerPalette(variant, appearance);
@@ -12029,7 +12098,7 @@ var BannerRoot = React10__namespace.forwardRef(
   }
 );
 BannerRoot.displayName = "Banner";
-var BannerIcon = React10__namespace.forwardRef(
+var BannerIcon = React8__namespace.forwardRef(
   ({ className, style, size = BANNER_SIZES.md.icon, align = "start", ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
     "span",
     {
@@ -12052,7 +12121,7 @@ var BannerIcon = React10__namespace.forwardRef(
   )
 );
 BannerIcon.displayName = "BannerIcon";
-var BannerContent = React10__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+var BannerContent = React8__namespace.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
   "div",
   {
     ref,
@@ -12061,7 +12130,7 @@ var BannerContent = React10__namespace.forwardRef(({ className, ...props }, ref)
   }
 ));
 BannerContent.displayName = "BannerContent";
-var BannerTitle = React10__namespace.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+var BannerTitle = React8__namespace.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
   "span",
   {
     ref,
@@ -12071,7 +12140,7 @@ var BannerTitle = React10__namespace.forwardRef(({ className, style, ...props },
   }
 ));
 BannerTitle.displayName = "BannerTitle";
-var BannerDescription = React10__namespace.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+var BannerDescription = React8__namespace.forwardRef(({ className, style, ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
   "span",
   {
     ref,
@@ -12081,7 +12150,7 @@ var BannerDescription = React10__namespace.forwardRef(({ className, style, ...pr
   }
 ));
 BannerDescription.displayName = "BannerDescription";
-var BannerAction = React10__namespace.forwardRef(({ className, type = "button", ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+var BannerAction = React8__namespace.forwardRef(({ className, type = "button", ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
   "button",
   {
     ref,
@@ -12097,7 +12166,7 @@ var BannerAction = React10__namespace.forwardRef(({ className, type = "button", 
   }
 ));
 BannerAction.displayName = "BannerAction";
-var BannerClose = React10__namespace.forwardRef(({ className, type = "button", "aria-label": ariaLabel = "Dismiss", ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
+var BannerClose = React8__namespace.forwardRef(({ className, type = "button", "aria-label": ariaLabel = "Dismiss", ...props }, ref) => /* @__PURE__ */ jsxRuntime.jsx(
   "button",
   {
     ref,
@@ -12229,7 +12298,7 @@ function ActionNode({
   }
   return /* @__PURE__ */ jsxRuntime.jsx(BannerAction, { onClick, disabled, "aria-label": action["aria-label"], style: buttonStyle, children: label });
 }
-var Banner = React10__namespace.forwardRef(
+var Banner = React8__namespace.forwardRef(
   function Banner2({
     variant,
     tone,
@@ -12276,22 +12345,22 @@ var Banner = React10__namespace.forwardRef(
     const ink = textColor ?? palette.ink;
     const bodyInk = textColor ?? palette.body;
     const iconInk = iconColor ?? palette.icon;
-    const [internalOpen, setInternalOpen] = React10__namespace.useState(true);
-    const [remembered, setRemembered] = React10__namespace.useState(false);
-    React10__namespace.useEffect(() => {
+    const [internalOpen, setInternalOpen] = React8__namespace.useState(true);
+    const [remembered, setRemembered] = React8__namespace.useState(false);
+    React8__namespace.useEffect(() => {
       setRemembered(readDismissed(dismissId));
     }, [dismissId]);
     const isOpen = open ?? (internalOpen && !remembered);
-    const close = React10__namespace.useCallback(() => {
+    const close = React8__namespace.useCallback(() => {
       persistDismissed(dismissId);
       if (open === void 0) setInternalOpen(false);
       onOpenChange?.(false);
       onDismiss?.();
     }, [dismissId, onDismiss, onOpenChange, open]);
-    const closeRef = React10__namespace.useRef(close);
+    const closeRef = React8__namespace.useRef(close);
     closeRef.current = close;
-    const [expiry, setExpiry] = React10__namespace.useState(100);
-    React10__namespace.useEffect(() => {
+    const [expiry, setExpiry] = React8__namespace.useState(100);
+    React8__namespace.useEffect(() => {
       if (!autoDismiss || autoDismiss <= 0 || !isOpen) return;
       const start = Date.now();
       setExpiry(100);
@@ -12712,7 +12781,7 @@ Banner.displayName = "Banner";
 function severity(item) {
   return BANNER_TONE_SEVERITY[toBannerToneKey(item.tone ?? item.variant)];
 }
-var BannerStack = React10__namespace.forwardRef(
+var BannerStack = React8__namespace.forwardRef(
   function BannerStack2({
     banners,
     max = 1,
@@ -12726,13 +12795,13 @@ var BannerStack = React10__namespace.forwardRef(
     style,
     ...rest
   }, ref) {
-    const [expanded, setExpanded] = React10__namespace.useState(false);
-    const [dismissed, setDismissed] = React10__namespace.useState([]);
-    const live = React10__namespace.useMemo(
+    const [expanded, setExpanded] = React8__namespace.useState(false);
+    const [dismissed, setDismissed] = React8__namespace.useState([]);
+    const live = React8__namespace.useMemo(
       () => banners.filter((b) => !dismissed.includes(b.id)),
       [banners, dismissed]
     );
-    const ordered = React10__namespace.useMemo(() => {
+    const ordered = React8__namespace.useMemo(() => {
       if (!sortBySeverity) return live;
       return [...live].sort((a, b) => severity(b) - severity(a));
     }, [live, sortBySeverity]);
@@ -12814,7 +12883,7 @@ var BannerStack = React10__namespace.forwardRef(
   }
 );
 BannerStack.displayName = "BannerStack";
-var SectionContext = React10__namespace.createContext({
+var SectionContext = React8__namespace.createContext({
   collapsible: false,
   isOpen: true,
   divider: false,
@@ -12828,7 +12897,7 @@ function SectionHeader({
   className,
   ...props
 }) {
-  const { collapsible, isOpen, divider } = React10__namespace.useContext(SectionContext);
+  const { collapsible, isOpen, divider } = React8__namespace.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
     /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-1 min-w-0 flex-wrap items-center gap-3", children: [
       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-[11px] min-w-0 pointer-events-none", children: [
@@ -12986,7 +13055,7 @@ function SectionContent({
   children,
   ...props
 }) {
-  const { collapsible, divider, dividerStyle } = React10__namespace.useContext(SectionContext);
+  const { collapsible, divider, dividerStyle } = React8__namespace.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsxRuntime.jsx(
     "div",
     {
@@ -13065,7 +13134,7 @@ function SectionRow({
   ...props
 }) {
   if (dividers) {
-    const items = React10__namespace.Children.toArray(children).filter(Boolean);
+    const items = React8__namespace.Children.toArray(children).filter(Boolean);
     return /* @__PURE__ */ jsxRuntime.jsx(
       "div",
       {
@@ -13074,7 +13143,7 @@ function SectionRow({
         className: cn("flex items-stretch gap-0", className),
         style,
         ...props,
-        children: items.map((child, i) => /* @__PURE__ */ jsxRuntime.jsxs(React10__namespace.Fragment, { children: [
+        children: items.map((child, i) => /* @__PURE__ */ jsxRuntime.jsxs(React8__namespace.Fragment, { children: [
           i > 0 && /* @__PURE__ */ jsxRuntime.jsx(SectionDivider, { orientation: "vertical", className: "mx-5" }),
           /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 min-w-0", children: child })
         ] }, i))
@@ -13124,7 +13193,7 @@ function SectionTableContent({
   children,
   ...props
 }) {
-  const { collapsible } = React10__namespace.useContext(SectionContext);
+  const { collapsible } = React8__namespace.useContext(SectionContext);
   const inner = /* @__PURE__ */ jsxRuntime.jsx(
     "div",
     {
@@ -13149,8 +13218,8 @@ function SectionGroup({
   children,
   ...props
 }) {
-  const [openIndex, setOpenIndex] = React10__namespace.useState(defaultOpen);
-  const items = React10__namespace.Children.toArray(children).filter(Boolean);
+  const [openIndex, setOpenIndex] = React8__namespace.useState(defaultOpen);
+  const items = React8__namespace.Children.toArray(children).filter(Boolean);
   return /* @__PURE__ */ jsxRuntime.jsx(
     "div",
     {
@@ -13158,8 +13227,8 @@ function SectionGroup({
       className: cn("flex flex-col gap-4", className),
       ...props,
       children: items.map((child, i) => {
-        if (!React10__namespace.isValidElement(child)) return child;
-        return React10__namespace.cloneElement(child, {
+        if (!React8__namespace.isValidElement(child)) return child;
+        return React8__namespace.cloneElement(child, {
           key: i,
           collapsible: true,
           open: openIndex === i,
@@ -13185,11 +13254,11 @@ function Section({
   ...props
 }) {
   const isControlled = openProp !== void 0;
-  const [internalOpen, setInternalOpen] = React10__namespace.useState(
+  const [internalOpen, setInternalOpen] = React8__namespace.useState(
     isControlled ? openProp : defaultOpen
   );
   const isOpen = isControlled ? openProp : internalOpen;
-  const handleOpenChange = React10__namespace.useCallback(
+  const handleOpenChange = React8__namespace.useCallback(
     (next) => {
       if (!isControlled) setInternalOpen(next);
       onOpenChange?.(next);
@@ -13783,11 +13852,11 @@ function FileUpload({
   dropzoneClassName,
   inputRef: externalInputRef
 }) {
-  const reactId = React10__namespace.useId();
+  const reactId = React8__namespace.useId();
   const inputId = id ?? reactId;
   const spec = FILE_UPLOAD_SIZES[size] ?? FILE_UPLOAD_SIZES.md;
-  const internalInputRef = React10__namespace.useRef(null);
-  const attachInputRef = React10__namespace.useCallback(
+  const internalInputRef = React8__namespace.useRef(null);
+  const attachInputRef = React8__namespace.useCallback(
     (node) => {
       internalInputRef.current = node;
       if (!externalInputRef) return;
@@ -13799,30 +13868,30 @@ function FileUpload({
     },
     [externalInputRef]
   );
-  const [isDragOver, setIsDragOver] = React10__namespace.useState(false);
-  const [isHover, setIsHover] = React10__namespace.useState(false);
-  const [localFiles, setLocalFiles] = React10__namespace.useState([]);
-  const [validationErrors, setValidationErrors] = React10__namespace.useState([]);
+  const [isDragOver, setIsDragOver] = React8__namespace.useState(false);
+  const [isHover, setIsHover] = React8__namespace.useState(false);
+  const [localFiles, setLocalFiles] = React8__namespace.useState([]);
+  const [validationErrors, setValidationErrors] = React8__namespace.useState([]);
   const isImageVariant = variant === "image" || variant === "avatar" || variant === "gallery";
   const isPreviewVariant = isImageVariant || variant === "video";
-  const normalizedAllowedExts = React10__namespace.useMemo(
+  const normalizedAllowedExts = React8__namespace.useMemo(
     () => allowedFiles?.map((e) => e.startsWith(".") ? e.toLowerCase() : `.${e.toLowerCase()}`),
     [allowedFiles]
   );
   const effectiveAccept = accept ?? (normalizedAllowedExts ? normalizedAllowedExts.join(",") : getDefaultAccept(variant));
-  const chips = React10__namespace.useMemo(() => {
+  const chips = React8__namespace.useMemo(() => {
     if (formats) return formats;
     const derived = [];
     normalizedAllowedExts?.forEach((e) => derived.push(e.replace(".", "").toUpperCase()));
     if (maxSize) derived.push(`Max ${formatBytes(maxSize, 0)}`);
     return derived;
   }, [formats, normalizedAllowedExts, maxSize]);
-  const controlledUrls = React10__namespace.useMemo(() => {
+  const controlledUrls = React8__namespace.useMemo(() => {
     if (!value) return [];
     return Array.isArray(value) ? value.filter(Boolean) : [value].filter(Boolean);
   }, [value]);
   const hasControlledValue = controlledUrls.length > 0;
-  const displayItems = React10__namespace.useMemo(() => {
+  const displayItems = React8__namespace.useMemo(() => {
     const list = [];
     controlledUrls.forEach((url, i) => list.push({ kind: "url", url, index: i }));
     if (showLocalPreview) {
@@ -13832,13 +13901,13 @@ function FileUpload({
     }
     return list;
   }, [controlledUrls, localFiles, showLocalPreview]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     if (hasControlledValue && localFiles.length > 0) {
       localFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
       setLocalFiles([]);
     }
   }, [hasControlledValue]);
-  React10__namespace.useEffect(() => {
+  React8__namespace.useEffect(() => {
     return () => {
       localFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
     };
@@ -13885,7 +13954,7 @@ function FileUpload({
     }
     return { valid, errors };
   };
-  const processFiles = React10__namespace.useCallback(
+  const processFiles = React8__namespace.useCallback(
     (incoming) => {
       const fileArray = Array.from(incoming);
       const { valid, errors } = validateAndFilter(fileArray);
@@ -13943,7 +14012,7 @@ function FileUpload({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [multiple, maxFiles, maxSize, normalizedAllowedExts, displayItems.length, isImageVariant, showLocalPreview, onChange, onFilesChange, onValidationError]
   );
-  const openFilePicker = React10__namespace.useCallback(() => {
+  const openFilePicker = React8__namespace.useCallback(() => {
     if (disabled || readOnly) return;
     internalInputRef.current?.click();
   }, [disabled, readOnly]);
@@ -14012,7 +14081,7 @@ function FileUpload({
   const combinedError = error ?? validationErrors[0];
   const iconSize = ICON_SIZES[size] ?? spec.tileIcon;
   const avatarIconSize = AVATAR_ICON_SIZES[size] ?? 20;
-  const rows = React10__namespace.useMemo(() => {
+  const rows = React8__namespace.useMemo(() => {
     if (items) return items;
     return displayItems.map((item) => {
       if (item.kind === "url") {
