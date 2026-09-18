@@ -56,7 +56,7 @@ export const MENU = {
   /** Menu fades and lifts 4px, 140ms ease-out. */
   motion: "140ms ease-out",
   /** Hover wash on an option row. */
-  optionHover: "#FAFFF7",
+  optionHover: "#E3F1D6",
   /** Selected row: mint fill with a check, never a blue bar. */
   selectedBg: "#DCF3CE",
   selectedInk: "#003C1B",

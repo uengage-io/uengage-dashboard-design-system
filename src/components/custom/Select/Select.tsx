@@ -165,7 +165,6 @@ function Select<TItem = unknown>({
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
   const listRef = React.useRef<HTMLDivElement>(null);
-  /** Value of the row the keyboard highlight currently sits on. */
   const [activeValue, setActiveValue] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -460,41 +459,49 @@ function Select<TItem = unknown>({
     return out;
   }, [visibleOptions]);
 
-  /**
-   * Every row the highlight may land on, top to bottom: the enabled options in
-   * render order, then the "Create …" row when it is showing. Disabled rows are
-   * skipped so ArrowDown never parks on something Enter cannot pick.
-   */
   const navValues = React.useMemo(() => {
     const vals = visibleOptions.filter((o) => !o.disabled).map((o) => o.value);
     if (showCreate) vals.push(CREATE_VALUE);
     return vals;
   }, [visibleOptions, showCreate]);
 
-  /** Keep the highlight on a row that still exists — typing re-filters the list. */
   React.useEffect(() => {
     if (!open) {
       setActiveValue(null);
       return;
     }
+    const picked =
+      resolvedMode === "multi"
+        ? navValues.find((v) => selectedArr.includes(v))
+        : typeof selected === "string" && selected
+          ? selected
+          : undefined;
+    const anchor =
+      picked && navValues.includes(picked) ? picked : (navValues[0] ?? null);
+    setActiveValue(anchor);
+    if (anchor) scrollActiveIntoView(anchor);
+  }, [open]);
+
+  React.useEffect(() => {
+    if (!open) return;
     setActiveValue((cur) =>
       cur && navValues.includes(cur) ? cur : (navValues[0] ?? null),
     );
   }, [open, navValues]);
 
-  /** Bring the highlighted row into view without scrolling the page itself. */
   const scrollActiveIntoView = (val: string) => {
     requestAnimationFrame(() => {
-      listRef.current
-        ?.querySelector<HTMLElement>(`[data-opt-value="${CSS.escape(val)}"]`)
-        ?.scrollIntoView({ block: "nearest" });
+      requestAnimationFrame(() => {
+        listRef.current
+          ?.querySelector<HTMLElement>(`[data-opt-value="${CSS.escape(val)}"]`)
+          ?.scrollIntoView({ block: "nearest" });
+      });
     });
   };
 
   const moveActive = (delta: number) => {
     if (navValues.length === 0) return;
     const cur = activeValue ? navValues.indexOf(activeValue) : -1;
-    // Wrap around at both ends so a long list stays reachable from either side.
     const next =
       cur === -1
         ? delta > 0
@@ -513,13 +520,6 @@ function Select<TItem = unknown>({
     scrollActiveIntoView(val);
   };
 
-  /**
-   * Arrow navigation runs here, in the capture phase on the popover, rather than
-   * inside cmdk: when the select has no search box the focus lands on the popover
-   * itself, so cmdk's own root handler never sees the keystroke. Capturing first
-   * also keeps cmdk from moving the highlight a second time when the search box
-   * does have focus.
-   */
   const handleMenuKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown" || (e.key === "ArrowUp" && !e.altKey)) {
       e.preventDefault();
@@ -535,7 +535,6 @@ function Select<TItem = unknown>({
       e.stopPropagation();
       handleSelect(activeValue);
     } else if (e.key === "ArrowUp" && e.altKey) {
-      // Alt+ArrowUp collapses the menu.
       e.preventDefault();
       e.stopPropagation();
       setOpen(false);
@@ -571,15 +570,14 @@ function Select<TItem = unknown>({
           borderRadius: MENU.optionRadius,
           fontSize: spec.font,
           lineHeight: 1.3,
-          // Inline styles win over the class-based hover, so the keyboard
-          // highlight has to be resolved here too or it would never show.
-          background: checked
-            ? isMulti
-              ? MENU.multiSelectedBg
-              : MENU.selectedBg
-            : active
-              ? MENU.optionHover
-              : "transparent",
+          background:
+            checked && !isMulti
+              ? MENU.selectedBg
+              : active
+                ? MENU.optionHover
+                : checked
+                  ? MENU.multiSelectedBg
+                  : "transparent",
           boxShadow: active && checked ? `inset 0 0 0 1px ${MENU.selectedInk}` : undefined,
           color: checked && !isMulti ? MENU.selectedInk : SELECT_COLORS.value,
           fontWeight: checked && !isMulti ? 600 : 500,
@@ -657,12 +655,9 @@ function Select<TItem = unknown>({
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (disabled || readOnly || loading) return;
-                // With the menu open Enter picks whatever the arrows landed on.
                 if (open && e.key === "Enter" && activeValue) handleSelect(activeValue);
                 else setOpen((o) => !o);
               } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-                // Either arrow opens the menu from the trigger; once open the
-                // popover's own handler walks the highlight up and down.
                 if (!open) {
                   e.preventDefault();
                   if (!disabled && !readOnly && !loading) setOpen(true);
@@ -881,7 +876,6 @@ function Select<TItem = unknown>({
           >
             <style>{MENU_SCROLLBAR_CSS}</style>
             {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
-            {/* The highlight is driven from `activeValue`, so cmdk runs controlled. */}
             <Command
               shouldFilter={false}
               value={activeValue ?? ""}

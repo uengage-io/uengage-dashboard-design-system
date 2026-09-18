@@ -74,6 +74,8 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   const [focused, setFocused] = React.useState(false);
   const [hovered, setHovered] = React.useState(false);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const [activeValue, setActiveValue] = React.useState<string | null>(null);
   const touchedRef = React.useRef(false);
   const debounceRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
@@ -144,8 +146,80 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
   const hasQuery = displayValue.trim().length > 0;
 
+  const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
+  const isRecentsVisible =
+    !isDropdownVisible &&
+    focused &&
+    !hasQuery &&
+    !disabled &&
+    !readOnly &&
+    (recents?.length ?? 0) > 0;
+
+  const navValues = isDropdownVisible
+    ? filteredItems.map((item) => item.value)
+    : isRecentsVisible
+      ? recents!
+      : [];
+
+  const navKey = navValues.join("|");
+
+  React.useEffect(() => {
+    setActiveValue((cur) => (cur && navValues.includes(cur) ? cur : null));
+  }, [navKey]);
+
+  const scrollActiveIntoView = (val: string) => {
+    requestAnimationFrame(() => {
+      panelRef.current
+        ?.querySelector<HTMLElement>(`[data-nav-value="${CSS.escape(val)}"]`)
+        ?.scrollIntoView({ block: "nearest" });
+    });
+  };
+
+  const moveActive = (delta: number) => {
+    if (navValues.length === 0) return;
+    const cur = activeValue ? navValues.indexOf(activeValue) : -1;
+    const next =
+      cur === -1
+        ? delta > 0
+          ? 0
+          : navValues.length - 1
+        : (cur + delta + navValues.length) % navValues.length;
+    const val = navValues[next]!;
+    setActiveValue(val);
+    scrollActiveIntoView(val);
+  };
+
+  const commitActive = () => {
+    if (!activeValue) return false;
+    if (isRecentsVisible) {
+      handleRecentPick(activeValue);
+      setActiveValue(null);
+      return true;
+    }
+    const item = filteredItems.find((i) => i.value === activeValue);
+    if (!item) return false;
+    handleSelect(item);
+    setActiveValue(null);
+    return true;
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (hasDropdown && hasQuery && !dropdownOpen) {
+        e.preventDefault();
+        setDropdownOpen(true);
+        return;
+      }
+      if (navValues.length === 0) return;
+      e.preventDefault();
+      moveActive(e.key === "ArrowDown" ? 1 : -1);
+      return;
+    }
     if (e.key === "Enter") {
+      if (commitActive()) {
+        e.preventDefault();
+        return;
+      }
       if (!hasQuery) {
         onClear?.();
         return;
@@ -157,7 +231,10 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
         setDropdownOpen(false);
       }
     }
-    if (e.key === "Escape") setDropdownOpen(false);
+    if (e.key === "Escape") {
+      setActiveValue(null);
+      setDropdownOpen(false);
+    }
   };
 
   const handleSearchClick = () => {
@@ -218,14 +295,6 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
   const iconColor = getSearchBarIconColor(state);
   const messageColor = getSearchBarMessageColor(state);
 
-  const isDropdownVisible = hasDropdown && dropdownOpen && hasQuery;
-  const isRecentsVisible =
-    !isDropdownVisible &&
-    focused &&
-    !hasQuery &&
-    !disabled &&
-    !readOnly &&
-    (recents?.length ?? 0) > 0;
   // The badge is a hint for an empty field — it goes as soon as there is text.
   const showShortcut = Boolean(shortcut) && !hasQuery && !showClear;
 
@@ -405,6 +474,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
         {isRecentsVisible && (
           <div
+            ref={panelRef}
             className={cn(
               "absolute left-0 top-full z-50 mt-1.5 w-full overflow-hidden",
               dropdownClassName,
@@ -426,18 +496,21 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
             {recents!.map((entry) => (
               <div
                 key={entry}
+                data-nav-value={entry}
                 className="flex items-center transition-colors"
                 style={{
                   gap: 9,
                   padding: "7px 10px",
                   borderRadius: 6,
+                  background:
+                    activeValue === entry
+                      ? SEARCHBAR_COLORS.hoverTint
+                      : "transparent",
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = SEARCHBAR_COLORS.hoverTint;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                }}
+                onMouseEnter={() => setActiveValue(entry)}
+                onMouseLeave={() =>
+                  setActiveValue((cur) => (cur === entry ? null : cur))
+                }
               >
                 <button
                   type="button"
@@ -483,6 +556,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
 
         {isDropdownVisible && (
           <div
+            ref={panelRef}
             className={cn(
               "absolute left-0 top-full z-50 mt-1.5 max-h-48 w-full overflow-y-auto",
               dropdownClassName,
@@ -494,6 +568,7 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
                 <button
                   key={item.value}
                   type="button"
+                  data-nav-value={item.value}
                   className="flex w-full items-center text-left font-medium transition-colors"
                   style={{
                     padding: "7px 10px",
@@ -501,14 +576,15 @@ function SearchBar<T extends string | number = string, TItem = unknown>({
                     fontSize: 11,
                     lineHeight: 1.3,
                     color: SEARCHBAR_COLORS.value,
+                    background:
+                      activeValue === item.value
+                        ? SEARCHBAR_COLORS.hoverTint
+                        : "transparent",
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background =
-                      SEARCHBAR_COLORS.hoverTint;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
+                  onMouseEnter={() => setActiveValue(item.value)}
+                  onMouseLeave={() =>
+                    setActiveValue((cur) => (cur === item.value ? null : cur))
+                  }
                   onClick={() => handleSelect(item)}
                 >
                   {item.label}

@@ -451,7 +451,7 @@ var MENU = {
   background: INPUT_COLORS.surface,
   shadow: "2px 2px 4px rgba(0,0,0,.12)",
   /** Hover wash on an option row. */
-  optionHover: "#FAFFF7",
+  optionHover: "#E3F1D6",
   /** Selected row: mint fill with a check, never a blue bar. */
   selectedBg: "#DCF3CE",
   selectedInk: "#003C1B",
@@ -819,13 +819,22 @@ function Select({
       setActiveValue(null);
       return;
     }
+    const picked = resolvedMode === "multi" ? navValues.find((v) => selectedArr.includes(v)) : typeof selected === "string" && selected ? selected : void 0;
+    const anchor = picked && navValues.includes(picked) ? picked : navValues[0] ?? null;
+    setActiveValue(anchor);
+    if (anchor) scrollActiveIntoView(anchor);
+  }, [open]);
+  React4__namespace.useEffect(() => {
+    if (!open) return;
     setActiveValue(
       (cur) => cur && navValues.includes(cur) ? cur : navValues[0] ?? null
     );
   }, [open, navValues]);
   const scrollActiveIntoView = (val) => {
     requestAnimationFrame(() => {
-      listRef.current?.querySelector(`[data-opt-value="${CSS.escape(val)}"]`)?.scrollIntoView({ block: "nearest" });
+      requestAnimationFrame(() => {
+        listRef.current?.querySelector(`[data-opt-value="${CSS.escape(val)}"]`)?.scrollIntoView({ block: "nearest" });
+      });
     });
   };
   const moveActive = (delta) => {
@@ -890,9 +899,7 @@ function Select({
           borderRadius: MENU.optionRadius,
           fontSize: spec.font,
           lineHeight: 1.3,
-          // Inline styles win over the class-based hover, so the keyboard
-          // highlight has to be resolved here too or it would never show.
-          background: checked ? isMulti ? MENU.multiSelectedBg : MENU.selectedBg : active ? MENU.optionHover : "transparent",
+          background: checked && !isMulti ? MENU.selectedBg : active ? MENU.optionHover : checked ? MENU.multiSelectedBg : "transparent",
           boxShadow: active && checked ? `inset 0 0 0 1px ${MENU.selectedInk}` : void 0,
           color: checked && !isMulti ? MENU.selectedInk : INPUT_COLORS.value,
           fontWeight: checked && !isMulti ? 600 : 500,

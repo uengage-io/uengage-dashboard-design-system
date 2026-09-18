@@ -24,6 +24,8 @@ const TRIGGER_RESET = [
   "disabled:pointer-events-auto",
 ].join(" ");
 
+const EDGE_CONTROL_GAP = 6;
+
 const SCROLLBAR_HIDDEN =
   "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden";
 
@@ -321,39 +323,32 @@ function useEdgeScroll(enabled: boolean, activeValue: string) {
 function EdgeControl({
   side,
   palette,
+  disabled,
   onClick,
 }: {
   side: "left" | "right";
   palette: TabsPalette;
+  disabled: boolean;
   onClick: () => void;
 }) {
   const Icon = side === "left" ? ChevronLeft : ChevronRight;
   return (
-    <>
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 w-11"
-        style={{
-          [side]: 0,
-          background: `linear-gradient(${side === "left" ? "270deg" : "90deg"}, rgba(0,0,0,0), ${palette.surface} 62%)`,
-        }}
-      />
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-hidden="true"
-        onClick={onClick}
-        className="absolute top-1/2 flex h-[22px] w-[22px] -translate-y-1/2 cursor-pointer items-center justify-center rounded-md"
-        style={{
-          [side]: 2,
-          background: palette.surface,
-          border: `1px solid ${palette.strip}`,
-          color: palette.fg,
-        }}
-      >
-        <Icon size={11} strokeWidth={2.6} />
-      </button>
-    </>
+    <button
+      type="button"
+      tabIndex={-1}
+      aria-hidden="true"
+      disabled={disabled}
+      onClick={onClick}
+      className="flex h-[22px] w-[22px] shrink-0 cursor-pointer items-center justify-center self-center rounded-md disabled:cursor-default disabled:opacity-35"
+      style={{
+        background: palette.surface,
+        border: `1px solid ${palette.strip}`,
+        color: palette.fg,
+        [side === "left" ? "marginRight" : "marginLeft"]: EDGE_CONTROL_GAP,
+      }}
+    >
+      <Icon size={11} strokeWidth={2.6} />
+    </button>
   );
 }
 
@@ -762,6 +757,7 @@ export function DesignTabs({
 
   const scrollable = !useMenu && variant !== "vertical" && variant !== "pill";
   const { ref: scrollRef, edges, scrollBy } = useEdgeScroll(scrollable, activeValue);
+  const hasEdgeOverflow = scrollable && (edges.left || edges.right);
 
   // Underline slides a 2px bar; segmented slides the whole selected pill.
   const slides = variant === "underline" || variant === "segmented";
@@ -897,11 +893,21 @@ export function DesignTabs({
   } else {
     // underline
     strip = (
-      <div className="relative">
+      <div
+        className="flex items-stretch"
+        style={{ borderBottom: showBottomBorder ? `1px solid ${palette.strip}` : undefined }}
+      >
+        {hasEdgeOverflow && (
+          <EdgeControl
+            side="left"
+            palette={palette}
+            disabled={!edges.left}
+            onClick={() => scrollBy(-180)}
+          />
+        )}
         <div
           ref={scrollRef}
-          className={cn("overflow-x-auto overflow-y-hidden", SCROLLBAR_HIDDEN)}
-          style={{ borderBottom: showBottomBorder ? `1px solid ${palette.strip}` : undefined }}
+          className={cn("min-w-0 flex-1 overflow-x-auto overflow-y-hidden", SCROLLBAR_HIDDEN)}
         >
           {/* The More menu sits inline, directly after the last tab. */}
           <div
@@ -941,11 +947,13 @@ export function DesignTabs({
             />
           </div>
         </div>
-        {scrollable && edges.left && (
-          <EdgeControl side="left" palette={palette} onClick={() => scrollBy(-180)} />
-        )}
-        {scrollable && edges.right && (
-          <EdgeControl side="right" palette={palette} onClick={() => scrollBy(180)} />
+        {hasEdgeOverflow && (
+          <EdgeControl
+            side="right"
+            palette={palette}
+            disabled={!edges.right}
+            onClick={() => scrollBy(180)}
+          />
         )}
       </div>
     );
