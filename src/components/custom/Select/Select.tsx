@@ -165,6 +165,8 @@ function Select<TItem = unknown>({
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
   const listRef = React.useRef<HTMLDivElement>(null);
+  /** Value of the row the keyboard highlight currently sits on. */
+  const [activeValue, setActiveValue] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     listRef.current?.scrollTo({ top: 0 });
@@ -220,6 +222,11 @@ function Select<TItem = unknown>({
   };
 
   const handleSelect = (val: string) => {
+    if (val === CREATE_VALUE) {
+      onCreate?.(searchQuery.trim());
+      setOpen(false);
+      return;
+    }
     if (resolvedMode === "single") {
       commit(val);
       setOpen(false);
@@ -453,18 +460,105 @@ function Select<TItem = unknown>({
     return out;
   }, [visibleOptions]);
 
+  /**
+   * Every row the highlight may land on, top to bottom: the enabled options in
+   * render order, then the "Create …" row when it is showing. Disabled rows are
+   * skipped so ArrowDown never parks on something Enter cannot pick.
+   */
+  const navValues = React.useMemo(() => {
+    const vals = visibleOptions.filter((o) => !o.disabled).map((o) => o.value);
+    if (showCreate) vals.push(CREATE_VALUE);
+    return vals;
+  }, [visibleOptions, showCreate]);
+
+  /** Keep the highlight on a row that still exists — typing re-filters the list. */
+  React.useEffect(() => {
+    if (!open) {
+      setActiveValue(null);
+      return;
+    }
+    setActiveValue((cur) =>
+      cur && navValues.includes(cur) ? cur : (navValues[0] ?? null),
+    );
+  }, [open, navValues]);
+
+  /** Bring the highlighted row into view without scrolling the page itself. */
+  const scrollActiveIntoView = (val: string) => {
+    requestAnimationFrame(() => {
+      listRef.current
+        ?.querySelector<HTMLElement>(`[data-opt-value="${CSS.escape(val)}"]`)
+        ?.scrollIntoView({ block: "nearest" });
+    });
+  };
+
+  const moveActive = (delta: number) => {
+    if (navValues.length === 0) return;
+    const cur = activeValue ? navValues.indexOf(activeValue) : -1;
+    // Wrap around at both ends so a long list stays reachable from either side.
+    const next =
+      cur === -1
+        ? delta > 0
+          ? 0
+          : navValues.length - 1
+        : (cur + delta + navValues.length) % navValues.length;
+    const val = navValues[next]!;
+    setActiveValue(val);
+    scrollActiveIntoView(val);
+  };
+
+  const jumpActive = (to: "first" | "last") => {
+    if (navValues.length === 0) return;
+    const val = (to === "first" ? navValues[0] : navValues[navValues.length - 1])!;
+    setActiveValue(val);
+    scrollActiveIntoView(val);
+  };
+
+  /**
+   * Arrow navigation runs here, in the capture phase on the popover, rather than
+   * inside cmdk: when the select has no search box the focus lands on the popover
+   * itself, so cmdk's own root handler never sees the keystroke. Capturing first
+   * also keeps cmdk from moving the highlight a second time when the search box
+   * does have focus.
+   */
+  const handleMenuKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown" || (e.key === "ArrowUp" && !e.altKey)) {
+      e.preventDefault();
+      e.stopPropagation();
+      moveActive(e.key === "ArrowDown" ? 1 : -1);
+    } else if (e.key === "Home" || e.key === "End") {
+      e.preventDefault();
+      e.stopPropagation();
+      jumpActive(e.key === "Home" ? "first" : "last");
+    } else if (e.key === "Enter") {
+      if (!activeValue) return;
+      e.preventDefault();
+      e.stopPropagation();
+      handleSelect(activeValue);
+    } else if (e.key === "ArrowUp" && e.altKey) {
+      // Alt+ArrowUp collapses the menu.
+      e.preventDefault();
+      e.stopPropagation();
+      setOpen(false);
+    }
+  };
+
   const renderOption = (option: SelectOption) => {
     const checked = isSelected(option.value);
     const isMulti = resolvedMode === "multi";
     const rich = Boolean(option.description || option.icon);
     const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
+    const active = activeValue === option.value;
 
     return (
       <CommandItem
         key={option.value}
         value={option.value}
+        data-opt-value={option.value}
         disabled={option.disabled}
-        aria-selected={checked}
+        aria-selected={active}
+        onPointerMove={() => {
+          if (!option.disabled) setActiveValue(option.value);
+        }}
         onSelect={() => handleSelect(option.value)}
         className={cn(
           "group/opt cursor-pointer data-[disabled=true]:cursor-not-allowed",
@@ -477,11 +571,16 @@ function Select<TItem = unknown>({
           borderRadius: MENU.optionRadius,
           fontSize: spec.font,
           lineHeight: 1.3,
+          // Inline styles win over the class-based hover, so the keyboard
+          // highlight has to be resolved here too or it would never show.
           background: checked
             ? isMulti
               ? MENU.multiSelectedBg
               : MENU.selectedBg
-            : "transparent",
+            : active
+              ? MENU.optionHover
+              : "transparent",
+          boxShadow: active && checked ? `inset 0 0 0 1px ${MENU.selectedInk}` : undefined,
           color: checked && !isMulti ? MENU.selectedInk : SELECT_COLORS.value,
           fontWeight: checked && !isMulti ? 600 : 500,
           opacity: option.disabled ? 0.55 : 1,
@@ -557,19 +656,19 @@ function Select<TItem = unknown>({
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                if (!disabled && !readOnly && !loading) setOpen((o) => !o);
-              } else if (e.key === "ArrowDown") {
-                // ArrowDown opens the menu (chevron flips up); once open the
-                // Command list owns arrow navigation.
+                if (disabled || readOnly || loading) return;
+                // With the menu open Enter picks whatever the arrows landed on.
+                if (open && e.key === "Enter" && activeValue) handleSelect(activeValue);
+                else setOpen((o) => !o);
+              } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                // Either arrow opens the menu from the trigger; once open the
+                // popover's own handler walks the highlight up and down.
                 if (!open) {
                   e.preventDefault();
                   if (!disabled && !readOnly && !loading) setOpen(true);
-                }
-              } else if (e.key === "ArrowUp") {
-                // ArrowUp collapses the menu (chevron flips back down).
-                if (open) {
+                } else {
                   e.preventDefault();
-                  setOpen(false);
+                  moveActive(e.key === "ArrowDown" ? 1 : -1);
                 }
               } else if (e.key === "Escape") {
                 setOpen(false);
@@ -769,14 +868,7 @@ function Select<TItem = unknown>({
           className="max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none"
           collisionPadding={{ top: 64 }}
           style={{ width: "var(--radix-popover-trigger-width)" }}
-          onKeyDown={(e) => {
-            // Alt+ArrowUp collapses the menu; plain ArrowUp stays with the list
-            // so cmdk can keep moving the highlight.
-            if (e.key === "ArrowUp" && e.altKey) {
-              e.preventDefault();
-              setOpen(false);
-            }
-          }}
+          onKeyDownCapture={handleMenuKeyDown}
         >
           <div
             style={{
@@ -789,7 +881,12 @@ function Select<TItem = unknown>({
           >
             <style>{MENU_SCROLLBAR_CSS}</style>
             {/* shouldFilter={false}: we own filtering via Fuse.js; cmdk must not double-filter */}
-            <Command shouldFilter={false}>
+            {/* The highlight is driven from `activeValue`, so cmdk runs controlled. */}
+            <Command
+              shouldFilter={false}
+              value={activeValue ?? ""}
+              onValueChange={setActiveValue}
+            >
               {searchEnabled && !loading && (
                 <CommandInput
                   placeholder="Search..."
@@ -876,6 +973,9 @@ function Select<TItem = unknown>({
                     {showCreate && (
                       <CommandItem
                         value={CREATE_VALUE}
+                        data-opt-value={CREATE_VALUE}
+                        aria-selected={activeValue === CREATE_VALUE}
+                        onPointerMove={() => setActiveValue(CREATE_VALUE)}
                         onSelect={() => {
                           onCreate?.(query);
                           setOpen(false);
@@ -883,6 +983,8 @@ function Select<TItem = unknown>({
                         className="cursor-pointer"
                         style={{
                           minHeight: spec.option,
+                          background:
+                            activeValue === CREATE_VALUE ? MENU.optionHover : "transparent",
                           gap: SELECT_GAP,
                           padding: "0 10px",
                           marginTop: 4,

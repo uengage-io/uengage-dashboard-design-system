@@ -450,6 +450,8 @@ var MENU = {
   border: `1px solid ${INPUT_COLORS.border}`,
   background: INPUT_COLORS.surface,
   shadow: "2px 2px 4px rgba(0,0,0,.12)",
+  /** Hover wash on an option row. */
+  optionHover: "#FAFFF7",
   /** Selected row: mint fill with a check, never a blue bar. */
   selectedBg: "#DCF3CE",
   selectedInk: "#003C1B",
@@ -627,6 +629,7 @@ function Select({
   const [searchQuery, setSearchQuery] = React4__namespace.useState("");
   const [sortOrder, setSortOrder] = React4__namespace.useState("asc");
   const listRef = React4__namespace.useRef(null);
+  const [activeValue, setActiveValue] = React4__namespace.useState(null);
   React4__namespace.useEffect(() => {
     listRef.current?.scrollTo({ top: 0 });
   }, [sortOrder]);
@@ -662,6 +665,11 @@ function Select({
     onChange?.(next);
   };
   const handleSelect = (val) => {
+    if (val === CREATE_VALUE) {
+      onCreate?.(searchQuery.trim());
+      setOpen(false);
+      return;
+    }
     if (resolvedMode === "single") {
       commit(val);
       setOpen(false);
@@ -801,17 +809,75 @@ function Select({
     }
     return out;
   }, [visibleOptions]);
+  const navValues = React4__namespace.useMemo(() => {
+    const vals = visibleOptions.filter((o) => !o.disabled).map((o) => o.value);
+    if (showCreate) vals.push(CREATE_VALUE);
+    return vals;
+  }, [visibleOptions, showCreate]);
+  React4__namespace.useEffect(() => {
+    if (!open) {
+      setActiveValue(null);
+      return;
+    }
+    setActiveValue(
+      (cur) => cur && navValues.includes(cur) ? cur : navValues[0] ?? null
+    );
+  }, [open, navValues]);
+  const scrollActiveIntoView = (val) => {
+    requestAnimationFrame(() => {
+      listRef.current?.querySelector(`[data-opt-value="${CSS.escape(val)}"]`)?.scrollIntoView({ block: "nearest" });
+    });
+  };
+  const moveActive = (delta) => {
+    if (navValues.length === 0) return;
+    const cur = activeValue ? navValues.indexOf(activeValue) : -1;
+    const next = cur === -1 ? delta > 0 ? 0 : navValues.length - 1 : (cur + delta + navValues.length) % navValues.length;
+    const val = navValues[next];
+    setActiveValue(val);
+    scrollActiveIntoView(val);
+  };
+  const jumpActive = (to) => {
+    if (navValues.length === 0) return;
+    const val = to === "first" ? navValues[0] : navValues[navValues.length - 1];
+    setActiveValue(val);
+    scrollActiveIntoView(val);
+  };
+  const handleMenuKeyDown = (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp" && !e.altKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      moveActive(e.key === "ArrowDown" ? 1 : -1);
+    } else if (e.key === "Home" || e.key === "End") {
+      e.preventDefault();
+      e.stopPropagation();
+      jumpActive(e.key === "Home" ? "first" : "last");
+    } else if (e.key === "Enter") {
+      if (!activeValue) return;
+      e.preventDefault();
+      e.stopPropagation();
+      handleSelect(activeValue);
+    } else if (e.key === "ArrowUp" && e.altKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      setOpen(false);
+    }
+  };
   const renderOption = (option) => {
     const checked = isSelected(option.value);
     const isMulti = resolvedMode === "multi";
     const rich = Boolean(option.description || option.icon);
     const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
+    const active = activeValue === option.value;
     return /* @__PURE__ */ jsxRuntime.jsxs(
       CommandItem,
       {
         value: option.value,
+        "data-opt-value": option.value,
         disabled: option.disabled,
-        "aria-selected": checked,
+        "aria-selected": active,
+        onPointerMove: () => {
+          if (!option.disabled) setActiveValue(option.value);
+        },
         onSelect: () => handleSelect(option.value),
         className: cn(
           "group/opt cursor-pointer data-[disabled=true]:cursor-not-allowed",
@@ -824,7 +890,10 @@ function Select({
           borderRadius: MENU.optionRadius,
           fontSize: spec.font,
           lineHeight: 1.3,
-          background: checked ? isMulti ? MENU.multiSelectedBg : MENU.selectedBg : "transparent",
+          // Inline styles win over the class-based hover, so the keyboard
+          // highlight has to be resolved here too or it would never show.
+          background: checked ? isMulti ? MENU.multiSelectedBg : MENU.selectedBg : active ? MENU.optionHover : "transparent",
+          boxShadow: active && checked ? `inset 0 0 0 1px ${MENU.selectedInk}` : void 0,
           color: checked && !isMulti ? MENU.selectedInk : INPUT_COLORS.value,
           fontWeight: checked && !isMulti ? 600 : 500,
           opacity: option.disabled ? 0.55 : 1
@@ -892,7 +961,17 @@ function Select({
             onKeyDown: (e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                if (!disabled && !readOnly && !loading) setOpen((o) => !o);
+                if (disabled || readOnly || loading) return;
+                if (open && e.key === "Enter" && activeValue) handleSelect(activeValue);
+                else setOpen((o) => !o);
+              } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                if (!open) {
+                  e.preventDefault();
+                  if (!disabled && !readOnly && !loading) setOpen(true);
+                } else {
+                  e.preventDefault();
+                  moveActive(e.key === "ArrowDown" ? 1 : -1);
+                }
               } else if (e.key === "Escape") {
                 setOpen(false);
               }
@@ -1073,6 +1152,7 @@ function Select({
             className: "max-w-[calc(100vw-1rem)] border-0 p-0 shadow-none",
             collisionPadding: { top: 64 },
             style: { width: "var(--radix-popover-trigger-width)" },
+            onKeyDownCapture: handleMenuKeyDown,
             children: /* @__PURE__ */ jsxRuntime.jsxs(
               "div",
               {
@@ -1085,134 +1165,146 @@ function Select({
                 },
                 children: [
                   /* @__PURE__ */ jsxRuntime.jsx("style", { children: MENU_SCROLLBAR_CSS }),
-                  /* @__PURE__ */ jsxRuntime.jsxs(Command, { shouldFilter: false, children: [
-                    searchEnabled && !loading && /* @__PURE__ */ jsxRuntime.jsx(
-                      CommandInput,
-                      {
-                        placeholder: "Search...",
-                        value: searchQuery,
-                        onValueChange: handleSearchChange,
-                        spellCheck,
-                        style: { fontSize: spec.font }
-                      }
-                    ),
-                    resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxRuntime.jsxs(
-                      "div",
-                      {
-                        className: "sticky top-0 z-10 flex items-center justify-between",
-                        style: {
-                          padding: "6px 10px",
-                          background: MENU.background,
-                          borderBottom: `1px solid ${MENU.groupRule}`,
-                          fontSize: spec.font - 2,
-                          color: INPUT_COLORS.message
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "font-semibold", children: [
-                            selectedArr.length,
-                            " selected"
-                          ] }),
-                          /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "flex items-center gap-2", children: [
-                            /* @__PURE__ */ jsxRuntime.jsx(
-                              "button",
-                              {
-                                type: "button",
-                                onClick: () => commit(enabledOptions.map((o) => o.value)),
-                                disabled: allSelected,
-                                className: "font-semibold disabled:opacity-40",
-                                style: { color: MENU.selectedInk },
-                                children: "All"
-                              }
-                            ),
-                            /* @__PURE__ */ jsxRuntime.jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
-                            /* @__PURE__ */ jsxRuntime.jsx(
-                              "button",
-                              {
-                                type: "button",
-                                onClick: () => commit([]),
-                                disabled: selectedArr.length === 0,
-                                className: "font-semibold disabled:opacity-40",
-                                style: { color: INPUT_COLORS.message },
-                                children: "None"
-                              }
-                            )
-                          ] })
-                        ]
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntime.jsx(
-                      CommandList,
-                      {
-                        ref: listRef,
-                        "data-slot": "select-menu-list",
-                        style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
-                        children: loading ? /* @__PURE__ */ jsxRuntime.jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-                          groups.map((group, gi) => /* @__PURE__ */ jsxRuntime.jsxs(
-                            "div",
-                            {
-                              style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
-                              children: [
-                                group.name && /* @__PURE__ */ jsxRuntime.jsx(
-                                  "div",
+                  /* @__PURE__ */ jsxRuntime.jsxs(
+                    Command,
+                    {
+                      shouldFilter: false,
+                      value: activeValue ?? "",
+                      onValueChange: setActiveValue,
+                      children: [
+                        searchEnabled && !loading && /* @__PURE__ */ jsxRuntime.jsx(
+                          CommandInput,
+                          {
+                            placeholder: "Search...",
+                            value: searchQuery,
+                            onValueChange: handleSearchChange,
+                            spellCheck,
+                            style: { fontSize: spec.font }
+                          }
+                        ),
+                        resolvedMode === "multi" && !loading && visibleOptions.length > 0 && /* @__PURE__ */ jsxRuntime.jsxs(
+                          "div",
+                          {
+                            className: "sticky top-0 z-10 flex items-center justify-between",
+                            style: {
+                              padding: "6px 10px",
+                              background: MENU.background,
+                              borderBottom: `1px solid ${MENU.groupRule}`,
+                              fontSize: spec.font - 2,
+                              color: INPUT_COLORS.message
+                            },
+                            children: [
+                              /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "font-semibold", children: [
+                                selectedArr.length,
+                                " selected"
+                              ] }),
+                              /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "flex items-center gap-2", children: [
+                                /* @__PURE__ */ jsxRuntime.jsx(
+                                  "button",
                                   {
-                                    className: "sticky top-0 z-[5] font-semibold uppercase",
-                                    style: {
-                                      padding: "6px 10px 4px",
-                                      background: MENU.background,
-                                      fontSize: 10,
-                                      letterSpacing: "0.09em",
-                                      color: MENU.groupInk
-                                    },
-                                    children: group.name
+                                    type: "button",
+                                    onClick: () => commit(enabledOptions.map((o) => o.value)),
+                                    disabled: allSelected,
+                                    className: "font-semibold disabled:opacity-40",
+                                    style: { color: MENU.selectedInk },
+                                    children: "All"
                                   }
                                 ),
-                                group.options.map(renderOption)
-                              ]
-                            },
-                            group.name ?? `__ungrouped_${gi}`
-                          )),
-                          showCreate && /* @__PURE__ */ jsxRuntime.jsxs(
-                            CommandItem,
-                            {
-                              value: CREATE_VALUE,
-                              onSelect: () => {
-                                onCreate?.(query);
-                                setOpen(false);
-                              },
-                              className: "cursor-pointer",
-                              style: {
-                                minHeight: spec.option,
-                                gap: SELECT_GAP,
-                                padding: "0 10px",
-                                marginTop: 4,
-                                borderTop: `1px solid ${MENU.groupRule}`,
-                                borderRadius: MENU.optionRadius,
-                                fontSize: spec.font,
-                                fontWeight: 600,
-                                color: MENU.selectedInk
-                              },
-                              children: [
-                                /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
-                                /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "truncate", children: [
-                                  "Create \u201C",
-                                  query,
-                                  "\u201D"
-                                ] })
-                              ]
-                            }
-                          ),
-                          showEmpty && /* @__PURE__ */ jsxRuntime.jsx(
-                            "div",
-                            {
-                              className: "flex flex-col items-start gap-1",
-                              style: { padding: "14px 10px", fontSize: spec.font },
-                              children: emptyState ?? /* @__PURE__ */ jsxRuntime.jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
-                            }
-                          )
-                        ] })
-                      }
-                    )
-                  ] })
+                                /* @__PURE__ */ jsxRuntime.jsx("span", { style: { color: MENU.groupRule }, children: "|" }),
+                                /* @__PURE__ */ jsxRuntime.jsx(
+                                  "button",
+                                  {
+                                    type: "button",
+                                    onClick: () => commit([]),
+                                    disabled: selectedArr.length === 0,
+                                    className: "font-semibold disabled:opacity-40",
+                                    style: { color: INPUT_COLORS.message },
+                                    children: "None"
+                                  }
+                                )
+                              ] })
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntime.jsx(
+                          CommandList,
+                          {
+                            ref: listRef,
+                            "data-slot": "select-menu-list",
+                            style: { maxHeight: MENU.maxRows * spec.option + MENU.padding * 2 },
+                            children: loading ? /* @__PURE__ */ jsxRuntime.jsx(LoadingRows, { height: spec.option }) : /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+                              groups.map((group, gi) => /* @__PURE__ */ jsxRuntime.jsxs(
+                                "div",
+                                {
+                                  style: gi > 0 && group.name ? { borderTop: `1px solid ${MENU.groupRule}`, marginTop: 4, paddingTop: 4 } : void 0,
+                                  children: [
+                                    group.name && /* @__PURE__ */ jsxRuntime.jsx(
+                                      "div",
+                                      {
+                                        className: "sticky top-0 z-[5] font-semibold uppercase",
+                                        style: {
+                                          padding: "6px 10px 4px",
+                                          background: MENU.background,
+                                          fontSize: 10,
+                                          letterSpacing: "0.09em",
+                                          color: MENU.groupInk
+                                        },
+                                        children: group.name
+                                      }
+                                    ),
+                                    group.options.map(renderOption)
+                                  ]
+                                },
+                                group.name ?? `__ungrouped_${gi}`
+                              )),
+                              showCreate && /* @__PURE__ */ jsxRuntime.jsxs(
+                                CommandItem,
+                                {
+                                  value: CREATE_VALUE,
+                                  "data-opt-value": CREATE_VALUE,
+                                  "aria-selected": activeValue === CREATE_VALUE,
+                                  onPointerMove: () => setActiveValue(CREATE_VALUE),
+                                  onSelect: () => {
+                                    onCreate?.(query);
+                                    setOpen(false);
+                                  },
+                                  className: "cursor-pointer",
+                                  style: {
+                                    minHeight: spec.option,
+                                    background: activeValue === CREATE_VALUE ? MENU.optionHover : "transparent",
+                                    gap: SELECT_GAP,
+                                    padding: "0 10px",
+                                    marginTop: 4,
+                                    borderTop: `1px solid ${MENU.groupRule}`,
+                                    borderRadius: MENU.optionRadius,
+                                    fontSize: spec.font,
+                                    fontWeight: 600,
+                                    color: MENU.selectedInk
+                                  },
+                                  children: [
+                                    /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Plus, { size: 14, strokeWidth: 2.4, className: "shrink-0" }),
+                                    /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "truncate", children: [
+                                      "Create \u201C",
+                                      query,
+                                      "\u201D"
+                                    ] })
+                                  ]
+                                }
+                              ),
+                              showEmpty && /* @__PURE__ */ jsxRuntime.jsx(
+                                "div",
+                                {
+                                  className: "flex flex-col items-start gap-1",
+                                  style: { padding: "14px 10px", fontSize: spec.font },
+                                  children: emptyState ?? /* @__PURE__ */ jsxRuntime.jsx("span", { style: { color: INPUT_COLORS.message }, children: "No results found." })
+                                }
+                              )
+                            ] })
+                          }
+                        )
+                      ]
+                    }
+                  )
                 ]
               }
             )
