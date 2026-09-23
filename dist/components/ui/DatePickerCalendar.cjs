@@ -381,6 +381,20 @@ function Select({
     if (controlledValue !== void 0) setSelected(controlledValue);
   }, [controlledValue]);
   const selectedArr = mode === "multi" ? Array.isArray(selected) ? selected : [] : [];
+  const [pinnedValues, setPinnedValues] = React4__namespace.useState(
+    () => /* @__PURE__ */ new Set()
+  );
+  React4__namespace.useLayoutEffect(() => {
+    if (open && mode === "multi") setPinnedValues(new Set(selectedArr));
+  }, [open, mode]);
+  const pinningActive = mode === "multi" && pinnedValues.size > 0 && !searchQuery.trim();
+  const orderedOptions = React4__namespace.useMemo(() => {
+    if (!pinningActive) return visibleOptions;
+    const pinned = visibleOptions.filter((o) => pinnedValues.has(o.value));
+    const rest = visibleOptions.filter((o) => !pinnedValues.has(o.value));
+    return [...pinned, ...rest];
+  }, [pinningActive, visibleOptions, pinnedValues]);
+  const pinnedCount = pinningActive ? orderedOptions.filter((o) => pinnedValues.has(o.value)).length : 0;
   const enabledOptions = sortedOptions.filter((o) => !o.disabled);
   const allSelected = enabledOptions.length > 0 && enabledOptions.every((o) => selectedArr.includes(o.value));
   const isSelected = (val) => mode === "single" ? selected === val : selectedArr.includes(val);
@@ -668,9 +682,10 @@ function Select({
                   ]
                 }
               ),
-              visibleOptions.map((option) => {
+              orderedOptions.map((option, idx) => {
                 const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
                 const displayIndex = originalIdx + 1;
+                const isLastPinned = pinnedCount > 0 && idx === pinnedCount - 1 && pinnedCount < orderedOptions.length;
                 return /* @__PURE__ */ jsxRuntime.jsxs(
                   CommandItem,
                   {
@@ -680,7 +695,8 @@ function Select({
                     onSelect: () => handleSelect(option.value),
                     className: cn(
                       "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
-                      commandItemSizeClass
+                      commandItemSizeClass,
+                      isLastPinned && "border-b border-[#E5E7EB]"
                     ),
                     children: [
                       mode === "multi" && /* @__PURE__ */ jsxRuntime.jsx(CheckboxIcon, { checked: isSelected(option.value) }),
