@@ -121,6 +121,33 @@ function Select<TItem = unknown>({
   const selectedArr: string[] =
     mode === "multi" ? (Array.isArray(selected) ? selected : []) : [];
 
+  // ── Pin selected options to the top (multi mode) ──────────────────────
+  // Snapshot of the selection taken when the dropdown opens. Those options are
+  // listed first so they can be unselected without scrolling the whole list.
+  // Frozen for the open session so toggling doesn't make items jump around.
+  const [pinnedValues, setPinnedValues] = React.useState<Set<string>>(
+    () => new Set(),
+  );
+
+  React.useLayoutEffect(() => {
+    if (open && mode === "multi") setPinnedValues(new Set(selectedArr));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, mode]);
+
+  const pinningActive =
+    mode === "multi" && pinnedValues.size > 0 && !searchQuery.trim();
+
+  const orderedOptions = React.useMemo<SelectOption[]>(() => {
+    if (!pinningActive) return visibleOptions;
+    const pinned = visibleOptions.filter((o) => pinnedValues.has(o.value));
+    const rest = visibleOptions.filter((o) => !pinnedValues.has(o.value));
+    return [...pinned, ...rest];
+  }, [pinningActive, visibleOptions, pinnedValues]);
+
+  const pinnedCount = pinningActive
+    ? orderedOptions.filter((o) => pinnedValues.has(o.value)).length
+    : 0;
+
   const enabledOptions = sortedOptions.filter((o) => !o.disabled);
   const allSelected =
     enabledOptions.length > 0 &&
@@ -488,9 +515,13 @@ function Select<TItem = unknown>({
                 </CommandItem>
               )}
 
-              {visibleOptions.map((option) => {
+              {orderedOptions.map((option, idx) => {
                 const originalIdx = sortedOptions.findIndex((o) => o.value === option.value);
                 const displayIndex = originalIdx + 1;
+                const isLastPinned =
+                  pinnedCount > 0 &&
+                  idx === pinnedCount - 1 &&
+                  pinnedCount < orderedOptions.length;
                 return (
                   <CommandItem
                     key={option.value}
@@ -501,6 +532,7 @@ function Select<TItem = unknown>({
                     className={cn(
                       "hover:bg-[#E6F4EA] data-[selected=true]:bg-[#E6F4EA]",
                       commandItemSizeClass,
+                      isLastPinned && "border-b border-[#E5E7EB]",
                     )}
                   >
                     {mode === "multi" && (
