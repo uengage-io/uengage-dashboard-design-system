@@ -426,10 +426,23 @@ function Select({
     commit(mode === "multi" ? [] : "");
   };
   const pillsContainerRef = React4__namespace.useRef(null);
+  const badgeMeasureRef = React4__namespace.useRef(null);
+  const measuredWidthRef = React4__namespace.useRef(-1);
   const [visibleCount, setVisibleCount] = React4__namespace.useState(null);
   React4__namespace.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
-  }, [selectedArr.join(","), mode]);
+  }, [selectedArr.join(","), resolvedOptions.length, mode]);
+  React4__namespace.useEffect(() => {
+    const container = pillsContainerRef.current;
+    if (!container || mode !== "multi" || typeof ResizeObserver === "undefined")
+      return;
+    const ro = new ResizeObserver(() => {
+      if (container.clientWidth !== measuredWidthRef.current)
+        setVisibleCount(null);
+    });
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [mode]);
   React4__namespace.useLayoutEffect(() => {
     if (visibleCount !== null) return;
     const container = pillsContainerRef.current;
@@ -437,18 +450,25 @@ function Select({
       setVisibleCount(selectedArr.length);
       return;
     }
-    const containerRight = container.getBoundingClientRect().right;
+    const containerWidth = container.clientWidth;
+    measuredWidthRef.current = containerWidth;
     const pills = Array.from(
       container.querySelectorAll("[data-pill]")
     );
-    const BADGE_RESERVE = 40;
+    if (containerWidth === 0 || pills.length === 0) {
+      setVisibleCount(Math.min(1, selectedArr.length));
+      return;
+    }
+    const GAP = 4;
+    const badgeReserve = (badgeMeasureRef.current?.offsetWidth ?? 32) + GAP;
+    const originLeft = pills[0].offsetLeft;
     let count = pills.length;
     for (let i = 0; i < pills.length; i++) {
-      const pillRight = pills[i].getBoundingClientRect().right;
+      const pillRight = pills[i].offsetLeft - originLeft + pills[i].offsetWidth;
       const hasMore = i < pills.length - 1;
-      const limit = hasMore ? containerRight - BADGE_RESERVE : containerRight;
+      const limit = hasMore ? containerWidth - badgeReserve : containerWidth;
       if (pillRight > limit) {
-        count = i === 0 ? 1 : i;
+        count = Math.max(1, i);
         break;
       }
     }
@@ -578,6 +598,18 @@ function Select({
                       val
                     );
                   }),
+                  visibleCount === null && /* @__PURE__ */ jsxRuntime.jsxs(
+                    "span",
+                    {
+                      ref: badgeMeasureRef,
+                      "aria-hidden": true,
+                      className: "invisible absolute inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold min-w-[22px]",
+                      children: [
+                        "+",
+                        selectedArr.length
+                      ]
+                    }
+                  ),
                   overflowCount > 0 && /* @__PURE__ */ jsxRuntime.jsxs("span", { className: "inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]", children: [
                     "+",
                     overflowCount

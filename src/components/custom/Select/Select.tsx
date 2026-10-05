@@ -196,13 +196,31 @@ function Select<TItem = unknown>({
   // Two-pass approach so the +N badge is always visible:
   //   Pass 1 (null)  – all pills render with no badge; layout effect measures them.
   //   Pass 2 (number) – only the fitting pills + badge render; no ghost pills taking space.
+  // A ResizeObserver re-runs pass 1 whenever the container width changes, so a
+  // measurement taken before layout settled (0px wide, inside a dialog, etc.)
+  // doesn't leave the trigger stuck showing a single pill.
   const pillsContainerRef = React.useRef<HTMLDivElement>(null);
+  const badgeMeasureRef = React.useRef<HTMLSpanElement>(null);
+  const measuredWidthRef = React.useRef(-1);
   const [visibleCount, setVisibleCount] = React.useState<number | null>(null);
 
-  // When selection changes, reset to measuring pass.
+  // When selection / options change, reset to measuring pass.
   React.useLayoutEffect(() => {
     if (mode === "multi") setVisibleCount(null);
-  }, [selectedArr.join(","), mode]);
+  }, [selectedArr.join(","), resolvedOptions.length, mode]);
+
+  // Re-measure when the container is resized.
+  React.useEffect(() => {
+    const container = pillsContainerRef.current;
+    if (!container || mode !== "multi" || typeof ResizeObserver === "undefined")
+      return;
+    const ro = new ResizeObserver(() => {
+      if (container.clientWidth !== measuredWidthRef.current)
+        setVisibleCount(null);
+    });
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [mode]);
 
   // During measuring pass: compute how many pills fit.
   React.useLayoutEffect(() => {
@@ -214,19 +232,30 @@ function Select<TItem = unknown>({
       return;
     }
 
-    const containerRight = container.getBoundingClientRect().right;
+    const containerWidth = container.clientWidth;
+    measuredWidthRef.current = containerWidth;
     const pills = Array.from(
       container.querySelectorAll<HTMLElement>("[data-pill]"),
     );
-    const BADGE_RESERVE = 40;
+    if (containerWidth === 0 || pills.length === 0) {
+      // Not laid out yet — the ResizeObserver will trigger a re-measure.
+      setVisibleCount(Math.min(1, selectedArr.length));
+      return;
+    }
 
+    const GAP = 4; // gap-1
+    const badgeReserve = (badgeMeasureRef.current?.offsetWidth ?? 32) + GAP;
+
+    // offsetLeft/offsetWidth are layout values, unaffected by CSS transforms
+    // (e.g. a dialog's zoom-in animation) that skew getBoundingClientRect.
+    const originLeft = pills[0]!.offsetLeft;
     let count = pills.length;
     for (let i = 0; i < pills.length; i++) {
-      const pillRight = pills[i]!.getBoundingClientRect().right;
+      const pillRight = pills[i]!.offsetLeft - originLeft + pills[i]!.offsetWidth;
       const hasMore = i < pills.length - 1;
-      const limit = hasMore ? containerRight - BADGE_RESERVE : containerRight;
+      const limit = hasMore ? containerWidth - badgeReserve : containerWidth;
       if (pillRight > limit) {
-        count = i === 0 ? 1 : i;
+        count = Math.max(1, i);
         break;
       }
     }
@@ -404,6 +433,15 @@ function Select<TItem = unknown>({
                         </span>
                       );
                     })}
+                    {visibleCount === null && (
+                      <span
+                        ref={badgeMeasureRef}
+                        aria-hidden
+                        className="invisible absolute inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold min-w-[22px]"
+                      >
+                        +{selectedArr.length}
+                      </span>
+                    )}
                     {overflowCount > 0 && (
                       <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#4B5563] px-1.5 py-0.5 text-[11px] font-semibold text-white min-w-[22px]">
                         +{overflowCount}
