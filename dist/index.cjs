@@ -1462,6 +1462,7 @@ function SearchBar({
               isDropdownVisible && /* @__PURE__ */ jsxRuntime.jsx(
                 "div",
                 {
+                  onMouseDown: (e) => e.preventDefault(),
                   className: cn(
                     "absolute left-0 top-full z-50 mt-1 w-full overflow-y-auto rounded-md border border-[#E5E7EB] bg-white shadow-lg max-h-48",
                     dropdownClassName
