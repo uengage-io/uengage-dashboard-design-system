@@ -73,12 +73,23 @@ export function Pagination({
   loadMoreLabel,
 }: CustomPaginationProps) {
   const spec = PAGINATION_SIZES[size];
-  const pages = usePagination({
+
+  /* ── Fit to width ─────────────────────────────────────────────────────── */
+
+  // A phone cannot hold the full row, and wrapping it onto two lines reads as
+  // two controls. Instead the row sheds pieces until it fits:
+  // 0 as configured → 1 no first/last → 2 no siblings → 3 prev · current · next.
+  const [fitLevel, setFitLevel] = useState(0);
+  const showEnds = showFirstLast && fitLevel < 1;
+  const fitSiblings = fitLevel >= 2 ? 0 : siblingCount;
+
+  const allPages = usePagination({
     currentPage,
     totalPages,
-    siblingCount,
+    siblingCount: fitSiblings,
     boundaryCount,
   });
+  const pages = fitLevel >= 3 ? [currentPage] : allPages;
 
   const isPrevDisabled = disabled || loading || currentPage <= 1;
   const isNextDisabled = disabled || loading || currentPage >= totalPages;
@@ -118,7 +129,39 @@ export function Pagination({
     const observer = new ResizeObserver(() => measurePill(false));
     observer.observe(container);
     return () => observer.disconnect();
-  }, [currentPage, totalPages, siblingCount, boundaryCount, size, variant]);
+  }, [currentPage, totalPages, siblingCount, boundaryCount, size, variant, fitLevel]);
+
+  // Runs before paint, so stepping down never flashes the wrapped row.
+  useLayoutEffect(() => {
+    const list = containerRef.current;
+    const row = list?.parentElement;
+    if (!list || !row) return;
+    const cs = getComputedStyle(row);
+    const room =
+      row.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    if (list.scrollWidth > room + 0.5 && fitLevel < 3) setFitLevel(fitLevel + 1);
+  });
+
+  // When the row gets wider (or the page numbers change length), start again
+  // from the full row and let the effect above step down as far as needed.
+  const lastRowWidth = useRef(0);
+  useLayoutEffect(() => {
+    const row = containerRef.current?.parentElement;
+    if (!row) return;
+    // Seeded so the observer's first callback does not undo the initial fit.
+    lastRowWidth.current = row.clientWidth;
+    const observer = new ResizeObserver(() => {
+      const w = row.clientWidth;
+      if (w > lastRowWidth.current) setFitLevel(0);
+      lastRowWidth.current = w;
+    });
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [variant]);
+
+  useLayoutEffect(() => {
+    setFitLevel(0);
+  }, [currentPage, totalPages, siblingCount, boundaryCount, showFirstLast, size]);
 
   /* ── Derived state ────────────────────────────────────────────────────── */
 
@@ -434,7 +477,7 @@ export function Pagination({
       aria-label="Pagination"
       onKeyDown={handleKeyDown}
       className={cn(
-        "flex w-full flex-wrap items-center gap-[14px]",
+        "flex w-full min-w-0 flex-wrap items-center gap-[14px]",
         alignClass[resolvedAlign],
         // The bare control keeps its original centred layout.
         !hasLeading && !attached && "mx-auto",
@@ -450,7 +493,7 @@ export function Pagination({
 
       <PaginationContent
         ref={containerRef as React.Ref<HTMLUListElement>}
-        className="relative flex flex-row flex-wrap items-center justify-center"
+        className="relative flex flex-row flex-nowrap items-center justify-center"
         style={{
           gap: spec.gap,
           marginLeft: hasLeading ? "auto" : undefined,
@@ -479,7 +522,7 @@ export function Pagination({
           />
         )}
 
-        {showFirstLast && (
+        {showEnds && (
           <PaginationItem>
             <button
               type="button"
@@ -582,7 +625,7 @@ export function Pagination({
           </button>
         </PaginationItem>
 
-        {showFirstLast && (
+        {showEnds && (
           <PaginationItem>
             <button
               type="button"
