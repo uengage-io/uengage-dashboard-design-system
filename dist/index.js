@@ -776,7 +776,15 @@ function TopHeader({
           "div",
           {
             "data-slot": "top-header-row",
-            className: "flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2 py-[7px]",
+            className: cn(
+              "flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2 py-[7px]",
+              // Tabs as the title: the strip sits on the divider and the actions keep
+              // their breathing room above it — the tabs are barely taller than an
+              // sm button, so centring them would park the buttons on the line.
+              "[&:has(>[data-slot=top-header-title]_[data-slot=tabs])]:items-end",
+              "[&:has(>[data-slot=top-header-title]_[data-slot=tabs])]:pb-0",
+              "[&:has(>[data-slot=top-header-title]_[data-slot=tabs])>[data-slot=top-header-action]]:pb-[7px]"
+            ),
             children: [
               /* @__PURE__ */ jsxs(
                 "div",
@@ -10274,12 +10282,16 @@ function Pagination2({
   loadMoreLabel
 }) {
   const spec = PAGINATION_SIZES[size];
-  const pages = usePagination({
+  const [fitLevel, setFitLevel] = useState(0);
+  const showEnds = showFirstLast && fitLevel < 1;
+  const fitSiblings = fitLevel >= 2 ? 0 : siblingCount;
+  const allPages = usePagination({
     currentPage,
     totalPages,
-    siblingCount,
+    siblingCount: fitSiblings,
     boundaryCount
   });
+  const pages = fitLevel >= 3 ? [currentPage] : allPages;
   const isPrevDisabled = disabled || loading || currentPage <= 1;
   const isNextDisabled = disabled || loading || currentPage >= totalPages;
   const containerRef = useRef(null);
@@ -10311,7 +10323,31 @@ function Pagination2({
     const observer = new ResizeObserver(() => measurePill(false));
     observer.observe(container);
     return () => observer.disconnect();
-  }, [currentPage, totalPages, siblingCount, boundaryCount, size, variant]);
+  }, [currentPage, totalPages, siblingCount, boundaryCount, size, variant, fitLevel]);
+  useLayoutEffect(() => {
+    const list = containerRef.current;
+    const row = list?.parentElement;
+    if (!list || !row) return;
+    const cs = getComputedStyle(row);
+    const room = row.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    if (list.scrollWidth > room + 0.5 && fitLevel < 3) setFitLevel(fitLevel + 1);
+  });
+  const lastRowWidth = useRef(0);
+  useLayoutEffect(() => {
+    const row = containerRef.current?.parentElement;
+    if (!row) return;
+    lastRowWidth.current = row.clientWidth;
+    const observer = new ResizeObserver(() => {
+      const w = row.clientWidth;
+      if (w > lastRowWidth.current) setFitLevel(0);
+      lastRowWidth.current = w;
+    });
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [variant]);
+  useLayoutEffect(() => {
+    setFitLevel(0);
+  }, [currentPage, totalPages, siblingCount, boundaryCount, showFirstLast, size]);
   const goTo = (page) => {
     if (disabled || loading) return;
     const next = Math.min(Math.max(1, page), Math.max(1, totalPages));
@@ -10574,7 +10610,7 @@ function Pagination2({
       "aria-label": "Pagination",
       onKeyDown: handleKeyDown,
       className: cn(
-        "flex w-full flex-wrap items-center gap-[14px]",
+        "flex w-full min-w-0 flex-wrap items-center gap-[14px]",
         alignClass3[resolvedAlign],
         // The bare control keeps its original centred layout.
         !hasLeading && !attached && "mx-auto",
@@ -10591,7 +10627,7 @@ function Pagination2({
           PaginationContent,
           {
             ref: containerRef,
-            className: "relative flex flex-row flex-wrap items-center justify-center",
+            className: "relative flex flex-row flex-nowrap items-center justify-center",
             style: {
               gap: spec.gap,
               marginLeft: hasLeading ? "auto" : void 0
@@ -10616,7 +10652,7 @@ function Pagination2({
                   }
                 }
               ),
-              showFirstLast && /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
+              showEnds && /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
                 "button",
                 {
                   type: "button",
@@ -10702,7 +10738,7 @@ function Pagination2({
                   children: /* @__PURE__ */ jsx(ChevronRight, { size: spec.icon, strokeWidth: 2.4 })
                 }
               ) }),
-              showFirstLast && /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
+              showEnds && /* @__PURE__ */ jsx(PaginationItem, { children: /* @__PURE__ */ jsx(
                 "button",
                 {
                   type: "button",
