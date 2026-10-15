@@ -38,15 +38,8 @@ function TopHeader({
     >
       <div
         data-slot="top-header-row"
-        className={cn(
-          "flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2 py-[7px]",
-          // Tabs as the title: the strip sits on the divider and the actions keep
-          // their breathing room above it — the tabs are barely taller than an
-          // sm button, so centring them would park the buttons on the line.
-          "[&:has(>[data-slot=top-header-title]_[data-slot=tabs])]:items-end",
-          "[&:has(>[data-slot=top-header-title]_[data-slot=tabs])]:pb-0",
-          "[&:has(>[data-slot=top-header-title]_[data-slot=tabs])>[data-slot=top-header-action]]:pb-[7px]",
-        )}
+        // Tabs as the title get their own alignment — see globals.css.
+        className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2 py-[7px]"
       >
         {/* Title + helper — grows to fill available space, wraps action below when tight */}
         <div

@@ -203,6 +203,20 @@
   to   { opacity: 0; transform: scale(0); }
 }
 
+/* TopHeader with underline (primary) Tabs as the title — the strip sits on the divider and the
+   actions keep their breathing room above it. The tabs are barely taller than
+   the buttons, so centring the row would park the buttons on the tab line.
+   Plain CSS rather than utilities so it ships in styles.css and does not
+   depend on the consuming app's Tailwind generating arbitrary variants. */
+[data-slot="top-header-row"]:has(> [data-slot="top-header-title"] [data-slot="tabs"][data-tabs-variant="underline"]) {
+  align-items: flex-end;
+  padding-bottom: 0;
+}
+[data-slot="top-header-row"]:has(> [data-slot="top-header-title"] [data-slot="tabs"][data-tabs-variant="underline"])
+  > [data-slot="top-header-action"] {
+  padding-bottom: 8px;
+}
+
 /* AppSidebar — professional green scrollbar */
 [data-slot="app-sidebar-modules-scroll"] {
   scrollbar-width: thin;

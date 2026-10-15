@@ -965,6 +965,7 @@ export function DesignTabs({
         value={activeValue}
         onValueChange={handleChange}
         activationMode={activation}
+        data-tabs-variant={variant}
         className={cn("w-full gap-4", className)}
       >
         {strip}
