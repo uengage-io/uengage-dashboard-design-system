@@ -556,7 +556,10 @@ export const OverflowMenu: Story = {
 
 export const UnsavedChanges: Story = {
   name: "Unsaved changes",
-  args: { tabs: DS_TABS },
+  args: {
+    tabs: DS_TABS,
+    variant: "vertical"
+  },
   parameters: {
     docs: {
       description: {

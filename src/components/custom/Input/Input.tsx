@@ -309,10 +309,18 @@ function Input({
     </button>
   );
 
+  // Icon slot. At least icon-sized, but it grows for text adornments ("min",
+  // "km", "items") instead of squeezing them onto two lines; an SVG is still
+  // drawn at exactly the icon size.
   const glyph = (node: React.ReactNode) => (
     <span
-      className="flex shrink-0 items-center justify-center [&>svg]:size-full"
-      style={{ width: spec.icon, height: spec.icon, color: INPUT_COLORS.icon }}
+      className="flex shrink-0 items-center justify-center whitespace-nowrap [&>svg]:h-(--ue-input-icon) [&>svg]:w-(--ue-input-icon) [&>svg]:shrink-0"
+      style={{
+        minWidth: spec.icon,
+        height: spec.icon,
+        color: INPUT_COLORS.icon,
+        ["--ue-input-icon" as string]: `${spec.icon}px`,
+      }}
     >
       {node}
     </span>

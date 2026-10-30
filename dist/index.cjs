@@ -4257,7 +4257,11 @@ function DesignTabs({
       onValueChange: handleChange,
       activationMode: activation,
       "data-tabs-variant": variant,
-      className: cn("w-full gap-4", className),
+      className: cn(
+        "gap-4",
+        (variant === "segmented" || variant === "pill") && !fitted ? "w-auto max-w-full" : "w-full",
+        className
+      ),
       children: [
         strip,
         children
@@ -5115,8 +5119,13 @@ function Input2({
   const glyph = (node) => /* @__PURE__ */ jsxRuntime.jsx(
     "span",
     {
-      className: "flex shrink-0 items-center justify-center [&>svg]:size-full",
-      style: { width: spec.icon, height: spec.icon, color: INPUT_COLORS.icon },
+      className: "flex shrink-0 items-center justify-center whitespace-nowrap [&>svg]:h-(--ue-input-icon) [&>svg]:w-(--ue-input-icon) [&>svg]:shrink-0",
+      style: {
+        minWidth: spec.icon,
+        height: spec.icon,
+        color: INPUT_COLORS.icon,
+        ["--ue-input-icon"]: `${spec.icon}px`
+      },
       children: node
     }
   );
