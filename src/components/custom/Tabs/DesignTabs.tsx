@@ -966,7 +966,13 @@ export function DesignTabs({
         onValueChange={handleChange}
         activationMode={activation}
         data-tabs-variant={variant}
-        className={cn("w-full gap-4", className)}
+        // Segmented / pill strips size to their content (unless fitted), so they
+        // can sit inline in a toolbar row; underline keeps the full-width rule.
+        className={cn(
+          "gap-4",
+          (variant === "segmented" || variant === "pill") && !fitted ? "w-auto max-w-full" : "w-full",
+          className,
+        )}
       >
         {strip}
         {children}
